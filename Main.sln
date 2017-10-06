@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcxproj", "{8A5E7C54-F164-46A3-A649-886C037F66C5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{E1BCB0FA-57E7-4557-B6CA-A24EEE7A34AC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Triangle", "Apps\Triangle\Triangle.vcxproj", "{F0A13AAC-2FB9-48EF-AC33-5C2478A85243}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8A5E7C54-F164-46A3-A649-886C037F66C5} = {8A5E7C54-F164-46A3-A649-886C037F66C5}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug12|x64 = Debug12|x64
+		DebugVk|x64 = DebugVk|x64
+		Profile12|x64 = Profile12|x64
+		ProfileVk|x64 = ProfileVk|x64
+		Release12|x64 = Release12|x64
+		ReleaseVk|x64 = ReleaseVk|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A5E7C54-F164-46A3-A649-886C037F66C5}.Debug12|x64.ActiveCfg = Debug12|x64
+		{8A5E7C54-F164-46A3-A649-886C037F66C5}.Debug12|x64.Build.0 = Debug12|x64
+		{8A5E7C54-F164-46A3-A649-886C037F66C5}.DebugVk|x64.ActiveCfg = DebugVk|x64
+		{8A5E7C54-F164-46A3-A649-886C037F66C5}.DebugVk|x64.Build.0 = DebugVk|x64
+		{8A5E7C54-F164-46A3-A649-886C037F66C5}.Profile12|x64.ActiveCfg = Profile12|x64
+		{8A5E7C54-F164-46A3-A649-886C037F66C5}.Profile12|x64.Build.0 = Profile12|x64
+		{8A5E7C54-F164-46A3-A649-886C037F66C5}.ProfileVk|x64.ActiveCfg = ProfileVk|x64
+		{8A5E7C54-F164-46A3-A649-886C037F66C5}.ProfileVk|x64.Build.0 = ProfileVk|x64
+		{8A5E7C54-F164-46A3-A649-886C037F66C5}.Release12|x64.ActiveCfg = Release12|x64
+		{8A5E7C54-F164-46A3-A649-886C037F66C5}.Release12|x64.Build.0 = Release12|x64
+		{8A5E7C54-F164-46A3-A649-886C037F66C5}.ReleaseVk|x64.ActiveCfg = ReleaseVk|x64
+		{8A5E7C54-F164-46A3-A649-886C037F66C5}.ReleaseVk|x64.Build.0 = ReleaseVk|x64
+		{F0A13AAC-2FB9-48EF-AC33-5C2478A85243}.Debug12|x64.ActiveCfg = Debug12|x64
+		{F0A13AAC-2FB9-48EF-AC33-5C2478A85243}.Debug12|x64.Build.0 = Debug12|x64
+		{F0A13AAC-2FB9-48EF-AC33-5C2478A85243}.DebugVk|x64.ActiveCfg = DebugVk|x64
+		{F0A13AAC-2FB9-48EF-AC33-5C2478A85243}.DebugVk|x64.Build.0 = DebugVk|x64
+		{F0A13AAC-2FB9-48EF-AC33-5C2478A85243}.Profile12|x64.ActiveCfg = Profile12|x64
+		{F0A13AAC-2FB9-48EF-AC33-5C2478A85243}.Profile12|x64.Build.0 = Profile12|x64
+		{F0A13AAC-2FB9-48EF-AC33-5C2478A85243}.ProfileVk|x64.ActiveCfg = ProfileVk|x64
+		{F0A13AAC-2FB9-48EF-AC33-5C2478A85243}.ProfileVk|x64.Build.0 = ProfileVk|x64
+		{F0A13AAC-2FB9-48EF-AC33-5C2478A85243}.Release12|x64.ActiveCfg = Release12|x64
+		{F0A13AAC-2FB9-48EF-AC33-5C2478A85243}.Release12|x64.Build.0 = Release12|x64
+		{F0A13AAC-2FB9-48EF-AC33-5C2478A85243}.ReleaseVk|x64.ActiveCfg = ReleaseVk|x64
+		{F0A13AAC-2FB9-48EF-AC33-5C2478A85243}.ReleaseVk|x64.Build.0 = ReleaseVk|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F0A13AAC-2FB9-48EF-AC33-5C2478A85243} = {E1BCB0FA-57E7-4557-B6CA-A24EEE7A34AC}
+	EndGlobalSection
+EndGlobal
