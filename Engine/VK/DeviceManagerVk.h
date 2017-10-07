@@ -13,4 +13,11 @@
 namespace Kodiak
 {
 
+// Global accessors
+VkDevice GetDevice();
+
+// Initialization and shutdown
+void InitializeGraphicsDevice(const std::string& appName);
+void ShutdownGraphicsDevice();
+
 } // namespace Kodiak

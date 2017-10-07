@@ -12,24 +12,28 @@
 
 #include "Application.h"
 
+#include "DeviceManager.h"
+
+
 #pragma comment(lib, "runtimeobject.lib")
+
 
 using namespace std;
 using namespace Kodiak;
 
 
 Application::Application()
-	: m_name(s_apiPrefixString + " " + "Unnamed")
+	: m_name("Unnamed")
 {}
 
 
 Application::Application(const string& name)
-	: m_name(s_apiPrefixString + " " + name)
+	: m_name(name)
 {}
 
 
 Application::Application(const string& name, uint32_t displayWidth, uint32_t displayHeight)
-	: m_name(s_apiPrefixString + " " + name)
+	: m_name(name)
 	, m_displayWidth(displayWidth)
 	, m_displayHeight(displayHeight)
 {}
@@ -49,6 +53,8 @@ void Application::Run()
 
 	m_hinst = GetModuleHandle(0);
 
+	string appNameWithAPI = s_apiPrefixString + " " + m_name;
+
 	// Register class
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -61,7 +67,7 @@ void Application::Run()
 	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wcex.lpszMenuName = nullptr;
-	wcex.lpszClassName = m_name.c_str();
+	wcex.lpszClassName = appNameWithAPI.c_str();
 	wcex.hIconSm = LoadIcon(m_hinst, IDI_APPLICATION);
 	assert_msg(0 != RegisterClassEx(&wcex), "Unable to register a window");
 
@@ -69,7 +75,7 @@ void Application::Run()
 	RECT rc = { 0, 0, (LONG)m_displayWidth, (LONG)m_displayHeight };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 
-	m_hwnd = CreateWindow(m_name.c_str(), m_name.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
+	m_hwnd = CreateWindow(appNameWithAPI.c_str(), appNameWithAPI.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
 		rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, m_hinst, nullptr);
 
 	assert(m_hwnd != 0);
@@ -98,12 +104,16 @@ void Application::Initialize()
 {
 	Configure();
 
+	InitializeGraphicsDevice(m_name);
+
 	Startup();
 }
 
 
 void Application::Finalize()
-{}
+{
+	ShutdownGraphicsDevice();
+}
 
 
 bool Application::Tick()
