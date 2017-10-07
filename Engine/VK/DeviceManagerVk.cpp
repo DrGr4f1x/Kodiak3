@@ -12,7 +12,10 @@
 
 #include "DeviceManagerVk.h"
 
+#include "Application.h"
 #include "Utility.h"
+
+#include "SwapChainVk.h"
 
 #include <iostream>
 #include <sstream>
@@ -46,6 +49,11 @@ struct
 } queueFamilyIndices;
 
 vector<VkQueueFamilyProperties> queueFamilyProperties;
+VkQueue s_graphicsQueue;
+
+VkFormat s_depthFormat;
+
+SwapChain s_swapChain;
 
 } // anonymous namespace
 
@@ -63,7 +71,7 @@ VkDevice GetDevice()
 void InitializeDebugging(VkDebugReportFlagsEXT flags, VkDebugReportCallbackEXT callBack);
 uint32_t GetQueueFamilyIndex(VkQueueFlagBits queueFlags);
 bool IsExtensionSupported(const string& name);
-
+bool GetSupportedDepthFormat(VkPhysicalDevice physicalDevice, VkFormat* depthFormat);
 
 void InitializeGraphicsDevice(const string& appName)
 {
@@ -241,11 +249,30 @@ void InitializeGraphicsDevice(const string& appName)
 	}
 
 	VkResult result = vkCreateDevice(s_physicalDevice, &deviceCreateInfo, nullptr, &s_device);
+
+	// Get a graphics queue from the device
+	vkGetDeviceQueue(s_device, queueFamilyIndices.graphics, 0, &s_graphicsQueue);
+
+	// Find a suitable depth format
+	VkBool32 validDepthFormat = GetSupportedDepthFormat(s_physicalDevice, &s_depthFormat);
+	assert(validDepthFormat);
+
+	s_swapChain.Connect(s_instance, s_physicalDevice, s_device);
+
+	auto app = GetApplication();
+
+	s_swapChain.InitSurface(app->GetHINSTANCE(), app->GetHWND());
+
+	auto width = app->GetWidth();
+	auto height = app->GetHeight();
+	s_swapChain.Create(&width, &height);
 }
 
 
 void ShutdownGraphicsDevice()
 {
+	s_swapChain.Destroy();
+
 	vkDestroyDevice(s_device, nullptr);
 	s_device = VK_NULL_HANDLE;
 
@@ -397,6 +424,34 @@ uint32_t GetQueueFamilyIndex(VkQueueFlagBits queueFlags)
 bool IsExtensionSupported(const string& name)
 {
 	return find(begin(supportedExtensions), end(supportedExtensions), name) != end(supportedExtensions);
+}
+
+
+bool GetSupportedDepthFormat(VkPhysicalDevice physicalDevice, VkFormat *depthFormat)
+{
+	// Since all depth formats may be optional, we need to find a suitable depth format to use
+	// Start with the highest precision packed format
+	std::vector<VkFormat> depthFormats = {
+		VK_FORMAT_D32_SFLOAT_S8_UINT,
+		VK_FORMAT_D32_SFLOAT,
+		VK_FORMAT_D24_UNORM_S8_UINT,
+		VK_FORMAT_D16_UNORM_S8_UINT,
+		VK_FORMAT_D16_UNORM
+	};
+
+	for (auto& format : depthFormats)
+	{
+		VkFormatProperties formatProps;
+		vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &formatProps);
+		// Format must support depth stencil attachment for optimal tiling
+		if (formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
+		{
+			*depthFormat = format;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 } // namespace Kodiak

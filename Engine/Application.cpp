@@ -22,6 +22,14 @@ using namespace std;
 using namespace Kodiak;
 
 
+namespace
+{
+
+Application* g_application{ nullptr };
+
+} // anonymous namespace
+
+
 Application::Application()
 	: m_name("Unnamed")
 {}
@@ -80,6 +88,8 @@ void Application::Run()
 
 	assert(m_hwnd != 0);
 
+	g_application = this;
+
 	Initialize();
 
 	ShowWindow(m_hwnd, SW_SHOWDEFAULT);
@@ -102,6 +112,10 @@ void Application::Run()
 
 void Application::Initialize()
 {
+#if ENABLE_VULKAN_VALIDATION
+	CreateConsole("Vulkan validation output");
+#endif
+
 	Configure();
 
 	InitializeGraphicsDevice(m_name);
@@ -112,7 +126,11 @@ void Application::Initialize()
 
 void Application::Finalize()
 {
+	Shutdown();
+
 	ShutdownGraphicsDevice();
+
+	g_application = nullptr;
 }
 
 
@@ -124,6 +142,17 @@ bool Application::Tick()
 		Render();
 	}
 	return res;
+}
+
+
+void Application::CreateConsole(const string& title)
+{
+	AllocConsole();
+	AttachConsole(GetCurrentProcessId());
+	FILE* stream{ nullptr };
+	freopen_s(&stream, "CONOUT$", "w+", stdout);
+	freopen_s(&stream, "CONOUT$", "w+", stderr);
+	SetConsoleTitle(TEXT(title.c_str()));
 }
 
 
@@ -155,4 +184,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 
 	return 0;
+}
+
+
+Application* Kodiak::GetApplication()
+{
+	return g_application;
 }

@@ -13,6 +13,15 @@
     <ClInclude Include="DX12\DeviceManager12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
+    <ClInclude Include="DX12\SwapChain.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\SwapChain12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\SwapChainVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -23,6 +32,12 @@
     </ClCompile>
     <ClCompile Include="DX12\DeviceManager12.cpp">
       <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12\SwapChain12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\SwapChainVk.cpp">
+      <Filter>Graphics\VK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

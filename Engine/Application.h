@@ -31,10 +31,18 @@ public:
 	virtual bool Update() { return true; }
 	virtual void Render() {}
 
+	// Accessors
+	const HINSTANCE GetHINSTANCE() const { return m_hinst; }
+	const HWND GetHWND() const { return m_hwnd; }
+	uint32_t GetWidth() const { return m_displayWidth; }
+	uint32_t GetHeight() const { return m_displayHeight; }
+
 private:
 	void Initialize();
 	void Finalize();
 	bool Tick();
+
+	void CreateConsole(const std::string& title);
 
 private:
 	const std::string m_name;
@@ -45,5 +53,7 @@ private:
 	HINSTANCE m_hinst{ 0 };
 	HWND m_hwnd{ 0 };
 };
+
+Application* GetApplication();
 
 } // namespace Kodiak
