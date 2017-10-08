@@ -139,7 +139,11 @@ bool Application::Tick()
 	bool res = Update();
 	if (res)
 	{
+		PrepareFrame();
+
 		Render();
+
+		SubmitFrame();
 	}
 	return res;
 }

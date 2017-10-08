@@ -29,6 +29,9 @@ public:
 	void Create(uint32_t* width, uint32_t* height, bool vsync = false);
 	void Destroy();
 
+	VkResult AcquireNextImage(VkSemaphore presentCompleteSemaphore, uint32_t* imageIndex);
+	VkResult QueuePresent(VkQueue queue, uint32_t imageIndex, VkSemaphore waitSemaphore = VK_NULL_HANDLE);
+
 private:
 	VkInstance m_instance{ VK_NULL_HANDLE };
 	VkPhysicalDevice m_physicalDevice{ VK_NULL_HANDLE };

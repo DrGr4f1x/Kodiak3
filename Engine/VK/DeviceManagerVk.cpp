@@ -54,6 +54,23 @@ VkQueue s_graphicsQueue;
 VkFormat s_depthFormat;
 
 SwapChain s_swapChain;
+uint32_t s_currentBuffer{ 0 };
+
+// Synchronization semaphores
+struct 
+{
+	// Swap chain image presentation
+	VkSemaphore presentComplete;
+	// Command buffer submission and execution
+	VkSemaphore renderComplete;
+	// Text overlay submission and execution
+	VkSemaphore textOverlayComplete;
+} s_semaphores;
+
+// Contains command buffers and semaphores to be presented to the queue
+VkSubmitInfo s_submitInfo;
+// Pipeline stages used to wait at for graphics queue submissions
+VkPipelineStageFlags s_submitPipelineStages = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
 } // anonymous namespace
 
@@ -259,6 +276,32 @@ void InitializeGraphicsDevice(const string& appName)
 
 	s_swapChain.Connect(s_instance, s_physicalDevice, s_device);
 
+	// Create synchronization objects
+	VkSemaphoreCreateInfo semaphoreCreateInfo{};
+	semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	semaphoreCreateInfo.pNext = nullptr;
+	// Create a semaphore used to synchronize image presentation
+	// Ensures that the image is displayed before we start submitting new commands to the queu
+	ThrowIfFailed(vkCreateSemaphore(s_device, &semaphoreCreateInfo, nullptr, &s_semaphores.presentComplete));
+	// Create a semaphore used to synchronize command submission
+	// Ensures that the image is not presented until all commands have been submitted and executed
+	ThrowIfFailed(vkCreateSemaphore(s_device, &semaphoreCreateInfo, nullptr, &s_semaphores.renderComplete));
+	// Create a semaphore used to synchronize command submission
+	// Ensures that the image is not presented until all commands for the text overlay have been sumbitted and executed
+	// Will be inserted after the render complete semaphore if the text overlay is enabled
+	ThrowIfFailed(vkCreateSemaphore(s_device, &semaphoreCreateInfo, nullptr, &s_semaphores.textOverlayComplete));
+
+	// Set up submit info structure
+	// Semaphores will stay the same during application lifetime
+	// Command buffer submission info is set by each example
+	s_submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	s_submitInfo.pNext = nullptr;
+	s_submitInfo.pWaitDstStageMask = &s_submitPipelineStages;
+	s_submitInfo.waitSemaphoreCount = 1;
+	s_submitInfo.pWaitSemaphores = &s_semaphores.presentComplete;
+	s_submitInfo.signalSemaphoreCount = 1;
+	s_submitInfo.pSignalSemaphores = &s_semaphores.renderComplete;
+
 	auto app = GetApplication();
 
 	s_swapChain.InitSurface(app->GetHINSTANCE(), app->GetHWND());
@@ -280,6 +323,34 @@ void ShutdownGraphicsDevice()
 
 	vkDestroyInstance(s_instance, nullptr);
 	s_instance = VK_NULL_HANDLE;
+}
+
+
+void PrepareFrame()
+{
+	// Acquire the next image from the swap chain
+	VkResult err = s_swapChain.AcquireNextImage(s_semaphores.presentComplete, &s_currentBuffer);
+
+	ThrowIfFailed(err);
+
+	// TODO:
+	// Recreate the swapchain if it's no longer compatible with the surface (OUT_OF_DATE) or no longer optimal for presentation (SUBOPTIMAL)
+	/*if ((err == VK_ERROR_OUT_OF_DATE_KHR) || (err == VK_SUBOPTIMAL_KHR)) 
+	{
+		WindowResize();
+	}
+	else 
+	{
+		ThrowIfFailed(err);
+	}*/
+}
+
+
+void SubmitFrame()
+{
+	ThrowIfFailed(s_swapChain.QueuePresent(s_graphicsQueue, s_currentBuffer, s_semaphores.renderComplete));
+
+	ThrowIfFailed(vkQueueWaitIdle(s_graphicsQueue));
 }
 
 

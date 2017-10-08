@@ -20,4 +20,7 @@ VkDevice GetDevice();
 void InitializeGraphicsDevice(const std::string& appName);
 void ShutdownGraphicsDevice();
 
+void PrepareFrame();
+void SubmitFrame();
+
 } // namespace Kodiak
