@@ -12,7 +12,7 @@
 
 #include "Application.h"
 
-#include "DeviceManager.h"
+#include "GraphicsDevice.h"
 
 
 #pragma comment(lib, "runtimeobject.lib")
@@ -118,7 +118,8 @@ void Application::Initialize()
 
 	Configure();
 
-	InitializeGraphicsDevice(m_name);
+	m_graphicsDevice = make_unique<GraphicsDevice>();
+	m_graphicsDevice->Initialize(m_name, m_hinst, m_hwnd, m_displayWidth, m_displayHeight);
 
 	Startup();
 }
@@ -128,7 +129,8 @@ void Application::Finalize()
 {
 	Shutdown();
 
-	ShutdownGraphicsDevice();
+	m_graphicsDevice->Destroy();
+	m_graphicsDevice.reset();
 
 	g_application = nullptr;
 }
@@ -139,11 +141,11 @@ bool Application::Tick()
 	bool res = Update();
 	if (res)
 	{
-		PrepareFrame();
+		m_graphicsDevice->PrepareFrame();
 
 		Render();
 
-		SubmitFrame();
+		m_graphicsDevice->SubmitFrame();
 	}
 	return res;
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<ArrayOfArrayOfArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ArrayOfArrayOfString>
+    <ArrayOfString>
+      <string>D:\Kodiak3\Apps\Triangle\Main.cpp</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Kodiak3\Apps\Triangle\Stdafx.cpp</string>
+      <string>D:\Kodiak3\Engine\Stdafx.h</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Kodiak3\Engine\Application.cpp</string>
+      <string>D:\Kodiak3\Engine\Application.h</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Kodiak3\Apps\Triangle\TriangleApp.cpp</string>
+      <string>D:\Kodiak3\Apps\Triangle\TriangleApp.h</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Kodiak3\Engine\VK\GraphicsDeviceVk.cpp</string>
+      <string>D:\Kodiak3\Engine\VK\GraphicsDeviceVk.h</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Kodiak3\Engine\VK\DeviceManagerVk.cpp</string>
+      <string>D:\Kodiak3\Engine\VK\DeviceManagerVk.h</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Kodiak3\Engine\VK\SwapChainVk.cpp</string>
+      <string>D:\Kodiak3\Engine\VK\SwapChainVk.h</string>
+    </ArrayOfString>
+  </ArrayOfArrayOfString>
+</ArrayOfArrayOfArrayOfString>

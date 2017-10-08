@@ -13,6 +13,8 @@
 namespace Kodiak
 {
 
+class GraphicsDevice;
+
 class Application
 {
 public:
@@ -52,6 +54,8 @@ private:
 
 	HINSTANCE m_hinst{ 0 };
 	HWND m_hwnd{ 0 };
+
+	std::unique_ptr<GraphicsDevice> m_graphicsDevice;
 };
 
 Application* GetApplication();

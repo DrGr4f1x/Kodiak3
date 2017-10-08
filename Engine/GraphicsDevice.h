@@ -10,17 +10,10 @@
 
 #pragma once
 
-namespace Kodiak
-{
-
-// Global accessors
-VkDevice GetDevice();
-
-// Initialization and shutdown
-void InitializeGraphicsDevice(const std::string& appName);
-void ShutdownGraphicsDevice();
-
-void PrepareFrame();
-void SubmitFrame();
-
-} // namespace Kodiak
+#if defined(DX12)
+#include "DX12\GraphicsDevice12.h"
+#elif defined(VK)
+#include "VK\GraphicsDeviceVk.h"
+#else
+#error "No graphics API defined"
+#endif

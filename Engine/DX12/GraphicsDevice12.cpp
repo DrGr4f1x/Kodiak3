@@ -8,12 +8,6 @@
 // Author:  David Elder
 //
 
-#pragma once
+#include "Stdafx.h"
 
-#if defined(DX12)
-#include "DX12\DeviceManager12.h"
-#elif defined(VK)
-#include "VK\DeviceManagerVk.h"
-#else
-#error "No graphics API defined"
-#endif
+#include "GraphicsDevice12.h"
