@@ -112,8 +112,8 @@ void Application::Run()
 
 void Application::Initialize()
 {
-#if ENABLE_VULKAN_VALIDATION
-	CreateConsole("Vulkan validation output");
+#if ENABLE_VULKAN_VALIDATION || (defined(DX12) && _DEBUG)
+	CreateConsole("Validation output");
 #endif
 
 	Configure();

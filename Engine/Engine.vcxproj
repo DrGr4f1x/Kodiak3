@@ -212,6 +212,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="DX12\CommandAllocatorPool12.h" />
+    <ClInclude Include="DX12\CommandListManager12.h" />
     <ClInclude Include="DX12\GraphicsDevice12.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
@@ -231,10 +233,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="VK\SwapChainVk.h" />
+    <ClInclude Include="VK\SwapChainVk.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="DX12\CommandAllocatorPool12.cpp" />
+    <ClCompile Include="DX12\CommandListManager12.cpp" />
     <ClCompile Include="DX12\GraphicsDevice12.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
@@ -259,7 +267,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="VK\SwapChainVk.cpp" />
+    <ClCompile Include="VK\SwapChainVk.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -13,4 +13,18 @@
 namespace Kodiak
 {
 
+class SwapChain
+{
+public:
+	void Create(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height, DXGI_FORMAT format);
+	void Destroy();
+
+	void Present(UINT presentInterval);
+
+	static uint32_t GetBufferCount();
+
+private:
+	Microsoft::WRL::ComPtr<IDXGISwapChain1> m_swapChain;
+};
+
 } // namespace Kodiak

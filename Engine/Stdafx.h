@@ -58,6 +58,10 @@ inline void ThrowIfFailed(HRESULT hr)
 #define D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN   ((D3D12_GPU_VIRTUAL_ADDRESS)-1)
 const std::string s_apiPrefixString = "[DirectX 12]";
 
+#ifndef SAFE_RELEASE
+#define SAFE_RELEASE(x) if (x != nullptr) { x->Release(); x = nullptr; }
+#endif
+
 #elif defined(VK)
 
 #define FORCE_VULKAN_VALIDATION 0
