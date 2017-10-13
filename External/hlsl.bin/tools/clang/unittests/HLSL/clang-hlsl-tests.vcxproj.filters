@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\AllocatorTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\CompilerTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\DxilContainerTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\DxilModuleTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\DXIsenseTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\ExecutionTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\ExtensionTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\FileCheckerTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\FileCheckForTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\FunctionTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\LinkerTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\MSFileSysTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\Objects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\OptionsTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\RewriterTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\ShaderOpTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\SystemValueTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\ValidationTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\VerifierTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\CompilationResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\HLSLTestData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\HlslTestUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\DxcTestUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\ShaderOpTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\d3dx12.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\HLSL\clang-hlsl-tests.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\resources\windows_version_resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{E894C98A-4F8E-3985-BDB2-102F75BB4DB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{F09853BC-A963-38CA-830D-FD24FD7768CD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{07D5AE5D-FD8B-3E6D-AE07-9EC5CF4D78BC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

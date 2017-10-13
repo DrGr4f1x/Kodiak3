@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\lib\Driver\DriverOptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\Action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\Compilation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\Driver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\DriverDiagnostic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\Job.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\Multilib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\Options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\Phases.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\SanitizerArgs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\Tool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\ToolChain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\Util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\Types.def">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\CC1Options.td">
+      <Filter>TableGen descriptions</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\CLCompatOptions.td">
+      <Filter>TableGen descriptions</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Driver\Options.td">
+      <Filter>TableGen descriptions</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\lib\Driver\InputInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\lib\Driver\ToolChains.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\lib\Driver\Tools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\lib\Driver\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{E894C98A-4F8E-3985-BDB2-102F75BB4DB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{F09853BC-A963-38CA-830D-FD24FD7768CD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TableGen descriptions">
+      <UniqueIdentifier>{F9F05186-8627-3A1C-824D-3BC6969C2F20}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

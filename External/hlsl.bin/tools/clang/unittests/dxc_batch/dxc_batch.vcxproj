@@ -1,0 +1,553 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{CA22E093-3028-39E7-916C-0DD18BDF34E5}</ProjectGUID>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>dxc_batch</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Kodiak3\External\hlsl.bin\Debug\bin\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dxc_batch.dir\Debug\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">dxc_batch</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Kodiak3\External\hlsl.bin\Release\bin\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dxc_batch.dir\Release\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">dxc_batch</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Kodiak3\External\hlsl.bin\MinSizeRel\bin\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">dxc_batch.dir\MinSizeRel\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">dxc_batch</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Kodiak3\External\hlsl.bin\RelWithDebInfo\bin\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">dxc_batch.dir\RelWithDebInfo\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">dxc_batch</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalOptions> /Zc:sizedDealloc- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include;D:\Kodiak3\External\hlsl.bin\tools\clang\include;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4146;4180;4244;4258;4267;4291;4345;4351;4355;4456;4457;4458;4459;4503;4624;4722;4800;4100;4127;4512;4505;4610;4510;4702;4245;4706;4310;4701;4703;4389;4611;4805;4204;4324</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>4238</TreatSpecificWarningsAsErrors>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UndefinePreprocessorDefinitions>NDEBUG;NDEBUG;NDEBUG;NDEBUG</UndefinePreprocessorDefinitions>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;DBG;DBG;DBG;DBG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_GNU_SOURCE;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;DBG;DBG;DBG;DBG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_GNU_SOURCE;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include;D:\Kodiak3\External\hlsl.bin\tools\clang\include;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include;D:\Kodiak3\External\hlsl.bin\tools\clang\include;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\..\..\..\Debug\lib\LLVMAnalysis.lib;..\..\..\..\Debug\lib\LLVMipa.lib;..\..\..\..\Debug\lib\LLVMDxcSupport.lib;..\..\..\..\Debug\lib\LLVMHLSL.lib;..\..\..\..\Debug\lib\LLVMOption.lib;..\..\..\..\Debug\lib\LLVMSupport.lib;..\..\..\..\Debug\lib\LLVMMSSupport.lib;..\..\..\..\Debug\lib\clangAST.lib;..\..\..\..\Debug\lib\clangCodeGen.lib;..\..\..\..\Debug\lib\clangSema.lib;..\..\..\..\Debug\lib\dxcompiler.lib;..\..\..\..\Debug\lib\dxlib_sample.lib;..\..\..\..\Debug\lib\clangFrontend.lib;..\..\..\..\Debug\lib\clangDriver.lib;..\..\..\..\Debug\lib\LLVMOption.lib;..\..\..\..\Debug\lib\clangParse.lib;..\..\..\..\Debug\lib\clangSema.lib;..\..\..\..\Debug\lib\clangAnalysis.lib;..\..\..\..\Debug\lib\clangEdit.lib;..\..\..\..\Debug\lib\clangAST.lib;..\..\..\..\Debug\lib\clangLex.lib;..\..\..\..\Debug\lib\clangBasic.lib;..\..\..\..\Debug\lib\LLVMBitWriter.lib;..\..\..\..\Debug\lib\LLVMipo.lib;..\..\..\..\Debug\lib\LLVMVectorize.lib;..\..\..\..\Debug\lib\LLVMIRReader.lib;..\..\..\..\Debug\lib\LLVMBitReader.lib;..\..\..\..\Debug\lib\LLVMAsmParser.lib;..\..\..\..\Debug\lib\LLVMLinker.lib;..\..\..\..\Debug\lib\LLVMScalarOpts.lib;..\..\..\..\Debug\lib\LLVMInstCombine.lib;..\..\..\..\Debug\lib\LLVMProfileData.lib;..\..\..\..\Debug\lib\LLVMTarget.lib;..\..\..\..\Debug\lib\LLVMTransformUtils.lib;..\..\..\..\Debug\lib\LLVMipa.lib;..\..\..\..\Debug\lib\LLVMAnalysis.lib;..\..\..\..\Debug\lib\LLVMCore.lib;..\..\..\..\Debug\lib\LLVMSupport.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>Debug</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Kodiak3/External/hlsl.bin/Debug/lib/dxc_batch.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Kodiak3/External/hlsl.bin/Debug/bin/dxc_batch.pdb</ProgramDataBaseFile>
+      <StackReserveSize>10000000</StackReserveSize>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalOptions> /Zc:sizedDealloc- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include;D:\Kodiak3\External\hlsl.bin\tools\clang\include;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4146;4180;4244;4258;4267;4291;4345;4351;4355;4456;4457;4458;4459;4503;4624;4722;4800;4100;4127;4512;4505;4610;4510;4702;4245;4706;4310;4701;4703;4389;4611;4805;4204;4324</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>4238</TreatSpecificWarningsAsErrors>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_GNU_SOURCE;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_GNU_SOURCE;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include;D:\Kodiak3\External\hlsl.bin\tools\clang\include;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include;D:\Kodiak3\External\hlsl.bin\tools\clang\include;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\..\..\..\Release\lib\LLVMAnalysis.lib;..\..\..\..\Release\lib\LLVMipa.lib;..\..\..\..\Release\lib\LLVMDxcSupport.lib;..\..\..\..\Release\lib\LLVMHLSL.lib;..\..\..\..\Release\lib\LLVMOption.lib;..\..\..\..\Release\lib\LLVMSupport.lib;..\..\..\..\Release\lib\LLVMMSSupport.lib;..\..\..\..\Release\lib\clangAST.lib;..\..\..\..\Release\lib\clangCodeGen.lib;..\..\..\..\Release\lib\clangSema.lib;..\..\..\..\Release\lib\dxcompiler.lib;..\..\..\..\Release\lib\dxlib_sample.lib;..\..\..\..\Release\lib\clangFrontend.lib;..\..\..\..\Release\lib\clangDriver.lib;..\..\..\..\Release\lib\LLVMOption.lib;..\..\..\..\Release\lib\clangParse.lib;..\..\..\..\Release\lib\clangSema.lib;..\..\..\..\Release\lib\clangAnalysis.lib;..\..\..\..\Release\lib\clangEdit.lib;..\..\..\..\Release\lib\clangAST.lib;..\..\..\..\Release\lib\clangLex.lib;..\..\..\..\Release\lib\clangBasic.lib;..\..\..\..\Release\lib\LLVMBitWriter.lib;..\..\..\..\Release\lib\LLVMipo.lib;..\..\..\..\Release\lib\LLVMVectorize.lib;..\..\..\..\Release\lib\LLVMIRReader.lib;..\..\..\..\Release\lib\LLVMBitReader.lib;..\..\..\..\Release\lib\LLVMAsmParser.lib;..\..\..\..\Release\lib\LLVMLinker.lib;..\..\..\..\Release\lib\LLVMScalarOpts.lib;..\..\..\..\Release\lib\LLVMInstCombine.lib;..\..\..\..\Release\lib\LLVMProfileData.lib;..\..\..\..\Release\lib\LLVMTarget.lib;..\..\..\..\Release\lib\LLVMTransformUtils.lib;..\..\..\..\Release\lib\LLVMipa.lib;..\..\..\..\Release\lib\LLVMAnalysis.lib;..\..\..\..\Release\lib\LLVMCore.lib;..\..\..\..\Release\lib\LLVMSupport.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>No</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Kodiak3/External/hlsl.bin/Release/lib/dxc_batch.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Kodiak3/External/hlsl.bin/Release/bin/dxc_batch.pdb</ProgramDataBaseFile>
+      <StackReserveSize>10000000</StackReserveSize>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalOptions> /Zc:sizedDealloc- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include;D:\Kodiak3\External\hlsl.bin\tools\clang\include;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4146;4180;4244;4258;4267;4291;4345;4351;4355;4456;4457;4458;4459;4503;4624;4722;4800;4100;4127;4512;4505;4610;4510;4702;4245;4706;4310;4701;4703;4389;4611;4805;4204;4324</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>4238</TreatSpecificWarningsAsErrors>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_GNU_SOURCE;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat></DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_GNU_SOURCE;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include;D:\Kodiak3\External\hlsl.bin\tools\clang\include;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include;D:\Kodiak3\External\hlsl.bin\tools\clang\include;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\..\..\..\MinSizeRel\lib\LLVMAnalysis.lib;..\..\..\..\MinSizeRel\lib\LLVMipa.lib;..\..\..\..\MinSizeRel\lib\LLVMDxcSupport.lib;..\..\..\..\MinSizeRel\lib\LLVMHLSL.lib;..\..\..\..\MinSizeRel\lib\LLVMOption.lib;..\..\..\..\MinSizeRel\lib\LLVMSupport.lib;..\..\..\..\MinSizeRel\lib\LLVMMSSupport.lib;..\..\..\..\MinSizeRel\lib\clangAST.lib;..\..\..\..\MinSizeRel\lib\clangCodeGen.lib;..\..\..\..\MinSizeRel\lib\clangSema.lib;..\..\..\..\MinSizeRel\lib\dxcompiler.lib;..\..\..\..\MinSizeRel\lib\dxlib_sample.lib;..\..\..\..\MinSizeRel\lib\clangFrontend.lib;..\..\..\..\MinSizeRel\lib\clangDriver.lib;..\..\..\..\MinSizeRel\lib\LLVMOption.lib;..\..\..\..\MinSizeRel\lib\clangParse.lib;..\..\..\..\MinSizeRel\lib\clangSema.lib;..\..\..\..\MinSizeRel\lib\clangAnalysis.lib;..\..\..\..\MinSizeRel\lib\clangEdit.lib;..\..\..\..\MinSizeRel\lib\clangAST.lib;..\..\..\..\MinSizeRel\lib\clangLex.lib;..\..\..\..\MinSizeRel\lib\clangBasic.lib;..\..\..\..\MinSizeRel\lib\LLVMBitWriter.lib;..\..\..\..\MinSizeRel\lib\LLVMipo.lib;..\..\..\..\MinSizeRel\lib\LLVMVectorize.lib;..\..\..\..\MinSizeRel\lib\LLVMIRReader.lib;..\..\..\..\MinSizeRel\lib\LLVMBitReader.lib;..\..\..\..\MinSizeRel\lib\LLVMAsmParser.lib;..\..\..\..\MinSizeRel\lib\LLVMLinker.lib;..\..\..\..\MinSizeRel\lib\LLVMScalarOpts.lib;..\..\..\..\MinSizeRel\lib\LLVMInstCombine.lib;..\..\..\..\MinSizeRel\lib\LLVMProfileData.lib;..\..\..\..\MinSizeRel\lib\LLVMTarget.lib;..\..\..\..\MinSizeRel\lib\LLVMTransformUtils.lib;..\..\..\..\MinSizeRel\lib\LLVMipa.lib;..\..\..\..\MinSizeRel\lib\LLVMAnalysis.lib;..\..\..\..\MinSizeRel\lib\LLVMCore.lib;..\..\..\..\MinSizeRel\lib\LLVMSupport.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>No</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Kodiak3/External/hlsl.bin/MinSizeRel/lib/dxc_batch.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Kodiak3/External/hlsl.bin/MinSizeRel/bin/dxc_batch.pdb</ProgramDataBaseFile>
+      <StackReserveSize>10000000</StackReserveSize>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalOptions> /Zc:sizedDealloc- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include;D:\Kodiak3\External\hlsl.bin\tools\clang\include;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4146;4180;4244;4258;4267;4291;4345;4351;4355;4456;4457;4458;4459;4503;4624;4722;4800;4100;4127;4512;4505;4610;4510;4702;4245;4706;4310;4701;4703;4389;4611;4805;4204;4324</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>4238</TreatSpecificWarningsAsErrors>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_GNU_SOURCE;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_GNU_SOURCE;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include;D:\Kodiak3\External\hlsl.bin\tools\clang\include;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include;D:\Kodiak3\External\hlsl.bin\tools\clang\include;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\..\..\..\RelWithDebInfo\lib\LLVMAnalysis.lib;..\..\..\..\RelWithDebInfo\lib\LLVMipa.lib;..\..\..\..\RelWithDebInfo\lib\LLVMDxcSupport.lib;..\..\..\..\RelWithDebInfo\lib\LLVMHLSL.lib;..\..\..\..\RelWithDebInfo\lib\LLVMOption.lib;..\..\..\..\RelWithDebInfo\lib\LLVMSupport.lib;..\..\..\..\RelWithDebInfo\lib\LLVMMSSupport.lib;..\..\..\..\RelWithDebInfo\lib\clangAST.lib;..\..\..\..\RelWithDebInfo\lib\clangCodeGen.lib;..\..\..\..\RelWithDebInfo\lib\clangSema.lib;..\..\..\..\RelWithDebInfo\lib\dxcompiler.lib;..\..\..\..\RelWithDebInfo\lib\dxlib_sample.lib;..\..\..\..\RelWithDebInfo\lib\clangFrontend.lib;..\..\..\..\RelWithDebInfo\lib\clangDriver.lib;..\..\..\..\RelWithDebInfo\lib\LLVMOption.lib;..\..\..\..\RelWithDebInfo\lib\clangParse.lib;..\..\..\..\RelWithDebInfo\lib\clangSema.lib;..\..\..\..\RelWithDebInfo\lib\clangAnalysis.lib;..\..\..\..\RelWithDebInfo\lib\clangEdit.lib;..\..\..\..\RelWithDebInfo\lib\clangAST.lib;..\..\..\..\RelWithDebInfo\lib\clangLex.lib;..\..\..\..\RelWithDebInfo\lib\clangBasic.lib;..\..\..\..\RelWithDebInfo\lib\LLVMBitWriter.lib;..\..\..\..\RelWithDebInfo\lib\LLVMipo.lib;..\..\..\..\RelWithDebInfo\lib\LLVMVectorize.lib;..\..\..\..\RelWithDebInfo\lib\LLVMIRReader.lib;..\..\..\..\RelWithDebInfo\lib\LLVMBitReader.lib;..\..\..\..\RelWithDebInfo\lib\LLVMAsmParser.lib;..\..\..\..\RelWithDebInfo\lib\LLVMLinker.lib;..\..\..\..\RelWithDebInfo\lib\LLVMScalarOpts.lib;..\..\..\..\RelWithDebInfo\lib\LLVMInstCombine.lib;..\..\..\..\RelWithDebInfo\lib\LLVMProfileData.lib;..\..\..\..\RelWithDebInfo\lib\LLVMTarget.lib;..\..\..\..\RelWithDebInfo\lib\LLVMTransformUtils.lib;..\..\..\..\RelWithDebInfo\lib\LLVMipa.lib;..\..\..\..\RelWithDebInfo\lib\LLVMAnalysis.lib;..\..\..\..\RelWithDebInfo\lib\LLVMCore.lib;..\..\..\..\RelWithDebInfo\lib\LLVMSupport.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>Debug</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Kodiak3/External/hlsl.bin/RelWithDebInfo/lib/dxc_batch.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Kodiak3/External/hlsl.bin/RelWithDebInfo/bin/dxc_batch.pdb</ProgramDataBaseFile>
+      <StackReserveSize>10000000</StackReserveSize>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Kodiak3/External/DirectXShaderCompiler/tools/clang/unittests/dxc_batch/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Kodiak3/External/DirectXShaderCompiler -BD:/Kodiak3/External/hlsl.bin --check-stamp-file D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:/Kodiak3/External/DirectXShaderCompiler/tools/clang/unittests/dxc_batch/CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch\CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Kodiak3/External/DirectXShaderCompiler/tools/clang/unittests/dxc_batch/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Kodiak3/External/DirectXShaderCompiler -BD:/Kodiak3/External/hlsl.bin --check-stamp-file D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:/Kodiak3/External/DirectXShaderCompiler/tools/clang/unittests/dxc_batch/CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch\CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/Kodiak3/External/DirectXShaderCompiler/tools/clang/unittests/dxc_batch/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Kodiak3/External/DirectXShaderCompiler -BD:/Kodiak3/External/hlsl.bin --check-stamp-file D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:/Kodiak3/External/DirectXShaderCompiler/tools/clang/unittests/dxc_batch/CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch\CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/Kodiak3/External/DirectXShaderCompiler/tools/clang/unittests/dxc_batch/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Kodiak3/External/DirectXShaderCompiler -BD:/Kodiak3/External/hlsl.bin --check-stamp-file D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:/Kodiak3/External/DirectXShaderCompiler/tools/clang/unittests/dxc_batch/CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch\CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Kodiak3\External\hlsl.bin\tools\clang\unittests\dxc_batch\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\unittests\dxc_batch\dxc_batch.cpp"  />
+    <ResourceCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\resources\windows_version_resource.rc" >
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</SuppressStartupBanner>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">RC_VERSION_FIELD_1=3;RC_VERSION_FIELD_2=7;RC_VERSION_FIELD_3=0;RC_VERSION_FIELD_4=0;RC_FILE_VERSION=\"3.7 (LLVM 3.7-3a6f80e)\";RC_INTERNAL_NAME=\"dxc_batch\";RC_PRODUCT_NAME=\"clang\";RC_PRODUCT_VERSION=\"3.7 (LLVM 3.7-3a6f80e)\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</SuppressStartupBanner>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">RC_VERSION_FIELD_1=3;RC_VERSION_FIELD_2=7;RC_VERSION_FIELD_3=0;RC_VERSION_FIELD_4=0;RC_FILE_VERSION=\"3.7 (LLVM 3.7-3a6f80e)\";RC_INTERNAL_NAME=\"dxc_batch\";RC_PRODUCT_NAME=\"clang\";RC_PRODUCT_VERSION=\"3.7 (LLVM 3.7-3a6f80e)\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</SuppressStartupBanner>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">RC_VERSION_FIELD_1=3;RC_VERSION_FIELD_2=7;RC_VERSION_FIELD_3=0;RC_VERSION_FIELD_4=0;RC_FILE_VERSION=\"3.7 (LLVM 3.7-3a6f80e)\";RC_INTERNAL_NAME=\"dxc_batch\";RC_PRODUCT_NAME=\"clang\";RC_PRODUCT_VERSION=\"3.7 (LLVM 3.7-3a6f80e)\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</SuppressStartupBanner>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">RC_VERSION_FIELD_1=3;RC_VERSION_FIELD_2=7;RC_VERSION_FIELD_3=0;RC_VERSION_FIELD_4=0;RC_FILE_VERSION=\"3.7 (LLVM 3.7-3a6f80e)\";RC_INTERNAL_NAME=\"dxc_batch\";RC_PRODUCT_NAME=\"clang\";RC_PRODUCT_VERSION=\"3.7 (LLVM 3.7-3a6f80e)\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/ZERO_CHECK.vcxproj">
+      <Project>D00E1A65-C65F-346C-835A-5F807D749729</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/AST/ClangAttrClasses.vcxproj">
+      <Project>A6C019EC-A3B5-301D-A687-E709F2AA9036</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/AST/ClangAttrDump.vcxproj">
+      <Project>40753834-55E0-3F40-BDC7-56955466E705</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangAttrHasAttributeImpl.vcxproj">
+      <Project>08B9281F-76B0-360A-B63C-1C0B615CE7F6</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/AST/ClangAttrImpl.vcxproj">
+      <Project>E02E1424-D1AD-3A80-939B-6559B0041423</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangAttrList.vcxproj">
+      <Project>CFBF8688-11DD-36A7-9C8D-B22176AA2A60</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Serialization/ClangAttrPCHRead.vcxproj">
+      <Project>F1F5C7E3-0F16-369E-90BD-B5298384AC99</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Serialization/ClangAttrPCHWrite.vcxproj">
+      <Project>3C529308-443B-3395-AA47-9141D80B5355</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Sema/ClangAttrParsedAttrImpl.vcxproj">
+      <Project>962A9358-D100-394D-BE37-4C4DCEB1DC81</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Sema/ClangAttrParsedAttrKinds.vcxproj">
+      <Project>125814C9-0F6C-3A5D-A1AD-CF9E3B64039D</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Sema/ClangAttrParsedAttrList.vcxproj">
+      <Project>D9C9C6AE-8751-3AAA-8123-F4D503D51C5C</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Parse/ClangAttrParserStringSwitches.vcxproj">
+      <Project>B7D01DE7-BC93-3330-BFED-BFEE64CB79B5</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Sema/ClangAttrSpellingListIndex.vcxproj">
+      <Project>29951880-6DF2-3D2F-9B46-028B21DED6B8</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Sema/ClangAttrTemplateInstantiate.vcxproj">
+      <Project>C03D2264-014A-380B-ACA1-47B7B8F2F3E9</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/AST/ClangAttrVisitor.vcxproj">
+      <Project>B7A4E27D-EE82-3F1E-931A-FBCBC750AAF4</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/AST/ClangCommentCommandInfo.vcxproj">
+      <Project>7F696A16-672E-34B8-B318-862D27884077</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/AST/ClangCommentCommandList.vcxproj">
+      <Project>E964F960-3C17-35B4-A9B0-E01784D22BDC</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/AST/ClangCommentHTMLNamedCharacterReferences.vcxproj">
+      <Project>B07ED4A0-D3ED-3E21-AED3-8F39C7725515</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/AST/ClangCommentHTMLTags.vcxproj">
+      <Project>DC9288A3-5E0F-3852-9C97-728B462B8BFC</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/AST/ClangCommentHTMLTagsProperties.vcxproj">
+      <Project>88431FAF-E41A-3A52-93D2-98CBB684DEA8</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/AST/ClangCommentNodes.vcxproj">
+      <Project>BDAA5C29-51A1-3833-859A-F006AB344FA2</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/AST/ClangDeclNodes.vcxproj">
+      <Project>0FA5D20E-7A1A-38EF-8DC1-404B8B88A7D0</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangDiagnosticAST.vcxproj">
+      <Project>AF118AC0-94D4-323C-A552-EAE10AE00DAF</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangDiagnosticAnalysis.vcxproj">
+      <Project>E2C6BCA2-E468-35B2-B626-FB92F009F20B</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangDiagnosticComment.vcxproj">
+      <Project>7A9C5526-766F-3521-BB5C-AC5C43CDB8AB</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangDiagnosticCommon.vcxproj">
+      <Project>8A332C24-2E92-332C-8BFF-0FAC6CDA5636</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangDiagnosticDriver.vcxproj">
+      <Project>41C01541-11C1-354C-AADC-8576A332AA7C</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangDiagnosticFrontend.vcxproj">
+      <Project>B0E397BD-F0D9-3597-84C0-273A0803717E</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangDiagnosticGroups.vcxproj">
+      <Project>8ABCCC8A-508A-3D08-830F-A94A73DFCB6E</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangDiagnosticIndexName.vcxproj">
+      <Project>B366AF2B-8946-3E6B-B771-D892A56BBA41</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangDiagnosticLex.vcxproj">
+      <Project>4C7E049E-B5C5-3D66-80AC-C8EE851CED58</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangDiagnosticParse.vcxproj">
+      <Project>9F30BE40-DEEF-3CFE-B4BB-472C8DC11E88</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangDiagnosticSema.vcxproj">
+      <Project>D76D4E11-8D96-38AE-B6DB-3ABA3D915616</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/Basic/ClangDiagnosticSerialization.vcxproj">
+      <Project>5AFFACA4-ADB2-3B5B-BFE0-63F5D3FB2493</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/include/clang/AST/ClangStmtNodes.vcxproj">
+      <Project>065CC7CC-E144-39EB-A290-E883984CCF40</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Analysis/LLVMAnalysis.vcxproj">
+      <Project>C7DC381F-C925-3E0B-A1E2-9FAE6139E9AA</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/AsmParser/LLVMAsmParser.vcxproj">
+      <Project>67642DFC-200B-3C59-ACAF-2CC9880595FF</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Bitcode/Reader/LLVMBitReader.vcxproj">
+      <Project>81D2200A-D6A3-379C-ABC6-58027BD8E390</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Bitcode/Writer/LLVMBitWriter.vcxproj">
+      <Project>76B1284E-50BC-3486-A6B6-2B24DC7677FA</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/IR/LLVMCore.vcxproj">
+      <Project>1D2DF4FF-9D81-3F13-ACB6-023B255D574F</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/DxcSupport/LLVMDxcSupport.vcxproj">
+      <Project>77E9E8F7-B2CA-3DBB-9A68-CD187F9A2C18</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/HLSL/LLVMHLSL.vcxproj">
+      <Project>3D41D29C-D54E-3356-9016-17090B27B5C1</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/IRReader/LLVMIRReader.vcxproj">
+      <Project>8C66720F-7F6C-3835-AE2A-47B5A66C565C</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Transforms/InstCombine/LLVMInstCombine.vcxproj">
+      <Project>6F18C072-F4BC-36F0-9AA1-FE39EBB6C626</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Linker/LLVMLinker.vcxproj">
+      <Project>B00C8793-D0A5-371A-BF0E-E13D8FF4622B</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/MSSupport/LLVMMSSupport.vcxproj">
+      <Project>CDB9ACC6-427F-3968-B966-DDEDC16291FC</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Option/LLVMOption.vcxproj">
+      <Project>8BC2298C-01F4-393D-8674-4AAD571A8731</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/ProfileData/LLVMProfileData.vcxproj">
+      <Project>582F5E06-6C19-308E-AE20-B95D946B9B16</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Transforms/Scalar/LLVMScalarOpts.vcxproj">
+      <Project>D630958B-F458-3937-93CC-64C8D8D6A5E7</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Support/LLVMSupport.vcxproj">
+      <Project>862D746E-CA56-3B21-B7C7-A3E7B4D4265C</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Target/LLVMTarget.vcxproj">
+      <Project>F83B87C6-A138-3BB1-9DB2-9C93ECECE484</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Transforms/Utils/LLVMTransformUtils.vcxproj">
+      <Project>7298E1AC-BC88-3C3D-824E-E675B22D9A05</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Transforms/Vectorize/LLVMVectorize.vcxproj">
+      <Project>E9FF591B-C22D-30FE-A9B3-B023AA66AE39</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Analysis/IPA/LLVMipa.vcxproj">
+      <Project>C7576B65-C813-3B05-B097-BF8B9DA75595</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Transforms/IPO/LLVMipo.vcxproj">
+      <Project>D561E453-6852-3687-9A2E-49931B06D3FC</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/AST/clangAST.vcxproj">
+      <Project>251E1AA9-F30B-3217-9D00-C64DCA026ED0</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Analysis/clangAnalysis.vcxproj">
+      <Project>7ABDA0CB-874F-3085-A59D-0A03BABB55E0</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Basic/clangBasic.vcxproj">
+      <Project>287E101A-DB07-3147-AF7E-6BFF5C13964A</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/CodeGen/clangCodeGen.vcxproj">
+      <Project>F72B1A65-1434-3AC7-A08A-62214FA18EF7</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Driver/clangDriver.vcxproj">
+      <Project>EAFE209A-28A5-305B-90C1-643447A11BEF</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Edit/clangEdit.vcxproj">
+      <Project>0ECC8303-C23E-377D-B6D3-29B8A576D810</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Frontend/clangFrontend.vcxproj">
+      <Project>0F8F2395-9C4F-369C-8309-62BA7CEB1EF6</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Lex/clangLex.vcxproj">
+      <Project>DBB9D7D7-0E8D-353A-8D1A-4DCF57AD5DCC</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Parse/clangParse.vcxproj">
+      <Project>42C026D5-C242-35C4-9EA2-973680B8017B</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Sema/clangSema.vcxproj">
+      <Project>0AD1F3D1-6EBB-3672-9382-C389A8667DA5</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/tools/dxcompiler/dxcompiler.vcxproj">
+      <Project>AC186388-E125-340E-8452-AE306D2D375F</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/tools/dxlib-sample/dxlib_sample.vcxproj">
+      <Project>028E3032-AEA8-3667-B31E-2683911E587D</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

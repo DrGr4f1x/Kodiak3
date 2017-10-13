@@ -1,0 +1,422 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{C7DC381F-C925-3E0B-A1E2-9FAE6139E9AA}</ProjectGUID>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>LLVMAnalysis</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Kodiak3\External\hlsl.bin\Debug\lib\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">LLVMAnalysis.dir\Debug\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">LLVMAnalysis</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Kodiak3\External\hlsl.bin\Release\lib\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">LLVMAnalysis.dir\Release\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">LLVMAnalysis</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Kodiak3\External\hlsl.bin\MinSizeRel\lib\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">LLVMAnalysis.dir\MinSizeRel\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">LLVMAnalysis</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Kodiak3\External\hlsl.bin\RelWithDebInfo\lib\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">LLVMAnalysis.dir\RelWithDebInfo\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">LLVMAnalysis</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalOptions> /Zc:sizedDealloc- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4146;4180;4244;4258;4267;4291;4345;4351;4355;4456;4457;4458;4459;4503;4624;4722;4800;4100;4127;4512;4505;4610;4510;4702;4245;4706;4310;4701;4703;4389;4611;4805;4204;4324</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>4238</TreatSpecificWarningsAsErrors>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UndefinePreprocessorDefinitions>NDEBUG;NDEBUG;NDEBUG;NDEBUG</UndefinePreprocessorDefinitions>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;DBG;DBG;DBG;DBG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;DBG;DBG;DBG;DBG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalOptions> /Zc:sizedDealloc- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4146;4180;4244;4258;4267;4291;4345;4351;4355;4456;4457;4458;4459;4503;4624;4722;4800;4100;4127;4512;4505;4610;4510;4702;4245;4706;4310;4701;4703;4389;4611;4805;4204;4324</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>4238</TreatSpecificWarningsAsErrors>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalOptions> /Zc:sizedDealloc- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4146;4180;4244;4258;4267;4291;4345;4351;4355;4456;4457;4458;4459;4503;4624;4722;4800;4100;4127;4512;4505;4610;4510;4702;4245;4706;4310;4701;4703;4389;4611;4805;4204;4324</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>4238</TreatSpecificWarningsAsErrors>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat></DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalOptions> /Zc:sizedDealloc- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4146;4180;4244;4258;4267;4291;4345;4351;4355;4456;4457;4458;4459;4503;4624;4722;4800;4100;4127;4512;4505;4610;4510;4702;4245;4706;4310;4701;4703;4389;4611;4805;4204;4324</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatSpecificWarningsAsErrors>4238</TreatSpecificWarningsAsErrors>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;ENABLE_SPIRV_CODEGEN;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;_ITERATOR_DEBUG_LEVEL=0;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Kodiak3/External/DirectXShaderCompiler/lib/Analysis/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Kodiak3/External/DirectXShaderCompiler -BD:/Kodiak3/External/hlsl.bin --check-stamp-file D:\Kodiak3\External\hlsl.bin\lib\Analysis\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:/Kodiak3/External/DirectXShaderCompiler/lib/Analysis/CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Kodiak3\External\hlsl.bin\lib\Analysis\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Kodiak3/External/DirectXShaderCompiler/lib/Analysis/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Kodiak3/External/DirectXShaderCompiler -BD:/Kodiak3/External/hlsl.bin --check-stamp-file D:\Kodiak3\External\hlsl.bin\lib\Analysis\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:/Kodiak3/External/DirectXShaderCompiler/lib/Analysis/CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Kodiak3\External\hlsl.bin\lib\Analysis\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/Kodiak3/External/DirectXShaderCompiler/lib/Analysis/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Kodiak3/External/DirectXShaderCompiler -BD:/Kodiak3/External/hlsl.bin --check-stamp-file D:\Kodiak3\External\hlsl.bin\lib\Analysis\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:/Kodiak3/External/DirectXShaderCompiler/lib/Analysis/CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Kodiak3\External\hlsl.bin\lib\Analysis\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/Kodiak3/External/DirectXShaderCompiler/lib/Analysis/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Kodiak3/External/DirectXShaderCompiler -BD:/Kodiak3/External/hlsl.bin --check-stamp-file D:\Kodiak3\External\hlsl.bin\lib\Analysis\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:/Kodiak3/External/DirectXShaderCompiler/lib/Analysis/CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Kodiak3\External\hlsl.bin\lib\Analysis\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\StratifiedSets.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\AliasAnalysis.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\AliasSetTracker.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\AssumptionCache.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\BlockFrequencyInfo.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\BlockFrequencyInfoImpl.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\BranchProbabilityInfo.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\CFG.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\CFGPrinter.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\CGSCCPassManager.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\CallGraph.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\CallGraphSCCPass.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\CallPrinter.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\CaptureTracking.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\CodeMetrics.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\ConstantFolding.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\DOTGraphTraitsPass.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\DependenceAnalysis.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\DivergenceAnalysis.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\DomPrinter.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\DominanceFrontier.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\DominanceFrontierImpl.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\DxilConstantFolding.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\IVUsers.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\InlineCost.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\InstructionSimplify.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\Interval.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\IntervalIterator.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\IntervalPartition.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\IteratedDominanceFrontier.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\LazyCallGraph.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\LazyValueInfo.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\LibCallAliasAnalysis.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\LibCallSemantics.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\Lint.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\Loads.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\LoopAccessAnalysis.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\LoopInfo.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\LoopInfoImpl.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\LoopIterator.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\LoopPass.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\MemoryBuiltins.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\MemoryDependenceAnalysis.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\MemoryLocation.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\PHITransAddr.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\Passes.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\PostDominators.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\PtrUseVisitor.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\RegionInfo.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\RegionInfoImpl.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\RegionIterator.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\RegionPass.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\RegionPrinter.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\ScalarEvolution.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\ScalarEvolutionExpander.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\ScalarEvolutionExpressions.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\ScalarEvolutionNormalization.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\SparsePropagation.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\TargetFolder.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\TargetLibraryInfo.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\TargetTransformInfo.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\TargetTransformInfoImpl.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\Trace.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\ValueTracking.h" />
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Analysis\VectorUtils.h" />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\AliasAnalysis.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\AliasAnalysisCounter.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\AliasAnalysisEvaluator.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\AliasDebugger.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\AliasSetTracker.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\Analysis.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\AssumptionCache.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\BasicAliasAnalysis.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\BlockFrequencyInfo.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\BlockFrequencyInfoImpl.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\BranchProbabilityInfo.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CFG.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CFGPrinter.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CFLAliasAnalysis.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CGSCCPassManager.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CaptureTracking.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CostModel.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\CodeMetrics.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\ConstantFolding.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\Delinearization.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\DependenceAnalysis.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\DivergenceAnalysis.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\DomPrinter.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\DominanceFrontier.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\DxilConstantFolding.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\DxilConstantFoldingExt.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\IVUsers.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\InstCount.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\InstructionSimplify.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\Interval.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\IntervalPartition.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\IteratedDominanceFrontier.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\LazyCallGraph.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\LazyValueInfo.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\LibCallAliasAnalysis.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\LibCallSemantics.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\Lint.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\Loads.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\LoopAccessAnalysis.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\LoopInfo.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\LoopPass.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\MemDepPrinter.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\MemDerefPrinter.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\MemoryBuiltins.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\MemoryDependenceAnalysis.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\MemoryLocation.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\ModuleDebugInfoPrinter.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\NoAliasAnalysis.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\PHITransAddr.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\PostDominators.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\PtrUseVisitor.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\regioninfo.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\RegionPass.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\regionprinter.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\ScalarEvolution.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\ScalarEvolutionAliasAnalysis.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\ScalarEvolutionExpander.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\ScalarEvolutionNormalization.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\SparsePropagation.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\TargetLibraryInfo.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\TargetTransformInfo.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\Trace.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\TypeBasedAliasAnalysis.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\ScopedNoAliasAA.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\ValueTracking.cpp"  />
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\VectorUtils.cpp"  />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/ZERO_CHECK.vcxproj">
+      <Project>D00E1A65-C65F-346C-835A-5F807D749729</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/include/llvm/IR/intrinsics_gen.vcxproj">
+      <Project>602D2196-7966-3175-A0D1-2521541E263A</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

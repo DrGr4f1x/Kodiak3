@@ -115,4 +115,6 @@ inline std::string MakeStr(const std::wstring& wstr)
 }
 
 // Engine headers
+#include "Math\CommonMath.h"
 #include "Utility.h"
+#include "VectorMath.h"

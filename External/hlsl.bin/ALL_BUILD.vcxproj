@@ -1,0 +1,347 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{78BD6D22-B5BE-39AE-8ADC-D5E2E2281851}</ProjectGUID>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin;D:\Kodiak3\External\DirectXShaderCompiler;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin;D:\Kodiak3\External\DirectXShaderCompiler;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin;D:\Kodiak3\External\DirectXShaderCompiler;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Kodiak3\External\hlsl.bin;D:\Kodiak3\External\DirectXShaderCompiler;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\llvm_assert;D:\Kodiak3\External\hlsl.bin\include;D:\Kodiak3\External\DirectXShaderCompiler\include;D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Kodiak3\External\DirectXShaderCompiler\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Kodiak3/External/DirectXShaderCompiler/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Kodiak3/External/DirectXShaderCompiler -BD:/Kodiak3/External/hlsl.bin --check-stamp-file D:\Kodiak3\External\hlsl.bin\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:/Kodiak3/External/DirectXShaderCompiler/CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\CMakeLists.txt;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInitialize.cmake;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeCCompiler.cmake;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\VersionFromVCS.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddLLVMDefinitions.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\config-ix.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckIncludeFileCXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\TestBigEndian.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\HandleLLVMStdlib.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\CheckAtomic.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\GetHostTriple.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\FindOCaml.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddOCaml.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\HandleLLVMOptions.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\HandleLLVMStdlib.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddLLVMDefinitions.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\ChooseMSVCCRT.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPythonInterp.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Kodiak3\External\hlsl.bin\LLVMBuild.cmake;D:\Kodiak3\External\DirectXShaderCompiler\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\docs\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\examples\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\IPA\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\AsmParser\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Bitcode\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Bitcode\Reader\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Bitcode\Writer\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\AsmPrinter\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\SelectionDAG\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\MIRParser\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\DebugInfo\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\DebugInfo\DWARF\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\DebugInfo\PDB\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\Interpreter\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\MCJIT\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\RuntimeDyld\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\IntelJITEvents\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\OProfileJIT\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\Orc\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Linker\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\IR\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\IRReader\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\LTO\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\MC\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\MC\MCDisassembler\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\MC\MCParser\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Object\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Option\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Passes\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Support\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\TableGen\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Target\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\IPO\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\InstCombine\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Instrumentation\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Scalar\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Utils\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Vectorize\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\ObjCARC\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\HLSL\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\projects\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\dsymutil\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llc\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\lli\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\lli\ChildTarget\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-as\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-bcanalyzer\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-cov\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-diff\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-dis\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-dwarfdump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-extract\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-link\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-lto\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-mc\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-mcmarkup\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-nm\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-objdump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-pdbdump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-profdata\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-rtdyld\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-size\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\macho-dump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\opt\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\verify-uselistorder\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\utils\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\__init__.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\main.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\componentinfo.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\util.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\configutil.py;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\AsmPrinters.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\AsmParsers.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\Disassemblers.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\Targets.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\config.h.cmake;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\llvm-config.h.cmake;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Support\DataTypes.h.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddLLVM.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\LLVMProcessSources.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\AddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\LLVM-Config.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\TableGen.cmake;D:\Kodiak3\External\DirectXShaderCompiler\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Kodiak3\External\hlsl.bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Kodiak3/External/DirectXShaderCompiler/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Kodiak3/External/DirectXShaderCompiler -BD:/Kodiak3/External/hlsl.bin --check-stamp-file D:\Kodiak3\External\hlsl.bin\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:/Kodiak3/External/DirectXShaderCompiler/CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\CMakeLists.txt;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInitialize.cmake;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeCCompiler.cmake;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\VersionFromVCS.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddLLVMDefinitions.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\config-ix.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckIncludeFileCXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\TestBigEndian.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\HandleLLVMStdlib.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\CheckAtomic.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\GetHostTriple.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\FindOCaml.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddOCaml.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\HandleLLVMOptions.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\HandleLLVMStdlib.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddLLVMDefinitions.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\ChooseMSVCCRT.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPythonInterp.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Kodiak3\External\hlsl.bin\LLVMBuild.cmake;D:\Kodiak3\External\DirectXShaderCompiler\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\docs\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\examples\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\IPA\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\AsmParser\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Bitcode\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Bitcode\Reader\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Bitcode\Writer\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\AsmPrinter\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\SelectionDAG\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\MIRParser\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\DebugInfo\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\DebugInfo\DWARF\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\DebugInfo\PDB\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\Interpreter\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\MCJIT\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\RuntimeDyld\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\IntelJITEvents\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\OProfileJIT\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\Orc\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Linker\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\IR\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\IRReader\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\LTO\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\MC\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\MC\MCDisassembler\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\MC\MCParser\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Object\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Option\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Passes\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Support\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\TableGen\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Target\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\IPO\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\InstCombine\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Instrumentation\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Scalar\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Utils\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Vectorize\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\ObjCARC\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\HLSL\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\projects\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\dsymutil\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llc\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\lli\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\lli\ChildTarget\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-as\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-bcanalyzer\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-cov\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-diff\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-dis\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-dwarfdump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-extract\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-link\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-lto\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-mc\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-mcmarkup\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-nm\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-objdump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-pdbdump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-profdata\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-rtdyld\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-size\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\macho-dump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\opt\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\verify-uselistorder\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\utils\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\__init__.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\main.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\componentinfo.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\util.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\configutil.py;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\AsmPrinters.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\AsmParsers.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\Disassemblers.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\Targets.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\config.h.cmake;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\llvm-config.h.cmake;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Support\DataTypes.h.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddLLVM.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\LLVMProcessSources.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\AddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\LLVM-Config.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\TableGen.cmake;D:\Kodiak3\External\DirectXShaderCompiler\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Kodiak3\External\hlsl.bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/Kodiak3/External/DirectXShaderCompiler/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Kodiak3/External/DirectXShaderCompiler -BD:/Kodiak3/External/hlsl.bin --check-stamp-file D:\Kodiak3\External\hlsl.bin\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:/Kodiak3/External/DirectXShaderCompiler/CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\CMakeLists.txt;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInitialize.cmake;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeCCompiler.cmake;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\VersionFromVCS.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddLLVMDefinitions.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\config-ix.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckIncludeFileCXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\TestBigEndian.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\HandleLLVMStdlib.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\CheckAtomic.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\GetHostTriple.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\FindOCaml.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddOCaml.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\HandleLLVMOptions.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\HandleLLVMStdlib.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddLLVMDefinitions.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\ChooseMSVCCRT.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPythonInterp.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Kodiak3\External\hlsl.bin\LLVMBuild.cmake;D:\Kodiak3\External\DirectXShaderCompiler\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\docs\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\examples\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\IPA\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\AsmParser\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Bitcode\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Bitcode\Reader\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Bitcode\Writer\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\AsmPrinter\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\SelectionDAG\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\MIRParser\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\DebugInfo\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\DebugInfo\DWARF\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\DebugInfo\PDB\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\Interpreter\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\MCJIT\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\RuntimeDyld\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\IntelJITEvents\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\OProfileJIT\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\Orc\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Linker\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\IR\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\IRReader\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\LTO\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\MC\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\MC\MCDisassembler\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\MC\MCParser\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Object\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Option\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Passes\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Support\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\TableGen\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Target\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\IPO\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\InstCombine\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Instrumentation\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Scalar\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Utils\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Vectorize\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\ObjCARC\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\HLSL\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\projects\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\dsymutil\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llc\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\lli\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\lli\ChildTarget\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-as\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-bcanalyzer\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-cov\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-diff\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-dis\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-dwarfdump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-extract\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-link\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-lto\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-mc\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-mcmarkup\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-nm\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-objdump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-pdbdump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-profdata\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-rtdyld\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-size\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\macho-dump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\opt\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\verify-uselistorder\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\utils\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\__init__.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\main.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\componentinfo.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\util.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\configutil.py;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\AsmPrinters.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\AsmParsers.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\Disassemblers.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\Targets.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\config.h.cmake;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\llvm-config.h.cmake;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Support\DataTypes.h.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddLLVM.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\LLVMProcessSources.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\AddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\LLVM-Config.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\TableGen.cmake;D:\Kodiak3\External\DirectXShaderCompiler\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Kodiak3\External\hlsl.bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/Kodiak3/External/DirectXShaderCompiler/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Kodiak3/External/DirectXShaderCompiler -BD:/Kodiak3/External/hlsl.bin --check-stamp-file D:\Kodiak3\External\hlsl.bin\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:/Kodiak3/External/DirectXShaderCompiler/CMakeLists.txt;D:\Kodiak3\External\DirectXShaderCompiler\CMakeLists.txt;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInitialize.cmake;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeCCompiler.cmake;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;D:\Kodiak3\External\hlsl.bin\CMakeFiles\3.7.2\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\VersionFromVCS.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddLLVMDefinitions.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\config-ix.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckIncludeFileCXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\TestBigEndian.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\HandleLLVMStdlib.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\CheckAtomic.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\GetHostTriple.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\FindOCaml.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddOCaml.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\HandleLLVMOptions.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\HandleLLVMStdlib.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddLLVMDefinitions.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\ChooseMSVCCRT.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPythonInterp.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Kodiak3\External\hlsl.bin\LLVMBuild.cmake;D:\Kodiak3\External\DirectXShaderCompiler\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\docs\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\examples\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Analysis\IPA\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\AsmParser\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Bitcode\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Bitcode\Reader\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Bitcode\Writer\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\AsmPrinter\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\SelectionDAG\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\CodeGen\MIRParser\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\DebugInfo\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\DebugInfo\DWARF\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\DebugInfo\PDB\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\Interpreter\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\MCJIT\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\RuntimeDyld\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\IntelJITEvents\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\OProfileJIT\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ExecutionEngine\Orc\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Linker\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\IR\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\IRReader\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\LTO\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\MC\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\MC\MCDisassembler\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\MC\MCParser\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Object\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Option\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Passes\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Support\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\TableGen\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Target\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\IPO\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\InstCombine\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Instrumentation\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Scalar\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Utils\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\Vectorize\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\Transforms\ObjCARC\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\lib\HLSL\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\projects\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\dsymutil\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llc\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\lli\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\lli\ChildTarget\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-as\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-bcanalyzer\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-cov\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-diff\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-dis\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-dwarfdump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-extract\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-link\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-lto\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-mc\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-mcmarkup\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-nm\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-objdump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-pdbdump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-profdata\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-rtdyld\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\llvm-size\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\macho-dump\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\opt\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\tools\verify-uselistorder\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\utils\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\LLVMBuild.txt;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\__init__.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\main.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\componentinfo.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\util.py;D:\Kodiak3\External\DirectXShaderCompiler\utils\llvm-build\llvmbuild\configutil.py;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\AsmPrinters.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\AsmParsers.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\Disassemblers.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\Targets.def.in;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\config.h.cmake;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Config\llvm-config.h.cmake;D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\Support\DataTypes.h.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\AddLLVM.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\LLVMProcessSources.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\AddFileDependencies.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\LLVM-Config.cmake;D:\Kodiak3\External\DirectXShaderCompiler\cmake\modules\TableGen.cmake;D:\Kodiak3\External\DirectXShaderCompiler\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Kodiak3\External\hlsl.bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/ZERO_CHECK.vcxproj">
+      <Project>D00E1A65-C65F-346C-835A-5F807D749729</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/unittests/HLSLHost/HLSLHost.vcxproj">
+      <Project>2F51E147-2068-364B-A0F8-14AD4A6BAC0D</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Analysis/LLVMAnalysis.vcxproj">
+      <Project>C7DC381F-C925-3E0B-A1E2-9FAE6139E9AA</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/AsmParser/LLVMAsmParser.vcxproj">
+      <Project>67642DFC-200B-3C59-ACAF-2CC9880595FF</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Bitcode/Reader/LLVMBitReader.vcxproj">
+      <Project>81D2200A-D6A3-379C-ABC6-58027BD8E390</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Bitcode/Writer/LLVMBitWriter.vcxproj">
+      <Project>76B1284E-50BC-3486-A6B6-2B24DC7677FA</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/IR/LLVMCore.vcxproj">
+      <Project>1D2DF4FF-9D81-3F13-ACB6-023B255D574F</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/DxcSupport/LLVMDxcSupport.vcxproj">
+      <Project>77E9E8F7-B2CA-3DBB-9A68-CD187F9A2C18</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/HLSL/LLVMHLSL.vcxproj">
+      <Project>3D41D29C-D54E-3356-9016-17090B27B5C1</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/IRReader/LLVMIRReader.vcxproj">
+      <Project>8C66720F-7F6C-3835-AE2A-47B5A66C565C</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Transforms/InstCombine/LLVMInstCombine.vcxproj">
+      <Project>6F18C072-F4BC-36F0-9AA1-FE39EBB6C626</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/LTO/LLVMLTO.vcxproj">
+      <Project>670A0EEF-3A5B-3BF5-AFFA-74B3BDFF3855</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Linker/LLVMLinker.vcxproj">
+      <Project>B00C8793-D0A5-371A-BF0E-E13D8FF4622B</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/MSSupport/LLVMMSSupport.vcxproj">
+      <Project>CDB9ACC6-427F-3968-B966-DDEDC16291FC</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Option/LLVMOption.vcxproj">
+      <Project>8BC2298C-01F4-393D-8674-4AAD571A8731</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/ProfileData/LLVMProfileData.vcxproj">
+      <Project>582F5E06-6C19-308E-AE20-B95D946B9B16</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Transforms/Scalar/LLVMScalarOpts.vcxproj">
+      <Project>D630958B-F458-3937-93CC-64C8D8D6A5E7</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Support/LLVMSupport.vcxproj">
+      <Project>862D746E-CA56-3B21-B7C7-A3E7B4D4265C</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/TableGen/LLVMTableGen.vcxproj">
+      <Project>3B193F0F-35C9-34B6-A733-FBB27225A1C4</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Target/LLVMTarget.vcxproj">
+      <Project>F83B87C6-A138-3BB1-9DB2-9C93ECECE484</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Transforms/Utils/LLVMTransformUtils.vcxproj">
+      <Project>7298E1AC-BC88-3C3D-824E-E675B22D9A05</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Transforms/Vectorize/LLVMVectorize.vcxproj">
+      <Project>E9FF591B-C22D-30FE-A9B3-B023AA66AE39</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Analysis/IPA/LLVMipa.vcxproj">
+      <Project>C7576B65-C813-3B05-B097-BF8B9DA75595</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/lib/Transforms/IPO/LLVMipo.vcxproj">
+      <Project>D561E453-6852-3687-9A2E-49931B06D3FC</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/unittests/HLSL/clang-hlsl-tests.vcxproj">
+      <Project>FC0673B9-E9A2-36C6-91B7-62CD3C86EC85</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/utils/TableGen/clang-tblgen.vcxproj">
+      <Project>DFB433BF-E361-3309-8054-CFCA653B63DB</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/AST/clangAST.vcxproj">
+      <Project>251E1AA9-F30B-3217-9D00-C64DCA026ED0</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/ASTMatchers/clangASTMatchers.vcxproj">
+      <Project>289C3724-FDD1-37A4-BA16-19F925DE0E02</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Analysis/clangAnalysis.vcxproj">
+      <Project>7ABDA0CB-874F-3085-A59D-0A03BABB55E0</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Basic/clangBasic.vcxproj">
+      <Project>287E101A-DB07-3147-AF7E-6BFF5C13964A</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/CodeGen/clangCodeGen.vcxproj">
+      <Project>F72B1A65-1434-3AC7-A08A-62214FA18EF7</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Driver/clangDriver.vcxproj">
+      <Project>EAFE209A-28A5-305B-90C1-643447A11BEF</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Edit/clangEdit.vcxproj">
+      <Project>0ECC8303-C23E-377D-B6D3-29B8A576D810</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Format/clangFormat.vcxproj">
+      <Project>6815F159-CBF8-3250-AD81-0C772557F7AB</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Frontend/clangFrontend.vcxproj">
+      <Project>0F8F2395-9C4F-369C-8309-62BA7CEB1EF6</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/FrontendTool/clangFrontendTool.vcxproj">
+      <Project>42EE03E5-E06A-3EA0-96C8-B0B77B33143B</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Index/clangIndex.vcxproj">
+      <Project>D1FC5BCF-1E8D-3837-BD95-0B2541E5BBEC</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Lex/clangLex.vcxproj">
+      <Project>DBB9D7D7-0E8D-353A-8D1A-4DCF57AD5DCC</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Parse/clangParse.vcxproj">
+      <Project>42C026D5-C242-35C4-9EA2-973680B8017B</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Rewrite/clangRewrite.vcxproj">
+      <Project>ABAFFB77-9B52-3B49-8C70-33B7DAD6E176</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Frontend/Rewrite/clangRewriteFrontend.vcxproj">
+      <Project>469A1618-68F9-3FDC-828A-5072046C5B9C</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/SPIRV/clangSPIRV.vcxproj">
+      <Project>93B1CE8E-8EEB-3A71-86A8-047045BD87DF</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Sema/clangSema.vcxproj">
+      <Project>0AD1F3D1-6EBB-3672-9382-C389A8667DA5</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Tooling/clangTooling.vcxproj">
+      <Project>A1D7B0EC-9F11-3433-822F-C34195CDD8B2</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/lib/Tooling/Core/clangToolingCore.vcxproj">
+      <Project>F5FA9B58-1F0D-3820-AB95-D78146AD1C9C</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/tools/d3dcomp/d3dcompiler_dxc_bridge.vcxproj">
+      <Project>7E319808-D269-3C40-B3BB-4890A33E5C3F</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/tools/dotnetc/dndxc.csproj">
+      <Project>0A863FD1-FD94-42CF-8190-A3CA605A6459</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/tools/dxa/dxa.vcxproj">
+      <Project>8DDE1A1E-9D5A-37EF-94B9-06C511E6FA72</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/tools/dxc/dxc.vcxproj">
+      <Project>45C2E85D-159E-3EEE-88CB-1746C648AFE6</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/unittests/dxc_batch/dxc_batch.vcxproj">
+      <Project>CA22E093-3028-39E7-916C-0DD18BDF34E5</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/tools/dxcompiler/dxcompiler.vcxproj">
+      <Project>AC186388-E125-340E-8452-AE306D2D375F</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/dxexp/dxexp.vcxproj">
+      <Project>DACAE457-5813-3643-A89E-31FF2905B090</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/tools/dxl/dxl.vcxproj">
+      <Project>DE229CB9-E881-3E76-844F-B70FDD3967DE</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/tools/dxlib-sample/dxlib_sample.vcxproj">
+      <Project>028E3032-AEA8-3667-B31E-2683911E587D</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/tools/dxopt/dxopt.vcxproj">
+      <Project>8B103AF2-B1EE-360C-8973-40D5DAD8EE07</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/tools/dxr/dxr.vcxproj">
+      <Project>8C517542-2E96-3939-976D-C1FEC7FFD449</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/tools/dxv/dxv.vcxproj">
+      <Project>1CF63895-7B6D-39EF-8E0E-99CEE8E9E7A2</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/tools/clang/tools/libclang/libclang.vcxproj">
+      <Project>040B1D2F-9503-35D1-916E-6D56784C3DD7</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Kodiak3/External/hlsl.bin/utils/TableGen/llvm-tblgen.vcxproj">
+      <Project>BC7D449B-0CED-3EF1-AA83-0AD7AFDEFEB4</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

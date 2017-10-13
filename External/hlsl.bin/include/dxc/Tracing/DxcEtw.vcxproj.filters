@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Kodiak3\External\DirectXShaderCompiler\include\dxc\Tracing\CMakeLists.txt" />
+    <CustomBuild Include="D:\Kodiak3\External\hlsl.bin\CMakeFiles\ff004506fce14436832cc0d99ae64c2c\tmpdxcetw.h.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Kodiak3\External\hlsl.bin\CMakeFiles\ff004506fce14436832cc0d99ae64c2c\dxcetw.h.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Kodiak3\External\hlsl.bin\CMakeFiles\d72bb2b5b389761e00b39b3ed1d25592\DxcEtw.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\Kodiak3\External\hlsl.bin\include\dxc\Tracing\CMakeFiles\DxcEtw" />
+    <None Include="D:\Kodiak3\External\DirectXShaderCompiler\include\dxc\Tracing\dxcetw.man" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{97D99EF3-5998-3E58-AACC-3C8DD39631C1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

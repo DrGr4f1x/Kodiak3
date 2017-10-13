@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\AST\CMakeLists.txt" />
+    <CustomBuild Include="D:\Kodiak3\External\hlsl.bin\CMakeFiles\4afb36aa30a1a2400ee50bc306a2d5e3\AttrDump.inc.tmp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Kodiak3\External\hlsl.bin\CMakeFiles\4afb36aa30a1a2400ee50bc306a2d5e3\AttrDump.inc.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Kodiak3\External\hlsl.bin\CMakeFiles\187fbcd2e82356a67d6c3b5d1e012905\ClangAttrDump.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\Kodiak3\External\hlsl.bin\tools\clang\include\clang\AST\CMakeFiles\ClangAttrDump" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{97D99EF3-5998-3E58-AACC-3C8DD39631C1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

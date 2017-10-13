@@ -9,4 +9,14 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="TriangleApp.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{ab9cb6f4-a653-4a16-b692-31e976a44e9e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\TriangleVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
 </Project>

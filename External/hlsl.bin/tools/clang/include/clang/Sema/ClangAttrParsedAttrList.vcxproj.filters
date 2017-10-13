@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Kodiak3\External\DirectXShaderCompiler\tools\clang\include\clang\Sema\CMakeLists.txt" />
+    <CustomBuild Include="D:\Kodiak3\External\hlsl.bin\CMakeFiles\8da1024f5a4e00d127d7fd961dca6f7a\AttrParsedAttrList.inc.tmp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Kodiak3\External\hlsl.bin\CMakeFiles\8da1024f5a4e00d127d7fd961dca6f7a\AttrParsedAttrList.inc.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Kodiak3\External\hlsl.bin\CMakeFiles\6c55ef7167ba7670713817a66c6fd236\ClangAttrParsedAttrList.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\Kodiak3\External\hlsl.bin\tools\clang\include\clang\Sema\CMakeFiles\ClangAttrParsedAttrList" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{97D99EF3-5998-3E58-AACC-3C8DD39631C1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

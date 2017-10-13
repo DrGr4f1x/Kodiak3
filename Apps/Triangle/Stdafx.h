@@ -86,6 +86,7 @@ inline void ThrowIfFailed(VkResult res)
 #include <unordered_map>
 #include <vector>
 
+
 inline std::wstring MakeWStr(const std::string& str)
 {
 	return std::wstring(str.begin(), str.end());
@@ -96,3 +97,9 @@ inline std::string MakeStr(const std::wstring& wstr)
 {
 	return std::string(wstr.begin(), wstr.end());
 }
+
+
+// Engine headers
+#include "Math\CommonMath.h"
+#include "Utility.h"
+#include "VectorMath.h"

@@ -1,0 +1,155 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CMakePredefinedTargets", "CMakePredefinedTargets", "{22CBB21E-DC3A-3E1F-B789-6AD96952C5F0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External dependencies", "External dependencies", "{4B435FAE-0870-33CA-A4B3-B6EF12BAF148}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SPIRV-Tools build", "SPIRV-Tools build", "{4D5E7580-BD31-35B3-BA0C-909411BB3672}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SPIRV-Tools utilities", "SPIRV-Tools utilities", "{F0F8E1EC-631A-37BE-9F84-C71AB811FA67}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ALL_BUILD", "ALL_BUILD.vcxproj", "{78BD6D22-B5BE-39AE-8ADC-D5E2E2281851}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AFE9BFF1-24BB-3F38-84F3-A31C33F61D14} = {AFE9BFF1-24BB-3F38-84F3-A31C33F61D14}
+		{755C8933-17E6-3679-A00A-8B510BE5F03A} = {755C8933-17E6-3679-A00A-8B510BE5F03A}
+		{D00E1A65-C65F-346C-835A-5F807D749729} = {D00E1A65-C65F-346C-835A-5F807D749729}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "INSTALL", "INSTALL.vcxproj", "{833D0306-7941-3973-8924-1776688286DD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{78BD6D22-B5BE-39AE-8ADC-D5E2E2281851} = {78BD6D22-B5BE-39AE-8ADC-D5E2E2281851}
+		{D00E1A65-C65F-346C-835A-5F807D749729} = {D00E1A65-C65F-346C-835A-5F807D749729}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPIRV-Tools", "source\SPIRV-Tools.vcxproj", "{AFE9BFF1-24BB-3F38-84F3-A31C33F61D14}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D00E1A65-C65F-346C-835A-5F807D749729} = {D00E1A65-C65F-346C-835A-5F807D749729}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPIRV-Tools-opt", "source\opt\SPIRV-Tools-opt.vcxproj", "{755C8933-17E6-3679-A00A-8B510BE5F03A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AFE9BFF1-24BB-3F38-84F3-A31C33F61D14} = {AFE9BFF1-24BB-3F38-84F3-A31C33F61D14}
+		{D00E1A65-C65F-346C-835A-5F807D749729} = {D00E1A65-C65F-346C-835A-5F807D749729}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZERO_CHECK", "..\..\\ZERO_CHECK.vcxproj", "{D00E1A65-C65F-346C-835A-5F807D749729}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spirv-tools-build-version", "source\spirv-tools-build-version.vcxproj", "{CFF811C3-06B9-3B21-9266-038DA168099E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D00E1A65-C65F-346C-835A-5F807D749729} = {D00E1A65-C65F-346C-835A-5F807D749729}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spirv-tools-spv-amd-gcn-shader", "source\spirv-tools-spv-amd-gcn-shader.vcxproj", "{89BB3A35-28D8-366E-8248-F6EC4495BB0C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D00E1A65-C65F-346C-835A-5F807D749729} = {D00E1A65-C65F-346C-835A-5F807D749729}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spirv-tools-spv-amd-shader-ballot", "source\spirv-tools-spv-amd-shader-ballot.vcxproj", "{4D9EC197-75D2-361B-A8D9-36C028867D0E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D00E1A65-C65F-346C-835A-5F807D749729} = {D00E1A65-C65F-346C-835A-5F807D749729}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spirv-tools-spv-amd-shader-explicit-vertex-parameter", "source\spirv-tools-spv-amd-shader-explicit-vertex-parameter.vcxproj", "{04B5A1D2-A1D6-347F-B0AA-14708A6E49FD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D00E1A65-C65F-346C-835A-5F807D749729} = {D00E1A65-C65F-346C-835A-5F807D749729}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spirv-tools-spv-amd-shader-trinary-minmax", "source\spirv-tools-spv-amd-shader-trinary-minmax.vcxproj", "{532542A0-ACA3-3C9B-A98E-C445956D27A0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D00E1A65-C65F-346C-835A-5F807D749729} = {D00E1A65-C65F-346C-835A-5F807D749729}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spirv-tools-vimsyntax", "source\spirv-tools-vimsyntax.vcxproj", "{FC5468B0-9F92-3935-8B1F-09244518F3FB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D00E1A65-C65F-346C-835A-5F807D749729} = {D00E1A65-C65F-346C-835A-5F807D749729}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+		MinSizeRel|x64 = MinSizeRel|x64
+		RelWithDebInfo|x64 = RelWithDebInfo|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{78BD6D22-B5BE-39AE-8ADC-D5E2E2281851}.Debug|x64.ActiveCfg = Debug|x64
+		{78BD6D22-B5BE-39AE-8ADC-D5E2E2281851}.Debug|x64.Build.0 = Debug|x64
+		{78BD6D22-B5BE-39AE-8ADC-D5E2E2281851}.Release|x64.ActiveCfg = Release|x64
+		{78BD6D22-B5BE-39AE-8ADC-D5E2E2281851}.Release|x64.Build.0 = Release|x64
+		{78BD6D22-B5BE-39AE-8ADC-D5E2E2281851}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{78BD6D22-B5BE-39AE-8ADC-D5E2E2281851}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
+		{78BD6D22-B5BE-39AE-8ADC-D5E2E2281851}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{78BD6D22-B5BE-39AE-8ADC-D5E2E2281851}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
+		{833D0306-7941-3973-8924-1776688286DD}.Debug|x64.ActiveCfg = Debug|x64
+		{833D0306-7941-3973-8924-1776688286DD}.Release|x64.ActiveCfg = Release|x64
+		{833D0306-7941-3973-8924-1776688286DD}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{833D0306-7941-3973-8924-1776688286DD}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{AFE9BFF1-24BB-3F38-84F3-A31C33F61D14}.Debug|x64.ActiveCfg = Debug|x64
+		{AFE9BFF1-24BB-3F38-84F3-A31C33F61D14}.Debug|x64.Build.0 = Debug|x64
+		{AFE9BFF1-24BB-3F38-84F3-A31C33F61D14}.Release|x64.ActiveCfg = Release|x64
+		{AFE9BFF1-24BB-3F38-84F3-A31C33F61D14}.Release|x64.Build.0 = Release|x64
+		{AFE9BFF1-24BB-3F38-84F3-A31C33F61D14}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{AFE9BFF1-24BB-3F38-84F3-A31C33F61D14}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
+		{AFE9BFF1-24BB-3F38-84F3-A31C33F61D14}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{AFE9BFF1-24BB-3F38-84F3-A31C33F61D14}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
+		{755C8933-17E6-3679-A00A-8B510BE5F03A}.Debug|x64.ActiveCfg = Debug|x64
+		{755C8933-17E6-3679-A00A-8B510BE5F03A}.Debug|x64.Build.0 = Debug|x64
+		{755C8933-17E6-3679-A00A-8B510BE5F03A}.Release|x64.ActiveCfg = Release|x64
+		{755C8933-17E6-3679-A00A-8B510BE5F03A}.Release|x64.Build.0 = Release|x64
+		{755C8933-17E6-3679-A00A-8B510BE5F03A}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{755C8933-17E6-3679-A00A-8B510BE5F03A}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
+		{755C8933-17E6-3679-A00A-8B510BE5F03A}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{755C8933-17E6-3679-A00A-8B510BE5F03A}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
+		{D00E1A65-C65F-346C-835A-5F807D749729}.Debug|x64.ActiveCfg = Debug|x64
+		{D00E1A65-C65F-346C-835A-5F807D749729}.Debug|x64.Build.0 = Debug|x64
+		{D00E1A65-C65F-346C-835A-5F807D749729}.Release|x64.ActiveCfg = Release|x64
+		{D00E1A65-C65F-346C-835A-5F807D749729}.Release|x64.Build.0 = Release|x64
+		{D00E1A65-C65F-346C-835A-5F807D749729}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{D00E1A65-C65F-346C-835A-5F807D749729}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
+		{D00E1A65-C65F-346C-835A-5F807D749729}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{D00E1A65-C65F-346C-835A-5F807D749729}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
+		{CFF811C3-06B9-3B21-9266-038DA168099E}.Debug|x64.ActiveCfg = Debug|x64
+		{CFF811C3-06B9-3B21-9266-038DA168099E}.Release|x64.ActiveCfg = Release|x64
+		{CFF811C3-06B9-3B21-9266-038DA168099E}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{CFF811C3-06B9-3B21-9266-038DA168099E}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{89BB3A35-28D8-366E-8248-F6EC4495BB0C}.Debug|x64.ActiveCfg = Debug|x64
+		{89BB3A35-28D8-366E-8248-F6EC4495BB0C}.Release|x64.ActiveCfg = Release|x64
+		{89BB3A35-28D8-366E-8248-F6EC4495BB0C}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{89BB3A35-28D8-366E-8248-F6EC4495BB0C}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{4D9EC197-75D2-361B-A8D9-36C028867D0E}.Debug|x64.ActiveCfg = Debug|x64
+		{4D9EC197-75D2-361B-A8D9-36C028867D0E}.Release|x64.ActiveCfg = Release|x64
+		{4D9EC197-75D2-361B-A8D9-36C028867D0E}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{4D9EC197-75D2-361B-A8D9-36C028867D0E}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{04B5A1D2-A1D6-347F-B0AA-14708A6E49FD}.Debug|x64.ActiveCfg = Debug|x64
+		{04B5A1D2-A1D6-347F-B0AA-14708A6E49FD}.Release|x64.ActiveCfg = Release|x64
+		{04B5A1D2-A1D6-347F-B0AA-14708A6E49FD}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{04B5A1D2-A1D6-347F-B0AA-14708A6E49FD}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{532542A0-ACA3-3C9B-A98E-C445956D27A0}.Debug|x64.ActiveCfg = Debug|x64
+		{532542A0-ACA3-3C9B-A98E-C445956D27A0}.Release|x64.ActiveCfg = Release|x64
+		{532542A0-ACA3-3C9B-A98E-C445956D27A0}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{532542A0-ACA3-3C9B-A98E-C445956D27A0}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{FC5468B0-9F92-3935-8B1F-09244518F3FB}.Debug|x64.ActiveCfg = Debug|x64
+		{FC5468B0-9F92-3935-8B1F-09244518F3FB}.Release|x64.ActiveCfg = Release|x64
+		{FC5468B0-9F92-3935-8B1F-09244518F3FB}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{FC5468B0-9F92-3935-8B1F-09244518F3FB}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{78BD6D22-B5BE-39AE-8ADC-D5E2E2281851} = {22CBB21E-DC3A-3E1F-B789-6AD96952C5F0}
+		{833D0306-7941-3973-8924-1776688286DD} = {22CBB21E-DC3A-3E1F-B789-6AD96952C5F0}
+		{D00E1A65-C65F-346C-835A-5F807D749729} = {22CBB21E-DC3A-3E1F-B789-6AD96952C5F0}
+		{AFE9BFF1-24BB-3F38-84F3-A31C33F61D14} = {4B435FAE-0870-33CA-A4B3-B6EF12BAF148}
+		{755C8933-17E6-3679-A00A-8B510BE5F03A} = {4B435FAE-0870-33CA-A4B3-B6EF12BAF148}
+		{CFF811C3-06B9-3B21-9266-038DA168099E} = {4D5E7580-BD31-35B3-BA0C-909411BB3672}
+		{89BB3A35-28D8-366E-8248-F6EC4495BB0C} = {4D5E7580-BD31-35B3-BA0C-909411BB3672}
+		{4D9EC197-75D2-361B-A8D9-36C028867D0E} = {4D5E7580-BD31-35B3-BA0C-909411BB3672}
+		{04B5A1D2-A1D6-347F-B0AA-14708A6E49FD} = {4D5E7580-BD31-35B3-BA0C-909411BB3672}
+		{532542A0-ACA3-3C9B-A98E-C445956D27A0} = {4D5E7580-BD31-35B3-BA0C-909411BB3672}
+		{FC5468B0-9F92-3935-8B1F-09244518F3FB} = {F0F8E1EC-631A-37BE-9F84-C71AB811FA67}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Kodiak3\External\DirectXShaderCompiler\external\SPIRV-Headers\CMakeLists.txt" />
+    <CustomBuild Include="D:\Kodiak3\External\hlsl.bin\CMakeFiles\72d30a4df97e336d3ac9e596c38f57dc\install-headers.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\Kodiak3\External\hlsl.bin\external\SPIRV-Headers\CMakeFiles\install-headers" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{97D99EF3-5998-3E58-AACC-3C8DD39631C1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

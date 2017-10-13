@@ -1,0 +1,13 @@
+# CMake generation dependency list for this directory.
+D:/Kodiak3/External/DirectXShaderCompiler/tools/clang/CMakeLists.txt
+C:/Program Files/CMake/share/cmake-3.7/Modules/FindLibXml2.cmake
+C:/Program Files/CMake/share/cmake-3.7/Modules/FindPkgConfig.cmake
+C:/Program Files/CMake/share/cmake-3.7/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.7/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-3.7/Modules/CMakeParseArguments.cmake
+C:/Program Files/CMake/share/cmake-3.7/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.7/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-3.7/Modules/CMakeParseArguments.cmake
+D:/Kodiak3/External/DirectXShaderCompiler/tools/clang/include/clang/Basic/Version.inc.in
+D:/Kodiak3/External/DirectXShaderCompiler/tools/clang/include/clang/Config/config.h.cmake
+C:/Program Files/CMake/share/cmake-3.7/Modules/CMakeParseArguments.cmake

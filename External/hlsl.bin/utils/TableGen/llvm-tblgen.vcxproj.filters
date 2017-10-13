@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\AsmMatcherEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\AsmWriterEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\AsmWriterInst.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CallingConvEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CodeEmitterGen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CodeGenDAGPatterns.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CodeGenInstruction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CodeGenMapTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CodeGenRegisters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CodeGenSchedule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CodeGenTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\DAGISelEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\DAGISelMatcherEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\DAGISelMatcherGen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\DAGISelMatcherOpt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\DAGISelMatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\DFAPacketizerEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\DisassemblerEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\FastISelEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\FixedLenDecoderEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\InstrInfoEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\IntrinsicEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\OptParserEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\PseudoLoweringEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\RegisterInfoEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\SubtargetEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\TableGen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CTagsEmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\AsmWriterInst.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CodeGenDAGPatterns.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CodeGenInstruction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CodeGenIntrinsics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CodeGenRegisters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CodeGenSchedule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CodeGenTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\DAGISelMatcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\SequenceToOffsetTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\TableGenBackends.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\X86DisassemblerShared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\X86DisassemblerTables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\X86ModRMFilters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\X86RecognizableInstr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Kodiak3\External\DirectXShaderCompiler\utils\TableGen\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\resources\windows_version_resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{E894C98A-4F8E-3985-BDB2-102F75BB4DB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{F09853BC-A963-38CA-830D-FD24FD7768CD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{07D5AE5D-FD8B-3E6D-AE07-9EC5CF4D78BC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

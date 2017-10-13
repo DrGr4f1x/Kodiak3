@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\InstrProf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\InstrProfReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\InstrProfWriter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\CoverageMapping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\CoverageMappingWriter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\CoverageMappingReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\SampleProf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\SampleProfReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\SampleProfWriter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\InstrProfIndexed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\ProfileData\CoverageMapping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\ProfileData\CoverageMappingReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\ProfileData\CoverageMappingWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\ProfileData\InstrProf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\ProfileData\InstrProfReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\ProfileData\InstrProfWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\ProfileData\SampleProf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\ProfileData\SampleProfReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Kodiak3\External\DirectXShaderCompiler\include\llvm\ProfileData\SampleProfWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Kodiak3\External\DirectXShaderCompiler\lib\ProfileData\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{E894C98A-4F8E-3985-BDB2-102F75BB4DB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{F09853BC-A963-38CA-830D-FD24FD7768CD}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

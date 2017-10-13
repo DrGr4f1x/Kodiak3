@@ -21,12 +21,20 @@
       <string>D:\Kodiak3\Engine\VK\GraphicsDeviceVk.h</string>
     </ArrayOfString>
     <ArrayOfString>
-      <string>D:\Kodiak3\Engine\VK\DeviceManagerVk.cpp</string>
-      <string>D:\Kodiak3\Engine\VK\DeviceManagerVk.h</string>
-    </ArrayOfString>
-    <ArrayOfString>
       <string>D:\Kodiak3\Engine\VK\SwapChainVk.cpp</string>
       <string>D:\Kodiak3\Engine\VK\SwapChainVk.h</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Kodiak3\Engine\DX12\GraphicsDevice12.cpp</string>
+      <string>D:\Kodiak3\Engine\DX12\GraphicsDevice12.h</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Kodiak3\Engine\DX12\SwapChain12.cpp</string>
+      <string>D:\Kodiak3\Engine\DX12\SwapChain12.h</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Kodiak3\Engine\DX12\CommandListManager12.cpp</string>
+      <string>D:\Kodiak3\Engine\DX12\CommandListManager12.h</string>
     </ArrayOfString>
   </ArrayOfArrayOfString>
 </ArrayOfArrayOfArrayOfString>

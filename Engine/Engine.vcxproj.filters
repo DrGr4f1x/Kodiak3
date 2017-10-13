@@ -28,6 +28,40 @@
     <ClInclude Include="DX12\CommandAllocatorPool12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
+    <ClInclude Include="Math\CommonMath.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Scalar.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Quaternion.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Matrix3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Transform.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Matrix4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorMath.h" />
+    <ClInclude Include="Math\BoundingPlane.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\BoundingSphere.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Frustum.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -51,6 +85,12 @@
     <ClCompile Include="DX12\CommandAllocatorPool12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
+    <ClCompile Include="Math\Frustum.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -62,5 +102,13 @@
     <Filter Include="Graphics\VK">
       <UniqueIdentifier>{85385d4f-e200-465e-9b65-a58b4a0c5b20}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{6e4055e6-3c38-4e3f-b669-c035ab609ab7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Math\Functions.inl">
+      <Filter>Math</Filter>
+    </None>
   </ItemGroup>
 </Project>
