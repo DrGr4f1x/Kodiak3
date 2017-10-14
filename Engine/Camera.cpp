@@ -36,27 +36,28 @@ void BaseCamera::SetLookDirection(Vector3 forward, Vector3 up)
 	up = Cross(right, forward);
 
 	// Finish constructing basis
-	m_Basis = Matrix3(right, up, -forward);
-	m_CameraToWorld.SetRotation(Quaternion(m_Basis));
+	m_basis = Matrix3(right, up, -forward);
+	m_cameraToWorld.SetRotation(Quaternion(m_basis));
 }
+
 
 void BaseCamera::Update()
 {
-	m_PreviousViewProjMatrix = m_ViewProjMatrix;
+	m_previousViewProjMatrix = m_viewProjMatrix;
 
-	m_ViewMatrix = Matrix4(~m_CameraToWorld);
-	m_ViewProjMatrix = m_ProjMatrix * m_ViewMatrix;
-	m_ReprojectMatrix = m_PreviousViewProjMatrix * Invert(GetViewProjMatrix());
+	m_viewMatrix = Matrix4(~m_cameraToWorld);
+	m_viewProjMatrix = m_projMatrix * m_viewMatrix;
+	m_reprojectMatrix = m_previousViewProjMatrix * Invert(GetViewProjMatrix());
 
-	m_FrustumVS = Frustum(m_ProjMatrix);
-	m_FrustumWS = m_CameraToWorld * m_FrustumVS;
+	m_frustumVS = Frustum(m_projMatrix);
+	m_frustumWS = m_cameraToWorld * m_frustumVS;
 }
 
 
-void Camera::UpdateProjMatrix(void)
+void Camera::UpdateProjMatrix()
 {
-	float Y = 1.0f / std::tanf(m_VerticalFOV * 0.5f);
-	float X = Y * m_AspectRatio;
+	float Y = 1.0f / std::tanf(m_verticalFOV * 0.5f);
+	float X = Y * m_aspectRatio;
 
 	float Q1, Q2;
 
@@ -64,15 +65,15 @@ void Camera::UpdateProjMatrix(void)
 	// actually a great idea with F32 depth buffers to redistribute precision more evenly across
 	// the entire range.  It requires clearing Z to 0.0f and using a GREATER variant depth test.
 	// Some care must also be done to properly reconstruct linear W in a pixel shader from hyperbolic Z.
-	if (m_ReverseZ)
+	if (m_reverseZ)
 	{
-		Q1 = m_NearClip / (m_FarClip - m_NearClip);
-		Q2 = Q1 * m_FarClip;
+		Q1 = m_nearClip / (m_farClip - m_nearClip);
+		Q2 = Q1 * m_farClip;
 	}
 	else
 	{
-		Q1 = m_FarClip / (m_NearClip - m_FarClip);
-		Q2 = Q1 * m_NearClip;
+		Q1 = m_farClip / (m_nearClip - m_farClip);
+		Q2 = Q1 * m_nearClip;
 	}
 
 	SetProjMatrix(Matrix4(

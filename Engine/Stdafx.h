@@ -52,10 +52,13 @@ inline void ThrowIfFailed(HRESULT hr)
 #include <d3d11on12.h>
 #include <pix.h>
 #include "d3dx12.h"
+
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
+
 #define D3D12_GPU_VIRTUAL_ADDRESS_NULL      ((D3D12_GPU_VIRTUAL_ADDRESS)0)
 #define D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN   ((D3D12_GPU_VIRTUAL_ADDRESS)-1)
+
 const std::string s_apiPrefixString = "[DirectX 12]";
 
 #ifndef SAFE_RELEASE
@@ -72,7 +75,14 @@ const std::string s_apiPrefixString = "[DirectX 12]";
 
 #define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan.h>
+
 #pragma comment(lib, "vulkan-1.lib")
+
+// Custom define for better code readability
+#define VK_FLAGS_NONE 0
+// Default fence timeout in nanoseconds
+#define DEFAULT_FENCE_TIMEOUT 100000000000
+
 const std::string s_apiPrefixString = "[Vulkan]";
 
 inline void ThrowIfFailed(VkResult res)
@@ -116,5 +126,6 @@ inline std::string MakeStr(const std::wstring& wstr)
 
 // Engine headers
 #include "Math\CommonMath.h"
+#include "NonCopyable.h"
 #include "Utility.h"
 #include "VectorMath.h"

@@ -17,6 +17,8 @@ class SwapChain;
 
 class GraphicsDevice
 {
+	friend uint32_t GetMemoryType(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound);
+
 public:
 	GraphicsDevice();
 	~GraphicsDevice();
@@ -98,5 +100,40 @@ private:
 
 	uint32_t m_currentBuffer{ 0 };
 };
+
+
+// Utility methods and accessors
+VkDevice GetDevice();
+uint32_t GetMemoryType(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound = nullptr);
+
+// Debug name functions
+void SetDebugName(VkInstance obj, const std::string& name);
+void SetDebugName(VkPhysicalDevice obj, const std::string& name);
+void SetDebugName(VkDevice obj, const std::string& name);
+void SetDebugName(VkQueue obj, const std::string& name);
+void SetDebugName(VkSemaphore obj, const std::string& name);
+void SetDebugName(VkCommandBuffer obj, const std::string& name);
+void SetDebugName(VkFence obj, const std::string& name);
+void SetDebugName(VkDeviceMemory obj, const std::string& name);
+void SetDebugName(VkBuffer obj, const std::string& name);
+void SetDebugName(VkImage obj, const std::string& name);
+void SetDebugName(VkEvent obj, const std::string& name);
+void SetDebugName(VkQueryPool obj, const std::string& name);
+void SetDebugName(VkBufferView obj, const std::string& name);
+void SetDebugName(VkImageView obj, const std::string& name);
+void SetDebugName(VkShaderModule obj, const std::string& name);
+void SetDebugName(VkPipelineCache obj, const std::string& name);
+void SetDebugName(VkPipelineLayout obj, const std::string& name);
+void SetDebugName(VkRenderPass obj, const std::string& name);
+void SetDebugName(VkPipeline obj, const std::string& name);
+void SetDebugName(VkDescriptorSetLayout obj, const std::string& name);
+void SetDebugName(VkSampler obj, const std::string& name);
+void SetDebugName(VkDescriptorPool obj, const std::string& name);
+void SetDebugName(VkDescriptorSet obj, const std::string& name);
+void SetDebugName(VkFramebuffer obj, const std::string& name);
+void SetDebugName(VkCommandPool obj, const std::string& name);
+void SetDebugName(VkSurfaceKHR obj, const std::string& name);
+void SetDebugName(VkSwapchainKHR obj, const std::string& name);
+void SetDebugName(VkDebugReportCallbackEXT obj, const std::string& name);
 
 } // namespace Kodiak
