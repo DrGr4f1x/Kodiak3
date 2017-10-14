@@ -18,6 +18,7 @@
 
 namespace Math
 {
+
 class BaseCamera
 {
 public:
@@ -112,16 +113,19 @@ private:
 	bool m_reverseZ;				// Invert near and far clip distances so that Z=0 is the far plane
 };
 
+
 inline void BaseCamera::SetEyeAtUp(Vector3 eye, Vector3 at, Vector3 up)
 {
 	SetLookDirection(at - eye, up);
 	SetPosition(eye);
 }
 
+
 inline void BaseCamera::SetPosition(Vector3 worldPos)
 {
 	m_cameraToWorld.SetTranslation(worldPos);
 }
+
 
 inline void BaseCamera::SetTransform(const AffineTransform& xform)
 {
@@ -130,16 +134,19 @@ inline void BaseCamera::SetTransform(const AffineTransform& xform)
 	SetPosition(xform.GetTranslation());
 }
 
+
 inline void BaseCamera::SetRotation(Quaternion basisRotation)
 {
 	m_cameraToWorld.SetRotation(Normalize(basisRotation));
 	m_basis = Matrix3(m_cameraToWorld.GetRotation());
 }
 
+
 inline Camera::Camera() : m_reverseZ(true)
 {
 	SetPerspectiveMatrix(XM_PIDIV4, 9.0f / 16.0f, 1.0f, 1000.0f);
 }
+
 
 inline void Camera::SetPerspectiveMatrix(float verticalFovRadians, float aspectHeightOverWidth, float nearZClip, float farZClip)
 {
