@@ -10,9 +10,12 @@
 
 #pragma once
 
+#include "DescriptorHeap12.h"
+
 namespace Kodiak
 {
 
+class DescriptorAllocator;
 class SwapChain;
 
 class GraphicsDevice
@@ -49,5 +52,14 @@ private:
 
 	uint32_t m_currentBuffer{ 0 };
 };
+
+// Utility methods and accessors
+ID3D12Device* GetDevice();
+
+extern DescriptorAllocator g_descriptorAllocator[];
+inline D3D12_CPU_DESCRIPTOR_HANDLE AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE type, UINT count = 1)
+{
+	return g_descriptorAllocator[type].Allocate(count);
+}
 
 } // namespace Kodiak

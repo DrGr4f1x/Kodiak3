@@ -38,15 +38,20 @@ PFN_vkCmdDebugMarkerBeginEXT vkCmdDebugMarkerBegin{ nullptr };
 PFN_vkCmdDebugMarkerEndEXT vkCmdDebugMarkerEnd{ nullptr };
 PFN_vkCmdDebugMarkerInsertEXT vkCmdDebugMarkerInsert{ nullptr };
 
+bool g_debugMarkupAvailable = false;
+
 void SetDebugName(uint64_t obj, VkDebugReportObjectTypeEXT objType, const char* name)
 {
-	VkDebugMarkerObjectNameInfoEXT nameInfo = {};
-	nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
-	nameInfo.pNext = nullptr;
-	nameInfo.objectType = objType;
-	nameInfo.object = obj;
-	nameInfo.pObjectName = name;
-	vkDebugMarkerSetObjectName(g_device, &nameInfo);
+	if (g_debugMarkupAvailable)
+	{
+		VkDebugMarkerObjectNameInfoEXT nameInfo = {};
+		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
+		nameInfo.pNext = nullptr;
+		nameInfo.objectType = objType;
+		nameInfo.object = obj;
+		nameInfo.pObjectName = name;
+		vkDebugMarkerSetObjectName(g_device, &nameInfo);
+	}
 }
 #endif
 
@@ -87,6 +92,10 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 
 	SelectPhysicalDevice();
 
+#if ENABLE_VULKAN_DEBUG_MARKUP
+	InitializeDebugMarkup();
+#endif
+
 	// TODO: Setup features here
 
 	CreateLogicalDevice();
@@ -95,6 +104,8 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 
 	m_swapChain = make_unique<SwapChain>();
 	m_swapChain->Connect(m_instance, m_physicalDevice, m_device);
+
+	FindBestDepthFormat();
 
 	CreateSynchronizationPrimitives();
 
@@ -367,6 +378,33 @@ void GraphicsDevice::CreateSynchronizationPrimitives()
 }
 
 
+void GraphicsDevice::FindBestDepthFormat()
+{
+	// Since all depth formats may be optional, we need to find a suitable depth format to use
+	// Start with the highest precision packed format
+	std::vector<VkFormat> depthFormats = 
+	{
+		VK_FORMAT_D32_SFLOAT_S8_UINT,
+		VK_FORMAT_D32_SFLOAT,
+		VK_FORMAT_D24_UNORM_S8_UINT,
+		VK_FORMAT_D16_UNORM_S8_UINT,
+		VK_FORMAT_D16_UNORM
+	};
+
+	for (auto& format : depthFormats)
+	{
+		VkFormatProperties formatProps;
+		vkGetPhysicalDeviceFormatProperties(m_physicalDevice, format, &formatProps);
+		// Format must support depth stencil attachment for optimal tiling
+		if (formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
+		{
+			m_depthFormat = format;
+			return;
+		}
+	}
+}
+
+
 namespace
 {
 PFN_vkCreateDebugReportCallbackEXT CreateDebugReportCallback = VK_NULL_HANDLE;
@@ -459,22 +497,50 @@ void GraphicsDevice::InitializeDebugging(VkDebugReportFlagsEXT flags, VkDebugRep
 		nullptr,
 		(callBack != VK_NULL_HANDLE) ? &callBack : &msgCallback);
 	assert(!err);
+}
 
+
+void GraphicsDevice::InitializeDebugMarkup()
+{
 #if ENABLE_VULKAN_DEBUG_MARKUP
-	vkDebugMarkerSetObjectTag =
-		reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT>(vkGetInstanceProcAddr(m_instance, "vkDebugMarkerSetObjectTagEXT"));
+	bool extensionPresent = false;
 
-	vkDebugMarkerSetObjectName =
-		reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(vkGetInstanceProcAddr(m_instance, "vkDebugMarkerSetObjectNameEXT"));
+	// Check if the debug marker extension is present (which is the case if run from a graphics debugger)
+	uint32_t extensionCount;
+	vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, nullptr);
+	std::vector<VkExtensionProperties> extensions(extensionCount);
+	vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, extensions.data());
+	for (auto extension : extensions)
+	{
+		if (strcmp(extension.extensionName, VK_EXT_DEBUG_MARKER_EXTENSION_NAME) == 0)
+		{
+			extensionPresent = true;
+			break;
+		}
+	}
 
-	vkCmdDebugMarkerBegin =
-		reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(vkGetInstanceProcAddr(m_instance, "vkCmdDebugMarkerBeginEXT"));
+	if (extensionPresent)
+	{
+		vkDebugMarkerSetObjectTag =
+			reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT>(vkGetInstanceProcAddr(m_instance, "vkDebugMarkerSetObjectTagEXT"));
 
-	vkCmdDebugMarkerEnd =
-		reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(vkGetInstanceProcAddr(m_instance, "vkCmdDebugMarkerEndEXT"));
+		vkDebugMarkerSetObjectName =
+			reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(vkGetInstanceProcAddr(m_instance, "vkDebugMarkerSetObjectNameEXT"));
 
-	vkCmdDebugMarkerInsert =
-		reinterpret_cast<PFN_vkCmdDebugMarkerInsertEXT>(vkGetInstanceProcAddr(m_instance, "vkCmdDebugMarkerInsertEXT"));
+		vkCmdDebugMarkerBegin =
+			reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(vkGetInstanceProcAddr(m_instance, "vkCmdDebugMarkerBeginEXT"));
+
+		vkCmdDebugMarkerEnd =
+			reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(vkGetInstanceProcAddr(m_instance, "vkCmdDebugMarkerEndEXT"));
+
+		vkCmdDebugMarkerInsert =
+			reinterpret_cast<PFN_vkCmdDebugMarkerInsertEXT>(vkGetInstanceProcAddr(m_instance, "vkCmdDebugMarkerInsertEXT"));
+
+		if (vkDebugMarkerSetObjectName)
+		{
+			g_debugMarkupAvailable = true;
+		}
+	}
 #endif
 }
 
@@ -549,7 +615,7 @@ VkDevice Kodiak::GetDevice()
 }
 
 
-uint32_t Kodiak::GetMemoryType(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound)
+uint32_t Kodiak::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound)
 {
 	for (uint32_t i = 0; i < g_graphicsDevice->m_physicalDeviceMemoryProperties.memoryTypeCount; i++)
 	{

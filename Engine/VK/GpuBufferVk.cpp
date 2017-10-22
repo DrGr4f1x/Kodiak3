@@ -29,7 +29,7 @@ void GpuBuffer::Destroy()
 }
 
 
-void GpuBuffer::CreateBuffer(const string& name, uint32_t numElements, uint32_t elementSize, VkBufferUsageFlagBits flags, bool bHostMappable, const void* initialData)
+void GpuBuffer::CreateBuffer(const string& name, size_t numElements, size_t elementSize, VkBufferUsageFlagBits flags, bool bHostMappable, const void* initialData)
 {
 	m_elementCount = numElements;
 	m_elementSize = elementSize;
@@ -51,7 +51,7 @@ void GpuBuffer::CreateBuffer(const string& name, uint32_t numElements, uint32_t 
 	VkMemoryAllocateInfo memAlloc = {};
 	memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = GetMemoryType(memReqs.memoryTypeBits, memFlags);
+	memAlloc.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, memFlags);
 
 	ThrowIfFailed(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &m_deviceMemory));
 
@@ -77,4 +77,42 @@ void GpuBuffer::CreateBuffer(const string& name, uint32_t numElements, uint32_t 
 	m_descriptorInfo.buffer = m_buffer;
 	m_descriptorInfo.offset = 0;
 	m_descriptorInfo.range = m_bufferSize;
+}
+
+
+void IndexBuffer::Create(const string& name, size_t numElements, size_t elementSize, const void* initialData)
+{
+	assert(elementSize == 2 || elementSize == 4);
+	const bool bHostMappable = false;
+	CreateBuffer(name, numElements, elementSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, bHostMappable, initialData);
+
+	m_indexType = elementSize == 2 ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32;
+}
+
+
+void VertexBuffer::Create(const string& name, size_t numElements, size_t elementSize, const void* initialData)
+{
+	const bool bHostMappable = false;
+	CreateBuffer(name, numElements, elementSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, bHostMappable, initialData);
+}
+
+
+void ConstantBuffer::Create(const string& name, size_t numElements, size_t elementSize, const void* initialData)
+{
+	const bool bHostMappable = true;
+	CreateBuffer(name, 1, elementSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, bHostMappable, initialData);
+}
+
+
+void ConstantBuffer::Update(size_t sizeInBytes, const void* data)
+{
+	assert(sizeInBytes <= m_bufferSize);
+
+	// Map uniform buffer and update it
+	uint8_t* pData = nullptr;
+	ThrowIfFailed(vkMapMemory(GetDevice(), GetResource(), 0, sizeInBytes, 0, (void **)&pData));
+	memcpy(pData, data, sizeInBytes);
+	// Unmap after data has been copied
+	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
+	vkUnmapMemory(GetDevice(), GetResource());
 }

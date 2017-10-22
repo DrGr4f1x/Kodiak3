@@ -19,6 +19,14 @@ using namespace Kodiak;
 using namespace std;
 
 
+namespace Kodiak
+{
+
+CommandListManager g_commandManager;
+
+} // namespace Kodiak
+
+
 CommandQueue::CommandQueue(D3D12_COMMAND_LIST_TYPE type)
 	: m_type(type)
 	, m_commandQueue(nullptr)

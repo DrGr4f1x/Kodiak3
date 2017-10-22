@@ -23,7 +23,7 @@ public:
 	GpuResource() = default;
 	GpuResource(VkDeviceMemory memory);
 
-	void Destroy();
+	virtual void Destroy();
 
 	VkDeviceMemory operator->() { return m_deviceMemory; }
 	const VkDeviceMemory operator->() const { return m_deviceMemory; }

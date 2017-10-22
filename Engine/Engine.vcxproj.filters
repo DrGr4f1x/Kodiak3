@@ -4,9 +4,6 @@
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Utility.h" />
-    <ClInclude Include="DX12\SwapChain.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="DX12\SwapChain12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
@@ -93,6 +90,19 @@
     <ClInclude Include="VK\CommandBufferPoolVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
+    <ClInclude Include="DX12\DescriptorHeap12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="LinearAllocator12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\LinearAllocator12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="SwapChain.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Filesystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -143,6 +153,13 @@
     <ClCompile Include="VK\CommandBufferPoolVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
+    <ClCompile Include="DX12\DescriptorHeap12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12\LinearAllocator12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Filesystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">

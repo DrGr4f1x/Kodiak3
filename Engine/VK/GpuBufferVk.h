@@ -20,25 +20,57 @@ namespace Kodiak
 class GpuBuffer : public GpuResource
 {
 public:
+	virtual ~GpuBuffer() { Destroy(); }
 	void Destroy();
 
 	VkBuffer GetBuffer() { return m_buffer; }
 	const VkBuffer GetBuffer() const { return m_buffer; }
 
+	VkDescriptorBufferInfo& GetDescriptorInfo() { return m_descriptorInfo; }
+	const VkDescriptorBufferInfo& GetDescriptorInfo() const { return m_descriptorInfo; }
+
 	size_t GetSize() const { return m_bufferSize; }
-	uint32_t GetElementCount() const { return m_elementCount; }
-	uint32_t GetElementSize() const { return m_elementSize; }
+	size_t GetElementCount() const { return m_elementCount; }
+	size_t GetElementSize() const { return m_elementSize; }
 
 protected:
-	void CreateBuffer(const std::string& name, uint32_t numElements, uint32_t elementSize, VkBufferUsageFlagBits flags, bool bHostMappable, const void* initialData);
+	void CreateBuffer(const std::string& name, size_t numElements, size_t elementSize, VkBufferUsageFlagBits flags, bool bHostMappable, const void* initialData);
 
 protected:
 	size_t		m_bufferSize{ 0 };
-	uint32_t	m_elementCount{ 0 };
-	uint32_t	m_elementSize{ 0 };
+	size_t		m_elementCount{ 0 };
+	size_t		m_elementSize{ 0 };
 
 	VkBuffer		m_buffer{ VK_NULL_HANDLE };
 	VkDescriptorBufferInfo m_descriptorInfo;
+};
+
+
+class IndexBuffer : public GpuBuffer
+{
+public:
+	void Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData = nullptr);
+
+	VkIndexType GetIndexType() const { return m_indexType; }
+
+private:
+	VkIndexType m_indexType{ VK_INDEX_TYPE_UINT16 };
+};
+
+
+class VertexBuffer : public GpuBuffer
+{
+public:
+	void Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData = nullptr);
+};
+
+
+class ConstantBuffer : public GpuBuffer
+{
+public:
+	void Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData = nullptr);
+
+	void Update(size_t sizeInBytes, const void* data);
 };
 
 } // namespace Kodiak

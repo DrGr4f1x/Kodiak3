@@ -69,6 +69,10 @@ public:
 	static INLINE Matrix4 MakeScale(float scale) { return Matrix4(XMMatrixScaling(scale, scale, scale)); }
 	static INLINE Matrix4 MakeScale(Vector3 scale) { return Matrix4(XMMatrixScalingFromVector(scale)); }
 
+	static INLINE Matrix4 MakePerspective(float fovY, float aspect, float nearZ, float farZ)
+	{
+		return Matrix4(XMMatrixPerspectiveFovRH(fovY, aspect, nearZ, farZ));
+	}
 
 private:
 	XMMATRIX m_mat;

@@ -24,68 +24,73 @@ void Utility::ExitFatal(const std::string& message, const std::string& caption)
 }
 
 
-#if 0
 // A faster version of memcopy that uses SSE instructions.  TODO:  Write an ARM variant if necessary.
-void SIMDMemCopy(void* __restrict _Dest, const void* __restrict _Source, size_t NumQuadwords)
+void SIMDMemCopy(void* __restrict _dest, const void* __restrict _source, size_t numQuadwords)
 {
-	assert(Math::IsAligned(_Dest, 16));
-	assert(Math::IsAligned(_Source, 16));
+	assert(Math::IsAligned(_dest, 16));
+	assert(Math::IsAligned(_source, 16));
 
-	__m128i* __restrict Dest = (__m128i* __restrict)_Dest;
-	const __m128i* __restrict Source = (const __m128i* __restrict)_Source;
+	__m128i* __restrict dest = (__m128i* __restrict)_dest;
+	const __m128i* __restrict source = (const __m128i* __restrict)_source;
 
 	// Discover how many quadwords precede a cache line boundary.  Copy them separately.
-	size_t InitialQuadwordCount = (4 - ((size_t)Source >> 4) & 3) & 3;
-	if (InitialQuadwordCount > NumQuadwords)
-		InitialQuadwordCount = NumQuadwords;
-
-	switch (InitialQuadwordCount)
+	size_t initialQuadwordCount = (4 - ((size_t)source >> 4) & 3) & 3;
+	if (initialQuadwordCount > numQuadwords)
 	{
-	case 3: _mm_stream_si128(Dest + 2, _mm_load_si128(Source + 2));	 // Fall through
-	case 2: _mm_stream_si128(Dest + 1, _mm_load_si128(Source + 1));	 // Fall through
-	case 1: _mm_stream_si128(Dest + 0, _mm_load_si128(Source + 0));	 // Fall through
+		initialQuadwordCount = numQuadwords;
+	}
+
+	switch (initialQuadwordCount)
+	{
+	case 3: _mm_stream_si128(dest + 2, _mm_load_si128(source + 2));	 // Fall through
+	case 2: _mm_stream_si128(dest + 1, _mm_load_si128(source + 1));	 // Fall through
+	case 1: _mm_stream_si128(dest + 0, _mm_load_si128(source + 0));	 // Fall through
 	default:
 		break;
 	}
 
-	if (NumQuadwords == InitialQuadwordCount)
+	if (numQuadwords == initialQuadwordCount)
+	{
 		return;
+	}
 
-	Dest += InitialQuadwordCount;
-	Source += InitialQuadwordCount;
-	NumQuadwords -= InitialQuadwordCount;
+	dest += initialQuadwordCount;
+	source += initialQuadwordCount;
+	numQuadwords -= initialQuadwordCount;
 
-	size_t CacheLines = NumQuadwords >> 2;
+	size_t cacheLines = numQuadwords >> 2;
 
-	switch (CacheLines)
+	switch (cacheLines)
 	{
 	default:
-	case 10: _mm_prefetch((char*)(Source + 36), _MM_HINT_NTA);	// Fall through
-	case 9:  _mm_prefetch((char*)(Source + 32), _MM_HINT_NTA);	// Fall through
-	case 8:  _mm_prefetch((char*)(Source + 28), _MM_HINT_NTA);	// Fall through
-	case 7:  _mm_prefetch((char*)(Source + 24), _MM_HINT_NTA);	// Fall through
-	case 6:  _mm_prefetch((char*)(Source + 20), _MM_HINT_NTA);	// Fall through
-	case 5:  _mm_prefetch((char*)(Source + 16), _MM_HINT_NTA);	// Fall through
-	case 4:  _mm_prefetch((char*)(Source + 12), _MM_HINT_NTA);	// Fall through
-	case 3:  _mm_prefetch((char*)(Source + 8), _MM_HINT_NTA);	// Fall through
-	case 2:  _mm_prefetch((char*)(Source + 4), _MM_HINT_NTA);	// Fall through
-	case 1:  _mm_prefetch((char*)(Source + 0), _MM_HINT_NTA);	// Fall through
+	case 10: _mm_prefetch((char*)(source + 36), _MM_HINT_NTA);	// Fall through
+	case 9:  _mm_prefetch((char*)(source + 32), _MM_HINT_NTA);	// Fall through
+	case 8:  _mm_prefetch((char*)(source + 28), _MM_HINT_NTA);	// Fall through
+	case 7:  _mm_prefetch((char*)(source + 24), _MM_HINT_NTA);	// Fall through
+	case 6:  _mm_prefetch((char*)(source + 20), _MM_HINT_NTA);	// Fall through
+	case 5:  _mm_prefetch((char*)(source + 16), _MM_HINT_NTA);	// Fall through
+	case 4:  _mm_prefetch((char*)(source + 12), _MM_HINT_NTA);	// Fall through
+	case 3:  _mm_prefetch((char*)(source + 8), _MM_HINT_NTA);	// Fall through
+	case 2:  _mm_prefetch((char*)(source + 4), _MM_HINT_NTA);	// Fall through
+	case 1:  _mm_prefetch((char*)(source + 0), _MM_HINT_NTA);	// Fall through
 
 																// Do four quadwords per loop to minimize stalls.
-		for (size_t i = CacheLines; i > 0; --i)
+		for (size_t i = cacheLines; i > 0; --i)
 		{
 			// If this is a large copy, start prefetching future cache lines.  This also prefetches the
 			// trailing quadwords that are not part of a whole cache line.
 			if (i >= 10)
-				_mm_prefetch((char*)(Source + 40), _MM_HINT_NTA);
+			{
+				_mm_prefetch((char*)(source + 40), _MM_HINT_NTA);
+			}
 
-			_mm_stream_si128(Dest + 0, _mm_load_si128(Source + 0));
-			_mm_stream_si128(Dest + 1, _mm_load_si128(Source + 1));
-			_mm_stream_si128(Dest + 2, _mm_load_si128(Source + 2));
-			_mm_stream_si128(Dest + 3, _mm_load_si128(Source + 3));
+			_mm_stream_si128(dest + 0, _mm_load_si128(source + 0));
+			_mm_stream_si128(dest + 1, _mm_load_si128(source + 1));
+			_mm_stream_si128(dest + 2, _mm_load_si128(source + 2));
+			_mm_stream_si128(dest + 3, _mm_load_si128(source + 3));
 
-			Dest += 4;
-			Source += 4;
+			dest += 4;
+			source += 4;
 		}
 
 	case 0:	// No whole cache lines to read
@@ -93,11 +98,11 @@ void SIMDMemCopy(void* __restrict _Dest, const void* __restrict _Source, size_t 
 	}
 
 	// Copy the remaining quadwords
-	switch (NumQuadwords & 3)
+	switch (numQuadwords & 3)
 	{
-	case 3: _mm_stream_si128(Dest + 2, _mm_load_si128(Source + 2));	 // Fall through
-	case 2: _mm_stream_si128(Dest + 1, _mm_load_si128(Source + 1));	 // Fall through
-	case 1: _mm_stream_si128(Dest + 0, _mm_load_si128(Source + 0));	 // Fall through
+	case 3: _mm_stream_si128(dest + 2, _mm_load_si128(source + 2));	 // Fall through
+	case 2: _mm_stream_si128(dest + 1, _mm_load_si128(source + 1));	 // Fall through
+	case 1: _mm_stream_si128(dest + 0, _mm_load_si128(source + 0));	 // Fall through
 	default:
 		break;
 	}
@@ -105,43 +110,43 @@ void SIMDMemCopy(void* __restrict _Dest, const void* __restrict _Source, size_t 
 	_mm_sfence();
 }
 
-void SIMDMemFill(void* __restrict _Dest, __m128 FillVector, size_t NumQuadwords)
+
+void SIMDMemFill(void* __restrict _dest, __m128 fillVector, size_t numQuadwords)
 {
-	assert(Math::IsAligned(_Dest, 16));
+	assert(Math::IsAligned(_dest, 16));
 
-	register const __m128i Source = _mm_castps_si128(FillVector);
-	__m128i* __restrict Dest = (__m128i* __restrict)_Dest;
+	register const __m128i source = _mm_castps_si128(fillVector);
+	__m128i* __restrict dest = (__m128i* __restrict)_dest;
 
-	switch (((size_t)Dest >> 4) & 3)
+	switch (((size_t)dest >> 4) & 3)
 	{
-	case 1: _mm_stream_si128(Dest++, Source); --NumQuadwords;	 // Fall through
-	case 2: _mm_stream_si128(Dest++, Source); --NumQuadwords;	 // Fall through
-	case 3: _mm_stream_si128(Dest++, Source); --NumQuadwords;	 // Fall through
+	case 1: _mm_stream_si128(dest++, source); --numQuadwords;	 // Fall through
+	case 2: _mm_stream_si128(dest++, source); --numQuadwords;	 // Fall through
+	case 3: _mm_stream_si128(dest++, source); --numQuadwords;	 // Fall through
 	default:
 		break;
 	}
 
-	size_t WholeCacheLines = NumQuadwords >> 2;
+	size_t wholeCacheLines = numQuadwords >> 2;
 
 	// Do four quadwords per loop to minimize stalls.
-	while (WholeCacheLines--)
+	while (wholeCacheLines--)
 	{
-		_mm_stream_si128(Dest++, Source);
-		_mm_stream_si128(Dest++, Source);
-		_mm_stream_si128(Dest++, Source);
-		_mm_stream_si128(Dest++, Source);
+		_mm_stream_si128(dest++, source);
+		_mm_stream_si128(dest++, source);
+		_mm_stream_si128(dest++, source);
+		_mm_stream_si128(dest++, source);
 	}
 
 	// Copy the remaining quadwords
-	switch (NumQuadwords & 3)
+	switch (numQuadwords & 3)
 	{
-	case 3: _mm_stream_si128(Dest++, Source);	 // Fall through
-	case 2: _mm_stream_si128(Dest++, Source);	 // Fall through
-	case 1: _mm_stream_si128(Dest++, Source);	 // Fall through
+	case 3: _mm_stream_si128(dest++, source);	 // Fall through
+	case 2: _mm_stream_si128(dest++, source);	 // Fall through
+	case 1: _mm_stream_si128(dest++, source);	 // Fall through
 	default:
 		break;
 	}
 
 	_mm_sfence();
 }
-#endif

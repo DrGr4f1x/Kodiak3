@@ -140,4 +140,6 @@ private:
 	CommandQueue m_copyQueue;
 };
 
+extern CommandListManager g_commandManager;
+
 } // namespace Kodiak

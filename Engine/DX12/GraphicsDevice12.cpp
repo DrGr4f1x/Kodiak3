@@ -22,10 +22,12 @@ using namespace Kodiak;
 using namespace std;
 
 
-namespace Kodiak
+namespace
 {
-CommandListManager g_commandManager;
-} // namespace Kodiak
+
+ID3D12Device* g_device{ nullptr };
+
+} // anonymous namespace
 
 
 GraphicsDevice::GraphicsDevice() = default;
@@ -138,6 +140,8 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 	}
 #endif
 
+	g_device = m_device.Get();
+
 #if _DEBUG
 	ID3D12InfoQueue* pInfoQueue = nullptr;
 	if (SUCCEEDED(m_device->QueryInterface(MY_IID_PPV_ARGS(&pInfoQueue))))
@@ -240,6 +244,8 @@ void GraphicsDevice::Destroy()
 	}
 #endif
 
+	g_device = nullptr;
+
 	m_device.Reset();
 }
 
@@ -255,4 +261,10 @@ void GraphicsDevice::SubmitFrame()
 	UINT presentInterval = 0;
 
 	m_swapChain->Present(presentInterval);
+}
+
+
+ID3D12Device* Kodiak::GetDevice()
+{
+	return g_device;
 }

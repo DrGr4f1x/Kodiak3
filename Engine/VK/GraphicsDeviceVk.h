@@ -17,7 +17,7 @@ class SwapChain;
 
 class GraphicsDevice
 {
-	friend uint32_t GetMemoryType(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound);
+	friend uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound);
 
 public:
 	GraphicsDevice();
@@ -29,6 +29,15 @@ public:
 	void PrepareFrame();
 	void SubmitFrame();
 
+	SwapChain* GetSwapChain() { return m_swapChain.get(); }
+
+	VkFormat GetDepthFormat() const { return m_depthFormat; }
+	uint32_t GetCurrentBuffer() const { return m_currentBuffer; }
+
+	// TODO: Hacks
+	VkSemaphore GetPresentCompleteSemaphore() const { return m_semaphores.presentComplete; }
+	VkSemaphore GetRenderCompleteSemaphore() const { return m_semaphores.renderComplete; }
+
 private:
 	void CreateVulkanInstance();
 	void SelectPhysicalDevice();
@@ -36,10 +45,13 @@ private:
 	void CreateSynchronizationPrimitives();
 
 	void InitializeDebugging(VkDebugReportFlagsEXT flags, VkDebugReportCallbackEXT callBack);
+	void InitializeDebugMarkup();
 	void FreeDebugCallback();
 
 	uint32_t GetQueueFamilyIndex(VkQueueFlagBits queueFlags);
 	bool IsExtensionSupported(const std::string& name);
+
+	void FindBestDepthFormat();
 
 private:
 	bool m_initialized{ false };
@@ -99,12 +111,14 @@ private:
 	VkPipelineStageFlags m_submitPipelineStages{ VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
 	uint32_t m_currentBuffer{ 0 };
+
+	VkFormat m_depthFormat{ VK_FORMAT_UNDEFINED };
 };
 
 
 // Utility methods and accessors
 VkDevice GetDevice();
-uint32_t GetMemoryType(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound = nullptr);
+uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound = nullptr);
 
 // Debug name functions
 void SetDebugName(VkInstance obj, const std::string& name);

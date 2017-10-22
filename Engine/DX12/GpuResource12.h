@@ -33,7 +33,7 @@ public:
 
 	D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return m_gpuVirtualAddress; }
 
-private:
+protected:
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_resource;
 	D3D12_RESOURCE_STATES m_usageState;
 	D3D12_RESOURCE_STATES m_transitioningState;

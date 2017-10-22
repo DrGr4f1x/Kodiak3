@@ -75,7 +75,9 @@ inline void ThrowIfFailed(VkResult res)
 #include <cstdio>
 #include <cstdarg>
 #include <exception>
+#include <fstream>
 #include <functional>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <mutex>

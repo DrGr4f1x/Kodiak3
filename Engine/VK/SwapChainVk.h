@@ -32,6 +32,12 @@ public:
 	VkResult AcquireNextImage(VkSemaphore presentCompleteSemaphore, uint32_t* imageIndex);
 	VkResult QueuePresent(VkQueue queue, uint32_t imageIndex, VkSemaphore waitSemaphore = VK_NULL_HANDLE);
 
+	VkFormat GetColorFormat() const { return m_colorFormat; }
+	uint32_t GetImageCount() const { return m_imageCount; }
+
+	// TODO: remove this hack
+	VkImageView GetImageView(uint32_t index) const { return m_buffers[index].view; }
+
 private:
 	VkInstance m_instance{ VK_NULL_HANDLE };
 	VkPhysicalDevice m_physicalDevice{ VK_NULL_HANDLE };

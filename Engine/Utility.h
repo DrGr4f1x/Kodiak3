@@ -127,10 +127,10 @@ Utility::Printf( msg "\n", ##__VA_ARGS__ );
 
 #define BreakIfFailed( hr ) if (FAILED(hr)) __debugbreak()
 
-#if 0
-void SIMDMemCopy(void* __restrict Dest, const void* __restrict Source, size_t NumQuadwords);
-void SIMDMemFill(void* __restrict Dest, __m128 FillVector, size_t NumQuadwords);
-#endif
+
+void SIMDMemCopy(void* __restrict dest, const void* __restrict source, size_t numQuadwords);
+void SIMDMemFill(void* __restrict dest, __m128 fillVector, size_t numQuadwords);
+
 
 
 // Smart pointer helpers

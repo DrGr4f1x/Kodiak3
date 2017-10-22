@@ -92,6 +92,12 @@ void CommandContext::Finish(bool waitForCompletion)
 }
 
 
+void CommandContext::Finish(VkSemaphore waitSemaphore, VkSemaphore signalSemaphore, bool waitForCompletion)
+{
+	FinishInternal(waitSemaphore, signalSemaphore, waitForCompletion);
+}
+
+
 void CommandContext::Initialize()
 {
 	assert(m_commandList == VK_NULL_HANDLE);
@@ -115,7 +121,7 @@ void CommandContext::InitializeBuffer(GpuBuffer& dest, const void* initialData, 
 	VkMemoryAllocateInfo memAlloc = {};
 	memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = GetMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	memAlloc.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	void* data = nullptr;
 
@@ -213,4 +219,53 @@ void CommandContext::FinishInternal(VkSemaphore waitSemaphore, VkSemaphore signa
 	}
 
 	g_contextManager.FreeContext(this);
+}
+
+
+void GraphicsContext::SetViewport(float x, float y, float w, float h, float minDepth, float maxDepth)
+{
+	VkViewport viewport = {};
+	viewport.x = x;
+	viewport.y = y;
+	viewport.height = h;
+	viewport.width = w;
+	viewport.minDepth = minDepth;
+	viewport.maxDepth = maxDepth;
+	vkCmdSetViewport(m_commandList, 0, 1, &viewport);
+}
+
+
+void GraphicsContext::SetScissor(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom)
+{
+	VkRect2D scissor = {};
+	scissor.extent.width = right - left;
+	scissor.extent.height = bottom - top;
+	scissor.offset.x = static_cast<int32_t>(left);
+	scissor.offset.y = static_cast<int32_t>(top);
+	vkCmdSetScissor(m_commandList, 0, 1, &scissor);
+}
+
+
+void GraphicsContext::SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+{
+	VkViewport vp{ (float)x, (float)y, (float)w, (float)h, 0.0f, 1.0f };
+	VkRect2D rect;
+	rect.extent.width = w;
+	rect.extent.height = h;
+	rect.offset.x = static_cast<int32_t>(x);
+	rect.offset.y = static_cast<int32_t>(y);
+	vkCmdSetViewport(m_commandList, 0, 1, &vp);
+	vkCmdSetScissor(m_commandList, 0, 1, &rect);
+}
+
+
+void GraphicsContext::BindDescriptorSet(VkPipelineLayout pipelineLayout, VkDescriptorSet descriptorSet)
+{
+	vkCmdBindDescriptorSets(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+}
+
+
+void GraphicsContext::BindPipeline(VkPipeline pipeline)
+{
+	vkCmdBindPipeline(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 }

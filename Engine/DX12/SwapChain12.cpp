@@ -23,12 +23,6 @@ using namespace Kodiak;
 #define SWAP_CHAIN_BUFFER_COUNT 3
 
 
-namespace Kodiak
-{
-extern CommandListManager g_commandManager;
-} // namespace Kodiak
-
-
 void SwapChain::Create(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height, DXGI_FORMAT format)
 {
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
@@ -46,7 +40,7 @@ void SwapChain::Create(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, ui
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) // Win32
 	assert_succeeded(dxgiFactory->CreateSwapChainForHwnd(g_commandManager.GetCommandQueue(), hWnd, &swapChainDesc, nullptr, nullptr, &m_swapChain));
 #else // UWP
-	ASSERT_SUCCEEDED(dxgiFactory->CreateSwapChainForCoreWindow(g_commandManager.GetCommandQueue(), (IUnknown*)GameCore::g_window.Get(), &swapChainDesc, nullptr, &m_swapChain));
+	assert_succeeded(dxgiFactory->CreateSwapChainForCoreWindow(g_commandManager.GetCommandQueue(), (IUnknown*)GameCore::g_window.Get(), &swapChainDesc, nullptr, &m_swapChain));
 #endif
 }
 
