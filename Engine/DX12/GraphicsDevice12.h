@@ -30,6 +30,9 @@ public:
 	void PrepareFrame();
 	void SubmitFrame();
 
+	SwapChain* GetSwapChain() { return m_swapChain.get(); }
+	DXGI_FORMAT GetDepthFormat() const { return DXGI_FORMAT_D24_UNORM_S8_UINT; }
+
 private:
 	bool m_initialized{ false };
 

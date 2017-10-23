@@ -12,6 +12,8 @@
 
 #include "Application.h"
 #include "GpuBuffer.h"
+#include "PipelineState.h"
+#include "RootSignature.h"
 
 class TriangleApp : public Kodiak::Application
 {
@@ -38,6 +40,12 @@ private:
 	void InitPipeline();
 
 	void ShutdownVk();
+#endif
+
+#if DX12
+	void InitDX12();
+
+	void ShutdownDX12();
 #endif
 
 private:
@@ -79,5 +87,10 @@ private:
 	VkDescriptorSetLayout m_descriptorSetLayout{ VK_NULL_HANDLE };
 	VkDescriptorSet m_descriptorSet{ VK_NULL_HANDLE };
 	VkDescriptorPool m_descriptorPool{ VK_NULL_HANDLE };
+#endif
+
+#if DX12
+	Kodiak::RootSignature	m_rootSig;
+	Kodiak::GraphicsPSO		m_pso;
 #endif
 };

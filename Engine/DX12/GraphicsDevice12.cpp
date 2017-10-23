@@ -12,9 +12,11 @@
 
 #include "GraphicsDevice12.h"
 
-#include "Utility.h"
+#include "Shader.h"
 
 #include "CommandListManager12.h"
+#include "PipelineState12.h"
+#include "RootSignature12.h"
 #include "SwapChain12.h"
 
 
@@ -219,6 +221,8 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 		}
 	}
 
+	ThrowIfFailed(D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModels, nullptr, nullptr));
+
 	g_commandManager.Create(m_device.Get());
 
 	m_swapChain = make_unique<SwapChain>();
@@ -230,6 +234,10 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 
 void GraphicsDevice::Destroy()
 {
+	PSO::DestroyAll();
+	Shader::DestroyAll();
+	RootSignature::DestroyAll();
+
 	g_commandManager.Shutdown();
 
 	m_swapChain->Destroy();

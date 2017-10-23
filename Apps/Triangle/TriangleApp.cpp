@@ -15,6 +15,7 @@
 #include "CommandContext.h"
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
+#include "Shader.h"
 #include "SwapChain.h"
 
 
@@ -69,6 +70,10 @@ void TriangleApp::Startup()
 #if VK
 	InitVk();
 #endif
+
+#if DX12
+	InitDX12();
+#endif
 }
 
 
@@ -81,6 +86,11 @@ void TriangleApp::Shutdown()
 #if VK
 	ShutdownVk();
 #endif
+
+#if DX12
+	ShutdownDX12();
+#endif
+
 }
 
 
@@ -660,5 +670,86 @@ void TriangleApp::ShutdownVk()
 
 	vkDestroyDescriptorSetLayout(GetDevice(), m_descriptorSetLayout, nullptr);
 	m_descriptorSetLayout = VK_NULL_HANDLE;
+}
+#endif
+
+
+#if DX12
+void TriangleApp::InitDX12()
+{
+	m_rootSig.Reset(1);
+	m_rootSig[0].InitAsConstantBuffer(0, D3D12_SHADER_VISIBILITY_VERTEX);
+	m_rootSig.Finalize("Root sig", D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+	m_pso.SetRootSignature(m_rootSig);
+
+	D3D12_BLEND_DESC blendDesc = {};
+	blendDesc.IndependentBlendEnable = FALSE;
+	blendDesc.RenderTarget[0].BlendEnable = FALSE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+	m_pso.SetBlendState(blendDesc);
+
+	D3D12_DEPTH_STENCIL_DESC depthDesc = {};
+	depthDesc.DepthEnable = TRUE;
+	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	depthDesc.StencilEnable = FALSE;
+	depthDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+	depthDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+	depthDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	depthDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+	depthDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	depthDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	depthDesc.BackFace = depthDesc.FrontFace;
+
+	m_pso.SetDepthStencilState(depthDesc);
+
+	D3D12_RASTERIZER_DESC rasterDesc = {};
+	rasterDesc.FillMode = D3D12_FILL_MODE_SOLID;
+	rasterDesc.CullMode = D3D12_CULL_MODE_BACK;
+	rasterDesc.FrontCounterClockwise = TRUE;
+	rasterDesc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
+	rasterDesc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
+	rasterDesc.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
+	rasterDesc.DepthClipEnable = TRUE;
+	rasterDesc.MultisampleEnable = FALSE;
+	rasterDesc.AntialiasedLineEnable = FALSE;
+	rasterDesc.ForcedSampleCount = 0;
+	rasterDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+
+	m_pso.SetRasterizerState(rasterDesc);
+
+	auto vs = Shader::Load("TriangleVS");
+	auto ps = Shader::Load("TrianglePS");
+
+	m_pso.SetVertexShader(vs);
+	m_pso.SetPixelShader(ps);
+
+	m_pso.SetRenderTargetFormat(m_graphicsDevice->GetSwapChain()->GetFormat(), m_graphicsDevice->GetDepthFormat());
+
+	m_pso.SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+
+	D3D12_INPUT_ELEMENT_DESC elemDescs[2] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+	};
+
+	m_pso.SetInputLayout(2, elemDescs);
+
+	m_pso.Finalize();
+}
+
+
+void TriangleApp::ShutdownDX12()
+{
+
 }
 #endif

@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "ColorBuffer12.h"
+
 namespace Kodiak
 {
 
@@ -22,9 +24,16 @@ public:
 	void Present(UINT presentInterval);
 
 	static uint32_t GetBufferCount();
+	DXGI_FORMAT GetFormat() const { return m_format; }
+
+	ColorBuffer& GetColorBuffer(uint32_t index) { return m_displayPlanes[index]; }
+	const ColorBuffer& GetColorBuffer(uint32_t index) const { return m_displayPlanes[index]; }
 
 private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> m_swapChain;
+	DXGI_FORMAT m_format{ DXGI_FORMAT_UNKNOWN };
+
+	std::vector<ColorBuffer> m_displayPlanes;
 };
 
 } // namespace Kodiak

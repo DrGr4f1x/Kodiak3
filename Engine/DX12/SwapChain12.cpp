@@ -25,6 +25,8 @@ using namespace Kodiak;
 
 void SwapChain::Create(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height, DXGI_FORMAT format)
 {
+	m_format = format;
+
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 	swapChainDesc.Width = width;
 	swapChainDesc.Height = height;
@@ -42,11 +44,28 @@ void SwapChain::Create(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, ui
 #else // UWP
 	assert_succeeded(dxgiFactory->CreateSwapChainForCoreWindow(g_commandManager.GetCommandQueue(), (IUnknown*)GameCore::g_window.Get(), &swapChainDesc, nullptr, &m_swapChain));
 #endif
+
+	m_displayPlanes.reserve(SWAP_CHAIN_BUFFER_COUNT);
+	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i)
+	{
+		Microsoft::WRL::ComPtr<ID3D12Resource> displayPlane;
+		assert_succeeded(m_swapChain->GetBuffer(i, MY_IID_PPV_ARGS(&displayPlane)));
+
+		ColorBuffer buffer;
+		buffer.CreateFromSwapChain("Primary SwapChain Buffer", displayPlane.Detach());
+		m_displayPlanes.push_back(buffer);
+	}
 }
 
 
 void SwapChain::Destroy()
 {
+	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i)
+	{
+		m_displayPlanes[i].Destroy();
+	}
+	m_displayPlanes.clear();
+
 	m_swapChain.Reset();
 }
 
