@@ -82,6 +82,7 @@ void TriangleApp::Shutdown()
 	m_vertexBuffer.Destroy();
 	m_indexBuffer.Destroy();
 	m_constantBuffer.Destroy();
+	m_depthBuffer.Destroy();
 
 #if VK
 	ShutdownVk();
@@ -176,6 +177,12 @@ void TriangleApp::UpdateConstantBuffer()
 }
 
 
+void TriangleApp::InitDepthStencil()
+{
+	m_depthBuffer.Create("Depth Buffer", m_displayWidth, m_displayHeight, m_graphicsDevice->GetDepthFormat());
+}
+
+
 #if VK
 void TriangleApp::InitVk()
 {
@@ -263,51 +270,6 @@ void TriangleApp::InitRenderPass()
 }
 
 
-void TriangleApp::InitDepthStencil()
-{
-	// Create an optimal image used as the depth stencil attachment
-	VkImageCreateInfo image = {};
-	image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-	image.imageType = VK_IMAGE_TYPE_2D;
-	image.format = m_graphicsDevice->GetDepthFormat();
-	// Use example's height and width
-	image.extent = { m_displayWidth, m_displayHeight, 1 };
-	image.mipLevels = 1;
-	image.arrayLayers = 1;
-	image.samples = VK_SAMPLE_COUNT_1_BIT;
-	image.tiling = VK_IMAGE_TILING_OPTIMAL;
-	image.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-	image.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	ThrowIfFailed(vkCreateImage(GetDevice(), &image, nullptr, &m_depthStencilImage));
-
-	// Allocate memory for the image (device local) and bind it to our image
-	VkMemoryAllocateInfo memAlloc = {};
-	memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	VkMemoryRequirements memReqs;
-	vkGetImageMemoryRequirements(GetDevice(), m_depthStencilImage, &memReqs);
-	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, nullptr);
-	ThrowIfFailed(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &m_depthStencilMem));
-	ThrowIfFailed(vkBindImageMemory(GetDevice(), m_depthStencilImage, m_depthStencilMem, 0));
-
-	// Create a view for the depth stencil image
-	// Images aren't directly accessed in Vulkan, but rather through views described by a subresource range
-	// This allows for multiple views of one image with differing ranges (e.g. for different layers)
-	VkImageViewCreateInfo depthStencilView = {};
-	depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-	depthStencilView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	depthStencilView.format = m_graphicsDevice->GetDepthFormat();
-	depthStencilView.subresourceRange = {};
-	depthStencilView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
-	depthStencilView.subresourceRange.baseMipLevel = 0;
-	depthStencilView.subresourceRange.levelCount = 1;
-	depthStencilView.subresourceRange.baseArrayLayer = 0;
-	depthStencilView.subresourceRange.layerCount = 1;
-	depthStencilView.image = m_depthStencilImage;
-	ThrowIfFailed(vkCreateImageView(GetDevice(), &depthStencilView, nullptr, &m_depthStencilView));
-}
-
-
 void TriangleApp::InitFramebuffers()
 {
 	SwapChain* swapChain = m_graphicsDevice->GetSwapChain();
@@ -319,7 +281,7 @@ void TriangleApp::InitFramebuffers()
 	{
 		std::array<VkImageView, 2> attachments;
 		attachments[0] = swapChain->GetColorBuffer(i).GetRTV();						// Color attachment is the view of the swapchain image			
-		attachments[1] = m_depthStencilView;										// Depth/Stencil attachment is the same for all frame buffers			
+		attachments[1] = m_depthBuffer.GetDSV();									// Depth/Stencil attachment is the same for all frame buffers			
 
 		VkFramebufferCreateInfo frameBufferCreateInfo = {};
 		frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -664,15 +626,6 @@ void TriangleApp::ShutdownVk()
 	}
 	m_framebuffers.clear();
 
-	vkDestroyImage(GetDevice(), m_depthStencilImage, nullptr);
-	m_depthStencilImage = VK_NULL_HANDLE;
-
-	vkDestroyImageView(GetDevice(), m_depthStencilView, nullptr);
-	m_depthStencilView = VK_NULL_HANDLE;
-
-	vkFreeMemory(GetDevice(), m_depthStencilMem, nullptr);
-	m_depthStencilMem = VK_NULL_HANDLE;
-
 	vkDestroyPipeline(GetDevice(), m_pipeline, nullptr);
 	m_pipeline = VK_NULL_HANDLE;
 
@@ -762,14 +715,10 @@ void TriangleApp::InitDX12()
 	m_pso.SetInputLayout(2, elemDescs);
 
 	m_pso.Finalize();
-
-	// Create depth buffer
-	m_depthBuffer.Create("Depth buffer", m_displayWidth, m_displayHeight, DXGI_FORMAT_D32_FLOAT);
 }
 
 
 void TriangleApp::ShutdownDX12()
 {
-	m_depthBuffer.Destroy();
 }
 #endif

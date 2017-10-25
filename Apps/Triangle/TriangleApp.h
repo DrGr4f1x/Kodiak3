@@ -29,10 +29,12 @@ public:
 
 private:
 	void UpdateConstantBuffer();
+
+	void InitDepthStencil();
+
 #if VK
 	void InitVk();
 	void InitRenderPass();
-	void InitDepthStencil();
 	void InitFramebuffers();
 	void InitDescriptorPool();
 	void InitDescriptorSetLayout();
@@ -76,12 +78,11 @@ private:
 	// Camera controls
 	float m_zoom{ -2.5f };
 
+	Kodiak::DepthBuffer		m_depthBuffer{ 1.0f };
+
 #if VK
 	VkRenderPass m_renderPass{ VK_NULL_HANDLE };
 	std::vector<VkFramebuffer> m_framebuffers;
-	VkImage m_depthStencilImage{ VK_NULL_HANDLE };
-	VkDeviceMemory m_depthStencilMem{ VK_NULL_HANDLE };
-	VkImageView m_depthStencilView{ VK_NULL_HANDLE };
 	VkPipelineLayout m_pipelineLayout{ VK_NULL_HANDLE };
 	VkPipeline m_pipeline{ VK_NULL_HANDLE };
 	VkPipelineCache m_pipelineCache{ VK_NULL_HANDLE };
@@ -93,6 +94,5 @@ private:
 #if DX12
 	Kodiak::RootSignature	m_rootSig;
 	Kodiak::GraphicsPSO		m_pso;
-	Kodiak::DepthBuffer		m_depthBuffer{ 1.0f };
 #endif
 };
