@@ -83,8 +83,6 @@ void TriangleApp::Shutdown()
 	m_indexBuffer.Destroy();
 	m_constantBuffer.Destroy();
 
-	m_depthBuffer.Destroy();
-
 #if VK
 	ShutdownVk();
 #endif
