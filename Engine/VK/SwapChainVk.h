@@ -10,15 +10,10 @@
 
 #pragma once
 
+#include "ColorBufferVk.h"
+
 namespace Kodiak
 {
-
-typedef struct _SwapChainBuffers 
-{
-	VkImage image;
-	VkImageView view;
-} SwapChainBuffer;
-
 
 class SwapChain
 {
@@ -35,8 +30,8 @@ public:
 	VkFormat GetColorFormat() const { return m_colorFormat; }
 	uint32_t GetImageCount() const { return m_imageCount; }
 
-	// TODO: remove this hack
-	VkImageView GetImageView(uint32_t index) const { return m_buffers[index].view; }
+	ColorBuffer& GetColorBuffer(uint32_t index) { return m_displayPlanes[index]; }
+	const ColorBuffer& GetColorBuffer(uint32_t index) const { return m_displayPlanes[index]; }
 
 private:
 	VkInstance m_instance{ VK_NULL_HANDLE };
@@ -54,7 +49,7 @@ private:
 
 	uint32_t m_imageCount{ 0 };
 	std::vector<VkImage> m_images;
-	std::vector<SwapChainBuffer> m_buffers;
+	std::vector<ColorBuffer> m_displayPlanes;
 };
 
 } // namespace Kodiak

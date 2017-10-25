@@ -281,7 +281,7 @@ void SwapChain::Create(uint32_t* width, uint32_t* height, bool vsync)
 	{
 		for (uint32_t i = 0; i < m_imageCount; ++i)
 		{
-			vkDestroyImageView(m_device, m_buffers[i].view, nullptr);
+			m_displayPlanes[i].Destroy();
 		}
 		vkDestroySwapchainKHR(m_device, oldSwapchain, nullptr);
 	}
@@ -292,33 +292,10 @@ void SwapChain::Create(uint32_t* width, uint32_t* height, bool vsync)
 	ThrowIfFailed(vkGetSwapchainImagesKHR(m_device, m_swapChain, &m_imageCount, m_images.data()));
 
 	// Get the swap chain buffers containing the image and imageview
-	m_buffers.resize(m_imageCount);
+	m_displayPlanes.resize(m_imageCount);
 	for (uint32_t i = 0; i < m_imageCount; ++i)
 	{
-		VkImageViewCreateInfo colorAttachmentView = {};
-		colorAttachmentView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		colorAttachmentView.pNext = nullptr;
-		colorAttachmentView.format = m_colorFormat;
-		colorAttachmentView.components = 
-		{
-			VK_COMPONENT_SWIZZLE_R,
-			VK_COMPONENT_SWIZZLE_G,
-			VK_COMPONENT_SWIZZLE_B,
-			VK_COMPONENT_SWIZZLE_A
-		};
-		colorAttachmentView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		colorAttachmentView.subresourceRange.baseMipLevel = 0;
-		colorAttachmentView.subresourceRange.levelCount = 1;
-		colorAttachmentView.subresourceRange.baseArrayLayer = 0;
-		colorAttachmentView.subresourceRange.layerCount = 1;
-		colorAttachmentView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		colorAttachmentView.flags = 0;
-
-		m_buffers[i].image = m_images[i];
-
-		colorAttachmentView.image = m_buffers[i].image;
-
-		ThrowIfFailed(vkCreateImageView(m_device, &colorAttachmentView, nullptr, &m_buffers[i].view));
+		m_displayPlanes[i].CreateFromSwapChain("Primary SwapChain Buffer", m_images[i], *width, *height, m_colorFormat);
 	}
 }
 
@@ -329,8 +306,9 @@ void SwapChain::Destroy()
 	{
 		for (uint32_t i = 0; i < m_imageCount; ++i)
 		{
-			vkDestroyImageView(m_device, m_buffers[i].view, nullptr);
+			m_displayPlanes[i].Destroy();
 		}
+		m_displayPlanes.clear();
 	}
 
 	if (m_surface != VK_NULL_HANDLE)

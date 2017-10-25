@@ -318,7 +318,7 @@ void TriangleApp::InitFramebuffers()
 	for (uint32_t i = 0; i < imageCount; ++i)
 	{
 		std::array<VkImageView, 2> attachments;
-		attachments[0] = swapChain->GetImageView(i);								// Color attachment is the view of the swapchain image			
+		attachments[0] = swapChain->GetColorBuffer(i).GetRTV();						// Color attachment is the view of the swapchain image			
 		attachments[1] = m_depthStencilView;										// Depth/Stencil attachment is the same for all frame buffers			
 
 		VkFramebufferCreateInfo frameBufferCreateInfo = {};
