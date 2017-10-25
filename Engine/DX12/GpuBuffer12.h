@@ -30,10 +30,13 @@ public:
 	// Create a buffer.  If initial data is provided, it will be copied into the buffer using the default command context.
 	void Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData = nullptr);
 
+	D3D12_GPU_VIRTUAL_ADDRESS RootConstantBufferView() const { return m_gpuVirtualAddress; }
+
 protected:
 	GpuBuffer()
 	{
 		m_resourceFlags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		m_usageState = D3D12_RESOURCE_STATE_COMMON;
 		m_uav.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 		m_srv.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	}
@@ -47,8 +50,10 @@ protected:
 	size_t m_bufferSize{ 0 };
 	size_t m_elementCount{ 0 };
 	size_t m_elementSize{ 0 };
+	bool m_forceAlign256{ false };
 
 	D3D12_RESOURCE_FLAGS m_resourceFlags;
+	D3D12_HEAP_TYPE m_heapType{ D3D12_HEAP_TYPE_DEFAULT };
 };
 
 
@@ -84,6 +89,9 @@ public:
 	ConstantBuffer()
 	{
 		m_usageState = D3D12_RESOURCE_STATE_GENERIC_READ;
+		m_heapType = D3D12_HEAP_TYPE_UPLOAD;
+		m_resourceFlags = D3D12_RESOURCE_FLAG_NONE;
+		m_forceAlign256 = true;
 	}
 
 	void CreateDerivedViews() override;

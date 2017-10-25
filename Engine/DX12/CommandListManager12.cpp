@@ -93,7 +93,7 @@ void CommandQueue::Create(ID3D12Device* device)
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 	queueDesc.Type = m_type;
 	queueDesc.NodeMask = 1;
-	device->CreateCommandQueue(&queueDesc, MY_IID_PPV_ARGS(&m_commandQueue));
+	ThrowIfFailed(device->CreateCommandQueue(&queueDesc, MY_IID_PPV_ARGS(&m_commandQueue)));
 	m_commandQueue->SetName(L"CommandListManager::m_CommandQueue");
 
 	assert_succeeded(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, MY_IID_PPV_ARGS(&m_fence)));

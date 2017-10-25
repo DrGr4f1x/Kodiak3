@@ -93,9 +93,6 @@
     <ClInclude Include="DX12\DescriptorHeap12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
-    <ClInclude Include="LinearAllocator12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="DX12\LinearAllocator12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
@@ -152,6 +149,15 @@
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
     <ClInclude Include="VK\DepthBufferVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Framebuffer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\Framebuffer12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\FramebufferVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
   </ItemGroup>
@@ -244,6 +250,12 @@
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
     <ClCompile Include="VK\DepthBufferVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12\Framebuffer12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\FramebufferVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
   </ItemGroup>

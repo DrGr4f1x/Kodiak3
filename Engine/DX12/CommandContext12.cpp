@@ -12,7 +12,9 @@
 
 #include "CommandContext12.h"
 
+#include "ColorBuffer12.h"
 #include "CommandListManager12.h"
+#include "DepthBuffer12.h"
 
 
 using namespace Kodiak;
@@ -61,6 +63,45 @@ CommandContext* ContextManager::AllocateContext(D3D12_COMMAND_LIST_TYPE type)
 }
 
 
+void ContextManager::FreeContext(CommandContext* usedContext)
+{
+	assert(usedContext != nullptr);
+	lock_guard<mutex> CS(sm_contextAllocationMutex);
+
+	sm_availableContexts[usedContext->m_type].push(usedContext);
+}
+
+
+void ContextManager::DestroyAllContexts()
+{
+	for (uint32_t i = 0; i < 4; ++i)
+	{
+		sm_contextPool[i].clear();
+	}
+}
+
+
+CommandContext::~CommandContext()
+{
+	if (m_commandList != nullptr)
+	{
+		m_commandList->Release();
+		m_commandList = nullptr;
+	}
+}
+
+
+void CommandContext::DestroyAllContexts()
+{
+	LinearAllocator::DestroyAll();
+	// TODO
+#if 0
+	DynamicDescriptorHeap::DestroyAll();
+#endif
+	g_contextManager.DestroyAllContexts();
+}
+
+
 CommandContext& CommandContext::Begin(const string id)
 {
 	auto newContext = g_contextManager.AllocateContext(D3D12_COMMAND_LIST_TYPE_DIRECT);
@@ -97,10 +138,11 @@ uint64_t CommandContext::Finish(bool waitForCompletion)
 	cmdQueue.DiscardAllocator(fenceValue, m_currentAllocator);
 	m_currentAllocator = nullptr;
 
+
+	m_cpuLinearAllocator.CleanupUsedPages(fenceValue);
+	m_gpuLinearAllocator.CleanupUsedPages(fenceValue);
 	// TODO
 #if 0
-	m_CpuLinearAllocator.CleanupUsedPages(FenceValue);
-	m_GpuLinearAllocator.CleanupUsedPages(FenceValue);
 	m_DynamicViewDescriptorHeap.CleanupUsedHeaps(FenceValue);
 	m_DynamicSamplerDescriptorHeap.CleanupUsedHeaps(FenceValue);
 #endif
@@ -266,12 +308,12 @@ CommandContext::CommandContext(D3D12_COMMAND_LIST_TYPE type)
 	// TODO
 #if 0
 	ZeroMemory(m_CurrentDescriptorHeaps, sizeof(m_CurrentDescriptorHeaps));
-
-	m_CurGraphicsRootSignature = nullptr;
-	m_CurGraphicsPipelineState = nullptr;
-	m_CurComputeRootSignature = nullptr;
-	m_CurComputePipelineState = nullptr;
 #endif
+
+	m_curGraphicsRootSignature = nullptr;
+	m_curGraphicsPipelineState = nullptr;
+	m_curComputeRootSignature = nullptr;
+	m_curComputePipelineState = nullptr;
 	m_numBarriersToFlush = 0;
 }
 
@@ -284,18 +326,59 @@ void CommandContext::Reset()
 	m_currentAllocator = g_commandManager.GetQueue(m_type).RequestAllocator();
 	m_commandList->Reset(m_currentAllocator, nullptr);
 
+	m_curGraphicsRootSignature = nullptr;
+	m_curGraphicsPipelineState = nullptr;
+	m_curComputeRootSignature = nullptr;
+	m_curComputePipelineState = nullptr;
 	m_numBarriersToFlush = 0;
 
 	// TODO
 #if 0
-	m_CurGraphicsRootSignature = nullptr;
-	m_CurGraphicsPipelineState = nullptr;
-	m_CurComputeRootSignature = nullptr;
-	m_CurComputePipelineState = nullptr;
-	
-
 	BindDescriptorHeaps();
 #endif
+}
+
+
+void GraphicsContext::ClearColor(ColorBuffer& target)
+{
+	FlushResourceBarriers();
+	m_commandList->ClearRenderTargetView(target.GetRTV(), target.GetClearColor().GetPtr(), 0, nullptr);
+}
+
+
+void GraphicsContext::ClearDepth(DepthBuffer& target)
+{
+	FlushResourceBarriers();
+	m_commandList->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_DEPTH, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
+}
+
+
+void GraphicsContext::ClearStencil(DepthBuffer& target)
+{
+	FlushResourceBarriers();
+	m_commandList->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_STENCIL, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
+}
+
+
+void GraphicsContext::ClearDepthAndStencil(DepthBuffer& target)
+{
+	FlushResourceBarriers();
+	m_commandList->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
+}
+
+
+void GraphicsContext::SetRenderTarget(const ColorBuffer& colorBuffer)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvs[] = { colorBuffer.GetRTV() };
+	m_commandList->OMSetRenderTargets(1, rtvs, FALSE, nullptr);
+}
+
+
+void GraphicsContext::SetRenderTarget(const ColorBuffer& colorBuffer, const DepthBuffer& depthBuffer)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvs[] = { colorBuffer.GetRTV() };
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = depthBuffer.GetDSV();
+	m_commandList->OMSetRenderTargets(1, rtvs, FALSE, &dsv);
 }
 
 

@@ -12,13 +12,17 @@
 
 #include "GpuBuffer12.h"
 #include "LinearAllocator12.h"
+#include "PipelineState12.h"
+#include "RootSignature12.h"
 
 namespace Kodiak
 {
 
 // Forward declarations
+class ColorBuffer;
 class CommandListManager;
 class ComputeContext;
+class DepthBuffer;
 class GraphicsContext;
 
 
@@ -43,6 +47,10 @@ class CommandContext : public NonCopyable
 	friend ContextManager;
 
 public:
+	~CommandContext();
+
+	static void DestroyAllContexts();
+
 	static CommandContext& Begin(const std::string id = "");
 
 	// Flush existing commands and release the current context
@@ -86,6 +94,11 @@ protected:
 	D3D12_RESOURCE_BARRIER m_resourceBarrierBuffer[16];
 	UINT m_numBarriersToFlush;
 
+	ID3D12RootSignature* m_curGraphicsRootSignature;
+	ID3D12PipelineState* m_curGraphicsPipelineState;
+	ID3D12RootSignature* m_curComputeRootSignature;
+	ID3D12PipelineState* m_curComputePipelineState;
+
 	LinearAllocator m_cpuLinearAllocator;
 	LinearAllocator m_gpuLinearAllocator;
 
@@ -119,9 +132,23 @@ public:
 		return CommandContext::Begin(id).GetGraphicsContext();
 	}
 
+	void ClearColor(ColorBuffer& target);
+	void ClearDepth(DepthBuffer& target);
+	void ClearStencil(DepthBuffer& target);
+	void ClearDepthAndStencil(DepthBuffer& target);
+
+	void SetRootSignature(const RootSignature& rootSig);
+
+	void SetRenderTarget(const ColorBuffer& colorBuffer);
+	void SetRenderTarget(const ColorBuffer& colorBuffer, const DepthBuffer& depthBuffer);
+
 	void SetViewport(float x, float y, float w, float h, float minDepth = 0.0f, float maxDepth = 1.0f);
 	void SetScissor(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom);
 	void SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+	void SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology);
+
+	void SetPipelineState(const GraphicsPSO& PSO);
+	void SetConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer);
 
 	void SetIndexBuffer(IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, VertexBuffer& vertexBuffer);
@@ -129,6 +156,50 @@ public:
 
 	void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation = 0, int32_t baseVertexLocation = 0);
 };
+
+
+inline void GraphicsContext::SetRootSignature(const RootSignature& rootSig)
+{
+	auto signature = rootSig.GetSignature();
+	if (signature == m_curGraphicsRootSignature)
+	{
+		return;
+	}
+
+	m_commandList->SetGraphicsRootSignature(signature);
+	m_curGraphicsRootSignature = signature;
+
+	// TODO
+#if 0
+	m_DynamicViewDescriptorHeap.ParseGraphicsRootSignature(RootSig);
+	m_DynamicSamplerDescriptorHeap.ParseGraphicsRootSignature(RootSig);
+#endif
+}
+
+
+inline void GraphicsContext::SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology)
+{
+	m_commandList->IASetPrimitiveTopology(topology);
+}
+
+
+inline void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
+{
+	auto pipelineState = pso.GetPipelineStateObject();
+	if (pipelineState == m_curGraphicsPipelineState)
+	{
+		return;
+	}
+
+	m_commandList->SetPipelineState(pipelineState);
+	m_curGraphicsPipelineState = pipelineState;
+}
+
+
+inline void GraphicsContext::SetConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer)
+{
+	m_commandList->SetGraphicsRootConstantBufferView(rootIndex, constantBuffer.RootConstantBufferView());
+}
 
 
 inline void GraphicsContext::SetIndexBuffer(IndexBuffer& indexBuffer)
@@ -157,6 +228,7 @@ inline void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count
 
 inline void GraphicsContext::DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation, int32_t baseVertexLocation)
 {
+	FlushResourceBarriers();
 	m_commandList->DrawIndexedInstanced(indexCount, 1, startIndexLocation, baseVertexLocation, 0);
 }
 

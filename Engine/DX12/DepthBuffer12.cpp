@@ -28,6 +28,9 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 
 	D3D12_CLEAR_VALUE clearValue = {};
 	clearValue.Format = format;
+	clearValue.DepthStencil.Depth = m_clearDepth;
+	clearValue.DepthStencil.Stencil = m_clearStencil;
+
 	CreateTextureResource(name, resourceDesc, clearValue);
 	CreateDerivedViews(format);
 }
@@ -40,6 +43,9 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 
 	D3D12_CLEAR_VALUE clearValue = {};
 	clearValue.Format = format;
+	clearValue.DepthStencil.Depth = m_clearDepth;
+	clearValue.DepthStencil.Stencil = m_clearStencil;
+
 	CreateTextureResource(name, resourceDesc, clearValue);
 	CreateDerivedViews(format);
 }

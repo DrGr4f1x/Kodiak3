@@ -14,6 +14,7 @@
 
 #include "Shader.h"
 
+#include "CommandContext12.h"
 #include "CommandListManager12.h"
 #include "PipelineState12.h"
 #include "RootSignature12.h"
@@ -63,6 +64,8 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 		Utility::Print("WARNING:  Unable to enable D3D12 debug validation layer\n");
 	}
 #endif
+
+	ThrowIfFailed(D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModels, nullptr, nullptr));
 
 	// Obtain the DXGI factory
 	Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
@@ -221,8 +224,6 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 		}
 	}
 
-	ThrowIfFailed(D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModels, nullptr, nullptr));
-
 	g_commandManager.Create(m_device.Get());
 
 	m_swapChain = make_unique<SwapChain>();
@@ -234,11 +235,16 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 
 void GraphicsDevice::Destroy()
 {
+	g_commandManager.IdleGPU();
+
+	CommandContext::DestroyAllContexts();
+	g_commandManager.Shutdown();
+
 	PSO::DestroyAll();
 	Shader::DestroyAll();
 	RootSignature::DestroyAll();
 
-	g_commandManager.Shutdown();
+	DescriptorAllocator::DestroyAll();
 
 	m_swapChain->Destroy();
 	m_swapChain.reset();

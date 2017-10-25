@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Application.h"
+#include "DepthBuffer.h"
 #include "GpuBuffer.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
@@ -92,5 +93,6 @@ private:
 #if DX12
 	Kodiak::RootSignature	m_rootSig;
 	Kodiak::GraphicsPSO		m_pso;
+	Kodiak::DepthBuffer		m_depthBuffer{ 1.0f };
 #endif
 };

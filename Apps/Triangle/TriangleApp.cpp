@@ -83,6 +83,8 @@ void TriangleApp::Shutdown()
 	m_indexBuffer.Destroy();
 	m_constantBuffer.Destroy();
 
+	m_depthBuffer.Destroy();
+
 #if VK
 	ShutdownVk();
 #endif
@@ -127,16 +129,33 @@ void TriangleApp::Render()
 	context.BindPipeline(m_pipeline);
 #endif
 
+#if DX12
+	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
+	ColorBuffer& colorBuffer = m_graphicsDevice->GetSwapChain()->GetColorBuffer(curFrame);
+	colorBuffer.SetClearColor({ 0.0f, 0.0f, 0.2f, 1.0f });
+
+	context.TransitionResource(colorBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	context.TransitionResource(m_depthBuffer, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+	context.ClearColor(colorBuffer);
+	context.ClearDepth(m_depthBuffer);
+	context.SetRenderTarget(colorBuffer, m_depthBuffer);
+	context.SetRootSignature(m_rootSig);
+	context.SetPipelineState(m_pso);
+	context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context.SetConstantBuffer(0, m_constantBuffer);
+#endif
+
 	context.SetVertexBuffer(0, m_vertexBuffer);
 	context.SetIndexBuffer(m_indexBuffer);
 
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 
+#if VK
 	context.EndRenderPass();
 
-#if VK
 	context.Finish(m_graphicsDevice->GetPresentCompleteSemaphore(), m_graphicsDevice->GetRenderCompleteSemaphore());
 #elif DX12
+	context.TransitionResource(colorBuffer, D3D12_RESOURCE_STATE_PRESENT);
 	context.Finish();
 #endif
 }
@@ -713,7 +732,7 @@ void TriangleApp::InitDX12()
 
 	D3D12_RASTERIZER_DESC rasterDesc = {};
 	rasterDesc.FillMode = D3D12_FILL_MODE_SOLID;
-	rasterDesc.CullMode = D3D12_CULL_MODE_BACK;
+	rasterDesc.CullMode = D3D12_CULL_MODE_NONE;
 	rasterDesc.FrontCounterClockwise = TRUE;
 	rasterDesc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
 	rasterDesc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
@@ -745,11 +764,14 @@ void TriangleApp::InitDX12()
 	m_pso.SetInputLayout(2, elemDescs);
 
 	m_pso.Finalize();
+
+	// Create depth buffer
+	m_depthBuffer.Create("Depth buffer", m_displayWidth, m_displayHeight, DXGI_FORMAT_D32_FLOAT);
 }
 
 
 void TriangleApp::ShutdownDX12()
 {
-
+	m_depthBuffer.Destroy();
 }
 #endif

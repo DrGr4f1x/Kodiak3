@@ -23,16 +23,19 @@ void GpuBuffer::Create(const std::string& name, size_t numElements, size_t eleme
 {
 	GpuResource::Destroy();
 
+	if (m_forceAlign256)
+	{
+		elementSize = Math::AlignUp(elementSize, 256);
+	}
+
 	m_elementCount = numElements;
 	m_elementSize = elementSize;
 	m_bufferSize = numElements * elementSize;
 
 	auto resourceDesc = DescribeBuffer();
 
-	m_usageState = D3D12_RESOURCE_STATE_COMMON;
-
 	D3D12_HEAP_PROPERTIES heapProps;
-	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+	heapProps.Type = m_heapType;
 	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 	heapProps.CreationNodeMask = 1;
@@ -156,4 +159,18 @@ void ConstantBuffer::CreateDerivedViews()
 
 	m_cbv = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	GetDevice()->CreateConstantBufferView(&cbvDesc, m_cbv);
+}
+
+
+void ConstantBuffer::Update(size_t sizeInBytes, const void* data)
+{
+	assert(sizeInBytes <= m_bufferSize);
+
+	// Map uniform buffer and update it
+	void* pData = nullptr;
+	ThrowIfFailed(m_resource->Map(0, nullptr, &pData));
+	memcpy(pData, data, sizeInBytes);
+	// Unmap after data has been copied
+	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
+	m_resource->Unmap(0, nullptr);
 }

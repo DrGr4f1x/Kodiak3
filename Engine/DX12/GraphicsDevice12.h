@@ -31,7 +31,8 @@ public:
 	void SubmitFrame();
 
 	SwapChain* GetSwapChain() { return m_swapChain.get(); }
-	DXGI_FORMAT GetDepthFormat() const { return DXGI_FORMAT_D24_UNORM_S8_UINT; }
+	DXGI_FORMAT GetDepthFormat() const { return DXGI_FORMAT_D32_FLOAT; }
+	uint32_t GetCurrentBuffer() const { return m_currentBuffer; }
 
 private:
 	bool m_initialized{ false };
