@@ -67,8 +67,10 @@ void TriangleApp::Startup()
 
 	UpdateConstantBuffer();
 
+	auto swapChain = m_graphicsDevice->GetSwapChain();
+
 	// Setup render pass
-	auto colorFormat = m_graphicsDevice->GetSwapChain()->GetColorFormat();
+	auto colorFormat = swapChain->GetColorFormat();
 	auto depthFormat = m_graphicsDevice->GetDepthFormat();
 	m_renderPass.AddColorAttachment(colorFormat, ResourceState::Undefined, ResourceState::Present);
 	m_renderPass.AddDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
@@ -76,6 +78,14 @@ void TriangleApp::Startup()
 
 	// Depth stencil buffer
 	m_depthBuffer.Create("Depth Buffer", m_displayWidth, m_displayHeight, m_graphicsDevice->GetDepthFormat());
+
+	// Framebuffers
+	const uint32_t imageCount = swapChain->GetImageCount();
+	m_framebuffers.resize(imageCount);
+	for (uint32_t i = 0; i < imageCount; ++i)
+	{
+		m_framebuffers[i].Create(swapChain->GetColorBuffer(i), m_depthBuffer, m_renderPass);
+	}
 
 #if VK
 	InitVk();
@@ -94,6 +104,11 @@ void TriangleApp::Shutdown()
 	m_constantBuffer.Destroy();
 	m_depthBuffer.Destroy();
 	m_renderPass.Destroy();
+	for (auto& fb : m_framebuffers)
+	{
+		fb.Destroy();
+	}
+	m_framebuffers.clear();
 
 #if VK
 	ShutdownVk();
@@ -127,7 +142,7 @@ void TriangleApp::Render()
 	renderPassBeginInfo.renderArea.extent.height = m_displayHeight;
 	renderPassBeginInfo.clearValueCount = 2;
 	renderPassBeginInfo.pClearValues = clearValues;
-	renderPassBeginInfo.framebuffer = m_framebuffers[m_graphicsDevice->GetCurrentBuffer()];
+	renderPassBeginInfo.framebuffer = m_framebuffers[m_graphicsDevice->GetCurrentBuffer()].GetFramebuffer();
 
 	context.BeginRenderPass(renderPassBeginInfo);
 #endif
@@ -191,40 +206,11 @@ void TriangleApp::UpdateConstantBuffer()
 #if VK
 void TriangleApp::InitVk()
 {
-	InitFramebuffers();
 	InitDescriptorPool();
 	InitDescriptorSetLayout();
 	InitDescriptorSet();
 	InitPipelineCache();
 	InitPipeline();
-}
-
-
-void TriangleApp::InitFramebuffers()
-{
-	SwapChain* swapChain = m_graphicsDevice->GetSwapChain();
-	const uint32_t imageCount = swapChain->GetImageCount();
-
-	// Create a frame buffer for every image in the swapchain
-	m_framebuffers.resize(imageCount);
-	for (uint32_t i = 0; i < imageCount; ++i)
-	{
-		std::array<VkImageView, 2> attachments;
-		attachments[0] = swapChain->GetColorBuffer(i).GetRTV();						// Color attachment is the view of the swapchain image			
-		attachments[1] = m_depthBuffer.GetDSV();									// Depth/Stencil attachment is the same for all frame buffers			
-
-		VkFramebufferCreateInfo frameBufferCreateInfo = {};
-		frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		// All frame buffers use the same renderpass setup
-		frameBufferCreateInfo.renderPass = m_renderPass.GetRenderPass();
-		frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
-		frameBufferCreateInfo.pAttachments = attachments.data();
-		frameBufferCreateInfo.width = m_displayWidth;
-		frameBufferCreateInfo.height = m_displayHeight;
-		frameBufferCreateInfo.layers = 1;
-		// Create the framebuffer
-		ThrowIfFailed(vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &m_framebuffers[i]));
-	}
 }
 
 
@@ -547,12 +533,6 @@ void TriangleApp::InitPipeline()
 
 void TriangleApp::ShutdownVk()
 {
-	for (auto& fb : m_framebuffers)
-	{
-		vkDestroyFramebuffer(GetDevice(), fb, nullptr);
-	}
-	m_framebuffers.clear();
-
 	vkDestroyPipeline(GetDevice(), m_pipeline, nullptr);
 	m_pipeline = VK_NULL_HANDLE;
 

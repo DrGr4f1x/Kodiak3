@@ -12,6 +12,7 @@
 
 #include "Application.h"
 #include "DepthBuffer.h"
+#include "Framebuffer.h"
 #include "GpuBuffer.h"
 #include "PipelineState.h"
 #include "RenderPass.h"
@@ -31,11 +32,8 @@ public:
 private:
 	void UpdateConstantBuffer();
 
-	void InitDepthStencil();
-
 #if VK
 	void InitVk();
-	void InitFramebuffers();
 	void InitDescriptorPool();
 	void InitDescriptorSetLayout();
 	void InitDescriptorSet();
@@ -82,8 +80,9 @@ private:
 
 	Kodiak::RenderPass		m_renderPass;
 
+	std::vector<Kodiak::FrameBuffer> m_framebuffers;
+
 #if VK
-	std::vector<VkFramebuffer> m_framebuffers;
 	VkPipelineLayout m_pipelineLayout{ VK_NULL_HANDLE };
 	VkPipeline m_pipeline{ VK_NULL_HANDLE };
 	VkPipelineCache m_pipelineCache{ VK_NULL_HANDLE };

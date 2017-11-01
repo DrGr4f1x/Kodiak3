@@ -17,7 +17,7 @@ using namespace Kodiak;
 using namespace std;
 
 
-void Framebuffer::Destroy()
+void FrameBuffer::Destroy()
 {
 	for (auto& cb : m_colorBuffers)
 	{
@@ -30,14 +30,14 @@ void Framebuffer::Destroy()
 }
 
 
-void Framebuffer::Create(ColorBuffer& rtv, RenderPass& renderpass)
+void FrameBuffer::Create(ColorBuffer& rtv, RenderPass& renderpass)
 {
 	m_colorBuffers.push_back(rtv);
 	m_hasDepthBuffer = false;
 }
 
 
-void Framebuffer::Create(ColorBuffer& rtv, DepthBuffer& dsv, RenderPass& renderpass)
+void FrameBuffer::Create(ColorBuffer& rtv, DepthBuffer& dsv, RenderPass& renderpass)
 {
 	m_colorBuffers.push_back(rtv);
 	m_depthBuffer = dsv;
@@ -45,7 +45,7 @@ void Framebuffer::Create(ColorBuffer& rtv, DepthBuffer& dsv, RenderPass& renderp
 }
 
 
-ColorBuffer& Framebuffer::GetColorBuffer(uint32_t index)
+ColorBuffer& FrameBuffer::GetColorBuffer(uint32_t index)
 {
 	assert(index < (uint32_t)m_colorBuffers.size());
 	return m_colorBuffers[index];

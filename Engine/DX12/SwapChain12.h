@@ -23,7 +23,7 @@ public:
 
 	void Present(UINT presentInterval);
 
-	static uint32_t GetBufferCount();
+	uint32_t GetImageCount() const;
 	Format GetColorFormat() const { return m_format; }
 
 	ColorBuffer& GetColorBuffer(uint32_t index) { return m_displayPlanes[index]; }

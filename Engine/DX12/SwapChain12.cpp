@@ -76,7 +76,7 @@ void SwapChain::Present(UINT presentInterval)
 }
 
 
-uint32_t SwapChain::GetBufferCount()
+uint32_t SwapChain::GetImageCount() const
 {
 	return SWAP_CHAIN_BUFFER_COUNT;
 }

@@ -13,4 +13,25 @@
 namespace Kodiak
 {
 
+// Forward declarations
+class ColorBuffer;
+class DepthBuffer;
+class RenderPass;
+
+class FrameBuffer
+{
+public:
+	void Destroy();
+
+	void Create(ColorBuffer& rtv, RenderPass& renderpass);
+	void Create(ColorBuffer& rtv, DepthBuffer& dsv, RenderPass& renderpass);
+
+	// TODO MRTs
+
+	VkFramebuffer GetFramebuffer() { return m_framebuffer; }
+
+private:
+	VkFramebuffer m_framebuffer{ VK_NULL_HANDLE };
+};
+
 } // namespace Kodiak

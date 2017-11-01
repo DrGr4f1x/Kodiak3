@@ -19,7 +19,7 @@ namespace Kodiak
 // Forward declarations
 class RenderPass;
 
-class Framebuffer
+class FrameBuffer
 {
 public:
 	void Destroy();

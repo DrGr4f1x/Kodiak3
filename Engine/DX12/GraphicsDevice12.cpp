@@ -270,7 +270,7 @@ void GraphicsDevice::PrepareFrame()
 
 void GraphicsDevice::SubmitFrame()
 {
-	m_currentBuffer = (m_currentBuffer + 1) % SwapChain::GetBufferCount();
+	m_currentBuffer = (m_currentBuffer + 1) % m_swapChain->GetImageCount();
 
 	UINT presentInterval = 0;
 
