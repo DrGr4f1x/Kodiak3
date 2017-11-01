@@ -22,12 +22,12 @@ using namespace Kodiak;
 using namespace std;
 
 
-void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t height, DXGI_FORMAT format)
+void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t height, Format format)
 {
 	auto resourceDesc = DescribeTex2D(width, height, 1, 1, format, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
 
 	D3D12_CLEAR_VALUE clearValue = {};
-	clearValue.Format = format;
+	clearValue.Format = static_cast<DXGI_FORMAT>(format);
 	clearValue.DepthStencil.Depth = m_clearDepth;
 	clearValue.DepthStencil.Stencil = m_clearStencil;
 
@@ -36,13 +36,13 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 }
 
 
-void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t height, uint32_t samples, DXGI_FORMAT format)
+void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t height, uint32_t samples, Format format)
 {
 	auto resourceDesc = DescribeTex2D(width, height, 1, 1, format, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
 	resourceDesc.SampleDesc.Count = samples;
 
 	D3D12_CLEAR_VALUE clearValue = {};
-	clearValue.Format = format;
+	clearValue.Format = static_cast<DXGI_FORMAT>(format);
 	clearValue.DepthStencil.Depth = m_clearDepth;
 	clearValue.DepthStencil.Stencil = m_clearStencil;
 
@@ -51,12 +51,13 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 }
 
 
-void DepthBuffer::CreateDerivedViews(DXGI_FORMAT format)
+void DepthBuffer::CreateDerivedViews(Format format)
 {
 	auto resource = m_resource.Get();
+	auto dxFormat = static_cast<DXGI_FORMAT>(format);
 
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-	dsvDesc.Format = GetDSVFormat(format);
+	dsvDesc.Format = GetDSVFormat(dxFormat);
 	if (resource->GetDesc().SampleDesc.Count == 1)
 	{
 		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
@@ -81,7 +82,7 @@ void DepthBuffer::CreateDerivedViews(DXGI_FORMAT format)
 	dsvDesc.Flags = D3D12_DSV_FLAG_READ_ONLY_DEPTH;
 	device->CreateDepthStencilView(resource, &dsvDesc, m_dsv[1]);
 
-	DXGI_FORMAT stencilReadFormat = GetStencilFormat(format);
+	DXGI_FORMAT stencilReadFormat = GetStencilFormat(dxFormat);
 	if (stencilReadFormat != DXGI_FORMAT_UNKNOWN)
 	{
 		if (m_dsv[2].ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
@@ -109,7 +110,7 @@ void DepthBuffer::CreateDerivedViews(DXGI_FORMAT format)
 
 	// Create the shader resource view
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.Format = GetDepthFormat(format);
+	srvDesc.Format = GetDepthFormat(dxFormat);
 	if (dsvDesc.ViewDimension == D3D12_DSV_DIMENSION_TEXTURE2D)
 	{
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;

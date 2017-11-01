@@ -88,25 +88,25 @@ void GraphicsPSO::SetPrimitiveRestart(D3D12_INDEX_BUFFER_STRIP_CUT_VALUE ibProps
 }
 
 
-void GraphicsPSO::SetRenderTargetFormat(DXGI_FORMAT rtvFormat, DXGI_FORMAT dsvFormat, uint32_t msaaCount, uint32_t msaaQuality)
+void GraphicsPSO::SetRenderTargetFormat(Format rtvFormat, Format dsvFormat, uint32_t msaaCount, uint32_t msaaQuality)
 {
 	SetRenderTargetFormats(1, &rtvFormat, dsvFormat, msaaCount, msaaQuality);
 }
 
 
-void GraphicsPSO::SetRenderTargetFormats(uint32_t numRTVs, const DXGI_FORMAT* rtvFormats, DXGI_FORMAT dsvFormat, uint32_t msaaCount, uint32_t msaaQuality)
+void GraphicsPSO::SetRenderTargetFormats(uint32_t numRTVs, const Format* rtvFormats, Format dsvFormat, uint32_t msaaCount, uint32_t msaaQuality)
 {
 	assert_msg(numRTVs == 0 || rtvFormats != nullptr, "Null format array conflicts with non-zero length");
 	for (uint32_t i = 0; i < numRTVs; ++i)
 	{
-		m_psoDesc.RTVFormats[i] = rtvFormats[i];
+		m_psoDesc.RTVFormats[i] = static_cast<DXGI_FORMAT>(rtvFormats[i]);
 	}
 	for (uint32_t i = numRTVs; i < m_psoDesc.NumRenderTargets; ++i)
 	{
 		m_psoDesc.RTVFormats[i] = DXGI_FORMAT_UNKNOWN;
 	}
 	m_psoDesc.NumRenderTargets = numRTVs;
-	m_psoDesc.DSVFormat = dsvFormat;
+	m_psoDesc.DSVFormat = static_cast<DXGI_FORMAT>(dsvFormat);
 	m_psoDesc.SampleDesc.Count = msaaCount;
 	m_psoDesc.SampleDesc.Quality = msaaQuality;
 }

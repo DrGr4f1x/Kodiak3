@@ -35,7 +35,7 @@ void ColorBuffer::CreateFromSwapChain(const std::string& name, ID3D12Resource* b
 
 
 void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips,
-	DXGI_FORMAT format)
+	Format format)
 {
 	numMips = (numMips == 0 ? ComputeNumMips(width, height) : numMips);
 	auto flags = CombineResourceFlags();
@@ -45,7 +45,7 @@ void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 	resourceDesc.SampleDesc.Quality = 0;
 
 	D3D12_CLEAR_VALUE clearValue = {};
-	clearValue.Format = format;
+	clearValue.Format = static_cast<DXGI_FORMAT>(format);
 	clearValue.Color[0] = m_clearColor.R();
 	clearValue.Color[1] = m_clearColor.G();
 	clearValue.Color[2] = m_clearColor.B();
@@ -57,13 +57,13 @@ void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 
 
 void ColorBuffer::CreateArray(const std::string& name, uint32_t width, uint32_t height, uint32_t arrayCount,
-	DXGI_FORMAT format)
+	Format format)
 {
 	auto flags = CombineResourceFlags();
 	auto resourceDesc = DescribeTex2D(width, height, arrayCount, 1, format, flags);
 
 	D3D12_CLEAR_VALUE clearValue = {};
-	clearValue.Format = format;
+	clearValue.Format = static_cast<DXGI_FORMAT>(format);
 	clearValue.Color[0] = m_clearColor.R();
 	clearValue.Color[1] = m_clearColor.G();
 	clearValue.Color[2] = m_clearColor.B();
@@ -74,19 +74,21 @@ void ColorBuffer::CreateArray(const std::string& name, uint32_t width, uint32_t 
 }
 
 
-void ColorBuffer::CreateDerivedViews(DXGI_FORMAT format, uint32_t arraySize, uint32_t numMips)
+void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t numMips)
 {
 	assert_msg(arraySize == 1 || numMips == 1, "We don't support auto-mips on texture arrays");
 
 	m_numMipMaps = numMips - 1;
 
+	auto dxFormat = static_cast<DXGI_FORMAT>(format);
+
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 
-	rtvDesc.Format = format;
-	uavDesc.Format = GetUAVFormat(format);
-	srvDesc.Format = format;
+	rtvDesc.Format = dxFormat;
+	uavDesc.Format = GetUAVFormat(dxFormat);
+	srvDesc.Format = dxFormat;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
 	if (arraySize > 1)

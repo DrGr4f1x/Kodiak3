@@ -29,13 +29,13 @@ void PixelBuffer::Destroy()
 }
 
 
-VkImageCreateInfo PixelBuffer::DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips, VkFormat format, VkImageUsageFlags usageFlags)
+VkImageCreateInfo PixelBuffer::DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips, Format format, VkImageUsageFlags usageFlags)
 {
 	VkImageCreateInfo imageCreateInfo = {};
 	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	imageCreateInfo.pNext = nullptr;
 	imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-	imageCreateInfo.format = format;
+	imageCreateInfo.format = static_cast<VkFormat>(format);
 	imageCreateInfo.extent = { width, height, 1 };
 	imageCreateInfo.mipLevels = numMips;
 	imageCreateInfo.arrayLayers = depthOrArraySize;

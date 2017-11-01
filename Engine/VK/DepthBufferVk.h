@@ -28,17 +28,17 @@ public:
 	// Create a depth buffer.  If an address is supplied, memory will not be allocated.
 	// The vmem address allows you to alias buffers (which can be especially useful for
 	// reusing ESRAM across a frame.)
-	void Create(const std::string& name, uint32_t width, uint32_t height, VkFormat format);
+	void Create(const std::string& name, uint32_t width, uint32_t height, Format format);
 
 	// Create a depth buffer.  Memory will be allocated in ESRAM (on Xbox One).  On Windows,
 	// this functions the same as Create() without a video address.
-	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numSamples, VkFormat format);
+	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numSamples, Format format);
 
 	// Get pre-created CPU-visible descriptor handles
 	const VkImageView& GetDSV() const { return m_dsv; }
 
 private:
-	void CreateDerivedViews(VkFormat format);
+	void CreateDerivedViews(Format format);
 
 private:
 	float m_clearDepth;

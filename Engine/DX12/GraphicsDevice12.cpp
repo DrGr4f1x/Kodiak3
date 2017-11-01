@@ -227,7 +227,7 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 	g_commandManager.Create(m_device.Get());
 
 	m_swapChain = make_unique<SwapChain>();
-	m_swapChain->Create(dxgiFactory.Get(), m_hwnd, m_width, m_height, DXGI_FORMAT_R10G10B10A2_UNORM);
+	m_swapChain->Create(dxgiFactory.Get(), m_hwnd, m_width, m_height, Format::R10G10B10A2_UNorm);
 
 	m_initialized = true;
 }

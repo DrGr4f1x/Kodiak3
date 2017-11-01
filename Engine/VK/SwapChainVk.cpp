@@ -119,7 +119,7 @@ void SwapChain::InitSurface(HINSTANCE hInstance, HWND hWnd)
 	// there is no preferered format, so we assume VK_FORMAT_B8G8R8A8_UNORM
 	if ((formatCount == 1) && (surfaceFormats[0].format == VK_FORMAT_UNDEFINED))
 	{
-		m_colorFormat = VK_FORMAT_B8G8R8A8_UNORM;
+		m_colorFormat = MapVulkanFormatToEngine(VK_FORMAT_B8G8R8A8_UNORM);
 		m_colorSpace = surfaceFormats[0].colorSpace;
 	}
 	else
@@ -131,7 +131,7 @@ void SwapChain::InitSurface(HINSTANCE hInstance, HWND hWnd)
 		{
 			if (surfaceFormat.format == VK_FORMAT_B8G8R8A8_UNORM)
 			{
-				m_colorFormat = surfaceFormat.format;
+				m_colorFormat = MapVulkanFormatToEngine(surfaceFormat.format);
 				m_colorSpace = surfaceFormat.colorSpace;
 				found_B8G8R8A8_UNORM = true;
 				break;
@@ -142,7 +142,7 @@ void SwapChain::InitSurface(HINSTANCE hInstance, HWND hWnd)
 		// select the first available color format
 		if (!found_B8G8R8A8_UNORM)
 		{
-			m_colorFormat = surfaceFormats[0].format;
+			m_colorFormat = MapVulkanFormatToEngine(surfaceFormats[0].format);
 			m_colorSpace = surfaceFormats[0].colorSpace;
 		}
 	}
@@ -245,12 +245,14 @@ void SwapChain::Create(uint32_t* width, uint32_t* height, bool vsync)
 		};
 	}
 
+	auto vkFormat = static_cast<VkFormat>(m_colorFormat);
+
 	VkSwapchainCreateInfoKHR swapchainCI = {};
 	swapchainCI.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	swapchainCI.pNext = nullptr;
 	swapchainCI.surface = m_surface;
 	swapchainCI.minImageCount = desiredNumberOfSwapchainImages;
-	swapchainCI.imageFormat = m_colorFormat;
+	swapchainCI.imageFormat = vkFormat;
 	swapchainCI.imageColorSpace = m_colorSpace;
 	swapchainCI.imageExtent = { swapchainExtent.width, swapchainExtent.height };
 	swapchainCI.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
@@ -267,7 +269,7 @@ void SwapChain::Create(uint32_t* width, uint32_t* height, bool vsync)
 
 	// Set additional usage flag for blitting from the swapchain images if supported
 	VkFormatProperties formatProps;
-	vkGetPhysicalDeviceFormatProperties(m_physicalDevice, m_colorFormat, &formatProps);
+	vkGetPhysicalDeviceFormatProperties(m_physicalDevice, vkFormat, &formatProps);
 	if (formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT) 
 	{
 		swapchainCI.imageUsage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;

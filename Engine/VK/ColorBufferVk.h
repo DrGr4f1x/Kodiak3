@@ -26,9 +26,9 @@ public:
 	void Destroy();
 
 	// Create a color buffer from a swap chain buffer.  Unordered access is restricted.
-	void CreateFromSwapChain(const std::string& name, VkImage baseImage, uint32_t width, uint32_t height, VkFormat format);
+	void CreateFromSwapChain(const std::string& name, VkImage baseImage, uint32_t width, uint32_t height, Format format);
 
-	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips, VkFormat format);
+	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips, Format format);
 
 	// Get pre-created CPU-visible descriptor handles
 	VkImageView GetSRV() const { return m_imageView; }
@@ -55,7 +55,7 @@ protected:
 	bool			m_ownsImage{ true };
 
 private:
-	void CreateDerivedViews(VkFormat format, uint32_t arraySize, uint32_t numMips = 1);
+	void CreateDerivedViews(Format format, uint32_t arraySize, uint32_t numMips = 1);
 };
 
 } // namespace Kodiak

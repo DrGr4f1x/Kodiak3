@@ -67,6 +67,16 @@ void TriangleApp::Startup()
 
 	UpdateConstantBuffer();
 
+	// Setup render pass
+	auto colorFormat = m_graphicsDevice->GetSwapChain()->GetColorFormat();
+	auto depthFormat = m_graphicsDevice->GetDepthFormat();
+	m_renderPass.AddColorAttachment(colorFormat, ResourceState::Undefined, ResourceState::Present);
+	m_renderPass.AddDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
+	m_renderPass.Finalize();
+
+	// Depth stencil buffer
+	m_depthBuffer.Create("Depth Buffer", m_displayWidth, m_displayHeight, m_graphicsDevice->GetDepthFormat());
+
 #if VK
 	InitVk();
 #endif
@@ -83,6 +93,7 @@ void TriangleApp::Shutdown()
 	m_indexBuffer.Destroy();
 	m_constantBuffer.Destroy();
 	m_depthBuffer.Destroy();
+	m_renderPass.Destroy();
 
 #if VK
 	ShutdownVk();
@@ -109,7 +120,7 @@ void TriangleApp::Render()
 	VkRenderPassBeginInfo renderPassBeginInfo = {};
 	renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassBeginInfo.pNext = nullptr;
-	renderPassBeginInfo.renderPass = m_renderPass;
+	renderPassBeginInfo.renderPass = m_renderPass.GetRenderPass();
 	renderPassBeginInfo.renderArea.offset.x = 0;
 	renderPassBeginInfo.renderArea.offset.y = 0;
 	renderPassBeginInfo.renderArea.extent.width = m_displayWidth;
@@ -177,96 +188,15 @@ void TriangleApp::UpdateConstantBuffer()
 }
 
 
-void TriangleApp::InitDepthStencil()
-{
-	m_depthBuffer.Create("Depth Buffer", m_displayWidth, m_displayHeight, m_graphicsDevice->GetDepthFormat());
-}
-
-
 #if VK
 void TriangleApp::InitVk()
 {
-	InitRenderPass();
-	InitDepthStencil();
 	InitFramebuffers();
 	InitDescriptorPool();
 	InitDescriptorSetLayout();
 	InitDescriptorSet();
 	InitPipelineCache();
 	InitPipeline();
-}
-
-
-void TriangleApp::InitRenderPass()
-{
-	std::array<VkAttachmentDescription, 2> attachments = {};
-	// Color attachment
-	attachments[0].format = m_graphicsDevice->GetSwapChain()->GetColorFormat();
-	attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
-	attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	attachments[0].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-	// Depth attachment
-	attachments[1].format = m_graphicsDevice->GetDepthFormat();
-	attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
-	attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	attachments[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-	VkAttachmentReference colorReference = {};
-	colorReference.attachment = 0;
-	colorReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-	VkAttachmentReference depthReference = {};
-	depthReference.attachment = 1;
-	depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-	VkSubpassDescription subpassDescription = {};
-	subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	subpassDescription.colorAttachmentCount = 1;
-	subpassDescription.pColorAttachments = &colorReference;
-	subpassDescription.pDepthStencilAttachment = &depthReference;
-	subpassDescription.inputAttachmentCount = 0;
-	subpassDescription.pInputAttachments = nullptr;
-	subpassDescription.preserveAttachmentCount = 0;
-	subpassDescription.pPreserveAttachments = nullptr;
-	subpassDescription.pResolveAttachments = nullptr;
-
-	// Subpass dependencies for layout transitions
-	std::array<VkSubpassDependency, 2> dependencies;
-
-	dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependencies[0].dstSubpass = 0;
-	dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-	dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-	dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-	dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-	dependencies[1].srcSubpass = 0;
-	dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
-	dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-	dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-	dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-	dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-	VkRenderPassCreateInfo renderPassInfo = {};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
-	renderPassInfo.pAttachments = attachments.data();
-	renderPassInfo.subpassCount = 1;
-	renderPassInfo.pSubpasses = &subpassDescription;
-	renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
-	renderPassInfo.pDependencies = dependencies.data();
-
-	ThrowIfFailed(vkCreateRenderPass(GetDevice(), &renderPassInfo, nullptr, &m_renderPass));
 }
 
 
@@ -286,7 +216,7 @@ void TriangleApp::InitFramebuffers()
 		VkFramebufferCreateInfo frameBufferCreateInfo = {};
 		frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		// All frame buffers use the same renderpass setup
-		frameBufferCreateInfo.renderPass = m_renderPass;
+		frameBufferCreateInfo.renderPass = m_renderPass.GetRenderPass();
 		frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
 		frameBufferCreateInfo.pAttachments = attachments.data();
 		frameBufferCreateInfo.width = m_displayWidth;
@@ -461,7 +391,7 @@ void TriangleApp::InitPipeline()
 	// The layout used for this pipeline (can be shared among multiple pipelines using the same layout)
 	pipelineCreateInfo.layout = m_pipelineLayout;
 	// Renderpass this pipeline is attached to
-	pipelineCreateInfo.renderPass = m_renderPass;
+	pipelineCreateInfo.renderPass = m_renderPass.GetRenderPass();
 
 	// Construct the differnent states making up the pipeline
 
@@ -603,7 +533,7 @@ void TriangleApp::InitPipeline()
 	pipelineCreateInfo.pMultisampleState = &multisampleState;
 	pipelineCreateInfo.pViewportState = &viewportState;
 	pipelineCreateInfo.pDepthStencilState = &depthStencilState;
-	pipelineCreateInfo.renderPass = m_renderPass;
+	pipelineCreateInfo.renderPass = m_renderPass.GetRenderPass();
 	pipelineCreateInfo.pDynamicState = &dynamicState;
 
 	// Create rendering pipeline using the specified states
@@ -617,9 +547,6 @@ void TriangleApp::InitPipeline()
 
 void TriangleApp::ShutdownVk()
 {
-	vkDestroyRenderPass(GetDevice(), m_renderPass, nullptr);
-	m_renderPass = VK_NULL_HANDLE;
-
 	for (auto& fb : m_framebuffers)
 	{
 		vkDestroyFramebuffer(GetDevice(), fb, nullptr);
@@ -702,7 +629,7 @@ void TriangleApp::InitDX12()
 	m_pso.SetVertexShader(vs);
 	m_pso.SetPixelShader(ps);
 
-	m_pso.SetRenderTargetFormat(m_graphicsDevice->GetSwapChain()->GetFormat(), m_graphicsDevice->GetDepthFormat());
+	m_pso.SetRenderTargetFormat(m_graphicsDevice->GetSwapChain()->GetColorFormat(), m_graphicsDevice->GetDepthFormat());
 
 	m_pso.SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 

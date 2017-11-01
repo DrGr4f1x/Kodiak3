@@ -18,20 +18,20 @@ namespace Kodiak
 class SwapChain
 {
 public:
-	void Create(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height, DXGI_FORMAT format);
+	void Create(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height, Format format);
 	void Destroy();
 
 	void Present(UINT presentInterval);
 
 	static uint32_t GetBufferCount();
-	DXGI_FORMAT GetFormat() const { return m_format; }
+	Format GetColorFormat() const { return m_format; }
 
 	ColorBuffer& GetColorBuffer(uint32_t index) { return m_displayPlanes[index]; }
 	const ColorBuffer& GetColorBuffer(uint32_t index) const { return m_displayPlanes[index]; }
 
 private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> m_swapChain;
-	DXGI_FORMAT m_format{ DXGI_FORMAT_UNKNOWN };
+	Format m_format{ Format::Unknown };
 
 	std::vector<ColorBuffer> m_displayPlanes;
 };

@@ -31,7 +31,7 @@ public:
 
 	SwapChain* GetSwapChain() { return m_swapChain.get(); }
 
-	VkFormat GetDepthFormat() const { return m_depthFormat; }
+	Format GetDepthFormat() const { return m_depthFormat; }
 	uint32_t GetCurrentBuffer() const { return m_currentBuffer; }
 
 	// TODO: Hacks
@@ -112,7 +112,7 @@ private:
 
 	uint32_t m_currentBuffer{ 0 };
 
-	VkFormat m_depthFormat{ VK_FORMAT_UNDEFINED };
+	Format m_depthFormat{ Format::Unknown };
 };
 
 

@@ -30,7 +30,7 @@ void DepthBuffer::Destroy()
 }
 
 
-void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t height, VkFormat format)
+void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t height, Format format)
 {
 	m_format = format;
 
@@ -40,12 +40,12 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 }
 
 
-void DepthBuffer::CreateDerivedViews(VkFormat format)
+void DepthBuffer::CreateDerivedViews(Format format)
 {
 	auto vkFormat = static_cast<VkFormat>(format);
 
 	VkImageAspectFlags flags = VK_IMAGE_ASPECT_DEPTH_BIT;
-	if (format == VK_FORMAT_D24_UNORM_S8_UINT || format == VK_FORMAT_D32_SFLOAT_S8_UINT)
+	if (vkFormat == VK_FORMAT_D24_UNORM_S8_UINT || vkFormat == VK_FORMAT_D32_SFLOAT_S8_UINT)
 	{
 		flags |= VK_IMAGE_ASPECT_STENCIL_BIT;
 	}

@@ -23,14 +23,14 @@ using namespace Kodiak;
 #define SWAP_CHAIN_BUFFER_COUNT 3
 
 
-void SwapChain::Create(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height, DXGI_FORMAT format)
+void SwapChain::Create(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height, Format format)
 {
 	m_format = format;
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 	swapChainDesc.Width = width;
 	swapChainDesc.Height = height;
-	swapChainDesc.Format = format;
+	swapChainDesc.Format = static_cast<DXGI_FORMAT>(format);
 	swapChainDesc.Scaling = DXGI_SCALING_NONE;
 	swapChainDesc.SampleDesc.Quality = 0;
 	swapChainDesc.SampleDesc.Count = 1;

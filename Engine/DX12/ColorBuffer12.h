@@ -41,12 +41,12 @@ public:
 	// Create a color buffer.  If an address is supplied, memory will not be allocated.
 	// The vmem address allows you to alias buffers (which can be especially useful for
 	// reusing ESRAM across a frame.)
-	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips,	DXGI_FORMAT format);
+	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips,	Format format);
 
 	// Create a color buffer.  If an address is supplied, memory will not be allocated.
 	// The vmem address allows you to alias buffers (which can be especially useful for
 	// reusing ESRAM across a frame.)
-	void CreateArray(const std::string& name, uint32_t width, uint32_t height, uint32_t arrayCount,	DXGI_FORMAT format);
+	void CreateArray(const std::string& name, uint32_t width, uint32_t height, uint32_t arrayCount,	Format format);
 
 	// Get pre-created CPU-visible descriptor handles
 	const D3D12_CPU_DESCRIPTOR_HANDLE& GetSRV(void) const { return m_srvHandle; }
@@ -94,7 +94,7 @@ protected:
 		return highBit + 1;
 	}
 
-	void CreateDerivedViews(DXGI_FORMAT format, uint32_t arraySize, uint32_t numMips = 1);
+	void CreateDerivedViews(Format format, uint32_t arraySize, uint32_t numMips = 1);
 
 protected:
 	Color m_clearColor;

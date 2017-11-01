@@ -33,8 +33,8 @@ public:
 		m_stencilSRV.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	}
 
-	void Create(const std::string& name, uint32_t width, uint32_t height, DXGI_FORMAT format);
-	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numSamples, DXGI_FORMAT format);
+	void Create(const std::string& name, uint32_t width, uint32_t height, Format format);
+	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numSamples, Format format);
 
 	// Get pre-created CPU-visible descriptor handles
 	const D3D12_CPU_DESCRIPTOR_HANDLE& GetDSV() const { return m_dsv[0]; }
@@ -48,7 +48,7 @@ public:
 	uint8_t GetClearStencil() const { return m_clearStencil; }
 
 private:
-	void CreateDerivedViews(DXGI_FORMAT Format);
+	void CreateDerivedViews(Format format);
 
 private:
 	float m_clearDepth;

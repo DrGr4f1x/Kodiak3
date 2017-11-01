@@ -27,7 +27,7 @@ public:
 	VkResult AcquireNextImage(VkSemaphore presentCompleteSemaphore, uint32_t* imageIndex);
 	VkResult QueuePresent(VkQueue queue, uint32_t imageIndex, VkSemaphore waitSemaphore = VK_NULL_HANDLE);
 
-	VkFormat GetColorFormat() const { return m_colorFormat; }
+	Format GetColorFormat() const { return m_colorFormat; }
 	uint32_t GetImageCount() const { return m_imageCount; }
 
 	ColorBuffer& GetColorBuffer(uint32_t index) { return m_displayPlanes[index]; }
@@ -42,7 +42,7 @@ private:
 
 	uint32_t m_queueNodeIndex{ UINT32_MAX };  // Index of the deteced graphics and presenting device queue
 
-	VkFormat m_colorFormat{ VK_FORMAT_UNDEFINED };
+	Format m_colorFormat{ Format::Unknown };
 	VkColorSpaceKHR m_colorSpace;
 	
 	VkSwapchainKHR m_swapChain{ VK_NULL_HANDLE };  // Handle to the current swap chain, required for recreation

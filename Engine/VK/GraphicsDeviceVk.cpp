@@ -398,7 +398,7 @@ void GraphicsDevice::FindBestDepthFormat()
 		// Format must support depth stencil attachment for optimal tiling
 		if (formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
 		{
-			m_depthFormat = format;
+			m_depthFormat = MapVulkanFormatToEngine(format);
 			return;
 		}
 	}

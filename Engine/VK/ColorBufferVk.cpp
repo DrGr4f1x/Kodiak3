@@ -32,7 +32,7 @@ void ColorBuffer::Destroy()
 }
 
 
-void ColorBuffer::CreateFromSwapChain(const std::string& name, VkImage baseImage, uint32_t width, uint32_t height, VkFormat format)
+void ColorBuffer::CreateFromSwapChain(const std::string& name, VkImage baseImage, uint32_t width, uint32_t height, Format format)
 {
 	m_ownsImage = false;
 
@@ -48,7 +48,7 @@ void ColorBuffer::CreateFromSwapChain(const std::string& name, VkImage baseImage
 }
 
 
-void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips, VkFormat format)
+void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips, Format format)
 {
 	numMips = (numMips == 0 ? ComputeNumMips(width, height) : numMips);
 
@@ -65,7 +65,7 @@ void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 }
 
 
-void ColorBuffer::CreateDerivedViews(VkFormat format, uint32_t arraySize, uint32_t numMips)
+void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t numMips)
 {
 	m_numMipMaps = numMips - 1;
 

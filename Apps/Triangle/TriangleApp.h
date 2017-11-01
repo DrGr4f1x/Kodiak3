@@ -14,6 +14,7 @@
 #include "DepthBuffer.h"
 #include "GpuBuffer.h"
 #include "PipelineState.h"
+#include "RenderPass.h"
 #include "RootSignature.h"
 
 class TriangleApp : public Kodiak::Application
@@ -34,7 +35,6 @@ private:
 
 #if VK
 	void InitVk();
-	void InitRenderPass();
 	void InitFramebuffers();
 	void InitDescriptorPool();
 	void InitDescriptorSetLayout();
@@ -80,8 +80,9 @@ private:
 
 	Kodiak::DepthBuffer		m_depthBuffer{ 1.0f };
 
+	Kodiak::RenderPass		m_renderPass;
+
 #if VK
-	VkRenderPass m_renderPass{ VK_NULL_HANDLE };
 	std::vector<VkFramebuffer> m_framebuffers;
 	VkPipelineLayout m_pipelineLayout{ VK_NULL_HANDLE };
 	VkPipeline m_pipeline{ VK_NULL_HANDLE };
