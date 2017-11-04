@@ -106,4 +106,7 @@ protected:
 	uint32_t m_sampleCount{ 1 };
 };
 
+using ColorBufferPtr = std::shared_ptr<ColorBuffer>;
+using ColorBufferUPtr = std::unique_ptr<ColorBuffer>;
+
 } // namespace Kodiak

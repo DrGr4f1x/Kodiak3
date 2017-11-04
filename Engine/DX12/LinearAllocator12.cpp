@@ -113,26 +113,26 @@ LinearAllocationPage* LinearAllocatorPageManager::CreateNewPage(size_t pageSize)
 	resourceDesc.SampleDesc.Quality = 0;
 	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
-	D3D12_RESOURCE_STATES defaultUsage;
+	ResourceState defaultUsage;
 
 	if (m_allocationType == kGpuExclusive)
 	{
 		heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
 		resourceDesc.Width = pageSize == 0 ? kGpuAllocatorPageSize : pageSize;
 		resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-		defaultUsage = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		defaultUsage = ResourceState::UnorderedAccess;
 	}
 	else
 	{
 		heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
 		resourceDesc.Width = pageSize == 0 ? kCpuAllocatorPageSize : pageSize;
 		resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-		defaultUsage = D3D12_RESOURCE_STATE_GENERIC_READ;
+		defaultUsage = ResourceState::GenericRead;
 	}
 
 	ID3D12Resource* buffer = nullptr;
 	assert_succeeded(GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
-		&resourceDesc, defaultUsage, nullptr, MY_IID_PPV_ARGS(&buffer)));
+		&resourceDesc, static_cast<D3D12_RESOURCE_STATES>(defaultUsage), nullptr, MY_IID_PPV_ARGS(&buffer)));
 
 	buffer->SetName(L"LinearAllocator Page");
 

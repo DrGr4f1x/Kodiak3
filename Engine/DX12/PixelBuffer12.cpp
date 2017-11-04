@@ -311,7 +311,7 @@ size_t PixelBuffer::BytesPerPixel(DXGI_FORMAT format)
 }
 
 
-void PixelBuffer::AssociateWithResource(const std::string& name, ID3D12Resource* resource, D3D12_RESOURCE_STATES currentState)
+void PixelBuffer::AssociateWithResource(const std::string& name, ID3D12Resource* resource, ResourceState currentState)
 {
 	assert(resource != nullptr);
 	D3D12_RESOURCE_DESC resourceDesc = resource->GetDesc();
@@ -340,7 +340,7 @@ void PixelBuffer::CreateTextureResource(const std::string& name, const D3D12_RES
 	assert_succeeded(GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
 		&resourceDesc, D3D12_RESOURCE_STATE_COMMON, &clearValue, MY_IID_PPV_ARGS(&m_resource)));
 
-	m_usageState = D3D12_RESOURCE_STATE_COMMON;
+	m_usageState = ResourceState::Common;
 	m_gpuVirtualAddress = D3D12_GPU_VIRTUAL_ADDRESS_NULL;
 
 #ifndef _RELEASE

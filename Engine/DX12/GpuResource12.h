@@ -21,7 +21,7 @@ class GpuResource
 
 public:
 	GpuResource();
-	GpuResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES initialState);
+	GpuResource(ID3D12Resource* resource, ResourceState initialState);
 
 	virtual void Destroy();
 
@@ -35,8 +35,8 @@ public:
 
 protected:
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_resource;
-	D3D12_RESOURCE_STATES m_usageState;
-	D3D12_RESOURCE_STATES m_transitioningState;
+	ResourceState m_usageState;
+	ResourceState m_transitioningState;
 	D3D12_GPU_VIRTUAL_ADDRESS m_gpuVirtualAddress;
 };
 

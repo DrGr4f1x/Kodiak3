@@ -24,7 +24,7 @@ using namespace std;
 
 void ColorBuffer::CreateFromSwapChain(const std::string& name, ID3D12Resource* baseResource)
 {
-	AssociateWithResource(name, baseResource, D3D12_RESOURCE_STATE_PRESENT);
+	AssociateWithResource(name, baseResource, ResourceState::Present);
 
 	//m_UAVHandle[0] = Graphics::AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	//Graphics::g_Device->CreateUnorderedAccessView(m_pResource.Get(), nullptr, nullptr, m_UAVHandle[0]);

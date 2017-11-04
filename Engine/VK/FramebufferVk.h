@@ -10,6 +10,9 @@
 
 #pragma once
 
+#include "ColorBufferVk.h"
+#include "DepthBufferVk.h"
+
 namespace Kodiak
 {
 
@@ -21,17 +24,27 @@ class RenderPass;
 class FrameBuffer
 {
 public:
+	~FrameBuffer() { Destroy(); }
+
 	void Destroy();
 
-	void Create(ColorBuffer& rtv, RenderPass& renderpass);
-	void Create(ColorBuffer& rtv, DepthBuffer& dsv, RenderPass& renderpass);
+	void Create(ColorBufferPtr& rtv, RenderPass& renderpass);
+	void Create(ColorBufferPtr& rtv, DepthBufferPtr& dsv, RenderPass& renderpass);
 
 	// TODO MRTs
 
 	VkFramebuffer GetFramebuffer() { return m_framebuffer; }
 
+	uint32_t GetWidth() const { return m_width; }
+	uint32_t GetHeight() const { return m_height; }
+
 private:
+	uint32_t m_width{ 0 };
+	uint32_t m_height{ 0 };
 	VkFramebuffer m_framebuffer{ VK_NULL_HANDLE };
 };
+
+using FrameBufferPtr = std::shared_ptr<FrameBuffer>;
+using FrameBufferUPtr = std::unique_ptr<FrameBuffer>;
 
 } // namespace Kodiak

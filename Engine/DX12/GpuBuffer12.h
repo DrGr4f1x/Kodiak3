@@ -36,7 +36,7 @@ protected:
 	GpuBuffer()
 	{
 		m_resourceFlags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-		m_usageState = D3D12_RESOURCE_STATE_COMMON;
+		m_usageState = ResourceState::Common;
 		m_uav.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 		m_srv.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	}
@@ -88,7 +88,7 @@ class ConstantBuffer : public GpuBuffer
 public:
 	ConstantBuffer()
 	{
-		m_usageState = D3D12_RESOURCE_STATE_GENERIC_READ;
+		m_usageState = ResourceState::GenericRead;
 		m_heapType = D3D12_HEAP_TYPE_UPLOAD;
 		m_resourceFlags = D3D12_RESOURCE_FLAG_NONE;
 		m_forceAlign256 = true;

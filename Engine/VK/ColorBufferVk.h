@@ -23,6 +23,8 @@ public:
 		: m_clearColor(clearColor), m_numMipMaps(0)
 	{}
 
+	~ColorBuffer() { Destroy(); }
+
 	void Destroy();
 
 	// Create a color buffer from a swap chain buffer.  Unordered access is restricted.
@@ -57,5 +59,8 @@ protected:
 private:
 	void CreateDerivedViews(Format format, uint32_t arraySize, uint32_t numMips = 1);
 };
+
+using ColorBufferPtr = std::shared_ptr<ColorBuffer>;
+using ColorBufferUPtr = std::unique_ptr<ColorBuffer>;
 
 } // namespace Kodiak

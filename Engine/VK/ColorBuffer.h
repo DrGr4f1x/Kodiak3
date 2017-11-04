@@ -16,4 +16,4 @@
 #include "VK\ColorBufferVk.h"
 #else
 #error "No graphics API defined"
-#endif#pragma once
+#endif

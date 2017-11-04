@@ -23,6 +23,8 @@ public:
 		, m_clearStencil(clearStencil)
 	{}
 
+	~DepthBuffer() { Destroy(); }
+
 	void Destroy();
 
 	// Create a depth buffer.  If an address is supplied, memory will not be allocated.
@@ -46,5 +48,8 @@ private:
 
 	VkImageView m_dsv{ VK_NULL_HANDLE };
 };
+
+using DepthBufferPtr = std::shared_ptr<DepthBuffer>;
+using DepthBufferUPtr = std::unique_ptr<DepthBuffer>;
 
 } // namespace Kodiak

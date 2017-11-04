@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "Color.h"
+#include "FramebufferVk.h"
 #include "GpuBufferVk.h"
 
 namespace Kodiak
@@ -18,6 +20,7 @@ namespace Kodiak
 // Forward declarations
 class ComputeContext;
 class GraphicsContext;
+class RenderPass;
 
 class ContextManager
 {
@@ -83,7 +86,8 @@ public:
 		return CommandContext::Begin(id).GetGraphicsContext();
 	}
 
-	void BeginRenderPass(VkRenderPassBeginInfo& beginInfo);
+	void BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor);
+	void BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor, float clearDepth, uint32_t clearStencil);
 	void EndRenderPass();
 
 	void SetViewport(float x, float y, float w, float h, float minDepth = 0.0f, float maxDepth = 1.0f);
@@ -100,12 +104,6 @@ public:
 
 	void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation = 0, int32_t baseVertexLocation = 0);
 };
-
-
-inline void GraphicsContext::BeginRenderPass(VkRenderPassBeginInfo& beginInfo)
-{
-	vkCmdBeginRenderPass(m_commandList, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
-}
 
 
 inline void GraphicsContext::EndRenderPass()

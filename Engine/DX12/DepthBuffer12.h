@@ -58,4 +58,7 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE m_stencilSRV;
 };
 
+using DepthBufferPtr = std::shared_ptr<DepthBuffer>;
+using DepthBufferUPtr = std::unique_ptr<DepthBuffer>;
+
 } // namespace Kodiak

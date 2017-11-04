@@ -18,6 +18,7 @@
 
 
 using namespace Kodiak;
+using namespace std;
 
 
 #define SWAP_CHAIN_BUFFER_COUNT 3
@@ -51,8 +52,8 @@ void SwapChain::Create(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, ui
 		Microsoft::WRL::ComPtr<ID3D12Resource> displayPlane;
 		assert_succeeded(m_swapChain->GetBuffer(i, MY_IID_PPV_ARGS(&displayPlane)));
 
-		ColorBuffer buffer;
-		buffer.CreateFromSwapChain("Primary SwapChain Buffer", displayPlane.Detach());
+		ColorBufferPtr buffer = make_shared<ColorBuffer>();
+		buffer->CreateFromSwapChain("Primary SwapChain Buffer", displayPlane.Detach());
 		m_displayPlanes.push_back(buffer);
 	}
 }
@@ -60,10 +61,6 @@ void SwapChain::Create(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, ui
 
 void SwapChain::Destroy()
 {
-	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i)
-	{
-		m_displayPlanes[i].Destroy();
-	}
 	m_displayPlanes.clear();
 
 	m_swapChain.Reset();

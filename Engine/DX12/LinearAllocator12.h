@@ -50,7 +50,7 @@ struct DynAlloc
 class LinearAllocationPage : public GpuResource
 {
 public:
-	LinearAllocationPage(ID3D12Resource* resource, D3D12_RESOURCE_STATES usage) 
+	LinearAllocationPage(ID3D12Resource* resource, ResourceState usage) 
 		: GpuResource()
 	{
 		m_resource.Attach(resource);

@@ -12,6 +12,7 @@
 
 #include "TriangleApp.h"
 
+#include "Color.h"
 #include "CommandContext.h"
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
@@ -77,14 +78,16 @@ void TriangleApp::Startup()
 	m_renderPass.Finalize();
 
 	// Depth stencil buffer
-	m_depthBuffer.Create("Depth Buffer", m_displayWidth, m_displayHeight, m_graphicsDevice->GetDepthFormat());
+	m_depthBuffer = make_shared<DepthBuffer>(1.0f);
+	m_depthBuffer->Create("Depth Buffer", m_displayWidth, m_displayHeight, m_graphicsDevice->GetDepthFormat());
 
 	// Framebuffers
 	const uint32_t imageCount = swapChain->GetImageCount();
 	m_framebuffers.resize(imageCount);
 	for (uint32_t i = 0; i < imageCount; ++i)
 	{
-		m_framebuffers[i].Create(swapChain->GetColorBuffer(i), m_depthBuffer, m_renderPass);
+		m_framebuffers[i] = make_shared<FrameBuffer>();
+		m_framebuffers[i]->Create(swapChain->GetColorBuffer(i), m_depthBuffer, m_renderPass);
 	}
 
 #if VK
@@ -102,12 +105,9 @@ void TriangleApp::Shutdown()
 	m_vertexBuffer.Destroy();
 	m_indexBuffer.Destroy();
 	m_constantBuffer.Destroy();
-	m_depthBuffer.Destroy();
+	m_depthBuffer.reset();
 	m_renderPass.Destroy();
-	for (auto& fb : m_framebuffers)
-	{
-		fb.Destroy();
-	}
+	
 	m_framebuffers.clear();
 
 #if VK
@@ -125,27 +125,10 @@ void TriangleApp::Render()
 {
 	auto& context = GraphicsContext::Begin("Render frame");
 
-#if VK
-	// Set clear values for all framebuffer attachments with loadOp set to clear
-	// We use two attachments (color and depth) that are cleared at the start of the subpass and as such we need to set clear values for both
-	VkClearValue clearValues[2];
-	clearValues[0].color = { { 0.0f, 0.0f, 0.2f, 1.0f } };
-	clearValues[1].depthStencil = { 1.0f, 0 };
-
-	VkRenderPassBeginInfo renderPassBeginInfo = {};
-	renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassBeginInfo.pNext = nullptr;
-	renderPassBeginInfo.renderPass = m_renderPass.GetRenderPass();
-	renderPassBeginInfo.renderArea.offset.x = 0;
-	renderPassBeginInfo.renderArea.offset.y = 0;
-	renderPassBeginInfo.renderArea.extent.width = m_displayWidth;
-	renderPassBeginInfo.renderArea.extent.height = m_displayHeight;
-	renderPassBeginInfo.clearValueCount = 2;
-	renderPassBeginInfo.pClearValues = clearValues;
-	renderPassBeginInfo.framebuffer = m_framebuffers[m_graphicsDevice->GetCurrentBuffer()].GetFramebuffer();
-
-	context.BeginRenderPass(renderPassBeginInfo);
-#endif
+	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
+	
+	Color clearColor{ DirectX::Colors::CornflowerBlue };
+	context.BeginRenderPass(m_renderPass, *m_framebuffers[curFrame], clearColor, 1.0f, 0);
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -155,15 +138,6 @@ void TriangleApp::Render()
 #endif
 
 #if DX12
-	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
-	ColorBuffer& colorBuffer = m_graphicsDevice->GetSwapChain()->GetColorBuffer(curFrame);
-	colorBuffer.SetClearColor({ 0.0f, 0.0f, 0.2f, 1.0f });
-
-	context.TransitionResource(colorBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	context.TransitionResource(m_depthBuffer, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-	context.ClearColor(colorBuffer);
-	context.ClearDepth(m_depthBuffer);
-	context.SetRenderTarget(colorBuffer, m_depthBuffer);
 	context.SetRootSignature(m_rootSig);
 	context.SetPipelineState(m_pso);
 	context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -175,12 +149,11 @@ void TriangleApp::Render()
 
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 
-#if VK
 	context.EndRenderPass();
 
+#if VK
 	context.Finish(m_graphicsDevice->GetPresentCompleteSemaphore(), m_graphicsDevice->GetRenderCompleteSemaphore());
 #elif DX12
-	context.TransitionResource(colorBuffer, D3D12_RESOURCE_STATE_PRESENT);
 	context.Finish();
 #endif
 }

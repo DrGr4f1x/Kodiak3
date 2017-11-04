@@ -43,7 +43,7 @@ void GpuBuffer::Create(const std::string& name, size_t numElements, size_t eleme
 
 	assert_succeeded(
 		GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
-			&resourceDesc, m_usageState, nullptr, MY_IID_PPV_ARGS(&m_resource)) );
+			&resourceDesc, static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(&m_resource)) );
 
 	m_gpuVirtualAddress = m_resource->GetGPUVirtualAddress();
 

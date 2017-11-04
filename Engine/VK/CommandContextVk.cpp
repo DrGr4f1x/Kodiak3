@@ -14,6 +14,7 @@
 
 #include "CommandBufferPoolVk.h"
 #include "GraphicsDeviceVk.h"
+#include "RenderPassVk.h"
 
 
 using namespace Kodiak;
@@ -219,6 +220,55 @@ void CommandContext::FinishInternal(VkSemaphore waitSemaphore, VkSemaphore signa
 	}
 
 	g_contextManager.FreeContext(this);
+}
+
+
+void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor)
+{
+	VkClearValue clearValue;
+	clearValue.color = { clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A() };
+
+	VkRenderPassBeginInfo renderPassBeginInfo = {};
+	renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	renderPassBeginInfo.pNext = nullptr;
+	renderPassBeginInfo.renderPass = pass.GetRenderPass();
+
+	// TODO: Pass the renderArea rectangle in as a parameter?
+	renderPassBeginInfo.renderArea.offset.x = 0;
+	renderPassBeginInfo.renderArea.offset.y = 0;
+	renderPassBeginInfo.renderArea.extent.width = framebuffer.GetWidth();
+	renderPassBeginInfo.renderArea.extent.height = framebuffer.GetHeight();
+
+	renderPassBeginInfo.clearValueCount = 1;
+	renderPassBeginInfo.pClearValues = &clearValue;
+	renderPassBeginInfo.framebuffer = framebuffer.GetFramebuffer();
+
+	vkCmdBeginRenderPass(m_commandList, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+}
+
+
+void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor, float clearDepth, uint32_t clearStencil)
+{
+	VkClearValue clearValues[2];
+	clearValues[0].color = { clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A() };
+	clearValues[1].depthStencil = { clearDepth, clearStencil };
+
+	VkRenderPassBeginInfo renderPassBeginInfo = {};
+	renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	renderPassBeginInfo.pNext = nullptr;
+	renderPassBeginInfo.renderPass = pass.GetRenderPass();
+
+	// TODO: Pass the renderArea rectangle in as a parameter?
+	renderPassBeginInfo.renderArea.offset.x = 0;
+	renderPassBeginInfo.renderArea.offset.y = 0;
+	renderPassBeginInfo.renderArea.extent.width = framebuffer.GetWidth();
+	renderPassBeginInfo.renderArea.extent.height = framebuffer.GetHeight();
+
+	renderPassBeginInfo.clearValueCount = 2;
+	renderPassBeginInfo.pClearValues = clearValues;
+	renderPassBeginInfo.framebuffer = framebuffer.GetFramebuffer();
+
+	vkCmdBeginRenderPass(m_commandList, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
 

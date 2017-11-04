@@ -18,16 +18,16 @@ using namespace Kodiak;
 
 GpuResource::GpuResource()
 	: m_resource(nullptr)
-	, m_usageState((D3D12_RESOURCE_STATES)-1)
-	, m_transitioningState((D3D12_RESOURCE_STATES)-1)
+	, m_usageState(ResourceState::Undefined)
+	, m_transitioningState(ResourceState::Undefined)
 	, m_gpuVirtualAddress(D3D12_GPU_VIRTUAL_ADDRESS_NULL)
 {}
 
 
-GpuResource::GpuResource(ID3D12Resource* resource, D3D12_RESOURCE_STATES initialState)
+GpuResource::GpuResource(ID3D12Resource* resource, ResourceState initialState)
 	: m_resource(resource)
 	, m_usageState(initialState)
-	, m_transitioningState((D3D12_RESOURCE_STATES)-1)
+	, m_transitioningState(ResourceState::Undefined)
 	, m_gpuVirtualAddress(D3D12_GPU_VIRTUAL_ADDRESS_NULL)
 {}
 

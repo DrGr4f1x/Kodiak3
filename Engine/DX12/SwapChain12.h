@@ -26,14 +26,14 @@ public:
 	uint32_t GetImageCount() const;
 	Format GetColorFormat() const { return m_format; }
 
-	ColorBuffer& GetColorBuffer(uint32_t index) { return m_displayPlanes[index]; }
-	const ColorBuffer& GetColorBuffer(uint32_t index) const { return m_displayPlanes[index]; }
+	ColorBufferPtr& GetColorBuffer(uint32_t index) { return m_displayPlanes[index]; }
+	const ColorBufferPtr& GetColorBuffer(uint32_t index) const { return m_displayPlanes[index]; }
 
 private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> m_swapChain;
 	Format m_format{ Format::Unknown };
 
-	std::vector<ColorBuffer> m_displayPlanes;
+	std::vector<ColorBufferPtr> m_displayPlanes;
 };
 
 } // namespace Kodiak

@@ -19,33 +19,33 @@ using namespace std;
 
 void FrameBuffer::Destroy()
 {
-	for (auto& cb : m_colorBuffers)
-	{
-		cb.Destroy();
-	}
 	m_colorBuffers.clear();
 
-	m_depthBuffer.Destroy();
+	m_depthBuffer.reset();
 	m_hasDepthBuffer = false;
 }
 
 
-void FrameBuffer::Create(ColorBuffer& rtv, RenderPass& renderpass)
+void FrameBuffer::Create(ColorBufferPtr& rtv, RenderPass& renderpass)
 {
+	m_colorBuffers.clear();
+
 	m_colorBuffers.push_back(rtv);
 	m_hasDepthBuffer = false;
 }
 
 
-void FrameBuffer::Create(ColorBuffer& rtv, DepthBuffer& dsv, RenderPass& renderpass)
+void FrameBuffer::Create(ColorBufferPtr& rtv, DepthBufferPtr& dsv, RenderPass& renderpass)
 {
+	m_colorBuffers.clear();
+
 	m_colorBuffers.push_back(rtv);
 	m_depthBuffer = dsv;
 	m_hasDepthBuffer = true;
 }
 
 
-ColorBuffer& FrameBuffer::GetColorBuffer(uint32_t index)
+ColorBufferPtr& FrameBuffer::GetColorBuffer(uint32_t index)
 {
 	assert(index < (uint32_t)m_colorBuffers.size());
 	return m_colorBuffers[index];

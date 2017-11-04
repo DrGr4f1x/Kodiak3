@@ -10,6 +10,9 @@
 
 #pragma once
 
+#include "Color.h"
+#include "ColorBuffer12.h"
+#include "DepthBuffer12.h"
 #include "GpuBuffer12.h"
 #include "LinearAllocator12.h"
 #include "PipelineState12.h"
@@ -23,7 +26,9 @@ class ColorBuffer;
 class CommandListManager;
 class ComputeContext;
 class DepthBuffer;
+class FrameBuffer;
 class GraphicsContext;
+class RenderPass;
 
 
 class ContextManager
@@ -77,8 +82,8 @@ public:
 
 	static void InitializeBuffer(GpuResource& dest, const void* data, size_t numBytes, size_t offset = 0);
 
-	void TransitionResource(GpuResource& resource, D3D12_RESOURCE_STATES newState, bool flushImmediate = false);
-	void BeginResourceTransition(GpuResource& resource, D3D12_RESOURCE_STATES newState, bool flushImmediate = false);
+	void TransitionResource(GpuResource& resource, ResourceState newState, bool flushImmediate = false);
+	void BeginResourceTransition(GpuResource& resource, ResourceState newState, bool flushImmediate = false);
 	void InsertUAVBarrier(GpuResource& resource, bool flushImmediate = false);
 	void InsertAliasBarrier(GpuResource& before, GpuResource& after, bool flushImmediate = false);
 	inline void FlushResourceBarriers();
@@ -101,6 +106,14 @@ protected:
 
 	LinearAllocator m_cpuLinearAllocator;
 	LinearAllocator m_gpuLinearAllocator;
+
+	// Current render targets
+	std::array<ColorBuffer*, 8> m_renderTargets;
+	std::array<ResourceState, 8> m_renderTargetStates;
+	DepthBuffer* m_depthTarget;
+	ResourceState m_depthTargetState;
+	bool m_depthTargetValid{ false };
+	uint32_t m_numRenderTargets{ 0 };
 
 	std::string m_id;
 
@@ -136,6 +149,10 @@ public:
 	void ClearDepth(DepthBuffer& target);
 	void ClearStencil(DepthBuffer& target);
 	void ClearDepthAndStencil(DepthBuffer& target);
+
+	void BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor);
+	void BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor, float clearDepth, uint32_t clearStencil);
+	void EndRenderPass();
 
 	void SetRootSignature(const RootSignature& rootSig);
 

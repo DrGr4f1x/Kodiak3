@@ -22,22 +22,27 @@ class RenderPass;
 class FrameBuffer
 {
 public:
+	~FrameBuffer() { Destroy(); }
+
 	void Destroy();
 
-	void Create(ColorBuffer& rtv, RenderPass& renderpass);
-	void Create(ColorBuffer& rtv, DepthBuffer& dsv, RenderPass& renderpass);
+	void Create(ColorBufferPtr& rtv, RenderPass& renderpass);
+	void Create(ColorBufferPtr& rtv, DepthBufferPtr& dsv, RenderPass& renderpass);
 
-	ColorBuffer& GetColorBuffer(uint32_t index);
-	DepthBuffer& GetDepthBuffer() { return m_depthBuffer; }
+	ColorBufferPtr& GetColorBuffer(uint32_t index);
+	DepthBufferPtr& GetDepthBuffer() { return m_depthBuffer; }
 
 	size_t GetNumColorBuffers() const { return m_colorBuffers.size(); }
 
 	bool HasDepthBuffer() const { return m_hasDepthBuffer; }
 
 private:
-	std::vector<ColorBuffer> m_colorBuffers;
-	DepthBuffer m_depthBuffer;
+	std::vector<ColorBufferPtr> m_colorBuffers;
+	DepthBufferPtr m_depthBuffer;
 	bool m_hasDepthBuffer{ false };
 };
+
+using FrameBufferPtr = std::shared_ptr<FrameBuffer>;
+using FrameBufferUPtr = std::unique_ptr<FrameBuffer>;
 
 } // namespace Kodiak

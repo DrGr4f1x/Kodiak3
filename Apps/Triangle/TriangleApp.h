@@ -76,11 +76,11 @@ private:
 	// Camera controls
 	float m_zoom{ -2.5f };
 
-	Kodiak::DepthBuffer		m_depthBuffer{ 1.0f };
+	Kodiak::DepthBufferPtr	m_depthBuffer;
 
 	Kodiak::RenderPass		m_renderPass;
 
-	std::vector<Kodiak::FrameBuffer> m_framebuffers;
+	std::vector<Kodiak::FrameBufferPtr> m_framebuffers;
 
 #if VK
 	VkPipelineLayout m_pipelineLayout{ VK_NULL_HANDLE };

@@ -281,10 +281,7 @@ void SwapChain::Create(uint32_t* width, uint32_t* height, bool vsync)
 	// This also cleans up all the presentable images
 	if (oldSwapchain != VK_NULL_HANDLE)
 	{
-		for (uint32_t i = 0; i < m_imageCount; ++i)
-		{
-			m_displayPlanes[i].Destroy();
-		}
+		m_displayPlanes.clear();
 		vkDestroySwapchainKHR(m_device, oldSwapchain, nullptr);
 	}
 	ThrowIfFailed(vkGetSwapchainImagesKHR(m_device, m_swapChain, &m_imageCount, nullptr));
@@ -297,7 +294,8 @@ void SwapChain::Create(uint32_t* width, uint32_t* height, bool vsync)
 	m_displayPlanes.resize(m_imageCount);
 	for (uint32_t i = 0; i < m_imageCount; ++i)
 	{
-		m_displayPlanes[i].CreateFromSwapChain("Primary SwapChain Buffer", m_images[i], *width, *height, m_colorFormat);
+		m_displayPlanes[i] = make_shared<ColorBuffer>();
+		m_displayPlanes[i]->CreateFromSwapChain("Primary SwapChain Buffer", m_images[i], *width, *height, m_colorFormat);
 	}
 }
 
@@ -306,10 +304,6 @@ void SwapChain::Destroy()
 {
 	if (m_swapChain != VK_NULL_HANDLE)
 	{
-		for (uint32_t i = 0; i < m_imageCount; ++i)
-		{
-			m_displayPlanes[i].Destroy();
-		}
 		m_displayPlanes.clear();
 	}
 

@@ -19,12 +19,9 @@ using namespace Kodiak;
 
 void ColorBuffer::Destroy()
 {
-	if (m_imageView != VK_NULL_HANDLE)
-	{
-		vkDestroyImageView(GetDevice(), m_imageView, nullptr);
-		m_imageView = VK_NULL_HANDLE;
-	}
-
+	vkDestroyImageView(GetDevice(), m_imageView, nullptr);
+	m_imageView = VK_NULL_HANDLE;
+	
 	if (m_ownsImage)
 	{
 		PixelBuffer::Destroy();

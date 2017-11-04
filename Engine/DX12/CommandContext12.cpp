@@ -12,26 +12,22 @@
 
 #include "CommandContext12.h"
 
-#include "ColorBuffer12.h"
 #include "CommandListManager12.h"
-#include "DepthBuffer12.h"
+#include "Framebuffer12.h"
+#include "RenderPass12.h"
 
 
 using namespace Kodiak;
 using namespace std;
 
 
-#define VALID_COMPUTE_QUEUE_RESOURCE_STATES \
-    ( D3D12_RESOURCE_STATE_UNORDERED_ACCESS \
-    | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE \
-    | D3D12_RESOURCE_STATE_COPY_DEST \
-    | D3D12_RESOURCE_STATE_COPY_SOURCE )
-
-
 namespace
 {
 
 ContextManager g_contextManager;
+
+const ResourceState VALID_COMPUTE_QUEUE_RESOURCE_STATES =
+	ResourceState::NonPixelShaderResource | ResourceState::UnorderedAccess | ResourceState::CopyDest | ResourceState::CopySource;
 
 } // anonymous namespace
 
@@ -172,18 +168,18 @@ void CommandContext::InitializeBuffer(GpuResource& dest, const void* bufferData,
 	SIMDMemCopy(mem.dataPtr, bufferData, Math::DivideByMultiple(numBytes, 16));
 
 	// copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
-	initContext.TransitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST, true);
+	initContext.TransitionResource(dest, ResourceState::CopyDest, true);
 	initContext.m_commandList->CopyBufferRegion(dest.GetResource(), offset, mem.buffer.GetResource(), 0, numBytes);
-	initContext.TransitionResource(dest, D3D12_RESOURCE_STATE_GENERIC_READ, true);
+	initContext.TransitionResource(dest, ResourceState::GenericRead, true);
 
 	// Execute the command list and wait for it to finish so we can release the upload buffer
 	initContext.Finish(true);
 }
 
 
-void CommandContext::TransitionResource(GpuResource& resource, D3D12_RESOURCE_STATES newState, bool flushImmediate)
+void CommandContext::TransitionResource(GpuResource& resource, ResourceState newState, bool flushImmediate)
 {
-	D3D12_RESOURCE_STATES oldState = resource.m_usageState;
+	ResourceState oldState = resource.m_usageState;
 
 	if (m_type == D3D12_COMMAND_LIST_TYPE_COMPUTE)
 	{
@@ -199,14 +195,14 @@ void CommandContext::TransitionResource(GpuResource& resource, D3D12_RESOURCE_ST
 		barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		barrierDesc.Transition.pResource = resource.GetResource();
 		barrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		barrierDesc.Transition.StateBefore = oldState;
-		barrierDesc.Transition.StateAfter = newState;
+		barrierDesc.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(oldState);
+		barrierDesc.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(newState);
 
 		// Check to see if we already started the transition
 		if (newState == resource.m_transitioningState)
 		{
 			barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_END_ONLY;
-			resource.m_transitioningState = (D3D12_RESOURCE_STATES)-1;
+			resource.m_transitioningState = ResourceState::Undefined;
 		}
 		else
 		{
@@ -227,7 +223,7 @@ void CommandContext::TransitionResource(GpuResource& resource, D3D12_RESOURCE_ST
 }
 
 
-void CommandContext::BeginResourceTransition(GpuResource& resource, D3D12_RESOURCE_STATES newState, bool flushImmediate)
+void CommandContext::BeginResourceTransition(GpuResource& resource, ResourceState newState, bool flushImmediate)
 {
 	// If it's already transitioning, finish that transition
 	if (resource.m_transitioningState != (D3D12_RESOURCE_STATES)-1)
@@ -235,7 +231,7 @@ void CommandContext::BeginResourceTransition(GpuResource& resource, D3D12_RESOUR
 		TransitionResource(resource, resource.m_transitioningState);
 	}
 
-	D3D12_RESOURCE_STATES oldState = resource.m_usageState;
+	ResourceState oldState = resource.m_usageState;
 
 	if (oldState != newState)
 	{
@@ -245,8 +241,8 @@ void CommandContext::BeginResourceTransition(GpuResource& resource, D3D12_RESOUR
 		barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		barrierDesc.Transition.pResource = resource.GetResource();
 		barrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		barrierDesc.Transition.StateBefore = oldState;
-		barrierDesc.Transition.StateAfter = newState;
+		barrierDesc.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(oldState);
+		barrierDesc.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(newState);
 
 		barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_BEGIN_ONLY;
 
@@ -364,6 +360,130 @@ void GraphicsContext::ClearDepthAndStencil(DepthBuffer& target)
 {
 	FlushResourceBarriers();
 	m_commandList->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
+}
+
+
+void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor)
+{
+	// Verify the renderpass and framebuffer are compatible
+	assert(pass.GetNumColorAttachments() == framebuffer.GetNumColorBuffers());
+
+	assert(!pass.HasDepthAttachment());
+	assert(!framebuffer.HasDepthBuffer());
+
+	array<D3D12_CPU_DESCRIPTOR_HANDLE, 8> RTVs;
+
+	m_numRenderTargets = (uint32_t)pass.GetNumColorAttachments();
+
+	// Gather render targets for EndRenderPass
+	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
+	{
+		m_renderTargets[i] = framebuffer.GetColorBuffer(i).get();
+		m_renderTargetStates[i] = pass.GetFinalColorState(i);
+	}
+	m_depthTargetValid = false;
+
+	// Transition resources to initial states
+	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
+	{
+		RTVs[i] = m_renderTargets[i]->GetRTV();
+		TransitionResource(*m_renderTargets[i], ResourceState::RenderTarget);
+	}
+
+	FlushResourceBarriers();
+
+	// Set the render targets
+	m_commandList->OMSetRenderTargets(m_numRenderTargets, &RTVs[0], FALSE, nullptr);
+
+	// Clear render targets
+	float rgba[4];
+	rgba[0] = clearColor.R();
+	rgba[1] = clearColor.G();
+	rgba[2] = clearColor.B();
+	rgba[3] = clearColor.A();
+	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
+	{
+		m_commandList->ClearRenderTargetView(RTVs[i], rgba, 0, nullptr);
+	}
+}
+
+
+void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor, float clearDepth, uint32_t clearStencil)
+{
+	// Verify the renderpass and framebuffer are compatible
+	assert(pass.GetNumColorAttachments() == framebuffer.GetNumColorBuffers());
+
+	assert(pass.HasDepthAttachment());
+	assert(framebuffer.HasDepthBuffer());
+
+	array<D3D12_CPU_DESCRIPTOR_HANDLE, 8> RTVs;
+	D3D12_CPU_DESCRIPTOR_HANDLE DSV;
+
+	m_numRenderTargets = (uint32_t)pass.GetNumColorAttachments();
+
+	// Gather render targets for EndRenderPass
+	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
+	{
+		m_renderTargets[i] = framebuffer.GetColorBuffer(i).get();
+		m_renderTargetStates[i] = pass.GetFinalColorState(i);
+	}
+	m_depthTarget = framebuffer.GetDepthBuffer().get();
+	m_depthTargetState = pass.GetFinalDepthState();
+	m_depthTargetValid = true;
+
+	// Transition resources to initial states
+	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
+	{
+		RTVs[i] = m_renderTargets[i]->GetRTV();
+		TransitionResource(*m_renderTargets[i], ResourceState::RenderTarget);
+	}
+	DSV = m_depthTarget->GetDSV();
+	TransitionResource(*m_depthTarget, ResourceState::DepthWrite);
+
+	FlushResourceBarriers();
+
+	// Set the render targets
+	m_commandList->OMSetRenderTargets(m_numRenderTargets, &RTVs[0], FALSE, &DSV);
+
+	// Clear render targets
+	float rgba[4];
+	rgba[0] = clearColor.R();
+	rgba[1] = clearColor.G();
+	rgba[2] = clearColor.B();
+	rgba[3] = clearColor.A();
+	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
+	{
+		m_commandList->ClearRenderTargetView(RTVs[i], rgba, 0, nullptr);
+	}
+	m_commandList->ClearDepthStencilView(DSV, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepth, (UINT8)clearStencil, 0, nullptr);
+}
+
+
+void GraphicsContext::EndRenderPass()
+{
+	// Transition render targets to final states
+	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
+	{
+		TransitionResource(*m_renderTargets[i], m_renderTargetStates[i]);
+	}
+	if (m_depthTargetValid)
+	{
+		TransitionResource(*m_depthTarget, m_depthTargetState);
+	}
+
+	FlushResourceBarriers();
+
+	// Clear cached render targets
+	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
+	{
+		m_renderTargets[i] = nullptr;
+	}
+	if (m_depthTargetValid)
+	{
+		m_depthTarget = nullptr;
+	}
+	m_numRenderTargets = 0;
+	m_depthTargetValid = false;
 }
 
 
