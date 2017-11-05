@@ -17,3 +17,18 @@
 #else
 #error "No graphics API defined"
 #endif
+
+namespace Kodiak
+{
+
+struct Defaults
+{
+	static const uint32_t DepthBias;
+	static const float DepthBiasClamp;
+	static const float SlopeScaledDepthBias;
+	static const byte StencilReadMask;
+	static const byte StencilWriteMask;
+	static const float Float32Max;
+};
+
+} // namespace Kodiak

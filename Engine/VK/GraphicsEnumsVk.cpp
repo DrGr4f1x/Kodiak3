@@ -17,6 +17,17 @@ using namespace Kodiak;
 using namespace std;
 
 
+namespace Kodiak
+{
+const uint32_t Defaults::DepthBias = 0;
+const float Defaults::SlopeScaledDepthBias = 0.0f;
+const float Defaults::DepthBiasClamp = 0.0f;
+const byte Defaults::StencilReadMask = 0xFF;
+const byte Defaults::StencilWriteMask = 0xFF;
+const float Defaults::Float32Max = FLT_MAX;
+} // namespace Kodiak
+
+
 Format Kodiak::MapVulkanFormatToEngine(VkFormat format)
 {
 	static bool initialized = false;

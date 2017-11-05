@@ -17,6 +17,17 @@ using namespace Kodiak;
 using namespace std;
 
 
+namespace Kodiak
+{
+const uint32_t Defaults::DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
+const float Defaults::SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
+const float Defaults::DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
+const byte Defaults::StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+const byte Defaults::StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+const float Defaults::Float32Max = D3D12_FLOAT32_MAX;
+} // namespace Kodiak
+
+
 Format Kodiak::MapDXGIFormatToEngine(DXGI_FORMAT format)
 {
 	static bool initialized = false;

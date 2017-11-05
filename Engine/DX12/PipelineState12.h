@@ -13,12 +13,90 @@
 
 #pragma once
 
+#include "InputLayout.h"
+
 namespace Kodiak
 {
 
 // Forward declarations
+class RenderPass;
 class RootSignature;
 class Shader;
+
+
+struct RenderTargetBlendDesc
+{
+	RenderTargetBlendDesc();
+	RenderTargetBlendDesc(Blend srcBlend, Blend dstBlend);
+
+	bool		blendEnable;
+	bool		logicOpEnable;
+	Blend		srcBlend;
+	Blend		dstBlend;
+	BlendOp		blendOp;
+	Blend		srcBlendAlpha;
+	Blend		dstBlendAlpha;
+	BlendOp		blendOpAlpha;
+	LogicOp		logicOp;
+	ColorWrite	writeMask;
+};
+
+
+struct BlendStateDesc
+{
+	BlendStateDesc();
+	BlendStateDesc(Blend srcBlend, Blend dstBlend);
+
+	bool					alphaToCoverageEnable;
+	bool					independentBlendEnable;
+	RenderTargetBlendDesc	renderTargetBlend[8];
+};
+
+
+struct RasterizerStateDesc
+{
+	RasterizerStateDesc();
+	RasterizerStateDesc(CullMode cullMode, FillMode fillMode);
+
+	CullMode	cullMode;
+	FillMode	fillMode;
+	bool		frontCounterClockwise;
+	int32_t		depthBias;
+	float		depthBiasClamp;
+	float		slopeScaledDepthBias;
+	bool		depthClipEnable;
+	bool		multisampleEnable;
+	bool		antialiasedLineEnable;
+	uint32_t	forcedSampleCount;
+	bool		conservativeRasterizationEnable;
+};
+
+
+struct StencilOpDesc
+{
+	StencilOpDesc();
+
+	StencilOp		stencilFailOp;
+	StencilOp		stencilDepthFailOp;
+	StencilOp		stencilPassOp;
+	ComparisonFunc	stencilFunc;
+};
+
+
+struct DepthStencilStateDesc
+{
+	DepthStencilStateDesc();
+	DepthStencilStateDesc(bool enable, bool writeEnable);
+
+	bool			depthEnable;
+	DepthWrite		depthWriteMask;
+	ComparisonFunc	depthFunc;
+	bool			stencilEnable;
+	uint8_t			stencilReadMask;
+	uint8_t			stencilWriteMask;
+	StencilOpDesc	frontFace;
+	StencilOpDesc	backFace;
+};
 
 
 class PSO
@@ -53,28 +131,14 @@ public:
 	// Start with empty state
 	GraphicsPSO();
 
-	void SetBlendState(const D3D12_BLEND_DESC& blendDesc);
-	void SetRasterizerState(const D3D12_RASTERIZER_DESC& rasterizerDesc);
-	void SetDepthStencilState(const D3D12_DEPTH_STENCIL_DESC& depthStencilDesc);
+	void SetBlendState(const BlendStateDesc& blendDesc);
+	void SetRasterizerState(const RasterizerStateDesc& rasterizerDesc);
+	void SetDepthStencilState(const DepthStencilStateDesc& depthStencilDesc);
 	void SetSampleMask(uint32_t sampleMask);
-	void SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType);
-	void SetRenderTargetFormat(Format rtvFormat, Format dsvFormat, uint32_t msaaCount = 1, uint32_t msaaQuality = 0);
-	void SetRenderTargetFormats(uint32_t numRTVs, const Format* rtvFormats, Format dsvFormat, uint32_t msaaCount = 1, uint32_t msaaQuality = 0);
-	void SetInputLayout(uint32_t numElements, const D3D12_INPUT_ELEMENT_DESC* pInputElementDescs);
-	void SetPrimitiveRestart(D3D12_INDEX_BUFFER_STRIP_CUT_VALUE ibProps);
-
-	// These const_casts shouldn't be necessary, but we need to fix the API to accept "const void* pShaderBytecode"
-	void SetVertexShader(const void* binary, size_t size) { m_psoDesc.VS = CD3DX12_SHADER_BYTECODE(const_cast<void*>(binary), size); }
-	void SetPixelShader(const void* binary, size_t size) { m_psoDesc.PS = CD3DX12_SHADER_BYTECODE(const_cast<void*>(binary), size); }
-	void SetGeometryShader(const void* binary, size_t size) { m_psoDesc.GS = CD3DX12_SHADER_BYTECODE(const_cast<void*>(binary), size); }
-	void SetHullShader(const void* binary, size_t size) { m_psoDesc.HS = CD3DX12_SHADER_BYTECODE(const_cast<void*>(binary), size); }
-	void SetDomainShader(const void* binary, size_t size) { m_psoDesc.DS = CD3DX12_SHADER_BYTECODE(const_cast<void*>(binary), size); }
-
-	void SetVertexShader(const D3D12_SHADER_BYTECODE& binary) { m_psoDesc.VS = binary; }
-	void SetPixelShader(const D3D12_SHADER_BYTECODE& binary) { m_psoDesc.PS = binary; }
-	void SetGeometryShader(const D3D12_SHADER_BYTECODE& binary) { m_psoDesc.GS = binary; }
-	void SetHullShader(const D3D12_SHADER_BYTECODE& binary) { m_psoDesc.HS = binary; }
-	void SetDomainShader(const D3D12_SHADER_BYTECODE& binary) { m_psoDesc.DS = binary; }
+	void SetPrimitiveTopologyType(PrimitiveTopologyType topologyType);
+	void SetRenderPass(const RenderPass& renderpass);
+	void SetInputLayout(uint32_t numStreams, const VertexStreamDesc* vertexStreams, uint32_t numElements, const VertexElementDesc* inputElementDescs);
+	void SetPrimitiveRestart(IndexBufferStripCutValue ibProps);
 
 	void SetVertexShader(const Shader* vertexShader);
 	void SetPixelShader(const Shader* pixelShader);
@@ -88,6 +152,7 @@ public:
 private:
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC m_psoDesc;
 	std::shared_ptr<const D3D12_INPUT_ELEMENT_DESC> m_inputLayouts;
+	std::shared_ptr<const VertexElementDesc> m_inputElements;
 };
 
 

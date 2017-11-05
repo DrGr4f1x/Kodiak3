@@ -179,6 +179,12 @@
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
     <ClInclude Include="BitmaskEnum.h" />
+    <ClInclude Include="CommonStates.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="InputLayout.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -288,6 +294,9 @@
     </ClCompile>
     <ClCompile Include="DX12\GraphicsEnums12.cpp">
       <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonStates.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

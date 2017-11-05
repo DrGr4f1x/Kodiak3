@@ -45,8 +45,6 @@ private:
 
 #if DX12
 	void InitDX12();
-
-	void ShutdownDX12();
 #endif
 
 private:
