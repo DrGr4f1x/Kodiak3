@@ -273,59 +273,6 @@ void TriangleApp::InitDescriptorSet()
 }
 
 
-// Vulkan loads it's shaders from an immediate binary representation called SPIR-V
-// Shaders are compiled offline from e.g. GLSL using the reference glslang compiler
-// This function loads such a shader from a binary file and returns a shader module structure
-VkShaderModule loadSPIRVShader(std::string filename)
-{
-	size_t shaderSize;
-	char* shaderCode = nullptr;
-
-	auto& filesystem = Filesystem::GetInstance();
-	string fullpath = filesystem.GetFullPath(filename);
-
-	std::ifstream is(fullpath, std::ios::binary | std::ios::in | std::ios::ate);
-
-	if (is.is_open())
-	{
-		shaderSize = is.tellg();
-		is.seekg(0, std::ios::beg);
-		// Copy file contents into a buffer
-		shaderCode = new char[shaderSize];
-		is.read(shaderCode, shaderSize);
-		is.close();
-		assert(shaderSize > 0);
-	}
-
-	if (shaderCode)
-	{
-		// Create a new shader module that will be used for pipeline creation
-		VkShaderModuleCreateInfo moduleCreateInfo{};
-		moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		moduleCreateInfo.codeSize = shaderSize;
-		moduleCreateInfo.pCode = (uint32_t*)shaderCode;
-
-		VkShaderModule shaderModule;
-		ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &shaderModule));
-
-		delete[] shaderCode;
-
-		return shaderModule;
-	}
-	else
-	{
-		std::cerr << "Error: Could not open shader file \"" << filename << "\"" << std::endl;
-		return VK_NULL_HANDLE;
-	}
-}
-
-
-const string getAssetPath()
-{
-	return "./../Data/Shaders/SPIR-V/";
-}
-
-
 void TriangleApp::ShutdownVk()
 {
 	vkDestroyDescriptorPool(GetDevice(), m_descriptorPool, nullptr);
@@ -346,34 +293,6 @@ void TriangleApp::InitDX12()
 	m_rootSig.Reset(1);
 	m_rootSig[0].InitAsConstantBuffer(0, D3D12_SHADER_VISIBILITY_VERTEX);
 	m_rootSig.Finalize("Root sig", D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-
-	m_pso.SetRootSignature(m_rootSig);
-
-	// Render state
-	m_pso.SetRasterizerState(CommonStates::RasterizerTwoSided());
-	m_pso.SetBlendState(CommonStates::BlendDisable());
-	m_pso.SetDepthStencilState(CommonStates::DepthStateReadOnlyReversed());
-
-	auto vs = Shader::Load("TriangleVS");
-	auto ps = Shader::Load("TrianglePS");
-
-	m_pso.SetVertexShader(vs);
-	m_pso.SetPixelShader(ps);
-
-	m_pso.SetRenderPass(m_renderPass);
-
-	m_pso.SetPrimitiveTopologyType(PrimitiveTopologyType::Triangle);
-
-	// Vertex inputs
-	VertexStreamDesc vertexStreamDesc{ 0, sizeof(Vertex), InputClassification::PerVertexData };
-	VertexElementDesc vertexElements[] =
-	{
-		{ "Position", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
-		{ "Color", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 }
-	};
-	m_pso.SetInputLayout(1, &vertexStreamDesc, 2, vertexElements);
-
-	m_pso.Finalize();
 }
 #endif
 
