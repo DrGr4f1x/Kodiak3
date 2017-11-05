@@ -128,6 +128,50 @@ enum class FillMode
 };
 
 
+enum class ComparisonFunc
+{
+	Never =			VK_COMPARE_OP_NEVER,
+	Less =			VK_COMPARE_OP_LESS,
+	Equal =			VK_COMPARE_OP_EQUAL,
+	LessEqual =		VK_COMPARE_OP_LESS_OR_EQUAL,
+	Greater =		VK_COMPARE_OP_GREATER,
+	NotEqual =		VK_COMPARE_OP_NOT_EQUAL,
+	GreaterEqual =	VK_COMPARE_OP_GREATER_OR_EQUAL,
+	Always =		VK_COMPARE_OP_ALWAYS
+};
+
+
+enum class StencilOp
+{
+	Keep =		VK_STENCIL_OP_KEEP,
+	Zero =		VK_STENCIL_OP_ZERO,
+	Replace =	VK_STENCIL_OP_REPLACE,
+	IncrSat =	VK_STENCIL_OP_INCREMENT_AND_CLAMP,
+	DecrSat =	VK_STENCIL_OP_DECREMENT_AND_CLAMP,
+	Invert =	VK_STENCIL_OP_INVERT,
+	Incr =		VK_STENCIL_OP_INCREMENT_AND_WRAP,
+	Decr =		VK_STENCIL_OP_DECREMENT_AND_WRAP
+};
+
+
+enum class IndexBufferStripCutValue
+{
+	Disabled,
+	Value_0xFFFF,
+	Value_0xFFFFFFFF
+};
+
+
+enum class PrimitiveTopologyType
+{
+	Undefined,
+	Point =		VK_PRIMITIVE_TOPOLOGY_POINT_LIST,
+	Line =		VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
+	Triangle =	VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+	Patch =		VK_PRIMITIVE_TOPOLOGY_PATCH_LIST
+};
+
+
 enum class InputClassification
 {
 	PerVertexData = VK_VERTEX_INPUT_RATE_VERTEX,

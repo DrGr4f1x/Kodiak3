@@ -32,13 +32,13 @@ public:
 private:
 	void UpdateConstantBuffer();
 
+	void InitPSO();
+
 #if VK
 	void InitVk();
 	void InitDescriptorPool();
 	void InitDescriptorSetLayout();
 	void InitDescriptorSet();
-	void InitPipelineCache();
-	void InitPipeline();
 
 	void ShutdownVk();
 #endif
@@ -80,10 +80,10 @@ private:
 
 	std::vector<Kodiak::FrameBufferPtr> m_framebuffers;
 
+	Kodiak::GraphicsPSO		m_pso;
+
 #if VK
 	VkPipelineLayout m_pipelineLayout{ VK_NULL_HANDLE };
-	VkPipeline m_pipeline{ VK_NULL_HANDLE };
-	VkPipelineCache m_pipelineCache{ VK_NULL_HANDLE };
 	VkDescriptorSetLayout m_descriptorSetLayout{ VK_NULL_HANDLE };
 	VkDescriptorSet m_descriptorSet{ VK_NULL_HANDLE };
 	VkDescriptorPool m_descriptorPool{ VK_NULL_HANDLE };
@@ -91,6 +91,5 @@ private:
 
 #if DX12
 	Kodiak::RootSignature	m_rootSig;
-	Kodiak::GraphicsPSO		m_pso;
 #endif
 };

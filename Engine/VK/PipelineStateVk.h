@@ -16,6 +16,7 @@ namespace Kodiak
 {
 
 // Forward declarations
+class RenderPass;
 class RootSignature;
 class Shader;
 
@@ -92,6 +93,129 @@ struct DepthStencilStateDesc
 	uint8_t			stencilWriteMask;
 	StencilOpDesc	frontFace;
 	StencilOpDesc	backFace;
+};
+
+
+struct ShaderBytecode
+{
+	const byte* binary;
+	size_t size;
+};
+
+
+class PSO
+{
+public:
+	PSO() = default;
+
+	static void DestroyAll();
+
+	// TODO
+#if 0
+	void SetRootSignature(const RootSignature& bindMappings)
+	{
+		m_rootSignature = &bindMappings;
+	}
+
+	const RootSignature& GetRootSignature() const
+	{
+		assert(m_rootSignature != nullptr);
+		return *m_rootSignature;
+	}
+#else
+	void SetPipelineLayout(VkPipelineLayout layout)
+	{
+		m_layout = layout;
+	}
+
+	VkPipelineLayout GetLayout() const
+	{
+		return m_layout;
+	}
+#endif
+
+	VkPipeline GetPipelineStateObject() const { return m_pipeline; }
+
+protected:
+#if 0
+	const RootSignature* m_rootSignature{ nullptr };
+#else
+	VkPipelineLayout m_layout{ VK_NULL_HANDLE };
+#endif
+	VkPipeline m_pipeline{ VK_NULL_HANDLE };
+};
+
+
+class GraphicsPSO : public PSO
+{
+	friend class CommandContext;
+
+public:
+	// Start with empty state
+	GraphicsPSO();
+
+	void SetBlendState(const BlendStateDesc& stateDesc);
+	void SetRasterizerState(const RasterizerStateDesc& stateDesc);
+	void SetDepthStencilState(const DepthStencilStateDesc& stateDesc);
+	void SetSampleMask(uint32_t sampleMask);
+	void SetPrimitiveTopologyType(PrimitiveTopologyType topologyType);
+	void SetRenderPass(RenderPass& renderpass);
+	void SetInputLayout(uint32_t numStreams, const VertexStreamDesc* vertexStreams, uint32_t numElements, const VertexElementDesc* inputElementDescs);
+	void SetPrimitiveRestart(IndexBufferStripCutValue ibProps);
+
+	void SetVertexShader(const Kodiak::Shader* vertexShader);
+	void SetPixelShader(const Kodiak::Shader* pixelShader);
+	void SetGeometryShader(const Kodiak::Shader* geometryShader);
+	void SetHullShader(const Kodiak::Shader* hullShader);
+	void SetDomainShader(const Kodiak::Shader* domainShader);
+
+	void Finalize();
+
+private:
+	VkRenderPass m_renderPass{ VK_NULL_HANDLE };
+	bool m_finalized{ false };
+
+	// Main pipeline description
+	VkGraphicsPipelineCreateInfo m_pipelineCreateInfo{ VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO };
+
+	// Render state descriptions
+	VkPipelineViewportStateCreateInfo m_viewportStateInfo{ VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO };
+	VkPipelineColorBlendStateCreateInfo m_blendStateInfo{ VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO };
+	std::array<VkPipelineColorBlendAttachmentState, 8> m_blendAttachments;
+	VkPipelineMultisampleStateCreateInfo m_multisampleInfo{ VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO };
+	VkPipelineRasterizationStateCreateInfo m_rasterizationInfo{ VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO };
+	VkPipelineDepthStencilStateCreateInfo m_depthStencilInfo{ VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO };
+	VkPipelineVertexInputStateCreateInfo m_vertexInputInfo{ VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO };
+	VkPipelineInputAssemblyStateCreateInfo m_inputAssemblyInfo{ VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO };
+
+	// Vertex inputs
+	std::vector<VkVertexInputBindingDescription> m_vertexInputBindings;
+	std::vector<VkVertexInputAttributeDescription> m_vertexAttributes;
+
+	// Shaders
+	ShaderBytecode m_vertexShader{ nullptr, 0 };
+	ShaderBytecode m_pixelShader{ nullptr, 0 };
+	ShaderBytecode m_hullShader{ nullptr, 0 };
+	ShaderBytecode m_domainShader{ nullptr, 0 };
+	ShaderBytecode m_geometryShader{ nullptr, 0 };
+	std::vector<VkPipelineShaderStageCreateInfo> m_shaderStages;
+
+	// Dynamic states
+	std::vector<VkDynamicState> m_dynamicStates;
+};
+
+
+class ComputePSO : public PSO
+{
+	friend class CommandContext;
+
+public:
+	ComputePSO();
+
+	void Finalize();
+
+private:
+
 };
 
 } // namespace Kodiak

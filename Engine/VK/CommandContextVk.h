@@ -19,7 +19,9 @@ namespace Kodiak
 
 // Forward declarations
 class ComputeContext;
+class ComputePSO;
 class GraphicsContext;
+class GraphicsPSO;
 class RenderPass;
 
 class ContextManager
@@ -94,9 +96,10 @@ public:
 	void SetScissor(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom);
 	void SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
+	void SetPipelineState(const GraphicsPSO& PSO);
+
 	// TODO remove me
 	void BindDescriptorSet(VkPipelineLayout pipelineLayout, VkDescriptorSet descriptorSet);
-	void BindPipeline(VkPipeline pipeline);
 
 	void SetIndexBuffer(IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, VertexBuffer& vertexBuffer);

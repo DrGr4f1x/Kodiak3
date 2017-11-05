@@ -14,6 +14,7 @@
 
 #include "CommandBufferPoolVk.h"
 #include "GraphicsDeviceVk.h"
+#include "PipelineStateVk.h"
 #include "RenderPassVk.h"
 
 
@@ -309,13 +310,13 @@ void GraphicsContext::SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, 
 }
 
 
-void GraphicsContext::BindDescriptorSet(VkPipelineLayout pipelineLayout, VkDescriptorSet descriptorSet)
+void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 {
-	vkCmdBindDescriptorSets(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+	vkCmdBindPipeline(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, pso.GetPipelineStateObject());
 }
 
 
-void GraphicsContext::BindPipeline(VkPipeline pipeline)
+void GraphicsContext::BindDescriptorSet(VkPipelineLayout pipelineLayout, VkDescriptorSet descriptorSet)
 {
-	vkCmdBindPipeline(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+	vkCmdBindDescriptorSets(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
 }

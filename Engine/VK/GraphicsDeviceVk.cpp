@@ -15,6 +15,7 @@
 #include "Utility.h"
 
 #include "CommandBufferPoolVk.h"
+#include "PipelineStateVk.h"
 #include "SwapChainVk.h"
 
 #include <iostream>
@@ -123,6 +124,8 @@ void GraphicsDevice::Destroy()
 	assert(m_initialized);
 
 	g_commandBufferPool.Destroy();
+
+	PSO::DestroyAll();
 
 	m_swapChain->Destroy();
 	m_swapChain.reset();
