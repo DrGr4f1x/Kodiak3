@@ -41,49 +41,49 @@ public:
 		m_rootParam.ParameterType = (D3D12_ROOT_PARAMETER_TYPE)0xFFFFFFFF;
 	}
 
-	void InitAsConstants(uint32_t _register, uint32_t numDwords, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL)
+	void InitAsConstants(uint32_t _register, uint32_t numDwords, ShaderVisibility visibility = ShaderVisibility::All)
 	{
 		m_rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
-		m_rootParam.ShaderVisibility = visibility;
+		m_rootParam.ShaderVisibility = static_cast<D3D12_SHADER_VISIBILITY>(visibility);
 		m_rootParam.Constants.Num32BitValues = numDwords;
 		m_rootParam.Constants.ShaderRegister = _register;
 		m_rootParam.Constants.RegisterSpace = 0;
 	}
 
-	void InitAsConstantBuffer(uint32_t _register, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL)
+	void InitAsConstantBuffer(uint32_t _register, ShaderVisibility visibility = ShaderVisibility::All)
 	{
 		m_rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-		m_rootParam.ShaderVisibility = visibility;
+		m_rootParam.ShaderVisibility = static_cast<D3D12_SHADER_VISIBILITY>(visibility);
 		m_rootParam.Descriptor.ShaderRegister = _register;
 		m_rootParam.Descriptor.RegisterSpace = 0;
 	}
 
-	void InitAsBufferSRV(uint32_t _register, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL)
+	void InitAsBufferSRV(uint32_t _register, ShaderVisibility visibility = ShaderVisibility::All)
 	{
 		m_rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
-		m_rootParam.ShaderVisibility = visibility;
+		m_rootParam.ShaderVisibility = static_cast<D3D12_SHADER_VISIBILITY>(visibility);
 		m_rootParam.Descriptor.ShaderRegister = _register;
 		m_rootParam.Descriptor.RegisterSpace = 0;
 	}
 
-	void InitAsBufferUAV(uint32_t _register, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL)
+	void InitAsBufferUAV(uint32_t _register, ShaderVisibility visibility = ShaderVisibility::All)
 	{
 		m_rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV;
-		m_rootParam.ShaderVisibility = visibility;
+		m_rootParam.ShaderVisibility = static_cast<D3D12_SHADER_VISIBILITY>(visibility);
 		m_rootParam.Descriptor.ShaderRegister = _register;
 		m_rootParam.Descriptor.RegisterSpace = 0;
 	}
 
-	void InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE type, uint32_t _register, uint32_t count, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL)
+	void InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE type, uint32_t _register, uint32_t count, ShaderVisibility visibility = ShaderVisibility::All)
 	{
 		InitAsDescriptorTable(1, visibility);
 		SetTableRange(0, type, _register, count);
 	}
 
-	void InitAsDescriptorTable(uint32_t rangeCount, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL)
+	void InitAsDescriptorTable(uint32_t rangeCount, ShaderVisibility visibility = ShaderVisibility::All)
 	{
 		m_rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		m_rootParam.ShaderVisibility = visibility;
+		m_rootParam.ShaderVisibility = static_cast<D3D12_SHADER_VISIBILITY>(visibility);
 		m_rootParam.DescriptorTable.NumDescriptorRanges = rangeCount;
 		m_rootParam.DescriptorTable.pDescriptorRanges = new D3D12_DESCRIPTOR_RANGE[rangeCount];
 	}
@@ -162,9 +162,9 @@ public:
 	}
 
 	void InitStaticSampler(uint32_t _register, const D3D12_SAMPLER_DESC& nonStaticSamplerDesc,
-		D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
+		ShaderVisibility visibility = ShaderVisibility::All);
 
-	void Finalize(const std::string& name, D3D12_ROOT_SIGNATURE_FLAGS flags = D3D12_ROOT_SIGNATURE_FLAG_NONE);
+	void Finalize(const std::string& name, RootSignatureFlags flags = RootSignatureFlags::None);
 
 	ID3D12RootSignature* GetSignature() const { return m_signature; }
 

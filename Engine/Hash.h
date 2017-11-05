@@ -31,6 +31,9 @@
 
 namespace Utility
 {
+
+extern const size_t g_hashStart;
+
 inline size_t HashRange(const uint32_t* const Begin, const uint32_t* const End, size_t Hash)
 {
 #if ENABLE_SSE_CRC32

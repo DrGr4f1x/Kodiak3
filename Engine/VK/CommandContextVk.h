@@ -23,6 +23,8 @@ class ComputePSO;
 class GraphicsContext;
 class GraphicsPSO;
 class RenderPass;
+class RootSignature;
+
 
 class ContextManager
 {
@@ -70,6 +72,9 @@ public:
 protected:
 	VkCommandBuffer m_commandList{ VK_NULL_HANDLE };
 
+	VkPipelineLayout m_curGraphicsPipelineLayout{ VK_NULL_HANDLE };
+	VkPipelineLayout m_curComputePipelineLayout{ VK_NULL_HANDLE };
+
 private:
 	CommandContext() = default;
 
@@ -92,6 +97,8 @@ public:
 	void BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor, float clearDepth, uint32_t clearStencil);
 	void EndRenderPass();
 
+	void SetRootSignature(const RootSignature& rootSig);
+
 	void SetViewport(float x, float y, float w, float h, float minDepth = 0.0f, float maxDepth = 1.0f);
 	void SetScissor(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom);
 	void SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
@@ -99,7 +106,7 @@ public:
 	void SetPipelineState(const GraphicsPSO& PSO);
 
 	// TODO remove me
-	void BindDescriptorSet(VkPipelineLayout pipelineLayout, VkDescriptorSet descriptorSet);
+	void BindDescriptorSet(VkDescriptorSet descriptorSet);
 
 	void SetIndexBuffer(IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, VertexBuffer& vertexBuffer);

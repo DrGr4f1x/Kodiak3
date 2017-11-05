@@ -172,6 +172,34 @@ enum class PrimitiveTopologyType
 };
 
 
+enum class ShaderVisibility
+{
+	All =		D3D12_SHADER_VISIBILITY_ALL,
+	Graphics =	D3D12_SHADER_VISIBILITY_ALL,
+	Compute =	D3D12_SHADER_VISIBILITY_ALL,
+	Domain =	D3D12_SHADER_VISIBILITY_DOMAIN,
+	Geometry =	D3D12_SHADER_VISIBILITY_GEOMETRY,
+	Hull =		D3D12_SHADER_VISIBILITY_HULL,
+	Pixel =		D3D12_SHADER_VISIBILITY_PIXEL,
+	Vertex =	D3D12_SHADER_VISIBILITY_VERTEX
+};
+
+
+enum class RootSignatureFlags
+{
+	None =								D3D12_ROOT_SIGNATURE_FLAG_NONE,
+	AllowInputAssemblerInputLayout =	D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT,
+	DenyVertexShaderRootAccess =		D3D12_ROOT_SIGNATURE_FLAG_DENY_VERTEX_SHADER_ROOT_ACCESS,
+	DenyHullShaderRootAccess =			D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS,
+	DenyDomainShaderRootAccess =		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS,
+	DenyGeometryShaderRootAccess =		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS,
+	DenyPixelShaderRootAccess =			D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS,
+	AllowStreamOutput =					D3D12_ROOT_SIGNATURE_FLAG_ALLOW_STREAM_OUTPUT
+};
+
+template <> struct EnableBitmaskOperators<RootSignatureFlags> { static const bool enable = true; };
+
+
 enum class InputClassification
 {
 	PerVertexData = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,

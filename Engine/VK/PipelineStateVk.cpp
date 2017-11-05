@@ -17,6 +17,7 @@
 
 #include "GraphicsDeviceVk.h"
 #include "RenderPassVk.h"
+#include "RootSignatureVk.h"
 
 
 using namespace Kodiak;
@@ -500,12 +501,7 @@ void GraphicsPSO::Finalize()
 	createInfo.pMultisampleState = &m_multisampleInfo;
 	createInfo.pDepthStencilState = &m_depthStencilInfo;
 	createInfo.pColorBlendState = &m_blendStateInfo;
-	// TODO
-#if 0
 	createInfo.layout = m_rootSignature->GetLayout();
-#else
-	createInfo.layout = m_layout;
-#endif
 	createInfo.renderPass = m_renderPass;
 	createInfo.subpass = 0;
 	createInfo.basePipelineHandle = VK_NULL_HANDLE;

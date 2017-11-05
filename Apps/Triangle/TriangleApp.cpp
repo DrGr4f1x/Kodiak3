@@ -91,12 +91,10 @@ void TriangleApp::Startup()
 		m_framebuffers[i]->Create(swapChain->GetColorBuffer(i), m_depthBuffer, m_renderPass);
 	}
 
+	InitRootSig();
+
 #if VK
 	InitVk();
-#endif
-
-#if DX12
-	InitDX12();
 #endif
 
 	InitPSO();
@@ -110,7 +108,8 @@ void TriangleApp::Shutdown()
 	m_constantBuffer.Destroy();
 	m_depthBuffer.reset();
 	m_renderPass.Destroy();
-	
+	m_rootSig.Destroy();
+
 	m_framebuffers.clear();
 
 #if VK
@@ -130,17 +129,17 @@ void TriangleApp::Render()
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
+	context.SetRootSignature(m_rootSig);
+	context.SetPipelineState(m_pso);
+
 #if VK
-	context.BindDescriptorSet(m_pipelineLayout, m_descriptorSet);
+	context.BindDescriptorSet(m_descriptorSet);
 #endif
 
 #if DX12
-	context.SetRootSignature(m_rootSig);
 	context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	context.SetConstantBuffer(0, m_constantBuffer);
 #endif
-
-	context.SetPipelineState(m_pso);
 
 	context.SetVertexBuffer(0, m_vertexBuffer);
 	context.SetIndexBuffer(m_indexBuffer);
@@ -178,7 +177,6 @@ void TriangleApp::UpdateConstantBuffer()
 void TriangleApp::InitVk()
 {
 	InitDescriptorPool();
-	InitDescriptorSetLayout();
 	InitDescriptorSet();
 }
 
@@ -209,39 +207,6 @@ void TriangleApp::InitDescriptorPool()
 }
 
 
-void TriangleApp::InitDescriptorSetLayout()
-{
-	// Setup layout of descriptors used in this example
-	// Basically connects the different shader stages to descriptors for binding uniform buffers, image samplers, etc.
-	// So every shader binding should map to one descriptor set layout binding
-
-	// Binding 0: Uniform buffer (Vertex shader)
-	VkDescriptorSetLayoutBinding layoutBinding = {};
-	layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	layoutBinding.descriptorCount = 1;
-	layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-	layoutBinding.pImmutableSamplers = nullptr;
-
-	VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
-	descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	descriptorLayout.pNext = nullptr;
-	descriptorLayout.bindingCount = 1;
-	descriptorLayout.pBindings = &layoutBinding;
-
-	ThrowIfFailed(vkCreateDescriptorSetLayout(GetDevice(), &descriptorLayout, nullptr, &m_descriptorSetLayout));
-
-	// Create the pipeline layout that is used to generate the rendering pipelines that are based on this descriptor set layout
-	// In a more complex scenario you would have different pipeline layouts for different descriptor set layouts that could be reused
-	VkPipelineLayoutCreateInfo pPipelineLayoutCreateInfo = {};
-	pPipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pPipelineLayoutCreateInfo.pNext = nullptr;
-	pPipelineLayoutCreateInfo.setLayoutCount = 1;
-	pPipelineLayoutCreateInfo.pSetLayouts = &m_descriptorSetLayout;
-
-	ThrowIfFailed(vkCreatePipelineLayout(GetDevice(), &pPipelineLayoutCreateInfo, nullptr, &m_pipelineLayout));
-}
-
-
 void TriangleApp::InitDescriptorSet()
 {
 	// Allocate a new descriptor set from the global descriptor pool
@@ -249,7 +214,8 @@ void TriangleApp::InitDescriptorSet()
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	allocInfo.descriptorPool = m_descriptorPool;
 	allocInfo.descriptorSetCount = 1;
-	allocInfo.pSetLayouts = &m_descriptorSetLayout;
+	auto layout = m_rootSig[0].GetLayout();
+	allocInfo.pSetLayouts = &layout;
 
 	ThrowIfFailed(vkAllocateDescriptorSets(GetDevice(), &allocInfo, &m_descriptorSet));
 
@@ -277,33 +243,21 @@ void TriangleApp::ShutdownVk()
 {
 	vkDestroyDescriptorPool(GetDevice(), m_descriptorPool, nullptr);
 	m_descriptorPool = VK_NULL_HANDLE;
-
-	vkDestroyPipelineLayout(GetDevice(), m_pipelineLayout, nullptr);
-	m_pipelineLayout = VK_NULL_HANDLE;
-
-	vkDestroyDescriptorSetLayout(GetDevice(), m_descriptorSetLayout, nullptr);
-	m_descriptorSetLayout = VK_NULL_HANDLE;
 }
 #endif
 
 
-#if DX12
-void TriangleApp::InitDX12()
+void TriangleApp::InitRootSig()
 {
 	m_rootSig.Reset(1);
-	m_rootSig[0].InitAsConstantBuffer(0, D3D12_SHADER_VISIBILITY_VERTEX);
-	m_rootSig.Finalize("Root sig", D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	m_rootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_rootSig.Finalize("Root sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
 }
-#endif
 
 
 void TriangleApp::InitPSO()
 {
-#if DX12
 	m_pso.SetRootSignature(m_rootSig);
-#else
-	m_pso.SetPipelineLayout(m_pipelineLayout);
-#endif
 
 	// Render state
 	m_pso.SetRasterizerState(CommonStates::RasterizerTwoSided());

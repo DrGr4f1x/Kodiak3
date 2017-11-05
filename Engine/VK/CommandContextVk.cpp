@@ -16,6 +16,7 @@
 #include "GraphicsDeviceVk.h"
 #include "PipelineStateVk.h"
 #include "RenderPassVk.h"
+#include "RootSignatureVk.h"
 
 
 using namespace Kodiak;
@@ -155,6 +156,9 @@ void CommandContext::Reset()
 {
 	assert(m_commandList == VK_NULL_HANDLE);
 	m_commandList = g_commandBufferPool.RequestCommandBuffer();
+
+	m_curGraphicsPipelineLayout = VK_NULL_HANDLE;
+	m_curComputePipelineLayout = VK_NULL_HANDLE;
 }
 
 
@@ -273,6 +277,12 @@ void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer
 }
 
 
+void GraphicsContext::SetRootSignature(const RootSignature& rootSig)
+{
+	m_curGraphicsPipelineLayout = rootSig.GetLayout();
+}
+
+
 void GraphicsContext::SetViewport(float x, float y, float w, float h, float minDepth, float maxDepth)
 {
 	VkViewport viewport = {};
@@ -316,7 +326,7 @@ void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 }
 
 
-void GraphicsContext::BindDescriptorSet(VkPipelineLayout pipelineLayout, VkDescriptorSet descriptorSet)
+void GraphicsContext::BindDescriptorSet(VkDescriptorSet descriptorSet)
 {
-	vkCmdBindDescriptorSets(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+	vkCmdBindDescriptorSets(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, m_curGraphicsPipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
 }

@@ -26,7 +26,7 @@ using namespace std;
 
 namespace
 {
-map< size_t, Microsoft::WRL::ComPtr<ID3D12RootSignature> > s_rootSignatureHashMap;
+map<size_t, Microsoft::WRL::ComPtr<ID3D12RootSignature>> s_rootSignatureHashMap;
 } // anonymous namespace
 
 
@@ -39,7 +39,7 @@ void RootSignature::DestroyAll()
 void RootSignature::InitStaticSampler(
 	uint32_t _register,
 	const D3D12_SAMPLER_DESC& nonStaticSamplerDesc,
-	D3D12_SHADER_VISIBILITY visibility)
+	ShaderVisibility visibility)
 {
 	assert(m_numInitializedStaticSamplers < m_numSamplers);
 	D3D12_STATIC_SAMPLER_DESC& staticSamplerDesc = m_samplerArray[m_numInitializedStaticSamplers++];
@@ -56,7 +56,7 @@ void RootSignature::InitStaticSampler(
 	staticSamplerDesc.MaxLOD = nonStaticSamplerDesc.MaxLOD;
 	staticSamplerDesc.ShaderRegister = _register;
 	staticSamplerDesc.RegisterSpace = 0;
-	staticSamplerDesc.ShaderVisibility = visibility;
+	staticSamplerDesc.ShaderVisibility = static_cast<D3D12_SHADER_VISIBILITY>(visibility);
 
 	if (staticSamplerDesc.AddressU == D3D12_TEXTURE_ADDRESS_MODE_BORDER ||
 		staticSamplerDesc.AddressV == D3D12_TEXTURE_ADDRESS_MODE_BORDER ||
@@ -99,7 +99,7 @@ void RootSignature::InitStaticSampler(
 }
 
 
-void RootSignature::Finalize(const string& name, D3D12_ROOT_SIGNATURE_FLAGS flags)
+void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 {
 	if (m_finalized)
 	{
@@ -113,7 +113,7 @@ void RootSignature::Finalize(const string& name, D3D12_ROOT_SIGNATURE_FLAGS flag
 	rootDesc.pParameters = (const D3D12_ROOT_PARAMETER*)m_paramArray.get();
 	rootDesc.NumStaticSamplers = m_numSamplers;
 	rootDesc.pStaticSamplers = (const D3D12_STATIC_SAMPLER_DESC*)m_samplerArray.get();
-	rootDesc.Flags = flags;
+	rootDesc.Flags = static_cast<D3D12_ROOT_SIGNATURE_FLAGS>(flags);
 
 	m_descriptorTableBitMap = 0;
 	m_samplerTableBitMap = 0;

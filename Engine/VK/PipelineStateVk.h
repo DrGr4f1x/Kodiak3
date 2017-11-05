@@ -110,8 +110,6 @@ public:
 
 	static void DestroyAll();
 
-	// TODO
-#if 0
 	void SetRootSignature(const RootSignature& bindMappings)
 	{
 		m_rootSignature = &bindMappings;
@@ -122,26 +120,11 @@ public:
 		assert(m_rootSignature != nullptr);
 		return *m_rootSignature;
 	}
-#else
-	void SetPipelineLayout(VkPipelineLayout layout)
-	{
-		m_layout = layout;
-	}
-
-	VkPipelineLayout GetLayout() const
-	{
-		return m_layout;
-	}
-#endif
 
 	VkPipeline GetPipelineStateObject() const { return m_pipeline; }
 
 protected:
-#if 0
 	const RootSignature* m_rootSignature{ nullptr };
-#else
-	VkPipelineLayout m_layout{ VK_NULL_HANDLE };
-#endif
 	VkPipeline m_pipeline{ VK_NULL_HANDLE };
 };
 

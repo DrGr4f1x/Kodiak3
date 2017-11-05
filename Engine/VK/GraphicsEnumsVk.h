@@ -179,6 +179,34 @@ enum class InputClassification
 };
 
 
+enum class ShaderVisibility
+{
+	All =		VK_SHADER_STAGE_ALL,
+	Graphics =	VK_SHADER_STAGE_ALL_GRAPHICS,
+	Compute =	VK_SHADER_STAGE_COMPUTE_BIT,
+	Domain =	VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT,
+	Geometry =	VK_SHADER_STAGE_GEOMETRY_BIT,
+	Hull =		VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT,
+	Pixel =		VK_SHADER_STAGE_FRAGMENT_BIT,
+	Vertex =	VK_SHADER_STAGE_VERTEX_BIT
+};
+
+
+enum class RootSignatureFlags
+{
+	None,
+	AllowInputAssemblerInputLayout,
+	DenyVertexShaderRootAccess,
+	DenyHullShaderRootAccess,
+	DenyDomainShaderRootAccess,
+	DenyGeometryShaderRootAccess,
+	DenyPixelShaderRootAccess,
+	AllowStreamOutput
+};
+
+template <> struct EnableBitmaskOperators<RootSignatureFlags> { static const bool enable = true; };
+
+
 enum class Format
 {
 	Unknown =				VK_FORMAT_UNDEFINED,
