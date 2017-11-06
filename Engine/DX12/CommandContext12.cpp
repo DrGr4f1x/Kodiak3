@@ -328,6 +328,8 @@ void CommandContext::Reset()
 	m_curComputePipelineState = nullptr;
 	m_numBarriersToFlush = 0;
 
+	m_curPrimitiveTopology = (D3D12_PRIMITIVE_TOPOLOGY)-1;
+
 	// TODO
 #if 0
 	BindDescriptorHeaps();

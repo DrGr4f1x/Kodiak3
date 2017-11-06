@@ -137,7 +137,6 @@ void TriangleApp::Render()
 #endif
 
 #if DX12
-	context.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	context.SetConstantBuffer(0, m_constantBuffer);
 #endif
 
@@ -148,11 +147,7 @@ void TriangleApp::Render()
 
 	context.EndRenderPass();
 
-#if VK
-	context.Finish(m_graphicsDevice->GetPresentCompleteSemaphore(), m_graphicsDevice->GetRenderCompleteSemaphore());
-#elif DX12
 	context.Finish();
-#endif
 }
 
 
@@ -272,7 +267,7 @@ void TriangleApp::InitPSO()
 
 	m_pso.SetRenderPass(m_renderPass);
 
-	m_pso.SetPrimitiveTopologyType(PrimitiveTopologyType::Triangle);
+	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
 	// Vertex inputs
 	VertexStreamDesc vertexStreamDesc{ 0, sizeof(Vertex), InputClassification::PerVertexData };

@@ -15,6 +15,7 @@
 #include "Utility.h"
 
 #include "CommandBufferPoolVk.h"
+#include "CommandContextVk.h"
 #include "PipelineStateVk.h"
 #include "RootSignatureVk.h"
 #include "SwapChainVk.h"
@@ -124,6 +125,8 @@ void GraphicsDevice::Destroy()
 {
 	assert(m_initialized);
 
+	CommandContext::DestroyAllContexts();
+
 	g_commandBufferPool.Destroy();
 
 	PSO::DestroyAll();
@@ -132,7 +135,6 @@ void GraphicsDevice::Destroy()
 	m_swapChain->Destroy();
 	m_swapChain.reset();
 
-	vkDestroySemaphore(m_device, m_semaphores.renderComplete, nullptr);
 	vkDestroySemaphore(m_device, m_semaphores.textOverlayComplete, nullptr);
 	vkDestroySemaphore(m_device, m_semaphores.presentComplete, nullptr);
 
@@ -157,6 +159,8 @@ void GraphicsDevice::PrepareFrame()
 	// Acquire the next image from the swap chain
 	VkResult err = m_swapChain->AcquireNextImage(m_semaphores.presentComplete, &m_currentBuffer);
 
+	g_commandBufferPool.SetCurWaitSemaphore(m_semaphores.presentComplete);
+
 	ThrowIfFailed(err);
 
 	// TODO:
@@ -174,7 +178,7 @@ void GraphicsDevice::PrepareFrame()
 
 void GraphicsDevice::SubmitFrame()
 {
-	ThrowIfFailed(m_swapChain->QueuePresent(m_graphicsQueue, m_currentBuffer, m_semaphores.renderComplete));
+	ThrowIfFailed(m_swapChain->QueuePresent(m_graphicsQueue, m_currentBuffer, g_commandBufferPool.GetCurWaitSemaphore()));
 
 	ThrowIfFailed(vkQueueWaitIdle(m_graphicsQueue));
 }
@@ -363,23 +367,9 @@ void GraphicsDevice::CreateSynchronizationPrimitives()
 	// Ensures that the image is displayed before we start submitting new commands to the queu
 	ThrowIfFailed(vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr, &m_semaphores.presentComplete));
 	// Create a semaphore used to synchronize command submission
-	// Ensures that the image is not presented until all commands have been submitted and executed
-	ThrowIfFailed(vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr, &m_semaphores.renderComplete));
-	// Create a semaphore used to synchronize command submission
 	// Ensures that the image is not presented until all commands for the text overlay have been sumbitted and executed
 	// Will be inserted after the render complete semaphore if the text overlay is enabled
 	ThrowIfFailed(vkCreateSemaphore(m_device, &semaphoreCreateInfo, nullptr, &m_semaphores.textOverlayComplete));
-
-	// Set up submit info structure
-	// Semaphores will stay the same during application lifetime
-	// Command buffer submission info is set by each example
-	m_submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	m_submitInfo.pNext = nullptr;
-	m_submitInfo.pWaitDstStageMask = &m_submitPipelineStages;
-	m_submitInfo.waitSemaphoreCount = 1;
-	m_submitInfo.pWaitSemaphores = &m_semaphores.presentComplete;
-	m_submitInfo.signalSemaphoreCount = 1;
-	m_submitInfo.pSignalSemaphores = &m_semaphores.renderComplete;
 }
 
 

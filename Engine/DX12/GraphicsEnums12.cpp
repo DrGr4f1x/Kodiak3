@@ -96,3 +96,36 @@ Format Kodiak::MapDXGIFormatToEngine(DXGI_FORMAT format)
 
 	return remapTable[format];
 }
+
+
+D3D12_PRIMITIVE_TOPOLOGY_TYPE Kodiak::MapPrimitiveTopologyToD3DType(PrimitiveTopology topology)
+{
+	switch (topology)
+	{
+	case PrimitiveTopology::PointList:
+		return D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
+
+	case PrimitiveTopology::LineList:
+		return D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+	case PrimitiveTopology::LineStrip:
+		return D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+
+	case PrimitiveTopology::TriangleList:
+		return D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	case PrimitiveTopology::TriangleStrip:
+		return D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+	case PrimitiveTopology::LineListWithAdjacency:
+		return D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+	case PrimitiveTopology::LineStripWithAdjacency:
+		return D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+
+	case PrimitiveTopology::TriangleListWithAdjacency:
+		return D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	case PrimitiveTopology::TriangleStripWithAdjacency:
+		return D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+	default:
+		return D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
+	}
+}

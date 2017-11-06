@@ -76,3 +76,48 @@ D3D12_CPU_DESCRIPTOR_HANDLE DescriptorAllocator::Allocate(uint32_t count)
 	m_remainingFreeHandles -= count;
 	return ret;
 }
+
+
+void UserDescriptorHeap::Create(const std::string& debugHeapName)
+{
+	auto device = GetDevice();
+
+	assert_succeeded(device->CreateDescriptorHeap(&m_heapDesc, MY_IID_PPV_ARGS(m_heap.ReleaseAndGetAddressOf())));
+#ifdef RELEASE
+	(void)debugHeapName;
+#else
+	m_heap->SetName(MakeWStr(debugHeapName).c_str());
+#endif
+
+	m_descriptorSize = device->GetDescriptorHandleIncrementSize(m_heapDesc.Type);
+	m_numFreeDescriptors = m_heapDesc.NumDescriptors;
+	m_firstHandle = DescriptorHandle(m_heap->GetCPUDescriptorHandleForHeapStart(), m_heap->GetGPUDescriptorHandleForHeapStart());
+	m_nextFreeHandle = m_firstHandle;
+}
+
+
+DescriptorHandle UserDescriptorHeap::Alloc(uint32_t count)
+{
+	assert_msg(HasAvailableSpace(count), "Descriptor Heap out of space.  Increase heap size.");
+	DescriptorHandle ret = m_nextFreeHandle;
+	m_nextFreeHandle += count * m_descriptorSize;
+	return ret;
+}
+
+
+bool UserDescriptorHeap::ValidateHandle(const DescriptorHandle& dhandle) const
+{
+	if (dhandle.GetCpuHandle().ptr < m_firstHandle.GetCpuHandle().ptr ||
+		dhandle.GetCpuHandle().ptr >= m_firstHandle.GetCpuHandle().ptr + m_heapDesc.NumDescriptors * m_descriptorSize)
+	{
+		return false;
+	}
+
+	if (dhandle.GetGpuHandle().ptr - m_firstHandle.GetGpuHandle().ptr !=
+		dhandle.GetCpuHandle().ptr - m_firstHandle.GetCpuHandle().ptr)
+	{
+		return false;
+	}
+
+	return true;
+}

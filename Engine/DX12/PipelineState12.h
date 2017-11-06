@@ -135,7 +135,7 @@ public:
 	void SetRasterizerState(const RasterizerStateDesc& rasterizerDesc);
 	void SetDepthStencilState(const DepthStencilStateDesc& depthStencilDesc);
 	void SetSampleMask(uint32_t sampleMask);
-	void SetPrimitiveTopologyType(PrimitiveTopologyType topologyType);
+	void SetPrimitiveTopology(PrimitiveTopology topology);
 	void SetRenderPass(const RenderPass& renderpass);
 	void SetInputLayout(uint32_t numStreams, const VertexStreamDesc* vertexStreams, uint32_t numElements, const VertexElementDesc* inputElementDescs);
 	void SetPrimitiveRestart(IndexBufferStripCutValue ibProps);
@@ -149,8 +149,11 @@ public:
 	// Perform validation and compute a hash value for fast state block comparisons
 	void Finalize();
 
+	D3D12_PRIMITIVE_TOPOLOGY GetTopology() const { return m_topology; }
+
 private:
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC m_psoDesc;
+	D3D12_PRIMITIVE_TOPOLOGY m_topology;
 	std::shared_ptr<const D3D12_INPUT_ELEMENT_DESC> m_inputLayouts;
 	std::shared_ptr<const VertexElementDesc> m_inputElements;
 };

@@ -71,8 +71,6 @@ void CommandBufferPool::Destroy()
 
 VkCommandBuffer CommandBufferPool::RequestCommandBuffer()
 {
-	lock_guard<mutex> CS(m_commandBufferMutex);
-
 	VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
 
 	if (!m_readyCommandBuffers.empty())

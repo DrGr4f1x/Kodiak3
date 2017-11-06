@@ -66,6 +66,33 @@ void ContextManager::DestroyAllContexts()
 }
 
 
+CommandContext::CommandContext()
+{
+	VkSemaphoreCreateInfo semaphoreCreateInfo{};
+	semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	semaphoreCreateInfo.pNext = nullptr;
+	
+	ThrowIfFailed(vkCreateSemaphore(GetDevice(), &semaphoreCreateInfo, nullptr, &m_signalSemaphore));
+}
+
+
+CommandContext::~CommandContext()
+{
+	vkDestroySemaphore(GetDevice(), m_signalSemaphore, nullptr);
+}
+
+
+void CommandContext::DestroyAllContexts()
+{
+	// TODO
+#if 0
+	LinearAllocator::DestroyAll();
+	DynamicDescriptorHeap::DestroyAll();
+#endif
+	g_contextManager.DestroyAllContexts();
+}
+
+
 CommandContext& CommandContext::Begin(const string ID)
 {
 	CommandContext* newContext = g_contextManager.AllocateContext();
@@ -91,19 +118,82 @@ CommandContext& CommandContext::Begin(const string ID)
 
 void CommandContext::Finish(bool waitForCompletion)
 {
-	FinishInternal(VK_NULL_HANDLE, VK_NULL_HANDLE, waitForCompletion);
-}
+	// TODO
+	auto device = g_commandBufferPool.GetDevice();
+	auto _queue = g_commandBufferPool.GetQueue();
 
+	//FlushImageBarriers();
+	//FlushBufferBarriers();
 
-void CommandContext::Finish(VkSemaphore waitSemaphore, VkSemaphore signalSemaphore, bool waitForCompletion)
-{
-	FinishInternal(waitSemaphore, signalSemaphore, waitForCompletion);
+	// TODO
+#if 0
+	if (m_ID.length() > 0)
+	{
+		EngineProfiling::EndBlock(this);
+	}
+#endif
+
+	vkEndCommandBuffer(m_commandList);
+
+	VkSubmitInfo submitInfo = {};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &m_commandList;
+
+	if (!waitForCompletion)
+	{
+		// Pipeline stage at which the queue submission will wait (via pWaitSemaphores)
+		VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+		auto waitSemaphore = g_commandBufferPool.GetCurWaitSemaphore();
+
+		if (waitSemaphore != VK_NULL_HANDLE)
+		{
+			submitInfo.pWaitDstStageMask = &waitStageMask;			// Pointer to the list of pipeline stages that the semaphore waits will occur at
+			submitInfo.pWaitSemaphores = &waitSemaphore;			// Semaphore(s) to wait upon before the submitted command buffer starts executing
+			submitInfo.waitSemaphoreCount = 1;						// One wait semaphore
+		}
+		if (m_signalSemaphore != VK_NULL_HANDLE)
+		{
+			submitInfo.pSignalSemaphores = &m_signalSemaphore;		// Semaphore(s) to be signaled when command buffers have completed
+			submitInfo.signalSemaphoreCount = 1;					// One signal semaphore
+		}
+
+		g_commandBufferPool.SetCurWaitSemaphore(m_signalSemaphore);
+	}
+
+	// Create fence to ensure that the command buffer has finished executing
+	VkFenceCreateInfo fenceCreateInfo = {};
+	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceCreateInfo.flags = 0;
+	VkFence fence;
+	ThrowIfFailed(vkCreateFence(device, &fenceCreateInfo, nullptr, &fence));
+
+	// Submit to the queue
+	ThrowIfFailed(vkQueueSubmit(_queue, 1, &submitInfo, fence));
+
+	g_commandBufferPool.DiscardCommandBuffer(fence, m_commandList);
+	m_commandList = VK_NULL_HANDLE;
+
+	// Recycle dynamic allocations
+	//m_vertexBufferAllocator.CleanupUsedBuffers(fence);
+	//m_indexBufferAllocator.CleanupUsedBuffers(fence);
+	//m_constantBufferAllocator.CleanupUsedBuffers(fence);
+	//m_dynamicDescriptorPool.CleanupUsedPools(fence);
+
+	if (waitForCompletion)
+	{
+		ThrowIfFailed(vkWaitForFences(device, 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT));
+	}
+
+	g_contextManager.FreeContext(this);
 }
 
 
 void CommandContext::Initialize()
 {
 	assert(m_commandList == VK_NULL_HANDLE);
+
 	m_commandList = g_commandBufferPool.RequestCommandBuffer();
 }
 
@@ -159,72 +249,6 @@ void CommandContext::Reset()
 
 	m_curGraphicsPipelineLayout = VK_NULL_HANDLE;
 	m_curComputePipelineLayout = VK_NULL_HANDLE;
-}
-
-
-void CommandContext::FinishInternal(VkSemaphore waitSemaphore, VkSemaphore signalSemaphore, bool waitForCompletion)
-{
-	// TODO
-	auto device = g_commandBufferPool.GetDevice();
-	auto _queue = g_commandBufferPool.GetQueue();
-
-	//FlushImageBarriers();
-	//FlushBufferBarriers();
-
-	// TODO
-#if 0
-	if (m_ID.length() > 0)
-	{
-		EngineProfiling::EndBlock(this);
-	}
-#endif
-
-	vkEndCommandBuffer(m_commandList);
-
-	// Pipeline stage at which the queue submission will wait (via pWaitSemaphores)
-	VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-
-	VkSubmitInfo submitInfo = {};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &m_commandList;
-	if (waitSemaphore != VK_NULL_HANDLE)
-	{
-		submitInfo.pWaitDstStageMask = &waitStageMask;			// Pointer to the list of pipeline stages that the semaphore waits will occur at
-		submitInfo.pWaitSemaphores = &waitSemaphore;			// Semaphore(s) to wait upon before the submitted command buffer starts executing
-		submitInfo.waitSemaphoreCount = 1;						// One wait semaphore
-	}
-	if (signalSemaphore != VK_NULL_HANDLE)
-	{
-		submitInfo.pSignalSemaphores = &signalSemaphore;		// Semaphore(s) to be signaled when command buffers have completed
-		submitInfo.signalSemaphoreCount = 1;					// One signal semaphore
-	}
-
-	// Create fence to ensure that the command buffer has finished executing
-	VkFenceCreateInfo fenceCreateInfo = {};
-	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-	fenceCreateInfo.flags = 0;
-	VkFence fence;
-	ThrowIfFailed(vkCreateFence(device, &fenceCreateInfo, nullptr, &fence));
-
-	// Submit to the queue
-	ThrowIfFailed(vkQueueSubmit(_queue, 1, &submitInfo, fence));
-
-	g_commandBufferPool.DiscardCommandBuffer(fence, m_commandList);
-	m_commandList = VK_NULL_HANDLE;
-
-	// Recycle dynamic allocations
-	//m_vertexBufferAllocator.CleanupUsedBuffers(fence);
-	//m_indexBufferAllocator.CleanupUsedBuffers(fence);
-	//m_constantBufferAllocator.CleanupUsedBuffers(fence);
-	//m_dynamicDescriptorPool.CleanupUsedPools(fence);
-
-	if (waitForCompletion)
-	{
-		ThrowIfFailed(vkWaitForFences(device, 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT));
-	}
-
-	g_contextManager.FreeContext(this);
 }
 
 

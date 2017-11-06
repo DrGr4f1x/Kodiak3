@@ -30,6 +30,10 @@ public:
 
 	inline size_t Size() { return m_commandBufferPool.size(); }
 
+	// TODO - Probably not thread-safe.  Think about how to handle submissions from multiple threads.
+	VkSemaphore GetCurWaitSemaphore() { return m_curWaitSemaphore; }
+	void SetCurWaitSemaphore(VkSemaphore waitSemaphore) { m_curWaitSemaphore = waitSemaphore; }
+	
 private:
 	VkCommandPool	m_commandPool{ VK_NULL_HANDLE };
 	VkQueue			m_queue{ VK_NULL_HANDLE };
@@ -38,6 +42,8 @@ private:
 	std::vector<VkCommandBuffer> m_commandBufferPool;
 	std::queue<std::pair<VkFence, VkCommandBuffer>> m_readyCommandBuffers;
 	std::mutex m_commandBufferMutex;
+
+	VkSemaphore m_curWaitSemaphore{ VK_NULL_HANDLE };
 };
 
 extern CommandBufferPool g_commandBufferPool;

@@ -34,10 +34,6 @@ public:
 	Format GetDepthFormat() const { return m_depthFormat; }
 	uint32_t GetCurrentBuffer() const { return m_currentBuffer; }
 
-	// TODO: Hacks
-	VkSemaphore GetPresentCompleteSemaphore() const { return m_semaphores.presentComplete; }
-	VkSemaphore GetRenderCompleteSemaphore() const { return m_semaphores.renderComplete; }
-
 private:
 	void CreateVulkanInstance();
 	void SelectPhysicalDevice();
@@ -99,16 +95,9 @@ private:
 	{
 		// Swap chain image presentation
 		VkSemaphore presentComplete{ VK_NULL_HANDLE };
-		// Command buffer submission and execution
-		VkSemaphore renderComplete{ VK_NULL_HANDLE };
 		// Text overlay submission and execution
 		VkSemaphore textOverlayComplete{ VK_NULL_HANDLE };
 	} m_semaphores;
-
-	// Contains command buffers and semaphores to be presented to the queue
-	VkSubmitInfo m_submitInfo;
-	// Pipeline stages used to wait at for graphics queue submissions
-	VkPipelineStageFlags m_submitPipelineStages{ VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
 	uint32_t m_currentBuffer{ 0 };
 

@@ -162,14 +162,53 @@ enum class IndexBufferStripCutValue
 };
 
 
-enum class PrimitiveTopologyType
+enum class PrimitiveTopology
 {
-	Undefined,
-	Point =		VK_PRIMITIVE_TOPOLOGY_POINT_LIST,
-	Line =		VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
-	Triangle =	VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
-	Patch =		VK_PRIMITIVE_TOPOLOGY_PATCH_LIST
+	PointList =						VK_PRIMITIVE_TOPOLOGY_POINT_LIST,
+	LineList =						VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
+	LineStrip =						VK_PRIMITIVE_TOPOLOGY_LINE_STRIP,
+	TriangleList =					VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+	TriangleStrip =					VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+	LineListWithAdjacency =			VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY,
+	LineStripWithAdjacency =		VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY,
+	TriangleListWithAdjacency =		VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY,
+	TriangleStripWithAdjacency =	VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY,
+	Patch_1_ControlPoint =			VK_PRIMITIVE_TOPOLOGY_PATCH_LIST,
+	Patch_2_ControlPoint,
+	Patch_3_ControlPoint,
+	Patch_4_ControlPoint,
+	Patch_5_ControlPoint,
+	Patch_6_ControlPoint,
+	Patch_7_ControlPoint,
+	Patch_8_ControlPoint,
+	Patch_9_ControlPoint,
+	Patch_10_ControlPoint,
+	Patch_11_ControlPoint,
+	Patch_12_ControlPoint,
+	Patch_13_ControlPoint,
+	Patch_14_ControlPoint,
+	Patch_15_ControlPoint,
+	Patch_16_ControlPoint,
+	Patch_17_ControlPoint,
+	Patch_18_ControlPoint,
+	Patch_19_ControlPoint,
+	Patch_20_ControlPoint,
+	Patch_21_ControlPoint,
+	Patch_22_ControlPoint,
+	Patch_23_ControlPoint,
+	Patch_24_ControlPoint,
+	Patch_25_ControlPoint,
+	Patch_26_ControlPoint,
+	Patch_27_ControlPoint,
+	Patch_28_ControlPoint,
+	Patch_29_ControlPoint,
+	Patch_30_ControlPoint,
+	Patch_31_ControlPoint,
+	Patch_32_ControlPoint
 };
+
+VkPrimitiveTopology MapEnginePrimitiveTopologyToVulkan(PrimitiveTopology topology);
+uint32_t GetControlPointCount(PrimitiveTopology topology);
 
 
 enum class InputClassification

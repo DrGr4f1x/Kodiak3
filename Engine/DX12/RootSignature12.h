@@ -124,6 +124,7 @@ public:
 	~RootSignature() = default;
 
 	static void DestroyAll();
+	void Destroy() {}
 
 	void Reset(uint32_t numRootParams, uint32_t numStaticSamplers = 0)
 	{

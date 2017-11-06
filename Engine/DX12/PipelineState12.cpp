@@ -221,10 +221,10 @@ void GraphicsPSO::SetSampleMask(uint32_t sampleMask)
 }
 
 
-void GraphicsPSO::SetPrimitiveTopologyType(PrimitiveTopologyType topologyType)
+void GraphicsPSO::SetPrimitiveTopology(PrimitiveTopology topology)
 {
-	assert_msg(topologyType != PrimitiveTopologyType::Undefined, "Can't draw with undefined topology");
-	m_psoDesc.PrimitiveTopologyType = static_cast<D3D12_PRIMITIVE_TOPOLOGY_TYPE>(topologyType);
+	m_psoDesc.PrimitiveTopologyType = MapPrimitiveTopologyToD3DType(topology);
+	m_topology = static_cast<D3D12_PRIMITIVE_TOPOLOGY>(topology);
 }
 
 

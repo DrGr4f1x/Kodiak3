@@ -213,6 +213,10 @@ GraphicsPSO::GraphicsPSO()
 	m_inputAssemblyInfo.pNext = nullptr;
 	m_inputAssemblyInfo.flags = 0;
 
+	m_tessellationInfo.pNext = nullptr;
+	m_tessellationInfo.flags = 0;
+	m_tessellationInfo.patchControlPoints = 0;
+
 	m_dynamicStates.push_back(VK_DYNAMIC_STATE_VIEWPORT);
 	m_dynamicStates.push_back(VK_DYNAMIC_STATE_SCISSOR);
 }
@@ -295,9 +299,10 @@ void GraphicsPSO::SetSampleMask(uint32_t sampleMask)
 }
 
 
-void GraphicsPSO::SetPrimitiveTopologyType(PrimitiveTopologyType topologyType)
+void GraphicsPSO::SetPrimitiveTopology(PrimitiveTopology topology)
 {
-	m_inputAssemblyInfo.topology = static_cast<VkPrimitiveTopology>(topologyType);
+	m_inputAssemblyInfo.topology = MapEnginePrimitiveTopologyToVulkan(topology);
+	m_tessellationInfo.patchControlPoints = GetControlPointCount(topology);
 }
 
 
@@ -495,7 +500,7 @@ void GraphicsPSO::Finalize()
 	createInfo.pStages = m_shaderStages.empty() ? nullptr : m_shaderStages.data();
 	createInfo.pVertexInputState = &m_vertexInputInfo;
 	createInfo.pInputAssemblyState = &m_inputAssemblyInfo;
-	createInfo.pTessellationState = nullptr;
+	createInfo.pTessellationState = &m_tessellationInfo;
 	createInfo.pViewportState = &m_viewportStateInfo;
 	createInfo.pRasterizationState = &m_rasterizationInfo;
 	createInfo.pMultisampleState = &m_multisampleInfo;

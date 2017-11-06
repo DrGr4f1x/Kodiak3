@@ -141,7 +141,7 @@ public:
 	void SetRasterizerState(const RasterizerStateDesc& stateDesc);
 	void SetDepthStencilState(const DepthStencilStateDesc& stateDesc);
 	void SetSampleMask(uint32_t sampleMask);
-	void SetPrimitiveTopologyType(PrimitiveTopologyType topologyType);
+	void SetPrimitiveTopology(PrimitiveTopology topology);
 	void SetRenderPass(RenderPass& renderpass);
 	void SetInputLayout(uint32_t numStreams, const VertexStreamDesc* vertexStreams, uint32_t numElements, const VertexElementDesc* inputElementDescs);
 	void SetPrimitiveRestart(IndexBufferStripCutValue ibProps);
@@ -170,6 +170,7 @@ private:
 	VkPipelineDepthStencilStateCreateInfo m_depthStencilInfo{ VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO };
 	VkPipelineVertexInputStateCreateInfo m_vertexInputInfo{ VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO };
 	VkPipelineInputAssemblyStateCreateInfo m_inputAssemblyInfo{ VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO };
+	VkPipelineTessellationStateCreateInfo m_tessellationInfo{ VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO };
 
 	// Vertex inputs
 	std::vector<VkVertexInputBindingDescription> m_vertexInputBindings;

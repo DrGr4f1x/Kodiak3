@@ -47,12 +47,14 @@ class CommandContext : NonCopyable
 	friend class ContextManager;
 
 public:
+	~CommandContext();
+
+	static void DestroyAllContexts();
+
 	static CommandContext& Begin(const std::string id = "");
 
 	// Flush existing commands and release the current context
 	void Finish(bool waitForCompletion = false);
-
-	void Finish(VkSemaphore waitSemaphore, VkSemaphore signalSemaphore, bool waitForCompletion = false);
 
 	// Prepare to render by reserving a command list
 	void Initialize();
@@ -75,12 +77,12 @@ protected:
 	VkPipelineLayout m_curGraphicsPipelineLayout{ VK_NULL_HANDLE };
 	VkPipelineLayout m_curComputePipelineLayout{ VK_NULL_HANDLE };
 
+	VkSemaphore m_signalSemaphore{ VK_NULL_HANDLE };
+
 private:
-	CommandContext() = default;
+	CommandContext();
 
 	void Reset();
-
-	void FinishInternal(VkSemaphore waitSemaphore, VkSemaphore signalSemaphore, bool waitForCompletion);
 };
 
 
