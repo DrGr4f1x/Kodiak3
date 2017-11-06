@@ -185,6 +185,12 @@
     <ClInclude Include="InputLayout.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="DescriptorHeap.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\DescriptorHeapVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -299,6 +305,9 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Hash.cpp" />
+    <ClCompile Include="VK\DescriptorHeapVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">

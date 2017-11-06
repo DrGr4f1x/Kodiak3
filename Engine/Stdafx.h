@@ -67,7 +67,7 @@ const std::string s_apiPrefixString = "[DirectX 12]";
 
 #elif defined(VK)
 
-#define FORCE_VULKAN_VALIDATION 0
+#define FORCE_VULKAN_VALIDATION 1
 #define ENABLE_VULKAN_VALIDATION (_DEBUG || FORCE_VULKAN_VALIDATION)
 
 #define FORCE_VULKAN_DEBUG_MARKUP 0

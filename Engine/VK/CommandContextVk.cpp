@@ -115,7 +115,7 @@ CommandContext& CommandContext::Begin(const string ID)
 	return *newContext;
 }
 
-
+#pragma optimize("",off)
 void CommandContext::Finish(bool waitForCompletion)
 {
 	// TODO
@@ -137,21 +137,27 @@ void CommandContext::Finish(bool waitForCompletion)
 
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.pNext = nullptr;
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &m_commandList;
+	submitInfo.pWaitDstStageMask = nullptr;
+	submitInfo.waitSemaphoreCount = 0;
+	submitInfo.pWaitSemaphores = nullptr;
+	submitInfo.signalSemaphoreCount = 0;
+	submitInfo.pSignalSemaphores = nullptr;
 
 	if (!waitForCompletion)
 	{
 		// Pipeline stage at which the queue submission will wait (via pWaitSemaphores)
-		VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		VkPipelineStageFlags waitStageMask[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
 		auto waitSemaphore = g_commandBufferPool.GetCurWaitSemaphore();
 
 		if (waitSemaphore != VK_NULL_HANDLE)
 		{
-			submitInfo.pWaitDstStageMask = &waitStageMask;			// Pointer to the list of pipeline stages that the semaphore waits will occur at
 			submitInfo.pWaitSemaphores = &waitSemaphore;			// Semaphore(s) to wait upon before the submitted command buffer starts executing
 			submitInfo.waitSemaphoreCount = 1;						// One wait semaphore
+			submitInfo.pWaitDstStageMask = waitStageMask;			// Pointer to the list of pipeline stages that the semaphore waits will occur at
 		}
 		if (m_signalSemaphore != VK_NULL_HANDLE)
 		{
@@ -188,6 +194,7 @@ void CommandContext::Finish(bool waitForCompletion)
 
 	g_contextManager.FreeContext(this);
 }
+#pragma optimize("",on)
 
 
 void CommandContext::Initialize()

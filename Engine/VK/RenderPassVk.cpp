@@ -58,6 +58,7 @@ void RenderPass::AddColorAttachment(Format colorFormat, ResourceState initialSta
 {
 	VkAttachmentDescription attachment = {};
 
+	attachment.flags = 0;
 	attachment.format = static_cast<VkFormat>(colorFormat);
 	attachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -73,6 +74,7 @@ void RenderPass::AddColorAttachment(Format colorFormat, ResourceState initialSta
 
 void RenderPass::AddDepthAttachment(Format colorFormat, ResourceState initialState, ResourceState finalState)
 {
+	m_depthAttachment.flags = 0;
 	m_depthAttachment.format = static_cast<VkFormat>(colorFormat);
 	m_depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	m_depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
