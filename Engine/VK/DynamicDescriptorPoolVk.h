@@ -12,8 +12,6 @@
 
 #include "RootSignatureVk.h"
 
-#if 0
-
 namespace Kodiak
 {
 
@@ -191,5 +189,3 @@ private:
 };
 
 } // namespace Kodiak
-
-#endif

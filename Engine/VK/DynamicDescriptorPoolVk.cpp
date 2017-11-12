@@ -10,10 +10,9 @@
 
 #include "Stdafx.h"
 
-#if 0
-
 #include "DynamicDescriptorPoolVk.h"
 
+#include "CommandListManagerVk.h"
 #include "GraphicsDeviceVk.h"
 #include "RootSignatureVk.h"
 
@@ -368,12 +367,26 @@ void DynamicDescriptorPool::DescriptorHandleCache::ParseRootSignature(const Root
 {
 	ClearCache();
 
-	auto numParameters = rootSig.GetNumParameters();
-	assert(numParameters <= kMaxDescriptorSets);
-
 	uint32_t currentImageOffset = 0;
 	uint32_t currentBufferOffset = 0;
 	uint32_t currentTexelBufferOffset = 0;
+
+	// TODO - this is fake
+
+	m_assignedDescriptorSetBitMap |= 1;
+	m_descriptorLayouts[0] = rootSig[0].GetLayout();
+
+	DescriptorSetCache& descriptorSet = m_descriptorSetCache[0];
+	descriptorSet.rangeCount = 1;
+	descriptorSet.ranges[0].type = DescriptorType::CBV;
+	descriptorSet.ranges[0].rangeSize = 1;
+	descriptorSet.ranges[0].offset = 0;
+	descriptorSet.ranges[0].bufferHandleStart = &m_bufferDescriptors[0] + currentBufferOffset;
+	currentBufferOffset++;
+
+#if 0
+	auto numParameters = rootSig.GetNumParameters();
+	assert(numParameters <= kMaxDescriptorSets);
 
 	for (uint32_t rootIndex = 0; rootIndex < numParameters; ++rootIndex)
 	{
@@ -460,6 +473,7 @@ void DynamicDescriptorPool::DescriptorHandleCache::ParseRootSignature(const Root
 			break;
 		}
 	}
+#endif
 
 	maxCachedImageDescriptors = currentImageOffset;
 	assert_msg(maxCachedImageDescriptors <= kMaxDescriptors, "Exceeded user-supplied maximum image cache size");
@@ -470,5 +484,3 @@ void DynamicDescriptorPool::DescriptorHandleCache::ParseRootSignature(const Root
 	maxCachedTexelBufferDescriptors = currentTexelBufferOffset;
 	assert_msg(maxCachedTexelBufferDescriptors <= kMaxDescriptors, "Exceeded user-supplied maximum texel buffer cache size");
 }
-
-#endif

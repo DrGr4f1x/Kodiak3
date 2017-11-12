@@ -73,6 +73,7 @@ void ContextManager::DestroyAllContexts()
 
 CommandContext::CommandContext(CommandListType type)
 	: m_type(type)
+	, m_dynamicDescriptorPool(*this)
 {
 	VkSemaphoreCreateInfo semaphoreCreateInfo{};
 	semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -93,8 +94,8 @@ void CommandContext::DestroyAllContexts()
 	// TODO
 #if 0
 	LinearAllocator::DestroyAll();
-	DynamicDescriptorHeap::DestroyAll();
 #endif
+	DynamicDescriptorPool::DestroyAll();
 	g_contextManager.DestroyAllContexts();
 }
 
@@ -149,7 +150,7 @@ void CommandContext::Finish(bool waitForCompletion)
 	//m_vertexBufferAllocator.CleanupUsedBuffers(fence);
 	//m_indexBufferAllocator.CleanupUsedBuffers(fence);
 	//m_constantBufferAllocator.CleanupUsedBuffers(fence);
-	//m_dynamicDescriptorPool.CleanupUsedPools(fence);
+	m_dynamicDescriptorPool.CleanupUsedPools(fence);
 
 	if (waitForCompletion)
 	{
@@ -276,6 +277,8 @@ void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer
 void GraphicsContext::SetRootSignature(const RootSignature& rootSig)
 {
 	m_curGraphicsPipelineLayout = rootSig.GetLayout();
+
+	m_dynamicDescriptorPool.ParseGraphicsRootSignature(rootSig);
 }
 
 
@@ -322,7 +325,8 @@ void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 }
 
 
-void GraphicsContext::BindDescriptorSet(VkDescriptorSet descriptorSet)
+void GraphicsContext::SetConstantBuffer(uint32_t rootIndex, ConstantBuffer& constantBuffer)
 {
-	vkCmdBindDescriptorSets(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, m_curGraphicsPipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+	VkDescriptorBufferInfo bufferInfo = constantBuffer.GetDescriptorInfo();
+	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, 0, 1, &bufferInfo);
 }

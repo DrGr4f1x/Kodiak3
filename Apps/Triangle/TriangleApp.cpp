@@ -92,11 +92,6 @@ void TriangleApp::Startup()
 	}
 
 	InitRootSig();
-
-#if VK
-	InitVk();
-#endif
-
 	InitPSO();
 }
 
@@ -111,10 +106,6 @@ void TriangleApp::Shutdown()
 	m_rootSig.Destroy();
 
 	m_framebuffers.clear();
-
-#if VK
-	ShutdownVk();
-#endif
 }
 
 
@@ -132,13 +123,7 @@ void TriangleApp::Render()
 	context.SetRootSignature(m_rootSig);
 	context.SetPipelineState(m_pso);
 
-#if VK
-	context.BindDescriptorSet(m_descriptorSet);
-#endif
-
-#if DX12
 	context.SetConstantBuffer(0, m_constantBuffer);
-#endif
 
 	context.SetVertexBuffer(0, m_vertexBuffer);
 	context.SetIndexBuffer(m_indexBuffer);
@@ -166,80 +151,6 @@ void TriangleApp::UpdateConstantBuffer()
 
 	m_constantBuffer.Update(sizeof(m_vsConstants), &m_vsConstants);
 }
-
-
-#if VK
-void TriangleApp::InitVk()
-{
-	InitDescriptorPool();
-	InitDescriptorSet();
-}
-
-
-void TriangleApp::InitDescriptorPool()
-{
-	// We need to tell the API the number of max. requested descriptors per type
-	VkDescriptorPoolSize typeCounts[1];
-	// This example only uses one descriptor type (uniform buffer) and only requests one descriptor of this type
-	typeCounts[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	typeCounts[0].descriptorCount = 1;
-	// For additional types you need to add new entries in the type count list
-	// E.g. for two combined image samplers :
-	// typeCounts[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	// typeCounts[1].descriptorCount = 2;
-
-	// Create the global descriptor pool
-	// All descriptors used in this example are allocated from this pool
-	VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
-	descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	descriptorPoolInfo.pNext = nullptr;
-	descriptorPoolInfo.poolSizeCount = 1;
-	descriptorPoolInfo.pPoolSizes = typeCounts;
-	// Set the max. number of descriptor sets that can be requested from this pool (requesting beyond this limit will result in an error)
-	descriptorPoolInfo.maxSets = 1;
-
-	ThrowIfFailed(vkCreateDescriptorPool(GetDevice(), &descriptorPoolInfo, nullptr, &m_descriptorPool));
-}
-
-
-void TriangleApp::InitDescriptorSet()
-{
-	// Allocate a new descriptor set from the global descriptor pool
-	VkDescriptorSetAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	allocInfo.descriptorPool = m_descriptorPool;
-	allocInfo.descriptorSetCount = 1;
-	auto layout = m_rootSig[0].GetLayout();
-	allocInfo.pSetLayouts = &layout;
-
-	ThrowIfFailed(vkAllocateDescriptorSets(GetDevice(), &allocInfo, &m_descriptorSet));
-
-	// Update the descriptor set determining the shader binding points
-	// For every binding point used in a shader there needs to be one
-	// descriptor set matching that binding point
-
-	VkWriteDescriptorSet writeDescriptorSet = {};
-
-	// Binding 0 : Uniform buffer
-	writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	writeDescriptorSet.dstSet = m_descriptorSet;
-	writeDescriptorSet.descriptorCount = 1;
-	writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	VkDescriptorBufferInfo bufferInfo = m_constantBuffer.GetDescriptorInfo();
-	writeDescriptorSet.pBufferInfo = &bufferInfo;
-	// Binds this uniform buffer to binding point 0
-	writeDescriptorSet.dstBinding = 0;
-
-	vkUpdateDescriptorSets(GetDevice(), 1, &writeDescriptorSet, 0, nullptr);
-}
-
-
-void TriangleApp::ShutdownVk()
-{
-	vkDestroyDescriptorPool(GetDevice(), m_descriptorPool, nullptr);
-	m_descriptorPool = VK_NULL_HANDLE;
-}
-#endif
 
 
 void TriangleApp::InitRootSig()

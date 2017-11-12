@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Color.h"
+#include "DynamicDescriptorPoolVk.h"
 #include "FramebufferVk.h"
 #include "GpuBufferVk.h"
 
@@ -72,14 +73,17 @@ public:
 	static void InitializeBuffer(GpuBuffer& dest, const void* initialData, size_t numBytes, bool useOffset = false, size_t offset = 0);
 
 protected:
+	CommandListType m_type;
 	VkCommandBuffer m_commandList{ VK_NULL_HANDLE };
 
+	// Current pipeline layouts
 	VkPipelineLayout m_curGraphicsPipelineLayout{ VK_NULL_HANDLE };
 	VkPipelineLayout m_curComputePipelineLayout{ VK_NULL_HANDLE };
 
-	VkSemaphore m_signalSemaphore{ VK_NULL_HANDLE };
+	// Descriptor pool
+	DynamicDescriptorPool m_dynamicDescriptorPool;
 
-	CommandListType m_type;
+	VkSemaphore m_signalSemaphore{ VK_NULL_HANDLE };
 
 private:
 	CommandContext(CommandListType type);
@@ -108,9 +112,7 @@ public:
 	void SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
 	void SetPipelineState(const GraphicsPSO& PSO);
-
-	// TODO remove me
-	void BindDescriptorSet(VkDescriptorSet descriptorSet);
+	void SetConstantBuffer(uint32_t rootIndex, ConstantBuffer& constantBuffer);
 
 	void SetIndexBuffer(IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, VertexBuffer& vertexBuffer);
@@ -155,6 +157,7 @@ inline void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count
 
 inline void GraphicsContext::DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation, int32_t baseVertexLocation)
 {
+	m_dynamicDescriptorPool.CommitGraphicsRootDescriptorSets(m_commandList);
 	vkCmdDrawIndexed(m_commandList, indexCount, 1, startIndexLocation, baseVertexLocation, 0);
 }
 

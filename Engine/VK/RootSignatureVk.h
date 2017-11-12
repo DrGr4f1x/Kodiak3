@@ -38,6 +38,7 @@ public:
 	}
 
 	VkDescriptorSetLayout GetLayout() { return m_descriptorSetLayout; }
+	constexpr VkDescriptorSetLayout GetLayout() const { return m_descriptorSetLayout; }
 
 protected:
 	ShaderVisibility	m_visibility;

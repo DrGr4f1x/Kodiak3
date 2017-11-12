@@ -35,14 +35,6 @@ private:
 	void InitRootSig();
 	void InitPSO();
 
-#if VK
-	void InitVk();
-	void InitDescriptorPool();
-	void InitDescriptorSet();
-
-	void ShutdownVk();
-#endif
-
 private:
 	// Vertex layout used in this example
 	struct Vertex 
@@ -78,9 +70,4 @@ private:
 
 	Kodiak::RootSignature	m_rootSig;
 	Kodiak::GraphicsPSO		m_pso;
-
-#if VK
-	VkDescriptorSet m_descriptorSet{ VK_NULL_HANDLE };
-	VkDescriptorPool m_descriptorPool{ VK_NULL_HANDLE };
-#endif
 };
