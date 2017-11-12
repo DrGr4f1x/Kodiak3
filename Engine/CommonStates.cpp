@@ -13,6 +13,7 @@
 #include "CommonStates.h"
 
 #include "PipelineState.h"
+#include "SamplerState.h"
 
 
 using namespace Kodiak;
@@ -416,6 +417,94 @@ const DepthStencilStateDesc& CommonStates::DepthStateTestEqual()
 		desc.frontFace.stencilDepthFailOp = StencilOp::Keep;
 		desc.backFace = desc.frontFace;
 
+		initialized = true;
+	}
+
+	return desc;
+}
+
+
+const SamplerStateDesc& CommonStates::SamplerLinearWrap()
+{
+	static SamplerStateDesc desc{ TextureFilter::MinMagMipLinear };
+	return desc;
+}
+
+
+const SamplerStateDesc& CommonStates::SamplerAnisoWrap()
+{
+	static SamplerStateDesc desc{};
+	static bool initialized = false;
+
+	if (!initialized)
+	{
+		desc.maxAnisotropy = 8;
+		initialized = true;
+	}
+
+	return desc;
+}
+
+
+const SamplerStateDesc& CommonStates::SamplerShadow()
+{
+	static SamplerStateDesc desc{ TextureFilter::ComparisonMinMagLinearMipPoint, TextureAddress::Clamp };
+	static bool initialized = false;
+
+	if (!initialized)
+	{
+		desc.comparisonFunc = ComparisonFunc::GreaterEqual;
+		initialized = true;
+	}
+
+	return desc;
+}
+
+
+const SamplerStateDesc& CommonStates::SamplerLinearClamp()
+{
+	static SamplerStateDesc desc{ TextureFilter::MinMagMipLinear, TextureAddress::Clamp };
+	return desc;
+}
+
+
+const SamplerStateDesc& CommonStates::SamplerVolumeWrap()
+{
+	static SamplerStateDesc desc{ TextureFilter::MinMagMipPoint };
+	return desc;
+}
+
+
+const SamplerStateDesc& CommonStates::SamplerPointClamp()
+{
+	static SamplerStateDesc desc{ TextureFilter::MinMagMipPoint, TextureAddress::Clamp };
+	return desc;
+}
+
+
+const SamplerStateDesc& CommonStates::SamplerPointBorder()
+{
+	static SamplerStateDesc desc{ TextureFilter::MinMagMipPoint, TextureAddress::Border };
+	static bool initialized = false;
+
+	if (!initialized)
+	{
+		desc.SetBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
+		initialized = true;
+	}
+
+	return desc;
+}
+
+
+const SamplerStateDesc& CommonStates::SamplerLinearBorder()
+{
+	static SamplerStateDesc desc{ TextureFilter::MinMagMipLinear, TextureAddress::Border };
+	static bool initialized = false;
+
+	if (!initialized)
+	{
+		desc.SetBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
 		initialized = true;
 	}
 

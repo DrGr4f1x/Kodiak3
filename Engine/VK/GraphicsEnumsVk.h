@@ -270,6 +270,18 @@ inline VkDescriptorType DescriptorTypeToVulkan(DescriptorType type)
 }
 
 
+enum class RootParameterType
+{
+	Invalid,
+	Constants32Bit,
+	DescriptorTable,
+	CBV,
+	UAV,
+	ImageSRV,
+	TextureSRV
+};
+
+
 enum class RootSignatureFlags
 {
 	None,
@@ -283,6 +295,60 @@ enum class RootSignatureFlags
 };
 
 template <> struct EnableBitmaskOperators<RootSignatureFlags> { static const bool enable = true; };
+
+
+enum class TextureFilter
+{
+	MinMagMipPoint,
+	MinMagPointMipLinear,
+	MinPointMagLinearMipPoint,
+	MinPointMagMipLinear,
+	MinLinearMagMipPoint,
+	MinLinearMagPointMipLinear,
+	MinMagLinearMipPoint,
+	MinMagMipLinear,
+	Anisotropic,
+
+	ComparisonMinMagMipPoint,
+	ComparisonMinMagPointMipLinear,
+	ComparisonMinPointMagLinearMipPoint,
+	ComparisonMinPointMagMipLinear,
+	ComparisonMinLinearMagMipPoint,
+	ComparisonMinLinearMagPointMipLinear,
+	ComparisonMinMagLinearMipPoint,
+	ComparisonMinMagMipLinear,
+	ComparisonAnisotropic,
+
+	MinimumMinMagMipPoint,
+	MinimumMinMagPointMipLinear,
+	MinimumMinPointMagLinearMipPoint,
+	MinimumMinPointMagMipLinear,
+	MinimumMinLinearMagMipPoint,
+	MinimumMinLinearMagPointMipLinear,
+	MinimumMinMagLinearMipPoint,
+	MinimumMinMagMipLinear,
+	MinimumAnisotropic,
+
+	MaximumMinMagMipPoint,
+	MaximumMinMagPointMipLinear,
+	MaximumMinPointMagLinearMipPoint,
+	MaximumMinPointMagMipLinear,
+	MaximumMinLinearMagMipPoint,
+	MaximumMinLinearMagPointMipLinear,
+	MaximumMinMagLinearMipPoint,
+	MaximumMinMagMipLinear,
+	MaximumAnisotropic
+};
+
+
+enum class TextureAddress
+{
+	Wrap,
+	Mirror,
+	Clamp,
+	Border,
+	MirrorOnce
+};
 
 
 enum class Format

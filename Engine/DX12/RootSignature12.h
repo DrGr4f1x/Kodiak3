@@ -16,6 +16,10 @@
 namespace Kodiak
 {
 
+// Forward declarations
+struct SamplerStateDesc;
+
+
 class RootParameter
 {
 	friend class RootSignature;
@@ -74,7 +78,7 @@ public:
 		m_rootParam.Descriptor.RegisterSpace = 0;
 	}
 
-	void InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE type, uint32_t _register, uint32_t count, ShaderVisibility visibility = ShaderVisibility::All)
+	void InitAsDescriptorRange(DescriptorType type, uint32_t _register, uint32_t count, ShaderVisibility visibility = ShaderVisibility::All)
 	{
 		InitAsDescriptorTable(1, visibility);
 		SetTableRange(0, type, _register, count);
@@ -88,10 +92,10 @@ public:
 		m_rootParam.DescriptorTable.pDescriptorRanges = new D3D12_DESCRIPTOR_RANGE[rangeCount];
 	}
 
-	void SetTableRange(uint32_t rangeIndex, D3D12_DESCRIPTOR_RANGE_TYPE type, uint32_t _register, uint32_t count, uint32_t space = 0)
+	void SetTableRange(uint32_t rangeIndex, DescriptorType type, uint32_t _register, uint32_t count, uint32_t space = 0)
 	{
 		D3D12_DESCRIPTOR_RANGE* range = const_cast<D3D12_DESCRIPTOR_RANGE*>(m_rootParam.DescriptorTable.pDescriptorRanges + rangeIndex);
-		range->RangeType = type;
+		range->RangeType = DescriptorTypeToDX12(type);
 		range->NumDescriptors = count;
 		range->BaseShaderRegister = _register;
 		range->RegisterSpace = space;
@@ -162,7 +166,7 @@ public:
 		return m_paramArray.get()[entryIndex];
 	}
 
-	void InitStaticSampler(uint32_t _register, const D3D12_SAMPLER_DESC& nonStaticSamplerDesc,
+	void InitStaticSampler(uint32_t _register, const SamplerStateDesc& nonStaticSamplerDesc,
 		ShaderVisibility visibility = ShaderVisibility::All);
 
 	void Finalize(const std::string& name, RootSignatureFlags flags = RootSignatureFlags::None);

@@ -223,6 +223,50 @@ enum class ShaderVisibility
 };
 
 
+enum class DescriptorType
+{
+	CBV,
+	Sampler,
+	TextureSRV,
+	ImageSRV,
+	ImageSampler,
+	BufferUAV,
+	ImageUAV
+};
+
+
+inline D3D12_DESCRIPTOR_RANGE_TYPE DescriptorTypeToDX12(DescriptorType type)
+{
+	switch (type)
+	{
+	case DescriptorType::CBV:
+		return D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+		break;
+	case DescriptorType::Sampler:
+		return D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
+		break;
+	case DescriptorType::TextureSRV:
+		return D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		break;
+	case DescriptorType::ImageSRV:
+		return D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		break;
+	case DescriptorType::ImageSampler:
+		return D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		break;
+	case DescriptorType::BufferUAV:
+		return D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+		break;
+	case DescriptorType::ImageUAV:
+		return D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+		break;
+	}
+	// Should never reach this assert
+	assert(false);
+	return D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+}
+
+
 enum class RootSignatureFlags
 {
 	None =								D3D12_ROOT_SIGNATURE_FLAG_NONE,
@@ -236,6 +280,60 @@ enum class RootSignatureFlags
 };
 
 template <> struct EnableBitmaskOperators<RootSignatureFlags> { static const bool enable = true; };
+
+
+enum class TextureFilter
+{
+	MinMagMipPoint =						D3D12_FILTER_MIN_MAG_MIP_POINT,
+	MinMagPointMipLinear =					D3D12_FILTER_MIN_MAG_POINT_MIP_LINEAR,
+	MinPointMagLinearMipPoint =				D3D12_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT,
+	MinPointMagMipLinear =					D3D12_FILTER_MIN_POINT_MAG_MIP_LINEAR,
+	MinLinearMagMipPoint =					D3D12_FILTER_MIN_LINEAR_MAG_MIP_POINT,
+	MinLinearMagPointMipLinear =			D3D12_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR,
+	MinMagLinearMipPoint =					D3D12_FILTER_MIN_MAG_LINEAR_MIP_POINT,
+	MinMagMipLinear =						D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+	Anisotropic =							D3D12_FILTER_ANISOTROPIC,
+
+	ComparisonMinMagMipPoint =				D3D12_FILTER_COMPARISON_MIN_MAG_MIP_POINT,
+	ComparisonMinMagPointMipLinear =		D3D12_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR,
+	ComparisonMinPointMagLinearMipPoint =	D3D12_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT,
+	ComparisonMinPointMagMipLinear =		D3D12_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR,
+	ComparisonMinLinearMagMipPoint =		D3D12_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT,
+	ComparisonMinLinearMagPointMipLinear =	D3D12_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR,
+	ComparisonMinMagLinearMipPoint =		D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT,
+	ComparisonMinMagMipLinear =				D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR,
+	ComparisonAnisotropic =					D3D12_FILTER_COMPARISON_ANISOTROPIC,
+
+	MinimumMinMagMipPoint =					D3D12_FILTER_MINIMUM_MIN_MAG_MIP_POINT,
+	MinimumMinMagPointMipLinear =			D3D12_FILTER_MINIMUM_MIN_MAG_POINT_MIP_LINEAR,
+	MinimumMinPointMagLinearMipPoint =		D3D12_FILTER_MINIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT,
+	MinimumMinPointMagMipLinear =			D3D12_FILTER_MINIMUM_MIN_POINT_MAG_MIP_LINEAR,
+	MinimumMinLinearMagMipPoint =			D3D12_FILTER_MINIMUM_MIN_LINEAR_MAG_MIP_POINT,
+	MinimumMinLinearMagPointMipLinear =		D3D12_FILTER_MINIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR,
+	MinimumMinMagLinearMipPoint =			D3D12_FILTER_MINIMUM_MIN_MAG_LINEAR_MIP_POINT,
+	MinimumMinMagMipLinear =				D3D12_FILTER_MINIMUM_MIN_MAG_MIP_LINEAR,
+	MinimumAnisotropic =					D3D12_FILTER_MINIMUM_ANISOTROPIC,
+
+	MaximumMinMagMipPoint =					D3D12_FILTER_MAXIMUM_MIN_MAG_MIP_POINT,
+	MaximumMinMagPointMipLinear =			D3D12_FILTER_MAXIMUM_MIN_MAG_POINT_MIP_LINEAR,
+	MaximumMinPointMagLinearMipPoint =		D3D12_FILTER_MAXIMUM_MIN_POINT_MAG_LINEAR_MIP_POINT,
+	MaximumMinPointMagMipLinear =			D3D12_FILTER_MAXIMUM_MIN_POINT_MAG_MIP_LINEAR,
+	MaximumMinLinearMagMipPoint =			D3D12_FILTER_MAXIMUM_MIN_LINEAR_MAG_MIP_POINT,
+	MaximumMinLinearMagPointMipLinear =		D3D12_FILTER_MAXIMUM_MIN_LINEAR_MAG_POINT_MIP_LINEAR,
+	MaximumMinMagLinearMipPoint =			D3D12_FILTER_MAXIMUM_MIN_MAG_LINEAR_MIP_POINT,
+	MaximumMinMagMipLinear =				D3D12_FILTER_MAXIMUM_MIN_MAG_MIP_LINEAR,
+	MaximumAnisotropic =					D3D12_FILTER_MAXIMUM_ANISOTROPIC
+};
+
+
+enum class TextureAddress
+{
+	Wrap =			D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+	Mirror =		D3D12_TEXTURE_ADDRESS_MODE_MIRROR,
+	Clamp =			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+	Border =		D3D12_TEXTURE_ADDRESS_MODE_BORDER,
+	MirrorOnce =	D3D12_TEXTURE_ADDRESS_MODE_MIRROR_ONCE
+};
 
 
 enum class InputClassification

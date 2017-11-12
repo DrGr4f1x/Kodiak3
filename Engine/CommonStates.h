@@ -44,6 +44,16 @@ public:
 	static const DepthStencilStateDesc& DepthStateReadOnly();
 	static const DepthStencilStateDesc& DepthStateReadOnlyReversed();
 	static const DepthStencilStateDesc& DepthStateTestEqual();
+
+	// Sampler states
+	static const SamplerStateDesc& SamplerLinearWrap();
+	static const SamplerStateDesc& SamplerAnisoWrap();
+	static const SamplerStateDesc& SamplerShadow();
+	static const SamplerStateDesc& SamplerLinearClamp();
+	static const SamplerStateDesc& SamplerVolumeWrap();
+	static const SamplerStateDesc& SamplerPointClamp();
+	static const SamplerStateDesc& SamplerPointBorder();
+	static const SamplerStateDesc& SamplerLinearBorder();
 };
 
 } // namespace Kodiak

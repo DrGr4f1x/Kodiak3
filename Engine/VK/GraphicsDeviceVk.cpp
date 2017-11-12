@@ -136,6 +136,8 @@ void GraphicsDevice::Destroy()
 	PSO::DestroyAll();
 	RootSignature::DestroyAll();
 
+	DescriptorSetAllocator::DestroyAll();
+
 	m_swapChain->Destroy();
 	m_swapChain.reset();
 

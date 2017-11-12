@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "DescriptorHeapVk.h"
+
 namespace Kodiak
 {
 
@@ -108,6 +110,12 @@ private:
 // Utility methods and accessors
 VkDevice GetDevice();
 uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound = nullptr);
+
+extern DescriptorSetAllocator g_descriptorSetAllocator;
+inline VkDescriptorSet AllocateDescriptorSet(VkDescriptorSetLayout layout)
+{
+	return g_descriptorSetAllocator.Allocate(layout);
+}
 
 // Debug name functions
 void SetDebugName(VkInstance obj, const std::string& name);

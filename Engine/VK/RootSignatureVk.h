@@ -13,6 +13,17 @@
 namespace Kodiak
 {
 
+// Forward declarations
+struct SamplerStateDesc;
+
+
+struct DescriptorRange
+{
+	DescriptorType type;
+	uint32_t numDescriptors{ 0 };
+};
+
+
 class RootParameter
 {
 	friend class RootSignature;
@@ -25,6 +36,7 @@ public:
 
 	void InitAsConstantBuffer(uint32_t _register, ShaderVisibility visibility = ShaderVisibility::All)
 	{
+		m_type = RootParameterType::CBV;
 		m_visibility = visibility;
 
 		VkDescriptorSetLayoutBinding binding;
@@ -37,14 +49,51 @@ public:
 		m_bindings.push_back(binding);
 	}
 
+	void InitAsDescriptorTable(uint32_t rangeCount, ShaderVisibility visibility = ShaderVisibility::All)
+	{
+		assert(m_type == RootParameterType::Invalid);
+		assert(m_bindings.empty());
+
+		m_type = RootParameterType::DescriptorTable;
+		m_visibility = visibility;
+	}
+
+	void SetTableRange(uint32_t rangeIndex, DescriptorType type, uint32_t shaderReg, uint32_t count, uint32_t space = 0)
+	{
+		assert(m_type == RootParameterType::DescriptorTable);
+		assert(rangeIndex < m_bindings.capacity());
+
+		for (uint32_t i = 0; i < count; ++i)
+		{
+			VkDescriptorSetLayoutBinding binding;
+			binding.stageFlags = static_cast<VkShaderStageFlags>(m_visibility);
+			binding.descriptorCount = 1;
+			binding.descriptorType = DescriptorTypeToVulkan(type);
+			binding.binding = shaderReg + i;
+			binding.pImmutableSamplers = nullptr;
+
+			m_bindings.push_back(binding);
+		}
+
+		DescriptorRange range;
+		range.type = type;
+		range.numDescriptors = count;
+		m_ranges.emplace_back(range);
+	}
+
 	VkDescriptorSetLayout GetLayout() { return m_descriptorSetLayout; }
 	constexpr VkDescriptorSetLayout GetLayout() const { return m_descriptorSetLayout; }
 
+	uint32_t GetNumRanges() const { return static_cast<uint32_t>(m_ranges.size()); }
+	const DescriptorRange& GetRangeDesc(uint32_t index) const { return m_ranges[index]; }
+
 protected:
+	RootParameterType	m_type;
 	ShaderVisibility	m_visibility;
 
-	VkDescriptorSetLayoutCreateInfo m_layoutInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
 	VkDescriptorSetLayout m_descriptorSetLayout{ VK_NULL_HANDLE };
+
+	std::vector<DescriptorRange> m_ranges;
 
 	std::vector<VkDescriptorSetLayoutBinding> m_bindings;
 };
@@ -75,11 +124,9 @@ public:
 		}
 		m_numParameters = numRootParams;
 
-		// TODO
-#if 0
 		if (numStaticSamplers > 0)
 		{
-			m_samplerArray.reset(new D3D12_STATIC_SAMPLER_DESC[numStaticSamplers]);
+			m_samplerArray.reset(new SamplerInfo[numStaticSamplers]);
 		}
 		else
 		{
@@ -87,7 +134,6 @@ public:
 		}
 		m_numSamplers = numStaticSamplers;
 		m_numInitializedStaticSamplers = 0;
-#endif
 	}
 
 	RootParameter& operator[] (size_t entryIndex)
@@ -102,6 +148,9 @@ public:
 		return m_paramArray.get()[entryIndex];
 	}
 
+	void InitStaticSampler(uint32_t _register, const SamplerStateDesc& nonStaticSamplerDesc,
+		ShaderVisibility visibility = ShaderVisibility::All);
+
 	void Finalize(const std::string& name, RootSignatureFlags flags = RootSignatureFlags::None);
 
 	VkPipelineLayout GetLayout() const { return m_layout; }
@@ -109,7 +158,18 @@ public:
 protected:
 	bool m_finalized{ false };
 	uint32_t m_numParameters{ 0 };
+	uint32_t m_numSamplers{ 0 };
+	uint32_t m_numInitializedStaticSamplers{ 0 };
 	std::unique_ptr<RootParameter[]> m_paramArray;
+
+	struct SamplerInfo
+	{
+		uint32_t _register;
+		ShaderVisibility visibility;
+		VkSamplerCreateInfo createInfo;
+	};
+	std::unique_ptr<SamplerInfo[]> m_samplerArray;
+	VkDescriptorSet m_staticSamplerSet{ VK_NULL_HANDLE };
 	VkPipelineLayout m_layout{ VK_NULL_HANDLE };
 };
 
