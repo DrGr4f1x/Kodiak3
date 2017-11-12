@@ -94,12 +94,12 @@ public:
 	CommandQueue& GetComputeQueue() { return m_computeQueue; }
 	CommandQueue& GetCopyQueue() { return m_copyQueue; }
 
-	CommandQueue& GetQueue(D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_DIRECT)
+	CommandQueue& GetQueue(CommandListType type = CommandListType::Direct)
 	{
 		switch (type)
 		{
-		case D3D12_COMMAND_LIST_TYPE_COMPUTE: return m_computeQueue;
-		case D3D12_COMMAND_LIST_TYPE_COPY: return m_copyQueue;
+		case CommandListType::Compute: return m_computeQueue;
+		case CommandListType::Copy: return m_copyQueue;
 		default: return m_graphicsQueue;
 		}
 	}
@@ -110,14 +110,14 @@ public:
 	}
 
 	void CreateNewCommandList(
-		D3D12_COMMAND_LIST_TYPE type,
+		CommandListType type,
 		ID3D12GraphicsCommandList** commandList,
 		ID3D12CommandAllocator** allocator);
 
 	// Test to see if a fence has already been reached
 	bool IsFenceComplete(uint64_t fenceValue)
 	{
-		return GetQueue(D3D12_COMMAND_LIST_TYPE(fenceValue >> 56)).IsFenceComplete(fenceValue);
+		return GetQueue(static_cast<CommandListType>(fenceValue >> 56)).IsFenceComplete(fenceValue);
 	}
 
 	// The CPU will wait for a fence to reach a specified value

@@ -31,13 +31,13 @@ class ContextManager
 public:
 	ContextManager() = default;
 
-	CommandContext* AllocateContext();
+	CommandContext* AllocateContext(CommandListType type);
 	void FreeContext(CommandContext*);
 	void DestroyAllContexts();
 
 private:
-	std::vector<std::unique_ptr<CommandContext> > sm_contextPool;
-	std::queue<CommandContext*> sm_availableContexts;
+	std::vector<std::unique_ptr<CommandContext> > sm_contextPool[4];
+	std::queue<CommandContext*> sm_availableContexts[4];
 	std::mutex sm_contextAllocationMutex;
 };
 
@@ -79,8 +79,10 @@ protected:
 
 	VkSemaphore m_signalSemaphore{ VK_NULL_HANDLE };
 
+	CommandListType m_type;
+
 private:
-	CommandContext();
+	CommandContext(CommandListType type);
 
 	void Reset();
 };

@@ -36,7 +36,7 @@ class ContextManager
 public:
 	ContextManager() {}
 
-	CommandContext* AllocateContext(D3D12_COMMAND_LIST_TYPE type);
+	CommandContext* AllocateContext(CommandListType type);
 	void FreeContext(CommandContext*);
 	void DestroyAllContexts();
 
@@ -66,7 +66,7 @@ public:
 
 	GraphicsContext& GetGraphicsContext() 
 	{
-		assert_msg(m_type != D3D12_COMMAND_LIST_TYPE_COMPUTE, "Cannot convert async compute context to graphics");
+		assert_msg(m_type != CommandListType::Compute, "Cannot convert async compute context to graphics");
 		return reinterpret_cast<GraphicsContext&>(*this);
 	}
 
@@ -119,10 +119,10 @@ protected:
 
 	std::string m_id;
 
-	D3D12_COMMAND_LIST_TYPE m_type;
+	CommandListType m_type;
 
 private:
-	CommandContext(D3D12_COMMAND_LIST_TYPE type);
+	CommandContext(CommandListType type);
 
 	void Reset();
 };

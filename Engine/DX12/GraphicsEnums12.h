@@ -304,4 +304,13 @@ enum class Format
 
 Format MapDXGIFormatToEngine(DXGI_FORMAT format);
 
+
+enum class CommandListType
+{
+	Direct =	D3D12_COMMAND_LIST_TYPE_DIRECT,
+	Bundle =	D3D12_COMMAND_LIST_TYPE_BUNDLE,
+	Compute =	D3D12_COMMAND_LIST_TYPE_COMPUTE,
+	Copy =		D3D12_COMMAND_LIST_TYPE_COPY
+};
+
 } // namespace Kodiak

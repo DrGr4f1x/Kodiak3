@@ -12,32 +12,38 @@
 
 #include "CommandBufferPoolVk.h"
 
+#include "CommandListManagerVk.h"
+#include "GraphicsDeviceVk.h"
+
+#include <sstream>
+
 
 using namespace Kodiak;
 using namespace std;
 
 
-namespace Kodiak
+CommandBufferPool::CommandBufferPool(CommandListType type)
+	: m_commandListType(type)
+{}
+
+
+CommandBufferPool::~CommandBufferPool()
 {
-
-CommandBufferPool g_commandBufferPool;
-
-} // namespace Kodiak
+	Destroy();
+}
 
 
-void CommandBufferPool::Create(VkQueue _queue, VkDevice device, uint32_t queueFamilyIndex)
+void CommandBufferPool::Create(uint32_t queueFamilyIndex)
 {
 	lock_guard<mutex> CS(m_commandBufferMutex);
-
-	m_queue = _queue;
-	m_device = device;
 
 	VkCommandPoolCreateInfo commandPoolInfo{ VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO };
 	commandPoolInfo.pNext = nullptr;
 	commandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 	commandPoolInfo.queueFamilyIndex = queueFamilyIndex;
 
-	ThrowIfFailed(vkCreateCommandPool(m_device, &commandPoolInfo, nullptr, &m_commandPool));
+	ThrowIfFailed(vkCreateCommandPool(GetDevice(), &commandPoolInfo, nullptr, &m_commandPool));
+	SetDebugName(m_commandPool, "CommandBufferPool::m_commandPool");
 }
 
 
@@ -52,36 +58,36 @@ void CommandBufferPool::Destroy()
 
 	while (!m_readyCommandBuffers.empty())
 	{
-		pair<VkFence, VkCommandBuffer>& commandBufferPair = m_readyCommandBuffers.front();
-		vkDestroyFence(m_device, commandBufferPair.first, nullptr);
 		m_readyCommandBuffers.pop();
 	}
 
+	auto device = GetDevice();
+
 	if (!m_commandBufferPool.empty())
 	{
-		vkFreeCommandBuffers(m_device, m_commandPool, static_cast<uint32_t>(m_commandBufferPool.size()), m_commandBufferPool.data());
+		vkFreeCommandBuffers(device, m_commandPool, static_cast<uint32_t>(m_commandBufferPool.size()), m_commandBufferPool.data());
 		m_commandBufferPool.clear();
 	}
 
-	vkDestroyCommandPool(m_device, m_commandPool, nullptr);
+	vkDestroyCommandPool(device, m_commandPool, nullptr);
 	m_commandPool = VK_NULL_HANDLE;
-	m_device = VK_NULL_HANDLE;
 }
 
 
 VkCommandBuffer CommandBufferPool::RequestCommandBuffer()
 {
+	lock_guard<mutex> CS(m_commandBufferMutex);
+
 	VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
 
 	if (!m_readyCommandBuffers.empty())
 	{
-		pair<VkFence, VkCommandBuffer>& commandBufferPair = m_readyCommandBuffers.front();
+		pair<shared_ptr<Fence>, VkCommandBuffer>& commandBufferPair = m_readyCommandBuffers.front();
 
-		if (VK_SUCCESS == vkGetFenceStatus(m_device, commandBufferPair.first))
+		if (commandBufferPair.first->IsComplete())
 		{
 			commandBuffer = commandBufferPair.second;
 			ThrowIfFailed(vkResetCommandBuffer(commandBuffer, 0));
-			vkDestroyFence(m_device, commandBufferPair.first, nullptr);
 			m_readyCommandBuffers.pop();
 		}
 	}
@@ -96,7 +102,10 @@ VkCommandBuffer CommandBufferPool::RequestCommandBuffer()
 		allocInfo.commandBufferCount = 1;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 
-		ThrowIfFailed(vkAllocateCommandBuffers(m_device, &allocInfo, &commandBuffer));
+		ThrowIfFailed(vkAllocateCommandBuffers(GetDevice(), &allocInfo, &commandBuffer));
+		stringstream sstr;
+		sstr << "CommandBuffer " << m_commandBufferPool.size();
+		SetDebugName(commandBuffer, sstr.str());
 
 		m_commandBufferPool.push_back(commandBuffer);
 	}
@@ -105,7 +114,7 @@ VkCommandBuffer CommandBufferPool::RequestCommandBuffer()
 }
 
 
-void CommandBufferPool::DiscardCommandBuffer(VkFence fence, VkCommandBuffer commandBuffer)
+void CommandBufferPool::DiscardCommandBuffer(shared_ptr<Fence> fence, VkCommandBuffer commandBuffer)
 {
 	lock_guard<mutex> CS(m_commandBufferMutex);
 

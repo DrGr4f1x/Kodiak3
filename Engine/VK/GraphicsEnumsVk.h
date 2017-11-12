@@ -231,6 +231,45 @@ enum class ShaderVisibility
 };
 
 
+enum class DescriptorType
+{
+	CBV,
+	Sampler,
+	TextureSRV,
+	ImageSRV,
+	BufferUAV,
+	ImageUAV
+};
+
+inline VkDescriptorType DescriptorTypeToVulkan(DescriptorType type)
+{
+	switch (type)
+	{
+	case DescriptorType::CBV:
+		return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		break;
+	case DescriptorType::Sampler:
+		return VK_DESCRIPTOR_TYPE_SAMPLER;
+		break;
+	case DescriptorType::TextureSRV:
+		return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		break;
+	case DescriptorType::ImageSRV:
+		return VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+		break;
+	case DescriptorType::BufferUAV:
+		return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		break;
+	case DescriptorType::ImageUAV:
+		return VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+		break;
+	}
+	// Should never reach this assert
+	assert(false);
+	return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+}
+
+
 enum class RootSignatureFlags
 {
 	None,
@@ -304,5 +343,14 @@ enum class Format
 };
 
 Format MapVulkanFormatToEngine(VkFormat format);
+
+
+enum class CommandListType
+{
+	Direct,
+	Bundle,
+	Compute,
+	Copy
+};
 
 } // namespace Kodiak

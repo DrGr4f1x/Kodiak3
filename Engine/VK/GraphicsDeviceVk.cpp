@@ -14,8 +14,8 @@
 
 #include "Utility.h"
 
-#include "CommandBufferPoolVk.h"
 #include "CommandContextVk.h"
+#include "CommandListManagerVk.h"
 #include "PipelineStateVk.h"
 #include "RootSignatureVk.h"
 #include "SwapChainVk.h"
@@ -115,7 +115,11 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 	m_swapChain->InitSurface(m_hinst, m_hwnd);
 	m_swapChain->Create(&m_width, &m_height);
 
-	g_commandBufferPool.Create(m_graphicsQueue, m_device, m_queueFamilyIndices.graphics);
+	g_commandManager.Create(
+		m_queueFamilyIndices.graphics, m_graphicsQueue,
+		m_queueFamilyIndices.compute, m_graphicsQueue,
+		m_queueFamilyIndices.transfer, m_graphicsQueue
+	);
 
 	m_initialized = true;
 }
@@ -127,7 +131,7 @@ void GraphicsDevice::Destroy()
 
 	CommandContext::DestroyAllContexts();
 
-	g_commandBufferPool.Destroy();
+	g_commandManager.Destroy();
 
 	PSO::DestroyAll();
 	RootSignature::DestroyAll();
@@ -159,7 +163,7 @@ void GraphicsDevice::PrepareFrame()
 	// Acquire the next image from the swap chain
 	VkResult err = m_swapChain->AcquireNextImage(m_semaphores.presentComplete, &m_currentBuffer);
 
-	g_commandBufferPool.SetCurWaitSemaphore(m_semaphores.presentComplete);
+	g_commandManager.BeginFrame(m_semaphores.presentComplete);
 
 	ThrowIfFailed(err);
 
@@ -178,9 +182,11 @@ void GraphicsDevice::PrepareFrame()
 
 void GraphicsDevice::SubmitFrame()
 {
-	ThrowIfFailed(m_swapChain->QueuePresent(m_graphicsQueue, m_currentBuffer, g_commandBufferPool.GetCurWaitSemaphore()));
+	ThrowIfFailed(m_swapChain->QueuePresent(m_graphicsQueue, m_currentBuffer, g_commandManager.GetGraphicsQueue().GetWaitSemaphore()));
 
 	ThrowIfFailed(vkQueueWaitIdle(m_graphicsQueue));
+
+	g_commandManager.DestroyRetiredFences();
 }
 
 

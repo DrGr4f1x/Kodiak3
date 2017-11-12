@@ -121,19 +121,19 @@ void CommandListManager::Create(ID3D12Device* device)
 }
 
 
-void CommandListManager::CreateNewCommandList(D3D12_COMMAND_LIST_TYPE type, ID3D12GraphicsCommandList** commandList, ID3D12CommandAllocator** allocator)
+void CommandListManager::CreateNewCommandList(CommandListType type, ID3D12GraphicsCommandList** commandList, ID3D12CommandAllocator** allocator)
 {
-	assert_msg(type != D3D12_COMMAND_LIST_TYPE_BUNDLE, "Bundles are not yet supported");
+	assert_msg(type != CommandListType::Bundle, "Bundles are not yet supported");
 
 	switch (type)
 	{
-	case D3D12_COMMAND_LIST_TYPE_DIRECT: *allocator = m_graphicsQueue.RequestAllocator(); break;
-	case D3D12_COMMAND_LIST_TYPE_BUNDLE: break;
-	case D3D12_COMMAND_LIST_TYPE_COMPUTE: *allocator = m_computeQueue.RequestAllocator(); break;
-	case D3D12_COMMAND_LIST_TYPE_COPY: *allocator = m_copyQueue.RequestAllocator(); break;
+	case CommandListType::Direct: *allocator = m_graphicsQueue.RequestAllocator(); break;
+	case CommandListType::Bundle: break;
+	case CommandListType::Compute: *allocator = m_computeQueue.RequestAllocator(); break;
+	case CommandListType::Copy: *allocator = m_copyQueue.RequestAllocator(); break;
 	}
 
-	assert_succeeded(m_device->CreateCommandList(1, type, *allocator, nullptr, MY_IID_PPV_ARGS(commandList)));
+	assert_succeeded(m_device->CreateCommandList(1, static_cast<D3D12_COMMAND_LIST_TYPE>(type), *allocator, nullptr, MY_IID_PPV_ARGS(commandList)));
 	(*commandList)->SetName(L"CommandList");
 }
 
@@ -186,7 +186,7 @@ extern CommandListManager g_commandManager;
 
 void CommandQueue::StallForFence(uint64_t fenceValue)
 {
-	CommandQueue& producer = g_commandManager.GetQueue((D3D12_COMMAND_LIST_TYPE)(fenceValue >> 56));
+	CommandQueue& producer = g_commandManager.GetQueue((CommandListType)(fenceValue >> 56));
 	m_commandQueue->Wait(producer.m_fence, fenceValue);
 }
 
@@ -221,7 +221,7 @@ void CommandQueue::WaitForFence(uint64_t fenceValue)
 
 void CommandListManager::WaitForFence(uint64_t fenceValue)
 {
-	CommandQueue& producer = g_commandManager.GetQueue((D3D12_COMMAND_LIST_TYPE)(fenceValue >> 56));
+	CommandQueue& producer = g_commandManager.GetQueue((CommandListType)(fenceValue >> 56));
 	producer.WaitForFence(fenceValue);
 }
 

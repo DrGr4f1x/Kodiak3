@@ -12,7 +12,7 @@
 
 #include "CommandContextVk.h"
 
-#include "CommandBufferPoolVk.h"
+#include "CommandListManagerVk.h"
 #include "GraphicsDeviceVk.h"
 #include "PipelineStateVk.h"
 #include "RenderPassVk.h"
@@ -26,17 +26,17 @@ using namespace std;
 ContextManager g_contextManager;
 
 
-CommandContext* ContextManager::AllocateContext()
+CommandContext* ContextManager::AllocateContext(CommandListType type)
 {
 	lock_guard<mutex> LockGuard(sm_contextAllocationMutex);
 
-	auto& availableContexts = sm_availableContexts;
+	auto& availableContexts = sm_availableContexts[static_cast<uint32_t>(type)];
 
 	CommandContext* ret = nullptr;
 	if (availableContexts.empty())
 	{
-		ret = new CommandContext();
-		sm_contextPool.emplace_back(ret);
+		ret = new CommandContext(type);
+		sm_contextPool[static_cast<uint32_t>(type)].emplace_back(ret);
 		ret->Initialize();
 	}
 	else
@@ -47,6 +47,8 @@ CommandContext* ContextManager::AllocateContext()
 	}
 	assert(ret != nullptr);
 
+	assert(ret->m_type == type);
+
 	return ret;
 }
 
@@ -56,17 +58,21 @@ void ContextManager::FreeContext(CommandContext* usedContext)
 	assert(usedContext != nullptr);
 
 	lock_guard<mutex> LockGuard(sm_contextAllocationMutex);
-	sm_availableContexts.push(usedContext);
+	sm_availableContexts[static_cast<uint32_t>(usedContext->m_type)].push(usedContext);
 }
 
 
 void ContextManager::DestroyAllContexts()
 {
-	sm_contextPool.clear();
+	for (uint32_t i = 0; i < 4; ++i)
+	{
+		sm_contextPool[i].clear();
+	}
 }
 
 
-CommandContext::CommandContext()
+CommandContext::CommandContext(CommandListType type)
+	: m_type(type)
 {
 	VkSemaphoreCreateInfo semaphoreCreateInfo{};
 	semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -95,7 +101,7 @@ void CommandContext::DestroyAllContexts()
 
 CommandContext& CommandContext::Begin(const string ID)
 {
-	CommandContext* newContext = g_contextManager.AllocateContext();
+	CommandContext* newContext = g_contextManager.AllocateContext(CommandListType::Direct);
 	// TODO
 #if 0
 	NewContext->SetID(ID);
@@ -118,9 +124,7 @@ CommandContext& CommandContext::Begin(const string ID)
 #pragma optimize("",off)
 void CommandContext::Finish(bool waitForCompletion)
 {
-	// TODO
-	auto device = g_commandBufferPool.GetDevice();
-	auto _queue = g_commandBufferPool.GetQueue();
+	assert(m_type == CommandListType::Direct || m_type == CommandListType::Compute);
 
 	//FlushImageBarriers();
 	//FlushBufferBarriers();
@@ -135,50 +139,10 @@ void CommandContext::Finish(bool waitForCompletion)
 
 	vkEndCommandBuffer(m_commandList);
 
-	VkSubmitInfo submitInfo = {};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.pNext = nullptr;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &m_commandList;
-	submitInfo.pWaitDstStageMask = nullptr;
-	submitInfo.waitSemaphoreCount = 0;
-	submitInfo.pWaitSemaphores = nullptr;
-	submitInfo.signalSemaphoreCount = 0;
-	submitInfo.pSignalSemaphores = nullptr;
+	CommandQueue& Queue = g_commandManager.GetQueue(m_type);
 
-	if (!waitForCompletion)
-	{
-		// Pipeline stage at which the queue submission will wait (via pWaitSemaphores)
-		VkPipelineStageFlags waitStageMask[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-
-		auto waitSemaphore = g_commandBufferPool.GetCurWaitSemaphore();
-
-		if (waitSemaphore != VK_NULL_HANDLE)
-		{
-			submitInfo.pWaitSemaphores = &waitSemaphore;			// Semaphore(s) to wait upon before the submitted command buffer starts executing
-			submitInfo.waitSemaphoreCount = 1;						// One wait semaphore
-			submitInfo.pWaitDstStageMask = waitStageMask;			// Pointer to the list of pipeline stages that the semaphore waits will occur at
-		}
-		if (m_signalSemaphore != VK_NULL_HANDLE)
-		{
-			submitInfo.pSignalSemaphores = &m_signalSemaphore;		// Semaphore(s) to be signaled when command buffers have completed
-			submitInfo.signalSemaphoreCount = 1;					// One signal semaphore
-		}
-
-		g_commandBufferPool.SetCurWaitSemaphore(m_signalSemaphore);
-	}
-
-	// Create fence to ensure that the command buffer has finished executing
-	VkFenceCreateInfo fenceCreateInfo = {};
-	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-	fenceCreateInfo.flags = 0;
-	VkFence fence;
-	ThrowIfFailed(vkCreateFence(device, &fenceCreateInfo, nullptr, &fence));
-
-	// Submit to the queue
-	ThrowIfFailed(vkQueueSubmit(_queue, 1, &submitInfo, fence));
-
-	g_commandBufferPool.DiscardCommandBuffer(fence, m_commandList);
+	auto fence = Queue.ExecuteCommandList(m_commandList, waitForCompletion ? VK_NULL_HANDLE : m_signalSemaphore);
+	Queue.DiscardCommandBuffer(fence, m_commandList);
 	m_commandList = VK_NULL_HANDLE;
 
 	// Recycle dynamic allocations
@@ -189,7 +153,7 @@ void CommandContext::Finish(bool waitForCompletion)
 
 	if (waitForCompletion)
 	{
-		ThrowIfFailed(vkWaitForFences(device, 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT));
+		g_commandManager.WaitForFence(fence);
 	}
 
 	g_contextManager.FreeContext(this);
@@ -201,7 +165,7 @@ void CommandContext::Initialize()
 {
 	assert(m_commandList == VK_NULL_HANDLE);
 
-	m_commandList = g_commandBufferPool.RequestCommandBuffer();
+	m_commandList = g_commandManager.GetQueue(m_type).RequestCommandBuffer();
 }
 
 
@@ -252,7 +216,8 @@ void CommandContext::InitializeBuffer(GpuBuffer& dest, const void* initialData, 
 void CommandContext::Reset()
 {
 	assert(m_commandList == VK_NULL_HANDLE);
-	m_commandList = g_commandBufferPool.RequestCommandBuffer();
+
+	m_commandList = g_commandManager.GetQueue(m_type).RequestCommandBuffer();
 
 	m_curGraphicsPipelineLayout = VK_NULL_HANDLE;
 	m_curComputePipelineLayout = VK_NULL_HANDLE;

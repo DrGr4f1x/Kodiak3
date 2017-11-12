@@ -32,17 +32,17 @@ const ResourceState VALID_COMPUTE_QUEUE_RESOURCE_STATES =
 } // anonymous namespace
 
 
-CommandContext* ContextManager::AllocateContext(D3D12_COMMAND_LIST_TYPE type)
+CommandContext* ContextManager::AllocateContext(CommandListType type)
 {
 	lock_guard<mutex> lockGuard(sm_contextAllocationMutex);
 
-	auto& availableContexts = sm_availableContexts[type];
+	auto& availableContexts = sm_availableContexts[static_cast<int32_t>(type)];
 
 	CommandContext* ret = nullptr;
 	if (availableContexts.empty())
 	{
 		ret = new CommandContext(type);
-		sm_contextPool[type].emplace_back(ret);
+		sm_contextPool[static_cast<int32_t>(type)].emplace_back(ret);
 		ret->Initialize();
 	}
 	else
@@ -64,7 +64,7 @@ void ContextManager::FreeContext(CommandContext* usedContext)
 	assert(usedContext != nullptr);
 	lock_guard<mutex> CS(sm_contextAllocationMutex);
 
-	sm_availableContexts[usedContext->m_type].push(usedContext);
+	sm_availableContexts[static_cast<int32_t>(usedContext->m_type)].push(usedContext);
 }
 
 
@@ -100,7 +100,7 @@ void CommandContext::DestroyAllContexts()
 
 CommandContext& CommandContext::Begin(const string id)
 {
-	auto newContext = g_contextManager.AllocateContext(D3D12_COMMAND_LIST_TYPE_DIRECT);
+	auto newContext = g_contextManager.AllocateContext(CommandListType::Direct);
 	newContext->SetID(id);
 	// TODO
 #if 0
@@ -113,7 +113,7 @@ CommandContext& CommandContext::Begin(const string id)
 
 uint64_t CommandContext::Finish(bool waitForCompletion)
 {
-	assert(m_type == D3D12_COMMAND_LIST_TYPE_DIRECT || m_type == D3D12_COMMAND_LIST_TYPE_COMPUTE);
+	assert(m_type == CommandListType::Direct || m_type == CommandListType::Compute);
 
 	FlushResourceBarriers();
 
@@ -181,7 +181,7 @@ void CommandContext::TransitionResource(GpuResource& resource, ResourceState new
 {
 	ResourceState oldState = resource.m_usageState;
 
-	if (m_type == D3D12_COMMAND_LIST_TYPE_COMPUTE)
+	if (m_type == CommandListType::Compute)
 	{
 		assert((oldState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == oldState);
 		assert((newState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == newState);
@@ -289,7 +289,7 @@ void CommandContext::InsertAliasBarrier(GpuResource& before, GpuResource& after,
 }
 
 
-CommandContext::CommandContext(D3D12_COMMAND_LIST_TYPE type)
+CommandContext::CommandContext(CommandListType type)
 	: m_type(type)
 	// TODO
 	//, m_DynamicViewDescriptorHeap(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV),
