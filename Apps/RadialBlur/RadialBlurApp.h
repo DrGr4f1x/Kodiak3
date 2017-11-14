@@ -17,6 +17,7 @@
 #include "PipelineState.h"
 #include "RenderPass.h"
 #include "RootSignature.h"
+#include "Texture.h"
 
 class RadialBlurApp : public Kodiak::Application
 {
@@ -34,8 +35,10 @@ private:
 	void InitRootSigs();
 	void InitPSOs();
 
+	void LoadAssets();
+
 private:
-	// Vertex layout used in this example
+	// Render pipeline resources
 	struct Vertex
 	{
 		float position[3];
@@ -54,4 +57,7 @@ private:
 	Kodiak::GraphicsPSO		m_colorPassPSO;
 	Kodiak::GraphicsPSO		m_phongPassPSO;
 	Kodiak::GraphicsPSO		m_offscreenDisplayPSO;
+
+	// Assets
+	Kodiak::TexturePtr		m_gradientTex;
 };

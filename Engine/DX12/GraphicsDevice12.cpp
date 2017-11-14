@@ -19,6 +19,7 @@
 #include "PipelineState12.h"
 #include "RootSignature12.h"
 #include "SwapChain12.h"
+#include "Texture12.h"
 
 
 using namespace Kodiak;
@@ -245,6 +246,7 @@ void GraphicsDevice::Destroy()
 	RootSignature::DestroyAll();
 
 	DescriptorAllocator::DestroyAll();
+	Texture::DestroyAll();
 
 	m_swapChain->Destroy();
 	m_swapChain.reset();

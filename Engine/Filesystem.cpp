@@ -244,6 +244,16 @@ string Filesystem::GetFullPath(const string& fname)
 }
 
 
+string Filesystem::GetFileExtension(const std::string& filename)
+{
+	string extension = PathFindExtensionA(filename.c_str());
+
+	transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+
+	return extension;
+}
+
+
 void Filesystem::Initialize()
 {
 	unique_lock<shared_mutex> CS(m_mutex);

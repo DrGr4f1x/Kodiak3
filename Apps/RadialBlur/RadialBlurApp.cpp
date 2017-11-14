@@ -44,18 +44,26 @@ void RadialBlurApp::Configure()
 #else
 #error No graphics API defined!
 #endif
+
+	filesystem.AddSearchPath("Data\\Textures");
+	filesystem.AddSearchPath("Data\\Models");
 }
 
 
 void RadialBlurApp::Startup()
 {
+	InitRenderPasses();
 	InitRootSigs();
 	InitPSOs();
+
+	LoadAssets();
 }
 
 
 void RadialBlurApp::Shutdown()
 {
+	m_gradientTex.reset();
+
 	m_renderPass.Destroy();
 	m_offscreenRenderPass.Destroy();
 
@@ -131,7 +139,7 @@ void RadialBlurApp::InitPSOs()
 		{ "Color", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 },
 		{ "Normal", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 }
 	};
-	m_phongPassPSO.SetInputLayout(1, &vertexStreamDesc, 2, vertexElements);
+	m_phongPassPSO.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
 
 	m_colorPassPSO = m_phongPassPSO;
 	m_colorPassPSO.SetRenderPass(m_offscreenRenderPass);
@@ -142,4 +150,10 @@ void RadialBlurApp::InitPSOs()
 	m_offscreenDisplayPSO.Finalize();
 	m_phongPassPSO.Finalize();
 	m_colorPassPSO.Finalize();
+}
+
+
+void RadialBlurApp::LoadAssets()
+{
+	m_gradientTex = Texture::Load("particle_gradient_rgba.ktx");
 }

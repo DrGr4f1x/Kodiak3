@@ -160,6 +160,22 @@ void CommandContext::Initialize()
 }
 
 
+void CommandContext::InitializeTexture(GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA subData[])
+{
+	uint64_t uploadBufferSize = GetRequiredIntermediateSize(dest.GetResource(), 0, numSubresources);
+
+	CommandContext& initContext = CommandContext::Begin();
+
+	// copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
+	DynAlloc mem = initContext.ReserveUploadMemory(uploadBufferSize);
+	UpdateSubresources(initContext.m_commandList, dest.GetResource(), mem.buffer.GetResource(), 0, 0, numSubresources, subData);
+	initContext.TransitionResource(dest, ResourceState::GenericRead);
+
+	// Execute the command list and wait for it to finish so we can release the upload buffer
+	initContext.Finish(true);
+}
+
+
 void CommandContext::InitializeBuffer(GpuResource& dest, const void* bufferData, size_t numBytes, size_t offset)
 {
 	CommandContext& initContext = CommandContext::Begin();

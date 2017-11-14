@@ -80,6 +80,7 @@ public:
 		return m_cpuLinearAllocator.Allocate(sizeInBytes);
 	}
 
+	static void InitializeTexture(GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA subData[]);
 	static void InitializeBuffer(GpuResource& dest, const void* data, size_t numBytes, size_t offset = 0);
 
 	void TransitionResource(GpuResource& resource, ResourceState newState, bool flushImmediate = false);

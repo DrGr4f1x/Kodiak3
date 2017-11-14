@@ -1,3 +1,4 @@
+//
 // This code is licensed under the MIT License (MIT).
 // THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
@@ -55,6 +56,7 @@ public:
 	bool IsDirectory(const std::string& fname);
 	bool GetFileStat(const std::string& fname, FileStat& stat);
 	std::string GetFullPath(const std::string& path);
+	std::string GetFileExtension(const std::string& filename);
 
 private:
 	Filesystem();

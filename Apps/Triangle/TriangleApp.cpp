@@ -187,7 +187,7 @@ void TriangleApp::InitPSO()
 		{ "Position", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
 		{ "Color", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 }
 	};
-	m_pso.SetInputLayout(1, &vertexStreamDesc, 2, vertexElements);
+	m_pso.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
 
 	m_pso.Finalize();
 }
