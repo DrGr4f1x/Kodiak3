@@ -1,6 +1,3 @@
 [submodule "External/DirectXShaderCompiler"]
 	path = External/DirectXShaderCompiler
 	url = https://github.com/Microsoft/DirectXShaderCompiler
-[submodule "Extern/assimp"]
-	path = Extern/assimp
-	url = https://github.com/assimp/assimp
