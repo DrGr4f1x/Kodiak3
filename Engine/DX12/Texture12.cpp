@@ -18,6 +18,7 @@
 #include "CommandContext12.h"
 #include "DDSTextureLoader12.h"
 #include "GraphicsDevice12.h"
+#include "KTXTextureLoader12.h"
 
 
 using namespace Kodiak;
@@ -206,6 +207,11 @@ void Texture::LoadDDS(const string& fullpath, bool sRgb)
 	unique_ptr<byte[]> data;
 	size_t dataSize;
 
+	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
 	ThrowIfFailed(BinaryReader::ReadEntireFile(fullpath, data, &dataSize));
 
 	auto device = GetDevice();
@@ -219,7 +225,16 @@ void Texture::LoadKTX(const string& fullpath, bool sRgb)
 	unique_ptr<byte[]> data;
 	size_t dataSize;
 
+	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
 	ThrowIfFailed(BinaryReader::ReadEntireFile(fullpath, data, &dataSize));
+
+	auto device = GetDevice();
+
+	ThrowIfFailed(CreateKTXTextureFromMemory(device, data.get(), dataSize, 0, sRgb, &m_resource, m_cpuDescriptorHandle));
 }
 
 
