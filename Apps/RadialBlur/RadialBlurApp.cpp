@@ -62,6 +62,7 @@ void RadialBlurApp::Startup()
 
 void RadialBlurApp::Shutdown()
 {
+	m_model.reset();
 	m_gradientTex.reset();
 
 	m_renderPass.Destroy();
@@ -155,5 +156,13 @@ void RadialBlurApp::InitPSOs()
 
 void RadialBlurApp::LoadAssets()
 {
+	auto layout = VertexLayout(
+	{ 
+		VertexComponent::Position,
+		VertexComponent::UV,
+		VertexComponent::Color,
+		VertexComponent::Normal
+	});
+	m_model = Model::Load("glowsphere.dae", layout);
 	m_gradientTex = Texture::Load("particle_gradient_rgba.ktx");
 }

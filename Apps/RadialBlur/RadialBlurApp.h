@@ -14,6 +14,7 @@
 #include "DepthBuffer.h"
 #include "Framebuffer.h"
 #include "GpuBuffer.h"
+#include "Model.h"
 #include "PipelineState.h"
 #include "RenderPass.h"
 #include "RootSignature.h"
@@ -59,5 +60,6 @@ private:
 	Kodiak::GraphicsPSO		m_offscreenDisplayPSO;
 
 	// Assets
+	Kodiak::ModelPtr		m_model;
 	Kodiak::TexturePtr		m_gradientTex;
 };
