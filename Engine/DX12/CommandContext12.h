@@ -13,10 +13,12 @@
 #include "Color.h"
 #include "ColorBuffer12.h"
 #include "DepthBuffer12.h"
+#include "DynamicDescriptorHeap12.h"
 #include "GpuBuffer12.h"
 #include "LinearAllocator12.h"
 #include "PipelineState12.h"
 #include "RootSignature12.h"
+#include "Texture12.h"
 
 namespace Kodiak
 {
@@ -89,21 +91,31 @@ public:
 	void InsertAliasBarrier(GpuResource& before, GpuResource& after, bool flushImmediate = false);
 	inline void FlushResourceBarriers();
 
+	void SetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12DescriptorHeap* heapPtr);
+	void SetDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEAP_TYPE type[], ID3D12DescriptorHeap* heapPtrs[]);
+
 protected:
 	void SetID(const std::string& id) { m_id = id; }
+
+	void BindDescriptorHeaps();
 
 protected:
 	CommandListManager* m_owningManager;
 	ID3D12GraphicsCommandList* m_commandList;
 	ID3D12CommandAllocator* m_currentAllocator;
 
-	D3D12_RESOURCE_BARRIER m_resourceBarrierBuffer[16];
-	UINT m_numBarriersToFlush;
-
 	ID3D12RootSignature* m_curGraphicsRootSignature;
 	ID3D12PipelineState* m_curGraphicsPipelineState;
 	ID3D12RootSignature* m_curComputeRootSignature;
 	ID3D12PipelineState* m_curComputePipelineState;
+
+	DynamicDescriptorHeap m_dynamicViewDescriptorHeap;		// HEAP_TYPE_CBV_SRV_UAV
+	DynamicDescriptorHeap m_dynamicSamplerDescriptorHeap;	// HEAP_TYPE_SAMPLER
+
+	D3D12_RESOURCE_BARRIER m_resourceBarrierBuffer[16];
+	uint32_t m_numBarriersToFlush;
+
+	ID3D12DescriptorHeap* m_currentDescriptorHeaps[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
 
 	LinearAllocator m_cpuLinearAllocator;
 	LinearAllocator m_gpuLinearAllocator;
@@ -139,6 +151,36 @@ inline void CommandContext::FlushResourceBarriers()
 }
 
 
+inline void CommandContext::SetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12DescriptorHeap* heapPtr)
+{
+	if (m_currentDescriptorHeaps[type] != heapPtr)
+	{
+		m_currentDescriptorHeaps[type] = heapPtr;
+		BindDescriptorHeaps();
+	}
+}
+
+
+inline void CommandContext::SetDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEAP_TYPE type[], ID3D12DescriptorHeap* heapPtrs[])
+{
+	bool anyChanged = false;
+
+	for (uint32_t i = 0; i < heapCount; ++i)
+	{
+		if (m_currentDescriptorHeaps[type[i]] != heapPtrs[i])
+		{
+			m_currentDescriptorHeaps[type[i]] = heapPtrs[i];
+			anyChanged = true;
+		}
+	}
+
+	if (anyChanged)
+	{
+		BindDescriptorHeaps();
+	}
+}
+
+
 class GraphicsContext : public CommandContext
 {
 public:
@@ -168,6 +210,7 @@ public:
 
 	void SetPipelineState(const GraphicsPSO& PSO);
 	void SetConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer);
+	void SetTexture(uint32_t rootIndex, uint32_t offset, const Texture& texture);
 
 	void SetIndexBuffer(IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, VertexBuffer& vertexBuffer);
@@ -188,11 +231,8 @@ inline void GraphicsContext::SetRootSignature(const RootSignature& rootSig)
 	m_commandList->SetGraphicsRootSignature(signature);
 	m_curGraphicsRootSignature = signature;
 
-	// TODO
-#if 0
-	m_DynamicViewDescriptorHeap.ParseGraphicsRootSignature(RootSig);
-	m_DynamicSamplerDescriptorHeap.ParseGraphicsRootSignature(RootSig);
-#endif
+	m_dynamicViewDescriptorHeap.ParseGraphicsRootSignature(rootSig);
+	m_dynamicSamplerDescriptorHeap.ParseGraphicsRootSignature(rootSig);
 }
 
 
@@ -217,6 +257,12 @@ inline void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 inline void GraphicsContext::SetConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer)
 {
 	m_commandList->SetGraphicsRootConstantBufferView(rootIndex, constantBuffer.RootConstantBufferView());
+}
+
+
+inline void GraphicsContext::SetTexture(uint32_t rootIndex, uint32_t offset, const Texture& texture)
+{
+	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &texture.GetSRV());
 }
 
 
@@ -247,6 +293,8 @@ inline void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count
 inline void GraphicsContext::DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation, int32_t baseVertexLocation)
 {
 	FlushResourceBarriers();
+	m_dynamicViewDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
+	m_dynamicSamplerDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
 	m_commandList->DrawIndexedInstanced(indexCount, 1, startIndexLocation, baseVertexLocation, 0);
 }
 

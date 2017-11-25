@@ -12,6 +12,7 @@
 
 #include "RadialBlurApp.h"
 
+#include "CommandContext.h"
 #include "CommonStates.h"
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
@@ -55,6 +56,8 @@ void RadialBlurApp::Startup()
 	InitRenderPasses();
 	InitRootSigs();
 	InitPSOs();
+	InitFramebuffers();
+	InitConstantBuffers();
 
 	LoadAssets();
 }
@@ -68,13 +71,59 @@ void RadialBlurApp::Shutdown()
 	m_renderPass.Destroy();
 	m_offscreenRenderPass.Destroy();
 
+	m_offscreenFramebuffer.reset();
+	m_framebuffers.clear();
+
+	m_sceneConstantBuffer.Destroy();
+
 	m_radialBlurRootSig.Destroy();
 	m_sceneRootSig.Destroy();
 }
 
 
+bool RadialBlurApp::Update()
+{
+	bool res = Application::Update();
+
+	if (res)
+	{
+		UpdateConstantBuffers();
+	}
+
+	return res;
+}
+
+
 void RadialBlurApp::Render()
-{}
+{
+	// Offscreen pass [offscreen render target]
+	{
+		auto& context = GraphicsContext::Begin("Offscreen");
+
+		Color clearColor{ DirectX::Colors::Black };
+		context.BeginRenderPass(m_offscreenRenderPass, *m_offscreenFramebuffer, clearColor, 1.0f, 0);
+
+		context.SetViewportAndScissor(0u, 0u, 256, 256);
+
+		context.SetRootSignature(m_sceneRootSig);
+		context.SetPipelineState(m_colorPassPSO);
+
+		// Draw the model
+		context.SetConstantBuffer(0, m_sceneConstantBuffer);
+		context.SetTexture(1, 0, *m_gradientTex);
+
+		context.EndRenderPass();
+
+		context.Finish();
+	}
+
+	// Main pass [backbuffer]
+	{
+		auto& context = GraphicsContext::Begin("Render frame");
+
+		context.Finish();
+	}
+}
 
 
 void RadialBlurApp::InitRenderPasses()
@@ -154,6 +203,43 @@ void RadialBlurApp::InitPSOs()
 }
 
 
+void RadialBlurApp::InitFramebuffers()
+{
+	// Framebuffer for offscreen pass
+	{
+		auto colorBuffer = make_shared<ColorBuffer>(DirectX::Colors::Black);
+		colorBuffer->Create("Offscreen Color Buffer", 256, 256, 1, Format::R8G8B8A8_UNorm);
+
+		auto depthBuffer = make_shared<DepthBuffer>(1.0f);
+		depthBuffer->Create("Offscreen Depth Buffer", 256, 256, Format::D32_Float);
+
+		m_offscreenFramebuffer = make_shared<FrameBuffer>();
+		m_offscreenFramebuffer->Create(colorBuffer, depthBuffer, m_offscreenRenderPass);
+	}
+
+	// Depth stencil buffer for swap chain
+	m_depthBuffer = make_shared<DepthBuffer>(1.0f);
+	m_depthBuffer->Create("Depth Buffer", m_displayWidth, m_displayHeight, m_graphicsDevice->GetDepthFormat());
+
+	// Framebuffers for swap chain
+	auto swapChain = m_graphicsDevice->GetSwapChain();
+
+	const uint32_t imageCount = swapChain->GetImageCount();
+	m_framebuffers.resize(imageCount);
+	for (uint32_t i = 0; i < imageCount; ++i)
+	{
+		m_framebuffers[i] = make_shared<FrameBuffer>();
+		m_framebuffers[i]->Create(swapChain->GetColorBuffer(i), m_depthBuffer, m_renderPass);
+	}
+}
+
+
+void RadialBlurApp::InitConstantBuffers()
+{
+	m_sceneConstantBuffer.Create("Scene Constant Buffer", 1, sizeof(SceneConstants));
+}
+
+
 void RadialBlurApp::LoadAssets()
 {
 	auto layout = VertexLayout(
@@ -165,4 +251,26 @@ void RadialBlurApp::LoadAssets()
 	});
 	m_model = Model::Load("glowsphere.dae", layout);
 	m_gradientTex = Texture::Load("particle_gradient_rgba.ktx");
+}
+
+
+void RadialBlurApp::UpdateConstantBuffers()
+{
+	using namespace Math;
+
+	m_sceneConstants.projectionMat = Math::Matrix4::MakePerspective(
+		DirectX::XMConvertToRadians(45.0f),
+		(float)m_displayWidth / (float)m_displayHeight,
+		0.1f,
+		256.0f);
+
+	Matrix4 viewMatrix = AffineTransform::MakeTranslation(Vector3(0.0f, 0.0f, m_zoom));
+
+	m_sceneConstants.modelMat = Math::Matrix4(kIdentity);
+	m_sceneConstants.modelMat = viewMatrix * AffineTransform::MakeTranslation(m_cameraPos);
+
+	// TODO Rotate model
+	// TODO Update gradientPos
+
+	m_sceneConstantBuffer.Update(sizeof(m_sceneConstants), &m_sceneConstants);
 }

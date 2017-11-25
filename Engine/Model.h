@@ -78,6 +78,9 @@ public:
 
 	static std::shared_ptr<Model> Load(const std::string& filename, const VertexLayout& layout);
 
+	const VertexBuffer& GetVertexBuffer() const { return m_vertexBuffer; }
+	const IndexBuffer& GetIndexBuffer() const { return m_indexBuffer; }
+
 protected:
 	VertexBuffer m_vertexBuffer;
 	IndexBuffer m_indexBuffer;

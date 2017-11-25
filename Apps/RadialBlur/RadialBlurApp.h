@@ -29,14 +29,19 @@ public:
 	void Startup() final;
 	void Shutdown() final;
 
+	bool Update() final;
 	void Render() final;
 
 private:
 	void InitRenderPasses();
 	void InitRootSigs();
 	void InitPSOs();
+	void InitFramebuffers();
+	void InitConstantBuffers();
 
 	void LoadAssets();
+
+	void UpdateConstantBuffers();
 
 private:
 	// Render pipeline resources
@@ -48,8 +53,19 @@ private:
 		float normal[3];
 	};
 
+	struct SceneConstants
+	{
+		Math::Matrix4 projectionMat;
+		Math::Matrix4 modelMat;
+		float gradientPos{ 0.0f };
+	};
+
 	Kodiak::RenderPass		m_renderPass;
 	Kodiak::RenderPass		m_offscreenRenderPass;
+
+	Kodiak::DepthBufferPtr	m_depthBuffer;
+	Kodiak::FrameBufferPtr	m_offscreenFramebuffer;
+	std::vector<Kodiak::FrameBufferPtr> m_framebuffers;
 
 	Kodiak::RootSignature	m_radialBlurRootSig;
 	Kodiak::RootSignature	m_sceneRootSig;
@@ -59,7 +75,15 @@ private:
 	Kodiak::GraphicsPSO		m_phongPassPSO;
 	Kodiak::GraphicsPSO		m_offscreenDisplayPSO;
 
+	// Constant buffers
+	SceneConstants			m_sceneConstants;
+	Kodiak::ConstantBuffer	m_sceneConstantBuffer;
+
 	// Assets
 	Kodiak::ModelPtr		m_model;
 	Kodiak::TexturePtr		m_gradientTex;
+
+	// Camera controls
+	float m_zoom{ -2.5f };
+	Math::Vector3 m_cameraPos{ Math::kZero };
 };

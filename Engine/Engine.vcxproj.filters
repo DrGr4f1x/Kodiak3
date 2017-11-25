@@ -221,6 +221,9 @@
     <ClInclude Include="Model.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="DX12\DynamicDescriptorHeap12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -358,6 +361,9 @@
     </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12\DynamicDescriptorHeap12.cpp">
+      <Filter>Graphics\DX12</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

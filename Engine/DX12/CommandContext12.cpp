@@ -136,12 +136,8 @@ uint64_t CommandContext::Finish(bool waitForCompletion)
 
 	m_cpuLinearAllocator.CleanupUsedPages(fenceValue);
 	m_gpuLinearAllocator.CleanupUsedPages(fenceValue);
-
-	// TODO
-#if 0
-	m_DynamicViewDescriptorHeap.CleanupUsedHeaps(FenceValue);
-	m_DynamicSamplerDescriptorHeap.CleanupUsedHeaps(FenceValue);
-#endif
+	m_dynamicViewDescriptorHeap.CleanupUsedHeaps(fenceValue);
+	m_dynamicSamplerDescriptorHeap.CleanupUsedHeaps(fenceValue);
 
 	if (waitForCompletion)
 	{
@@ -305,11 +301,30 @@ void CommandContext::InsertAliasBarrier(GpuResource& before, GpuResource& after,
 }
 
 
+void CommandContext::BindDescriptorHeaps()
+{
+	uint32_t nonNullHeaps = 0;
+	ID3D12DescriptorHeap* heapsToBind[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
+	for (uint32_t i = 0; i < D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES; ++i)
+	{
+		ID3D12DescriptorHeap* heapIter = m_currentDescriptorHeaps[i];
+		if (heapIter != nullptr)
+		{
+			heapsToBind[nonNullHeaps++] = heapIter;
+		}
+	}
+
+	if (nonNullHeaps > 0)
+	{
+		m_commandList->SetDescriptorHeaps(nonNullHeaps, heapsToBind);
+	}
+}
+
+
 CommandContext::CommandContext(CommandListType type)
 	: m_type(type)
-	// TODO
-	//, m_DynamicViewDescriptorHeap(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV),
-	//, m_DynamicSamplerDescriptorHeap(*this, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER),
+	, m_dynamicViewDescriptorHeap(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
+	, m_dynamicSamplerDescriptorHeap(*this, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER)
 	, m_cpuLinearAllocator(kCpuWritable)
 	, m_gpuLinearAllocator(kGpuExclusive)
 {
@@ -317,10 +332,7 @@ CommandContext::CommandContext(CommandListType type)
 	m_commandList = nullptr;
 	m_currentAllocator = nullptr;
 
-	// TODO
-#if 0
-	ZeroMemory(m_CurrentDescriptorHeaps, sizeof(m_CurrentDescriptorHeaps));
-#endif
+	ZeroMemory(m_currentDescriptorHeaps, sizeof(m_currentDescriptorHeaps));
 
 	m_curGraphicsRootSignature = nullptr;
 	m_curGraphicsPipelineState = nullptr;
