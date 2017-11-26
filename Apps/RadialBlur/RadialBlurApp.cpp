@@ -53,6 +53,8 @@ void RadialBlurApp::Configure()
 
 void RadialBlurApp::Startup()
 {
+	m_timerSpeed = 0.125f;
+
 	InitRenderPasses();
 	InitRootSigs();
 	InitPSOs();
@@ -101,7 +103,7 @@ void RadialBlurApp::Render()
 		auto& context = GraphicsContext::Begin("Offscreen");
 
 		Color clearColor{ DirectX::Colors::Black };
-		context.BeginRenderPass(m_offscreenRenderPass, *m_offscreenFramebuffer, clearColor, 0.0f, 0);
+		context.BeginRenderPass(m_offscreenRenderPass, *m_offscreenFramebuffer, clearColor, 1.0f, 0);
 
 		context.SetViewportAndScissor(0u, 0u, s_offscreenSize, s_offscreenSize);
 
@@ -128,7 +130,7 @@ void RadialBlurApp::Render()
 		uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
 		Color clearColor{ DirectX::Colors::Black };
-		context.BeginRenderPass(m_renderPass, *m_framebuffers[curFrame], clearColor, 0.0f, 0);
+		context.BeginRenderPass(m_renderPass, *m_framebuffers[curFrame], clearColor, 1.0f, 0);
 
 		context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -203,7 +205,7 @@ void RadialBlurApp::InitPSOs()
 	m_radialBlurPSO.SetRenderPass(m_renderPass);
 	m_radialBlurPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 	m_radialBlurPSO.SetBlendState(CommonStates::BlendTraditionalAdditive());
-	m_radialBlurPSO.SetDepthStencilState(CommonStates::DepthStateReadWrite());
+	m_radialBlurPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 	m_radialBlurPSO.SetRasterizerState(CommonStates::RasterizerTwoSided());
 	m_radialBlurPSO.SetVertexShader(Shader::Load("RadialBlurVS"));
 	m_radialBlurPSO.SetPixelShader(Shader::Load("RadialBlurPS"));
@@ -304,11 +306,18 @@ void RadialBlurApp::UpdateConstantBuffers()
 
 	Matrix4 viewMatrix = AffineTransform::MakeTranslation(Vector3(0.0f, 0.0f, m_zoom));
 
-	m_sceneConstants.modelMat = Matrix4(kIdentity);
-	m_sceneConstants.modelMat = Matrix4(AffineTransform::MakeTranslation(m_cameraPos)) * viewMatrix;
+	auto rotation = AffineTransform::MakeXRotation(DirectX::XMConvertToRadians(m_rotation.GetX()));
+	rotation = rotation * AffineTransform::MakeYRotation(DirectX::XMConvertToRadians(m_rotation.GetY()));
+	rotation = rotation * AffineTransform::MakeYRotation(DirectX::XMConvertToRadians(m_timer * 360.0f));
+	rotation = rotation * AffineTransform::MakeZRotation(DirectX::XMConvertToRadians(m_rotation.GetZ()));
 
-	// TODO Rotate model
-	// TODO Update gradientPos
+	m_sceneConstants.modelMat = Matrix4(kIdentity);
+	m_sceneConstants.modelMat = Matrix4(AffineTransform::MakeTranslation(m_cameraPos)) * viewMatrix * rotation;
+
+	if (!m_paused)
+	{
+		m_sceneConstants.gradientPos += m_frameTimer * 0.1f;
+	}
 
 	m_sceneConstantBuffer.Update(sizeof(m_sceneConstants), &m_sceneConstants);
 }

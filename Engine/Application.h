@@ -39,11 +39,23 @@ public:
 	uint32_t GetWidth() const { return m_displayWidth; }
 	uint32_t GetHeight() const { return m_displayHeight; }
 
+	// Application state
+	bool IsPaused() const { return m_paused; }
+	void Pause() { m_paused = true; }
+	void Unpause() { m_paused = false; }
+	void TogglePause() { m_paused = !m_paused; }
+
 protected:
 	const std::string m_name;
 
 	uint32_t m_displayWidth{ 1280 };
 	uint32_t m_displayHeight{ 720 };
+
+	// Application state
+	bool m_paused{ false };
+	float m_frameTimer{ 0.0f };
+	float m_timer{ 0.0f };
+	float m_timerSpeed{ 1.0f };
 
 	HINSTANCE m_hinst{ 0 };
 	HWND m_hwnd{ 0 };

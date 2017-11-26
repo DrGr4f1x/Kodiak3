@@ -41,6 +41,7 @@ public:
 	// Depth stencil states
 	static const DepthStencilStateDesc& DepthStateDisabled();
 	static const DepthStencilStateDesc& DepthStateReadWrite();
+	static const DepthStencilStateDesc& DepthStateReadWriteReversed();
 	static const DepthStencilStateDesc& DepthStateReadOnly();
 	static const DepthStencilStateDesc& DepthStateReadOnlyReversed();
 	static const DepthStencilStateDesc& DepthStateTestEqual();

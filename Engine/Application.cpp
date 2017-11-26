@@ -138,6 +138,8 @@ void Application::Finalize()
 
 bool Application::Tick()
 {
+	auto timeStart = chrono::high_resolution_clock::now();
+
 	bool res = Update();
 	if (res)
 	{
@@ -147,6 +149,20 @@ bool Application::Tick()
 
 		m_graphicsDevice->SubmitFrame();
 	}
+
+	auto timeEnd = chrono::high_resolution_clock::now();
+	auto timeDiff = chrono::duration<double, std::milli>(timeEnd - timeStart).count();
+	m_frameTimer = static_cast<float>(timeDiff * 0.001);
+
+	if (!m_paused)
+	{
+		m_timer += m_timerSpeed * m_frameTimer;
+		if (m_timer > 1.0f)
+		{
+			m_timer -= 1.0f;
+		}
+	}
+
 	return res;
 }
 
@@ -182,6 +198,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case VK_ESCAPE:
 			PostQuitMessage(0);
+			break;
+		case VK_PAUSE:
+			g_application->TogglePause();
 			break;
 		}
 		break;

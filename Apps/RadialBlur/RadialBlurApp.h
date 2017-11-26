@@ -101,4 +101,5 @@ private:
 
 	// Features
 	bool m_blur{ true };
+	Math::Vector3 m_rotation{ -16.25f, -28.75f, 0.0f };
 };

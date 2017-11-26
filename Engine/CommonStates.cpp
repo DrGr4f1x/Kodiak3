@@ -346,6 +346,32 @@ const DepthStencilStateDesc& CommonStates::DepthStateReadWrite()
 }
 
 
+const DepthStencilStateDesc& CommonStates::DepthStateReadWriteReversed()
+{
+	static DepthStencilStateDesc desc{};
+	static bool initialized = false;
+
+	if (!initialized)
+	{
+		desc.depthEnable = true;
+		desc.depthWriteMask = DepthWrite::All;
+		desc.depthFunc = ComparisonFunc::LessEqual;
+		desc.stencilEnable = false;
+		desc.stencilReadMask = Defaults::StencilReadMask;
+		desc.stencilWriteMask = Defaults::StencilWriteMask;
+		desc.frontFace.stencilFunc = ComparisonFunc::Always;
+		desc.frontFace.stencilPassOp = StencilOp::Keep;
+		desc.frontFace.stencilFailOp = StencilOp::Keep;
+		desc.frontFace.stencilDepthFailOp = StencilOp::Keep;
+		desc.backFace = desc.frontFace;
+
+		initialized = true;
+	}
+
+	return desc;
+}
+
+
 const DepthStencilStateDesc& CommonStates::DepthStateReadOnly()
 {
 	static DepthStencilStateDesc desc{};
