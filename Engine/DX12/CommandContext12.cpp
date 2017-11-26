@@ -90,10 +90,7 @@ CommandContext::~CommandContext()
 void CommandContext::DestroyAllContexts()
 {
 	LinearAllocator::DestroyAll();
-	// TODO
-#if 0
 	DynamicDescriptorHeap::DestroyAll();
-#endif
 	g_contextManager.DestroyAllContexts();
 }
 
@@ -358,10 +355,7 @@ void CommandContext::Reset()
 
 	m_curPrimitiveTopology = (D3D12_PRIMITIVE_TOPOLOGY)-1;
 
-	// TODO
-#if 0
 	BindDescriptorHeaps();
-#endif
 }
 
 

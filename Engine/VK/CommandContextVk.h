@@ -112,7 +112,7 @@ public:
 	void SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
 	void SetPipelineState(const GraphicsPSO& PSO);
-	void SetConstantBuffer(uint32_t rootIndex, ConstantBuffer& constantBuffer);
+	void SetRootConstantBuffer(uint32_t rootIndex, ConstantBuffer& constantBuffer);
 
 	void SetIndexBuffer(IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, VertexBuffer& vertexBuffer);

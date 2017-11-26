@@ -209,14 +209,22 @@ public:
 	void SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
 	void SetPipelineState(const GraphicsPSO& PSO);
-	void SetConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer);
-	void SetTexture(uint32_t rootIndex, uint32_t offset, const Texture& texture);
+	void SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer);
+	void SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer);
 
-	void SetIndexBuffer(IndexBuffer& indexBuffer);
-	void SetVertexBuffer(uint32_t slot, VertexBuffer& vertexBuffer);
+	void SetIndexBuffer(const IndexBuffer& indexBuffer);
+	void SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer);
 	void SetVertexBuffers(uint32_t startSlot, uint32_t count, VertexBuffer vertexBuffers[]);
 
+	void Draw(uint32_t vertexCount, uint32_t vertexStartOffset = 0);
 	void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation = 0, int32_t baseVertexLocation = 0);
+	void DrawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount,
+		uint32_t startVertexLocation = 0, uint32_t startInstanceLocation = 0);
+	void DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation,
+		int32_t baseVertexLocation, uint32_t startInstanceLocation);
 };
 
 
@@ -254,25 +262,43 @@ inline void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 }
 
 
-inline void GraphicsContext::SetConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer)
+inline void GraphicsContext::SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer)
 {
 	m_commandList->SetGraphicsRootConstantBufferView(rootIndex, constantBuffer.RootConstantBufferView());
 }
 
 
-inline void GraphicsContext::SetTexture(uint32_t rootIndex, uint32_t offset, const Texture& texture)
+inline void GraphicsContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer)
+{
+	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &constantBuffer.GetCBV());
+}
+
+
+inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture)
 {
 	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &texture.GetSRV());
 }
 
 
-inline void GraphicsContext::SetIndexBuffer(IndexBuffer& indexBuffer)
+inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
+{
+	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &colorBuffer.GetSRV());
+}
+
+
+inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer)
+{
+	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &depthBuffer.GetDepthSRV());
+}
+
+
+inline void GraphicsContext::SetIndexBuffer(const IndexBuffer& indexBuffer)
 {
 	m_commandList->IASetIndexBuffer(&indexBuffer.GetIBV());
 }
 
 
-inline void GraphicsContext::SetVertexBuffer(uint32_t slot, VertexBuffer& vertexBuffer)
+inline void GraphicsContext::SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer)
 {
 	D3D12_VERTEX_BUFFER_VIEW vbv[1] = { vertexBuffer.GetVBV() };
 	m_commandList->IASetVertexBuffers(slot, 1, vbv);
@@ -290,12 +316,35 @@ inline void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count
 }
 
 
+inline void GraphicsContext::Draw(UINT VertexCount, UINT VertexStartOffset)
+{
+	DrawInstanced(VertexCount, 1, VertexStartOffset, 0);
+}
+
+
 inline void GraphicsContext::DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation, int32_t baseVertexLocation)
+{
+	DrawIndexedInstanced(indexCount, 1, startIndexLocation, baseVertexLocation, 0);
+}
+
+
+inline void GraphicsContext::DrawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount,
+	uint32_t startVertexLocation, uint32_t startInstanceLocation)
 {
 	FlushResourceBarriers();
 	m_dynamicViewDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
 	m_dynamicSamplerDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
-	m_commandList->DrawIndexedInstanced(indexCount, 1, startIndexLocation, baseVertexLocation, 0);
+	m_commandList->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
+}
+
+
+inline void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation,
+	int32_t baseVertexLocation, uint32_t startInstanceLocation)
+{
+	FlushResourceBarriers();
+	m_dynamicViewDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
+	m_dynamicSamplerDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
+	m_commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
 }
 
 } // namespace Kodiak

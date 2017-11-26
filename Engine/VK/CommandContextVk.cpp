@@ -325,7 +325,7 @@ void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 }
 
 
-void GraphicsContext::SetConstantBuffer(uint32_t rootIndex, ConstantBuffer& constantBuffer)
+void GraphicsContext::SetRootConstantBuffer(uint32_t rootIndex, ConstantBuffer& constantBuffer)
 {
 	VkDescriptorBufferInfo bufferInfo = constantBuffer.GetDescriptorInfo();
 	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, 0, 1, &bufferInfo);
