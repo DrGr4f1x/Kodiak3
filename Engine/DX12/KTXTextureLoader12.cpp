@@ -1224,7 +1224,7 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(ID3D12Device* d3dDevice,
 		size_t twidth = 0;
 		size_t theight = 0;
 		size_t tdepth = 0;
-		hr = FillInitData(width, height, depth, numMips, arraySize, dxgiFormat, maxsize, ktxDataSize, ktxData,
+		hr = FillInitData(width, height, depth, numMips, arraySize, dxgiFormat, maxsize, ktxDataSize, ktxData + offset + sizeof(uint32_t), // TODO HACK
 			twidth, theight, tdepth, skipMip, initData.get());
 
 		if (SUCCEEDED(hr))
@@ -1240,7 +1240,7 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(ID3D12Device* d3dDevice,
 					? 2048 /*D3D10_REQ_TEXTURE3D_U_V_OR_W_DIMENSION*/
 					: 8192 /*D3D10_REQ_TEXTURE2D_U_OR_V_DIMENSION*/;
 
-				hr = FillInitData(width, height, depth, numMips, arraySize, dxgiFormat, maxsize, ktxDataSize, ktxData,
+				hr = FillInitData(width, height, depth, numMips, arraySize, dxgiFormat, maxsize, ktxDataSize, ktxData + offset + sizeof(uint32_t), // TODO HACK
 					twidth, theight, tdepth, skipMip, initData.get());
 
 				if (SUCCEEDED(hr))
