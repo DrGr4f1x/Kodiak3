@@ -123,7 +123,7 @@ void TriangleApp::Render()
 	context.SetRootSignature(m_rootSig);
 	context.SetPipelineState(m_pso);
 
-	context.SetConstantBuffer(0, m_constantBuffer);
+	context.SetRootConstantBuffer(0, m_constantBuffer);
 
 	context.SetVertexBuffer(0, m_vertexBuffer);
 	context.SetIndexBuffer(m_indexBuffer);

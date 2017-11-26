@@ -6,7 +6,7 @@ struct PSInput
 };
 
 [[vk::binding(0)]]
-Texture2D gradientTex : register(t0);
+Texture1D gradientTex : register(t0);
 [[vk::binding(0, 1)]]
 SamplerState linearSampler : register(s0);
 
@@ -15,7 +15,7 @@ float4 main(PSInput input) : SV_TARGET
 	// Use max. color channel value to detect bright glow emitters
 	if ((input.color.r >= 0.9f) || (input.color.g >= 0.9f) || (input.color.b >= 0.9f))
 	{
-		return float4(gradientTex.Sample(linearSampler, input.texcoord).rgb, 1.0f);
+		return float4(gradientTex.Sample(linearSampler, input.texcoord.x).rgb, 1.0f);
 	}
 	else
 	{

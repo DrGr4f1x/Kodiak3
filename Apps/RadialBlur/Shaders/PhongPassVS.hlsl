@@ -32,7 +32,7 @@ VSOutput main(VSInput input)
 #endif
 
 	output.normal = input.normal;
-	output.color = input.normal;
+	output.color = input.color;
 	output.texcoord = float2(gradientPos, 0.0f);
 
 	float4x4 modelToProjection = mul(projectionMatrix, modelMatrix);

@@ -60,6 +60,15 @@ private:
 		float gradientPos{ 0.0f };
 	};
 
+	struct RadialBlurConstants
+	{
+		float radialBlurScale = { 0.35f };
+		float radialBlurStrength = { 0.75f };
+		float radialOrigin[2] = { 0.5f, 0.5f };
+	};
+
+	static const uint32_t	s_offscreenSize{ 512 };
+
 	Kodiak::RenderPass		m_renderPass;
 	Kodiak::RenderPass		m_offscreenRenderPass;
 
@@ -79,11 +88,17 @@ private:
 	SceneConstants			m_sceneConstants;
 	Kodiak::ConstantBuffer	m_sceneConstantBuffer;
 
+	RadialBlurConstants		m_radialBlurConstants;
+	Kodiak::ConstantBuffer	m_radialBlurConstantBuffer;
+
 	// Assets
 	Kodiak::ModelPtr		m_model;
 	Kodiak::TexturePtr		m_gradientTex;
 
 	// Camera controls
-	float m_zoom{ -2.5f };
+	float m_zoom{ -10.0f };
 	Math::Vector3 m_cameraPos{ Math::kZero };
+
+	// Features
+	bool m_blur{ true };
 };

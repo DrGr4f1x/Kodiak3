@@ -101,16 +101,20 @@ void RadialBlurApp::Render()
 		auto& context = GraphicsContext::Begin("Offscreen");
 
 		Color clearColor{ DirectX::Colors::Black };
-		context.BeginRenderPass(m_offscreenRenderPass, *m_offscreenFramebuffer, clearColor, 1.0f, 0);
+		context.BeginRenderPass(m_offscreenRenderPass, *m_offscreenFramebuffer, clearColor, 0.0f, 0);
 
-		context.SetViewportAndScissor(0u, 0u, 256, 256);
+		context.SetViewportAndScissor(0u, 0u, s_offscreenSize, s_offscreenSize);
 
 		context.SetRootSignature(m_sceneRootSig);
 		context.SetPipelineState(m_colorPassPSO);
 
 		// Draw the model
-		context.SetConstantBuffer(0, m_sceneConstantBuffer);
-		context.SetTexture(1, 0, *m_gradientTex);
+		context.SetRootConstantBuffer(0, m_sceneConstantBuffer);
+		context.SetSRV(1, 0, *m_gradientTex);
+
+		context.SetVertexBuffer(0, m_model->GetVertexBuffer());
+		context.SetIndexBuffer(m_model->GetIndexBuffer());
+		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
 
 		context.EndRenderPass();
 
@@ -120,6 +124,37 @@ void RadialBlurApp::Render()
 	// Main pass [backbuffer]
 	{
 		auto& context = GraphicsContext::Begin("Render frame");
+
+		uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
+
+		Color clearColor{ DirectX::Colors::Black };
+		context.BeginRenderPass(m_renderPass, *m_framebuffers[curFrame], clearColor, 0.0f, 0);
+
+		context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
+
+		context.SetRootSignature(m_sceneRootSig);
+		context.SetPipelineState(m_phongPassPSO);
+
+		// Draw the model
+		context.SetRootConstantBuffer(0, m_sceneConstantBuffer);
+		context.SetSRV(1, 0, *m_gradientTex);
+
+		context.SetVertexBuffer(0, m_model->GetVertexBuffer());
+		context.SetIndexBuffer(m_model->GetIndexBuffer());
+		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+
+		if (m_blur)
+		{
+			context.SetRootSignature(m_radialBlurRootSig);
+			context.SetPipelineState(m_radialBlurPSO);
+			
+			context.SetSRV(0, 0, *m_offscreenFramebuffer->GetColorBuffer(0));
+			context.SetConstantBuffer(0, 1, m_radialBlurConstantBuffer);
+
+			context.Draw(3);
+		}
+
+		context.EndRenderPass();
 
 		context.Finish();
 	}
@@ -169,7 +204,7 @@ void RadialBlurApp::InitPSOs()
 	m_radialBlurPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 	m_radialBlurPSO.SetBlendState(CommonStates::BlendTraditionalAdditive());
 	m_radialBlurPSO.SetDepthStencilState(CommonStates::DepthStateReadWrite());
-	m_radialBlurPSO.SetRasterizerState(CommonStates::RasterizerDefaultCW());
+	m_radialBlurPSO.SetRasterizerState(CommonStates::RasterizerTwoSided());
 	m_radialBlurPSO.SetVertexShader(Shader::Load("RadialBlurVS"));
 	m_radialBlurPSO.SetPixelShader(Shader::Load("RadialBlurPS"));
 
@@ -208,10 +243,10 @@ void RadialBlurApp::InitFramebuffers()
 	// Framebuffer for offscreen pass
 	{
 		auto colorBuffer = make_shared<ColorBuffer>(DirectX::Colors::Black);
-		colorBuffer->Create("Offscreen Color Buffer", 256, 256, 1, Format::R8G8B8A8_UNorm);
+		colorBuffer->Create("Offscreen Color Buffer", s_offscreenSize, s_offscreenSize, 1, Format::R8G8B8A8_UNorm);
 
 		auto depthBuffer = make_shared<DepthBuffer>(1.0f);
-		depthBuffer->Create("Offscreen Depth Buffer", 256, 256, Format::D32_Float);
+		depthBuffer->Create("Offscreen Depth Buffer", s_offscreenSize, s_offscreenSize, Format::D32_Float);
 
 		m_offscreenFramebuffer = make_shared<FrameBuffer>();
 		m_offscreenFramebuffer->Create(colorBuffer, depthBuffer, m_offscreenRenderPass);
@@ -237,6 +272,9 @@ void RadialBlurApp::InitFramebuffers()
 void RadialBlurApp::InitConstantBuffers()
 {
 	m_sceneConstantBuffer.Create("Scene Constant Buffer", 1, sizeof(SceneConstants));
+
+	m_radialBlurConstantBuffer.Create("Radial Blur Constant Buffer", 1, sizeof(RadialBlurConstants));
+	m_radialBlurConstantBuffer.Update(sizeof(m_radialBlurConstants), &m_radialBlurConstants);
 }
 
 
@@ -249,7 +287,7 @@ void RadialBlurApp::LoadAssets()
 		VertexComponent::Color,
 		VertexComponent::Normal
 	});
-	m_model = Model::Load("glowsphere.dae", layout);
+	m_model = Model::Load("glowsphere.dae", layout, 0.05f);
 	m_gradientTex = Texture::Load("particle_gradient_rgba.ktx");
 }
 
@@ -258,7 +296,7 @@ void RadialBlurApp::UpdateConstantBuffers()
 {
 	using namespace Math;
 
-	m_sceneConstants.projectionMat = Math::Matrix4::MakePerspective(
+	m_sceneConstants.projectionMat = Matrix4::MakePerspective(
 		DirectX::XMConvertToRadians(45.0f),
 		(float)m_displayWidth / (float)m_displayHeight,
 		0.1f,
@@ -266,8 +304,8 @@ void RadialBlurApp::UpdateConstantBuffers()
 
 	Matrix4 viewMatrix = AffineTransform::MakeTranslation(Vector3(0.0f, 0.0f, m_zoom));
 
-	m_sceneConstants.modelMat = Math::Matrix4(kIdentity);
-	m_sceneConstants.modelMat = viewMatrix * AffineTransform::MakeTranslation(m_cameraPos);
+	m_sceneConstants.modelMat = Matrix4(kIdentity);
+	m_sceneConstants.modelMat = Matrix4(AffineTransform::MakeTranslation(m_cameraPos)) * viewMatrix;
 
 	// TODO Rotate model
 	// TODO Update gradientPos
