@@ -94,6 +94,8 @@ public:
 		m_forceAlign256 = true;
 	}
 
+	const D3D12_CPU_DESCRIPTOR_HANDLE& GetCBV() const { return m_cbv; }
+
 	void CreateDerivedViews() override;
 
 	void Update(size_t sizeInBytes, const void* data);
