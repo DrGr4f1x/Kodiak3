@@ -30,7 +30,7 @@ const int s_defaultFlags = aiProcess_FlipWindingOrder | aiProcess_Triangulate | 
 } // anonymous namespace
 
 
-ModelPtr Model::Load(const string& filename, const VertexLayout& layout)
+ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float scale)
 {
 	const string fullpath = Filesystem::GetInstance().GetFullPath(filename);
 	assert(!fullpath.empty());
@@ -78,13 +78,13 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout)
 				switch (component)
 				{
 				case VertexComponent::Position:
-					vertexData.push_back(pos->x);
-					vertexData.push_back(-pos->y);  // TODO: Is this a hack?
-					vertexData.push_back(pos->z);
+					vertexData.push_back(pos->x * scale);
+					vertexData.push_back(pos->y * scale);  // TODO: Is this a hack?
+					vertexData.push_back(pos->z * scale);
 					break;
 				case VertexComponent::Normal:
 					vertexData.push_back(normal->x);
-					vertexData.push_back(-normal->y); // TODO: Is this a hack?
+					vertexData.push_back(normal->y); // TODO: Is this a hack?
 					vertexData.push_back(normal->z);
 					break;
 				case VertexComponent::UV:
@@ -136,7 +136,8 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout)
 		}
 	}
 
-	model->m_vertexBuffer.Create("Model|VertexBuffer", vertexData.size(), sizeof(float), vertexData.data());
+	uint32_t stride = layout.ComputeStride();
+	model->m_vertexBuffer.Create("Model|VertexBuffer", sizeof(float) * vertexData.size() / stride, stride, vertexData.data());
 	model->m_indexBuffer.Create("Model|IndexBuffer", indexData.size(), sizeof(uint32_t), indexData.data());
 
 	return model;

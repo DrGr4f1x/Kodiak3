@@ -76,7 +76,7 @@ class Model
 {
 public:
 
-	static std::shared_ptr<Model> Load(const std::string& filename, const VertexLayout& layout);
+	static std::shared_ptr<Model> Load(const std::string& filename, const VertexLayout& layout, float scale = 1.0f);
 
 	const VertexBuffer& GetVertexBuffer() const { return m_vertexBuffer; }
 	const IndexBuffer& GetIndexBuffer() const { return m_indexBuffer; }
