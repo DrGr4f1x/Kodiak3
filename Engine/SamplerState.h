@@ -32,7 +32,7 @@ struct SamplerStateDesc
 	}
 
 
-	SamplerStateDesc(TextureFilter filter, TextureAddress address = TextureAddress::Clamp)
+	SamplerStateDesc(TextureFilter filter, TextureAddress address = TextureAddress::Wrap)
 	{
 		this->filter = filter;
 		addressU = addressV = addressW = address;
