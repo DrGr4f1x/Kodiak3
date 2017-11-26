@@ -30,6 +30,19 @@ Filesystem::Filesystem()
 }
 
 
+void Filesystem::SetDefaultRootDir()
+{
+	auto binDir = GetBinaryDir();
+	string rootDir = binDir;
+	auto pos = binDir.find("Bin");
+	if (pos != binDir.npos)
+	{
+		rootDir = binDir.substr(0, pos);
+	}
+	SetRootDir(rootDir);
+}
+
+
 void Filesystem::SetRootDir(const string& rootDir)
 {
 	unique_lock<shared_mutex> CS(m_mutex);

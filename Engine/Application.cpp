@@ -110,6 +110,12 @@ void Application::Run()
 }
 
 
+const string& Application::GetDefaultShaderPath()
+{
+	return s_defaultShaderPath;
+}
+
+
 void Application::Initialize()
 {
 #if ENABLE_VULKAN_VALIDATION || (defined(DX12) && _DEBUG)

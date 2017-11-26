@@ -61,6 +61,8 @@ inline void ThrowIfFailed(HRESULT hr)
 
 const std::string s_apiPrefixString = "[DirectX 12]";
 
+const std::string s_defaultShaderPath = "Shaders\\DXIL";
+
 #ifndef SAFE_RELEASE
 #define SAFE_RELEASE(x) if (x != nullptr) { x->Release(); x = nullptr; }
 #endif
@@ -84,6 +86,8 @@ const std::string s_apiPrefixString = "[DirectX 12]";
 #define DEFAULT_FENCE_TIMEOUT 100000000000
 
 const std::string s_apiPrefixString = "[Vulkan]";
+
+const std::string s_defaultShaderPath = "Shaders\\SPIR-V";
 
 inline void ThrowIfFailed(VkResult res)
 {

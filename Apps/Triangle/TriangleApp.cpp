@@ -30,22 +30,8 @@ void TriangleApp::Configure()
 	// Setup file system
 	auto& filesystem = Kodiak::Filesystem::GetInstance();
 
-	auto binDir = filesystem.GetBinaryDir();
-	string rootDir = binDir;
-	auto pos = binDir.find("Bin");
-	if (pos != binDir.npos)
-	{
-		rootDir = binDir.substr(0, pos);
-	}
-	filesystem.SetRootDir(rootDir);
-
-#if defined(DX12)
-	filesystem.AddSearchPath("Data\\Shaders\\DXIL");
-#elif defined(VK)
-	filesystem.AddSearchPath("Data\\Shaders\\SPIR-V");
-#else
-#error No graphics API defined!
-#endif
+	filesystem.SetDefaultRootDir();
+	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
 }
 
 

@@ -43,6 +43,8 @@ public:
 	const std::string& GetBinaryDir() const { return m_binaryDir; }
 	const std::string& GetRootDir() const { return m_rootDir; }
 
+	// Sets root dir to Bin\..
+	void SetDefaultRootDir();
 	void SetRootDir(const std::string& rootDir);
 
 	void AddSearchPath(const std::string& fname, bool appendPath = false);

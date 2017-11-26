@@ -45,6 +45,8 @@ public:
 	void Unpause() { m_paused = false; }
 	void TogglePause() { m_paused = !m_paused; }
 
+	const std::string& GetDefaultShaderPath();
+
 protected:
 	const std::string m_name;
 
