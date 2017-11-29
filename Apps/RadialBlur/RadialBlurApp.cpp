@@ -233,7 +233,7 @@ void RadialBlurApp::InitFramebuffers()
 		colorBuffer->Create("Offscreen Color Buffer", s_offscreenSize, s_offscreenSize, 1, Format::R8G8B8A8_UNorm);
 
 		auto depthBuffer = make_shared<DepthBuffer>(1.0f);
-		depthBuffer->Create("Offscreen Depth Buffer", s_offscreenSize, s_offscreenSize, Format::D32_Float);
+		depthBuffer->Create("Offscreen Depth Buffer", s_offscreenSize, s_offscreenSize, m_graphicsDevice->GetDepthFormat());
 
 		m_offscreenFramebuffer = make_shared<FrameBuffer>();
 		m_offscreenFramebuffer->Create(colorBuffer, depthBuffer, m_offscreenRenderPass);
