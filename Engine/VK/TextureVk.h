@@ -26,6 +26,7 @@ class Texture : public GpuResource
 public:
 	Texture() = default;
 	explicit Texture(VkImageView imageView) : m_imageView(imageView) {}
+	~Texture() { Destroy(); }
 
 	// Create a 1-level 1D texture
 	void Create1D(uint32_t pitch, uint32_t width, Format format, const void* initData);

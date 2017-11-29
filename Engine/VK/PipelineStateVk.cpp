@@ -558,11 +558,11 @@ void GraphicsPSO::Finalize()
 	}
 
 	// Clean up shader modules
-	/*for (auto& shaderStage : m_shaderStages)
+	for (auto& shaderStage : shaderStages)
 	{
 		vkDestroyShaderModule(GetDevice(), shaderStage.module, nullptr);
 	}
-	m_shaderStages.clear();*/
+	shaderStages.clear();
 }
 
 
