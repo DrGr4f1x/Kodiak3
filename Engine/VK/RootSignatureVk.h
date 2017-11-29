@@ -179,7 +179,12 @@ protected:
 	};
 	std::unique_ptr<SamplerInfo[]> m_samplerArray;
 	uint32_t m_staticSamplerSetIndex{ 0xFFFFFFFF };
+
+	std::vector<VkSampler> m_samplers;
+
+	VkDescriptorSetLayout m_samplerLayout{ VK_NULL_HANDLE };
 	VkDescriptorSet m_staticSamplerSet{ VK_NULL_HANDLE };
+
 	VkPipelineLayout m_layout{ VK_NULL_HANDLE };
 };
 

@@ -19,6 +19,7 @@
 #include "PipelineStateVk.h"
 #include "RootSignatureVk.h"
 #include "SwapChainVk.h"
+#include "TextureVk.h"
 
 #include <iostream>
 #include <sstream>
@@ -137,6 +138,7 @@ void GraphicsDevice::Destroy()
 	RootSignature::DestroyAll();
 
 	DescriptorSetAllocator::DestroyAll();
+	Texture::DestroyAll();
 
 	m_swapChain->Destroy();
 	m_swapChain.reset();

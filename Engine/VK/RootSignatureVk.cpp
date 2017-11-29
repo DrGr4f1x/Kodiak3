@@ -159,7 +159,6 @@ RootParameter::~RootParameter()
 	m_descriptorSetLayout = VK_NULL_HANDLE;
 }
 
-
 void RootSignature::DestroyAll()
 {
 	auto device = GetDevice();
@@ -175,6 +174,16 @@ void RootSignature::DestroyAll()
 void RootSignature::Destroy()
 {
 	m_paramArray.reset(nullptr);
+
+	auto device = GetDevice();
+
+	vkDestroyDescriptorSetLayout(device, m_samplerLayout, nullptr);
+
+	// Destroy samplers
+	for (auto& sampler : m_samplers)
+	{
+		vkDestroySampler(device, sampler, nullptr);
+	}
 }
 
 
@@ -312,6 +321,8 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 		}
 
 		// Create static samplers
+		m_samplers.resize(m_numSamplers);
+
 		if (m_numSamplers > 0)
 		{
 			VkDescriptorSetLayoutBinding samplerBinding;
@@ -325,14 +336,12 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 			// shader visibility.  A better system would create ranges of contiguous sampler bindings
 			// per shader visibility type.
 
-			std::vector<VkSampler> samplers(m_numSamplers);
-
 			for (uint32_t i = 0; i < m_numSamplers; ++i)
 			{
-				ThrowIfFailed(vkCreateSampler(device, &m_samplerArray[i].createInfo, nullptr, &samplers[i]));
+				ThrowIfFailed(vkCreateSampler(device, &m_samplerArray[i].createInfo, nullptr, &m_samplers[i]));
 			}
 
-			samplerBinding.pImmutableSamplers = samplers.data();
+			samplerBinding.pImmutableSamplers = m_samplers.data();
 
 			VkDescriptorSetLayoutCreateInfo createInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
 			createInfo.pNext = nullptr;
@@ -340,15 +349,14 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 			createInfo.bindingCount = 1;
 			createInfo.pBindings = &samplerBinding;
 
-			VkDescriptorSetLayout samplerLayout{ VK_NULL_HANDLE };
-			ThrowIfFailed(vkCreateDescriptorSetLayout(device, &createInfo, nullptr, &samplerLayout));
+			ThrowIfFailed(vkCreateDescriptorSetLayout(device, &createInfo, nullptr, &m_samplerLayout));
 
 			m_staticSamplerSetIndex = static_cast<uint32_t>(descriptorSetLayouts.size());
 
-			descriptorSetLayouts.push_back(samplerLayout);
+			descriptorSetLayouts.push_back(m_samplerLayout);
 
 			// Finally, create a dummy descriptor set for the static samplers
-			m_staticSamplerSet = AllocateDescriptorSet(samplerLayout);
+			m_staticSamplerSet = AllocateDescriptorSet(m_samplerLayout);
 		}
 
 		// Create the pipeline layout
