@@ -36,6 +36,9 @@ public:
 
 	void InitAsConstantBuffer(uint32_t _register, ShaderVisibility visibility = ShaderVisibility::All)
 	{
+		assert(m_type == RootParameterType::Invalid);
+		assert(m_bindings.empty());
+
 		m_type = RootParameterType::CBV;
 		m_visibility = visibility;
 
@@ -56,6 +59,8 @@ public:
 
 		m_type = RootParameterType::DescriptorTable;
 		m_visibility = visibility;
+
+		m_bindings.reserve(rangeCount);
 	}
 
 	void SetTableRange(uint32_t rangeIndex, DescriptorType type, uint32_t shaderReg, uint32_t count, uint32_t space = 0)
@@ -63,17 +68,16 @@ public:
 		assert(m_type == RootParameterType::DescriptorTable);
 		assert(rangeIndex < m_bindings.capacity());
 
-		for (uint32_t i = 0; i < count; ++i)
-		{
-			VkDescriptorSetLayoutBinding binding;
-			binding.stageFlags = static_cast<VkShaderStageFlags>(m_visibility);
-			binding.descriptorCount = 1;
-			binding.descriptorType = DescriptorTypeToVulkan(type);
-			binding.binding = shaderReg + i;
-			binding.pImmutableSamplers = nullptr;
+		VkDescriptorSetLayoutBinding binding;
+		binding.stageFlags = static_cast<VkShaderStageFlags>(m_visibility);
+		binding.descriptorCount = count;
+		binding.descriptorType = DescriptorTypeToVulkan(type);
+		binding.binding = m_currentBinding;
+		binding.pImmutableSamplers = nullptr;
 
-			m_bindings.push_back(binding);
-		}
+		m_bindings.push_back(binding);
+
+		++m_currentBinding;
 
 		DescriptorRange range;
 		range.type = type;
@@ -87,8 +91,10 @@ public:
 	uint32_t GetNumRanges() const { return static_cast<uint32_t>(m_ranges.size()); }
 	const DescriptorRange& GetRangeDesc(uint32_t index) const { return m_ranges[index]; }
 
+	RootParameterType GetType() const { return m_type; }
+
 protected:
-	RootParameterType	m_type;
+	RootParameterType	m_type{ RootParameterType::Invalid };
 	ShaderVisibility	m_visibility;
 
 	VkDescriptorSetLayout m_descriptorSetLayout{ VK_NULL_HANDLE };
@@ -96,11 +102,14 @@ protected:
 	std::vector<DescriptorRange> m_ranges;
 
 	std::vector<VkDescriptorSetLayoutBinding> m_bindings;
+	uint32_t m_currentBinding{ 0 };
 };
 
 
 class RootSignature
 {
+	friend class DynamicDescriptorPool;
+
 public:
 	RootSignature(uint32_t numRootParams = 0, uint32_t numStaticSamplers = 0) : m_numParameters(numRootParams)
 	{
@@ -169,6 +178,7 @@ protected:
 		VkSamplerCreateInfo createInfo;
 	};
 	std::unique_ptr<SamplerInfo[]> m_samplerArray;
+	uint32_t m_staticSamplerSetIndex{ 0xFFFFFFFF };
 	VkDescriptorSet m_staticSamplerSet{ VK_NULL_HANDLE };
 	VkPipelineLayout m_layout{ VK_NULL_HANDLE };
 };

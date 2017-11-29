@@ -280,6 +280,12 @@ void GraphicsDevice::SubmitFrame()
 }
 
 
+void GraphicsDevice::WaitForGpuIdle()
+{
+	g_commandManager.IdleGPU();
+}
+
+
 ID3D12Device* Kodiak::GetDevice()
 {
 	return g_device;

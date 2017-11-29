@@ -14,11 +14,11 @@
 
 #include "BinaryReader.h"
 #include "Filesystem.h"
+#include "KTXTextureLoader.h"
 
 #include "CommandContext12.h"
 #include "DDSTextureLoader12.h"
 #include "GraphicsDevice12.h"
-#include "KTXTextureLoader12.h"
 
 
 using namespace Kodiak;
@@ -90,8 +90,70 @@ Texture::Texture(D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {}
 
 
-void Texture::Create(uint32_t pitch, uint32_t width, uint32_t height, Format format, const void* initData)
+void Texture::Create1D(uint32_t pitch, uint32_t width, Format format, const void* initData)
 {
+	m_width = width;
+	m_height = 1;
+	m_depthOrArraySize = 1;
+	m_format = format;
+
+	m_usageState = ResourceState::CopyDest;
+
+	D3D12_RESOURCE_DESC texDesc = {};
+	texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE1D;
+	texDesc.Width = width;
+	texDesc.Height = 1;
+	texDesc.DepthOrArraySize = 1;
+	texDesc.MipLevels = 1;
+	texDesc.Format = static_cast<DXGI_FORMAT>(format);
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	D3D12_HEAP_PROPERTIES heapProps;
+	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProps.CreationNodeMask = 1;
+	heapProps.VisibleNodeMask = 1;
+
+	auto device = GetDevice();
+
+	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
+		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(m_resource.ReleaseAndGetAddressOf())));
+
+	m_resource->SetName(L"Texture");
+
+	D3D12_SUBRESOURCE_DATA texResource;
+	texResource.pData = initData;
+	texResource.RowPitch = pitch * BytesPerPixel(format);
+	texResource.SlicePitch = texResource.RowPitch;
+
+	CommandContext::InitializeTexture(*this, 1, &texResource);
+
+	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
+	SRVDesc.Format = texDesc.Format;
+	SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	SRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D;
+	SRVDesc.Texture1D.MipLevels = (UINT)-1;
+
+	device->CreateShaderResourceView(m_resource.Get(), &SRVDesc, m_cpuDescriptorHandle);
+}
+
+
+void Texture::Create2D(uint32_t pitch, uint32_t width, uint32_t height, Format format, const void* initData)
+{
+	m_width = width;
+	m_height = height;
+	m_depthOrArraySize = 1;
+	m_format = format;
+
 	m_usageState = ResourceState::CopyDest;
 
 	D3D12_RESOURCE_DESC texDesc = {};
@@ -165,7 +227,7 @@ shared_ptr<Texture> Texture::GetBlackTex2D()
 	auto makeBlackTex = [](Texture* texture, const string& filename)
 	{
 		uint32_t blackPixel = 0u;
-		texture->Create(1, 1, Format::R8G8B8A8_UNorm, &blackPixel);
+		texture->Create2D(1, 1, Format::R8G8B8A8_UNorm, &blackPixel);
 	};
 
 	return MakeTexture("DefaultWhiteTexture", makeBlackTex);
@@ -177,7 +239,7 @@ shared_ptr<Texture> Texture::GetWhiteTex2D()
 	auto makeWhiteTex = [](Texture* texture, const string& filename)
 	{
 		uint32_t whitePixel = 0xFFFFFFFFul;
-		texture->Create(1, 1, Format::R8G8B8A8_UNorm, &whitePixel);
+		texture->Create2D(1, 1, Format::R8G8B8A8_UNorm, &whitePixel);
 	};
 
 	return MakeTexture("DefaultWhiteTexture", makeWhiteTex);
@@ -189,7 +251,7 @@ shared_ptr<Texture> Texture::GetMagentaTex2D()
 	auto makeMagentaTex = [](Texture* texture, const string& filename)
 	{
 		uint32_t magentaPixel = 0x00FF00FF;
-		texture->Create(1, 1, Format::R8G8B8A8_UNorm, &magentaPixel);
+		texture->Create2D(1, 1, Format::R8G8B8A8_UNorm, &magentaPixel);
 	};
 
 	return MakeTexture("DefaultMagentaTexture", makeMagentaTex);
@@ -234,7 +296,7 @@ void Texture::LoadKTX(const string& fullpath, bool sRgb)
 
 	auto device = GetDevice();
 
-	ThrowIfFailed(CreateKTXTextureFromMemory(device, data.get(), dataSize, 0, sRgb, &m_resource, m_cpuDescriptorHandle));
+	ThrowIfFailed(CreateKTXTextureFromMemory(data.get(), dataSize, 0, sRgb, this));
 }
 
 

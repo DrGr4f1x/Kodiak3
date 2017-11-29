@@ -31,6 +31,11 @@ public:
 	void Create(ColorBufferPtr& rtv, RenderPass& renderpass);
 	void Create(ColorBufferPtr& rtv, DepthBufferPtr& dsv, RenderPass& renderpass);
 
+	ColorBufferPtr& GetColorBuffer(uint32_t index);
+	DepthBufferPtr& GetDepthBuffer() { return m_depthBuffer; }
+
+	size_t GetNumColorBuffers() const { return m_colorBuffers.size(); }
+
 	// TODO MRTs
 
 	VkFramebuffer GetFramebuffer() { return m_framebuffer; }
@@ -42,6 +47,9 @@ private:
 	uint32_t m_width{ 0 };
 	uint32_t m_height{ 0 };
 	VkFramebuffer m_framebuffer{ VK_NULL_HANDLE };
+
+	std::vector<ColorBufferPtr> m_colorBuffers;
+	DepthBufferPtr m_depthBuffer;
 };
 
 using FrameBufferPtr = std::shared_ptr<FrameBuffer>;

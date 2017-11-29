@@ -25,6 +25,14 @@ const float Defaults::DepthBiasClamp = 0.0f;
 const byte Defaults::StencilReadMask = 0xFF;
 const byte Defaults::StencilWriteMask = 0xFF;
 const float Defaults::Float32Max = FLT_MAX;
+
+const uint32_t Limits::MaxTextureDimension1D = 16384;
+const uint32_t Limits::MaxTextureDimension2D = 16384;
+const uint32_t Limits::MaxTextureDimension3D = 2048;
+const uint32_t Limits::MaxTextureDimensionCube = 16384;
+const uint32_t Limits::MaxTexture1DArrayElements = 2048;
+const uint32_t Limits::MaxTexture2DArrayElements = 2048;
+const uint32_t Limits::MaxTextureMipLevels = 15;
 } // namespace Kodiak
 
 

@@ -106,6 +106,8 @@ void Application::Run()
 			break;
 	} while (Tick());	// Returns false to quit loop
 
+	m_graphicsDevice->WaitForGpuIdle();
+
 	Shutdown();
 }
 

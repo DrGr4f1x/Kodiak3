@@ -27,12 +27,26 @@ public:
 	Texture();
 	explicit Texture(D3D12_CPU_DESCRIPTOR_HANDLE handle);
 
-	// Create a 1-level 2D texture
-	void Create(uint32_t pitch, uint32_t width, uint32_t height, Format format, const void* initData);
-	void Create(uint32_t width, uint32_t height, Format format, const void* initData)
+	// Create a 1-level 1D texture
+	void Create1D(uint32_t pitch, uint32_t width, Format format, const void* initData);
+	void Create1D(uint32_t width, Format format, const void* initData)
 	{
-		Create(width, width, height, format, initData);
+		Create1D(width, width, format, initData);
 	}
+
+	// Create a 1-level 2D texture
+	void Create2D(uint32_t pitch, uint32_t width, uint32_t height, Format format, const void* initData);
+	void Create2D(uint32_t width, uint32_t height, Format format, const void* initData)
+	{
+		Create2D(width, width, height, format, initData);
+	}
+
+	// Accessors
+	uint32_t GetWidth() const { return m_width; }
+	uint32_t GetHeight() const { return m_height; }
+	uint32_t GetDepth() const { return m_depthOrArraySize; }
+	uint32_t GetArraySize() const { return m_depthOrArraySize; }
+	Format GetFormat() const { return m_format; }
 
 	static std::shared_ptr<Texture> Load(const std::string& filename, bool sRgb = false);
 	static std::shared_ptr<Texture> GetBlackTex2D();
@@ -57,6 +71,11 @@ protected:
 
 protected:
 	D3D12_CPU_DESCRIPTOR_HANDLE m_cpuDescriptorHandle;
+
+	uint32_t m_width{ 0 };
+	uint32_t m_height{ 0 };
+	uint32_t m_depthOrArraySize{ 0 };
+	Format m_format{ Format::Unknown };
 };
 
 using TexturePtr = std::shared_ptr<Texture>;

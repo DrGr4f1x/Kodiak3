@@ -318,9 +318,10 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 			samplerBinding.binding = 0;
 			samplerBinding.descriptorCount = m_numSamplers;
 			samplerBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+			samplerBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
 			// TODO
-			// This code assumes samplers are continguous from 0 to m_numSamplers-1 and all have the same
+			// This code assumes samplers are contiguous from 0 to m_numSamplers-1 and all have the same
 			// shader visibility.  A better system would create ranges of contiguous sampler bindings
 			// per shader visibility type.
 
@@ -342,12 +343,12 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 			VkDescriptorSetLayout samplerLayout{ VK_NULL_HANDLE };
 			ThrowIfFailed(vkCreateDescriptorSetLayout(device, &createInfo, nullptr, &samplerLayout));
 
+			m_staticSamplerSetIndex = static_cast<uint32_t>(descriptorSetLayouts.size());
+
 			descriptorSetLayouts.push_back(samplerLayout);
 
 			// Finally, create a dummy descriptor set for the static samplers
 			m_staticSamplerSet = AllocateDescriptorSet(samplerLayout);
-
-			vkDestroyDescriptorSetLayout(device, samplerLayout, nullptr);
 		}
 
 		// Create the pipeline layout

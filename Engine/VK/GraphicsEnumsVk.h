@@ -252,7 +252,7 @@ inline VkDescriptorType DescriptorTypeToVulkan(DescriptorType type)
 		return VK_DESCRIPTOR_TYPE_SAMPLER;
 		break;
 	case DescriptorType::TextureSRV:
-		return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 		break;
 	case DescriptorType::ImageSRV:
 		return VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;

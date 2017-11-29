@@ -36,6 +36,8 @@ public:
 	Format GetDepthFormat() const { return m_depthFormat; }
 	uint32_t GetCurrentBuffer() const { return m_currentBuffer; }
 
+	void WaitForGpuIdle();
+
 private:
 	void CreateVulkanInstance();
 	void SelectPhysicalDevice();

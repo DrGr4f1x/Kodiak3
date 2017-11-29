@@ -16,6 +16,7 @@ struct VSOutput
 	float2 texcoord : TEXCOORD2;
 };
 
+[[vk::binding(0)]]
 cbuffer VSConstants : register(b0)
 {
 	float4x4 projectionMatrix;

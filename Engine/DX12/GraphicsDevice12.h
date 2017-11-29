@@ -34,6 +34,8 @@ public:
 	Format GetDepthFormat() const { return Format::D32_Float; }
 	uint32_t GetCurrentBuffer() const { return m_currentBuffer; }
 
+	void WaitForGpuIdle();
+
 private:
 	bool m_initialized{ false };
 

@@ -5,7 +5,7 @@
 // IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
 // PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 //
-// Author: David Elder
+// Author:  David Elder
 //
 
 #pragma once
@@ -13,22 +13,24 @@
 namespace Kodiak
 {
 
-HRESULT __cdecl CreateKTXTextureFromMemory(ID3D12Device* d3dDevice,
+// Forward declarations
+class Texture;
+
+
+HRESULT __cdecl CreateKTXTextureFromMemory(
 	const uint8_t* ktxData,
 	size_t ktxDataSize,
 	size_t maxsize,
 	bool forceSRGB,
-	ID3D12Resource** texture,
-	D3D12_CPU_DESCRIPTOR_HANDLE textureView
+	Texture* texture
 );
 
 
-HRESULT __cdecl CreateKTXTextureFromFile(ID3D12Device* d3dDevice,
+HRESULT __cdecl CreateKTXTextureFromFile(
 	const char* szFileName,
 	size_t maxsize,
 	bool forceSRGB,
-	ID3D12Resource** texture,
-	D3D12_CPU_DESCRIPTOR_HANDLE textureView
+	Texture* texture
 );
 
 } // namespace Kodiak

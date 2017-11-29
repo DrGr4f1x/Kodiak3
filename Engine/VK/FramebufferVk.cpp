@@ -48,6 +48,11 @@ void FrameBuffer::Create(ColorBufferPtr& rtv, RenderPass& renderpass)
 	frameBufferCreateInfo.layers = 1;
 
 	ThrowIfFailed(vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &m_framebuffer));
+
+	m_colorBuffers.clear();
+
+	m_colorBuffers.push_back(rtv);
+	m_depthBuffer.reset();
 }
 
 
@@ -69,4 +74,16 @@ void FrameBuffer::Create(ColorBufferPtr& rtv, DepthBufferPtr& dsv, RenderPass& r
 	frameBufferCreateInfo.layers = 1;
 
 	ThrowIfFailed(vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &m_framebuffer));
+
+	m_colorBuffers.clear();
+
+	m_colorBuffers.push_back(rtv);
+	m_depthBuffer = dsv;
+}
+
+
+ColorBufferPtr& FrameBuffer::GetColorBuffer(uint32_t index)
+{
+	assert(index < (uint32_t)m_colorBuffers.size());
+	return m_colorBuffers[index];
 }

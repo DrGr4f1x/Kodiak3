@@ -210,6 +210,14 @@ void CommandListManager::WaitForFence(shared_ptr<Fence> fence)
 }
 
 
+void CommandListManager::IdleGPU()
+{
+	m_graphicsQueue.WaitForIdle();
+	m_computeQueue.WaitForIdle();
+	m_copyQueue.WaitForIdle();
+}
+
+
 void CommandListManager::RetireFence(VkFence fence)
 {
 	lock_guard<mutex> CS(m_fenceMutex);

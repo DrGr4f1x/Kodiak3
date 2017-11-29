@@ -8,9 +8,9 @@ struct PSInput
 	float2 texcoord : TEXCOORD2;
 };
 
-[[vk::binding(0)]]
-Texture1D gradientTex : register(t0);
 [[vk::binding(0, 1)]]
+Texture1D gradientTex : register(t0);
+[[vk::binding(0, 2)]]
 SamplerState linearSampler : register(s0);
 
 float4 main(PSInput input) : SV_TARGET

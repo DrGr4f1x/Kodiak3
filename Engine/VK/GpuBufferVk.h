@@ -71,6 +71,8 @@ public:
 	void Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData = nullptr);
 
 	void Update(size_t sizeInBytes, const void* data);
+
+	const VkDescriptorBufferInfo& GetCBV() const { return m_descriptorInfo; }
 };
 
 } // namespace Kodiak

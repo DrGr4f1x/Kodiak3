@@ -365,25 +365,6 @@ void GraphicsPSO::SetVertexShader(const Shader* vertexShader)
 	
 	m_vertexShader.binary = vertexShader->GetByteCode();
 	m_vertexShader.size = vertexShader->GetByteCodeSize();
-
-	VkShaderModuleCreateInfo moduleCreateInfo{ VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
-	moduleCreateInfo.pNext = nullptr;
-	moduleCreateInfo.flags = 0;
-	moduleCreateInfo.codeSize = m_vertexShader.size;
-	moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_vertexShader.binary);
-
-	VkShaderModule module{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
-
-	VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
-	createInfo.pNext = nullptr;
-	createInfo.flags = 0;
-	createInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-	createInfo.pName = "main";
-	createInfo.module = module;
-	createInfo.pSpecializationInfo = nullptr;
-
-	m_shaderStages.push_back(createInfo);
 }
 
 
@@ -391,25 +372,6 @@ void GraphicsPSO::SetPixelShader(const Shader* pixelShader)
 {
 	m_pixelShader.binary = pixelShader->GetByteCode();
 	m_pixelShader.size = pixelShader->GetByteCodeSize();
-
-	VkShaderModuleCreateInfo moduleCreateInfo{ VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
-	moduleCreateInfo.pNext = nullptr;
-	moduleCreateInfo.flags = 0;
-	moduleCreateInfo.codeSize = m_pixelShader.size;
-	moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_pixelShader.binary);
-
-	VkShaderModule module{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
-
-	VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
-	createInfo.pNext = nullptr;
-	createInfo.flags = 0;
-	createInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-	createInfo.pName = "main";
-	createInfo.module = module;
-	createInfo.pSpecializationInfo = nullptr;
-
-	m_shaderStages.push_back(createInfo);
 }
 
 
@@ -417,25 +379,6 @@ void GraphicsPSO::SetHullShader(const Shader* hullShader)
 {
 	m_hullShader.binary = hullShader->GetByteCode();
 	m_hullShader.size = hullShader->GetByteCodeSize();
-
-	VkShaderModuleCreateInfo moduleCreateInfo{ VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
-	moduleCreateInfo.pNext = nullptr;
-	moduleCreateInfo.flags = 0;
-	moduleCreateInfo.codeSize = m_hullShader.size;
-	moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_hullShader.binary);
-
-	VkShaderModule module{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
-
-	VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
-	createInfo.pNext = nullptr;
-	createInfo.flags = 0;
-	createInfo.stage = VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
-	createInfo.pName = "main";
-	createInfo.module = module;
-	createInfo.pSpecializationInfo = nullptr;
-
-	m_shaderStages.push_back(createInfo);
 }
 
 
@@ -443,25 +386,6 @@ void GraphicsPSO::SetDomainShader(const Shader* domainShader)
 {
 	m_domainShader.binary = domainShader->GetByteCode();
 	m_domainShader.size = domainShader->GetByteCodeSize();
-
-	VkShaderModuleCreateInfo moduleCreateInfo{ VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
-	moduleCreateInfo.pNext = nullptr;
-	moduleCreateInfo.flags = 0;
-	moduleCreateInfo.codeSize = m_domainShader.size;
-	moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_domainShader.binary);
-
-	VkShaderModule module{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
-
-	VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
-	createInfo.pNext = nullptr;
-	createInfo.flags = 0;
-	createInfo.stage = VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
-	createInfo.pName = "main";
-	createInfo.module = module;
-	createInfo.pSpecializationInfo = nullptr;
-
-	m_shaderStages.push_back(createInfo);
 }
 
 
@@ -469,35 +393,133 @@ void GraphicsPSO::SetGeometryShader(const Shader* geometryShader)
 {
 	m_geometryShader.binary = geometryShader->GetByteCode();
 	m_geometryShader.size = geometryShader->GetByteCodeSize();
-
-	VkShaderModuleCreateInfo moduleCreateInfo{ VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
-	moduleCreateInfo.pNext = nullptr;
-	moduleCreateInfo.flags = 0;
-	moduleCreateInfo.codeSize = m_geometryShader.size;
-	moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_geometryShader.binary);
-
-	VkShaderModule module{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
-
-	VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
-	createInfo.pNext = nullptr;
-	createInfo.flags = 0;
-	createInfo.stage = VK_SHADER_STAGE_GEOMETRY_BIT;
-	createInfo.pName = "main";
-	createInfo.module = module;
-	createInfo.pSpecializationInfo = nullptr;
-
-	m_shaderStages.push_back(createInfo);
 }
 
 
 void GraphicsPSO::Finalize()
 {
+	std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
+
+	// Vertex shader
+	if (m_vertexShader)
+	{
+		VkShaderModuleCreateInfo moduleCreateInfo{ VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
+		moduleCreateInfo.pNext = nullptr;
+		moduleCreateInfo.flags = 0;
+		moduleCreateInfo.codeSize = m_vertexShader.size;
+		moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_vertexShader.binary);
+
+		VkShaderModule module{ VK_NULL_HANDLE };
+		ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
+
+		VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
+		createInfo.pNext = nullptr;
+		createInfo.flags = 0;
+		createInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+		createInfo.pName = "main";
+		createInfo.module = module;
+		createInfo.pSpecializationInfo = nullptr;
+
+		shaderStages.push_back(createInfo);
+	}
+
+	// Pixel shader
+	if (m_pixelShader)
+	{
+		VkShaderModuleCreateInfo moduleCreateInfo{ VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
+		moduleCreateInfo.pNext = nullptr;
+		moduleCreateInfo.flags = 0;
+		moduleCreateInfo.codeSize = m_pixelShader.size;
+		moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_pixelShader.binary);
+
+		VkShaderModule module{ VK_NULL_HANDLE };
+		ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
+
+		VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
+		createInfo.pNext = nullptr;
+		createInfo.flags = 0;
+		createInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+		createInfo.pName = "main";
+		createInfo.module = module;
+		createInfo.pSpecializationInfo = nullptr;
+
+		shaderStages.push_back(createInfo);
+	}
+
+	// Hull shader
+	if (m_hullShader)
+	{
+		VkShaderModuleCreateInfo moduleCreateInfo{ VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
+		moduleCreateInfo.pNext = nullptr;
+		moduleCreateInfo.flags = 0;
+		moduleCreateInfo.codeSize = m_hullShader.size;
+		moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_hullShader.binary);
+
+		VkShaderModule module{ VK_NULL_HANDLE };
+		ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
+
+		VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
+		createInfo.pNext = nullptr;
+		createInfo.flags = 0;
+		createInfo.stage = VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+		createInfo.pName = "main";
+		createInfo.module = module;
+		createInfo.pSpecializationInfo = nullptr;
+
+		shaderStages.push_back(createInfo);
+	}
+
+	// Domain shader
+	if(m_domainShader)
+	{
+		VkShaderModuleCreateInfo moduleCreateInfo{ VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
+		moduleCreateInfo.pNext = nullptr;
+		moduleCreateInfo.flags = 0;
+		moduleCreateInfo.codeSize = m_domainShader.size;
+		moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_domainShader.binary);
+
+		VkShaderModule module{ VK_NULL_HANDLE };
+		ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
+
+		VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
+		createInfo.pNext = nullptr;
+		createInfo.flags = 0;
+		createInfo.stage = VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+		createInfo.pName = "main";
+		createInfo.module = module;
+		createInfo.pSpecializationInfo = nullptr;
+
+		shaderStages.push_back(createInfo);
+	}
+
+	// Geometry shader
+	if (m_geometryShader)
+	{
+		VkShaderModuleCreateInfo moduleCreateInfo{ VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
+		moduleCreateInfo.pNext = nullptr;
+		moduleCreateInfo.flags = 0;
+		moduleCreateInfo.codeSize = m_geometryShader.size;
+		moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_geometryShader.binary);
+
+		VkShaderModule module{ VK_NULL_HANDLE };
+		ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
+
+		VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
+		createInfo.pNext = nullptr;
+		createInfo.flags = 0;
+		createInfo.stage = VK_SHADER_STAGE_GEOMETRY_BIT;
+		createInfo.pName = "main";
+		createInfo.module = module;
+		createInfo.pSpecializationInfo = nullptr;
+
+		shaderStages.push_back(createInfo);
+	}
+
 	VkGraphicsPipelineCreateInfo createInfo{ VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO };
 	createInfo.pNext = nullptr;
 	createInfo.flags = 0;
-	createInfo.stageCount = static_cast<uint32_t>(m_shaderStages.size());
-	createInfo.pStages = m_shaderStages.empty() ? nullptr : m_shaderStages.data();
+	createInfo.stageCount = static_cast<uint32_t>(shaderStages.size());
+	createInfo.pStages = shaderStages.empty() ? nullptr : shaderStages.data();
 	createInfo.pVertexInputState = &m_vertexInputInfo;
 	createInfo.pInputAssemblyState = &m_inputAssemblyInfo;
 	createInfo.pTessellationState = &m_tessellationInfo;
@@ -536,11 +558,11 @@ void GraphicsPSO::Finalize()
 	}
 
 	// Clean up shader modules
-	for (auto& shaderStage : m_shaderStages)
+	/*for (auto& shaderStage : m_shaderStages)
 	{
 		vkDestroyShaderModule(GetDevice(), shaderStage.module, nullptr);
 	}
-	m_shaderStages.clear();
+	m_shaderStages.clear();*/
 }
 
 

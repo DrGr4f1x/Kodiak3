@@ -13,6 +13,7 @@ struct VSOutput
 	float3 color : COLOR;
 };
 
+[[vk::binding(0)]]
 cbuffer VSConstants : register(b0)
 {
 	float4x4 projectionMatrix;

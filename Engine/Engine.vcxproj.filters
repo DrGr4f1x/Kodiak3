@@ -215,14 +215,17 @@
     <ClInclude Include="dds.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="DX12\KTXTextureLoader12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="DX12\DynamicDescriptorHeap12.h">
       <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\DDSTextureLoaderVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="KTXTextureLoader.h">
+      <Filter>Graphics\Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -356,14 +359,17 @@
     <ClCompile Include="DX12\DDSTextureLoader12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="DX12\KTXTextureLoader12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="DX12\DynamicDescriptorHeap12.cpp">
       <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\DDSTextureLoaderVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="KTXTextureLoader.cpp">
+      <Filter>Graphics\Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -378,6 +384,9 @@
     </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{6e4055e6-3c38-4e3f-b669-c035ab609ab7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Resources">
+      <UniqueIdentifier>{df89c8a2-9a4f-44e2-8031-febe351dfa20}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

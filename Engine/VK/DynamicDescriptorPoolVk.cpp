@@ -12,6 +12,7 @@
 
 #include "DynamicDescriptorPoolVk.h"
 
+#include "CommandContextVk.h"
 #include "CommandListManagerVk.h"
 #include "GraphicsDeviceVk.h"
 #include "RootSignatureVk.h"
@@ -87,6 +88,23 @@ VkDescriptorPool DynamicDescriptorPool::GetDescriptorPool()
 		m_currentPool = RequestDescriptorPool();
 	}
 	return m_currentPool;
+}
+
+
+void DynamicDescriptorPool::BindImmutableSamplers(VkPipelineBindPoint bindPoint, const RootSignature& rootSig)
+{
+	if (rootSig.m_staticSamplerSet != VK_NULL_HANDLE)
+	{
+		vkCmdBindDescriptorSets(
+			m_owningContext.m_commandList,
+			bindPoint,
+			m_pipelineLayout,
+			rootSig.m_staticSamplerSetIndex,
+			1,
+			&rootSig.m_staticSamplerSet,
+			0,
+			nullptr);
+	}
 }
 
 
@@ -219,7 +237,7 @@ void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& 
 					writeDescriptorSet.pBufferInfo = rangeDesc.bufferHandleStart + rangeIndex;
 					break;
 				case DescriptorType::TextureSRV:
-					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 					writeDescriptorSet.pImageInfo = rangeDesc.imageHandleStart + rangeIndex;
 					break;
 				case DescriptorType::BufferUAV:
@@ -371,21 +389,7 @@ void DynamicDescriptorPool::DescriptorHandleCache::ParseRootSignature(const Root
 	uint32_t currentBufferOffset = 0;
 	uint32_t currentTexelBufferOffset = 0;
 
-	// TODO - this is fake
-
-	m_assignedDescriptorSetBitMap |= 1;
-	m_descriptorLayouts[0] = rootSig[0].GetLayout();
-
-	DescriptorSetCache& descriptorSet = m_descriptorSetCache[0];
-	descriptorSet.rangeCount = 1;
-	descriptorSet.ranges[0].type = DescriptorType::CBV;
-	descriptorSet.ranges[0].rangeSize = 1;
-	descriptorSet.ranges[0].offset = 0;
-	descriptorSet.ranges[0].bufferHandleStart = &m_bufferDescriptors[0] + currentBufferOffset;
-	currentBufferOffset++;
-
-#if 0
-	auto numParameters = rootSig.GetNumParameters();
+	auto numParameters = rootSig.m_numParameters;
 	assert(numParameters <= kMaxDescriptorSets);
 
 	for (uint32_t rootIndex = 0; rootIndex < numParameters; ++rootIndex)
@@ -473,7 +477,6 @@ void DynamicDescriptorPool::DescriptorHandleCache::ParseRootSignature(const Root
 			break;
 		}
 	}
-#endif
 
 	maxCachedImageDescriptors = currentImageOffset;
 	assert_msg(maxCachedImageDescriptors <= kMaxDescriptors, "Exceeded user-supplied maximum image cache size");

@@ -11,9 +11,12 @@
 #pragma once
 
 #include "Color.h"
+#include "ColorBufferVk.h"
+#include "DepthBufferVk.h"
 #include "DynamicDescriptorPoolVk.h"
 #include "FramebufferVk.h"
 #include "GpuBufferVk.h"
+#include "TextureVk.h"
 
 namespace Kodiak
 {
@@ -46,6 +49,7 @@ private:
 class CommandContext : NonCopyable
 {
 	friend class ContextManager;
+	friend class DynamicDescriptorPool;
 
 public:
 	~CommandContext();
@@ -70,11 +74,19 @@ public:
 		return reinterpret_cast<ComputeContext&>(*this);
 	}
 
+	static void InitializeTexture(Texture& dest, const void* initialData, size_t numBytes);
 	static void InitializeBuffer(GpuBuffer& dest, const void* initialData, size_t numBytes, bool useOffset = false, size_t offset = 0);
+
+	void TransitionResource(Texture& texture, ResourceState newState, bool flushImmediate = false);
+	inline void FlushImageBarriers();
 
 protected:
 	CommandListType m_type;
 	VkCommandBuffer m_commandList{ VK_NULL_HANDLE };
+
+	// Image barriers
+	VkImageMemoryBarrier m_pendingImageBarriers[16];
+	uint8_t m_numImageBarriersToFlush{ 0 };
 
 	// Current pipeline layouts
 	VkPipelineLayout m_curGraphicsPipelineLayout{ VK_NULL_HANDLE };
@@ -90,6 +102,24 @@ private:
 
 	void Reset();
 };
+
+
+inline void CommandContext::FlushImageBarriers()
+{
+	if (m_numImageBarriersToFlush > 0)
+	{
+		vkCmdPipelineBarrier(
+			m_commandList,
+			VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+			VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+			0,
+			0, nullptr,
+			0, nullptr,
+			m_numImageBarriersToFlush, m_pendingImageBarriers);
+
+		m_numImageBarriersToFlush = 0;
+	}
+}
 
 
 class GraphicsContext : public CommandContext
@@ -113,12 +143,21 @@ public:
 
 	void SetPipelineState(const GraphicsPSO& PSO);
 	void SetRootConstantBuffer(uint32_t rootIndex, ConstantBuffer& constantBuffer);
+	void SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
+	//void SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer);
 
-	void SetIndexBuffer(IndexBuffer& indexBuffer);
-	void SetVertexBuffer(uint32_t slot, VertexBuffer& vertexBuffer);
+	void SetIndexBuffer(const IndexBuffer& indexBuffer);
+	void SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer);
 	void SetVertexBuffers(uint32_t startSlot, uint32_t count, VertexBuffer vertexBuffers[]);
 
+	void Draw(uint32_t vertexCount, uint32_t vertexStartOffset = 0);
 	void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation = 0, int32_t baseVertexLocation = 0);
+	void DrawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount,
+		uint32_t startVertexLocation = 0, uint32_t startInstanceLocation = 0);
+	void DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation,
+		int32_t baseVertexLocation, uint32_t startInstanceLocation);
 };
 
 
@@ -128,13 +167,43 @@ inline void GraphicsContext::EndRenderPass()
 }
 
 
-inline void GraphicsContext::SetIndexBuffer(IndexBuffer& indexBuffer)
+inline void GraphicsContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer)
+{
+	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &constantBuffer.GetCBV());
+}
+
+
+inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture)
+{
+	VkDescriptorImageInfo descriptorInfo = {};
+	descriptorInfo.imageView = texture.GetSRV();
+	descriptorInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
+}
+
+
+inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
+{
+	VkDescriptorImageInfo descriptorInfo = {};
+	descriptorInfo.imageView = colorBuffer.GetSRV();
+	descriptorInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
+}
+
+
+//inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer)
+//{
+//	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &depthBuffer.GetDepthSRV());
+//}
+
+
+inline void GraphicsContext::SetIndexBuffer(const IndexBuffer& indexBuffer)
 {
 	vkCmdBindIndexBuffer(m_commandList, indexBuffer.GetBuffer(), 0, indexBuffer.GetIndexType());
 }
 
 
-inline void GraphicsContext::SetVertexBuffer(uint32_t slot, VertexBuffer& vertexBuffer)
+inline void GraphicsContext::SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer)
 {
 	VkDeviceSize offsets[1] = { 0 };
 	VkBuffer buffers[1] = { vertexBuffer.GetBuffer() };
@@ -155,10 +224,33 @@ inline void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count
 }
 
 
+inline void GraphicsContext::Draw(UINT VertexCount, UINT VertexStartOffset)
+{
+	DrawInstanced(VertexCount, 1, VertexStartOffset, 0);
+}
+
+
 inline void GraphicsContext::DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation, int32_t baseVertexLocation)
 {
+	DrawIndexedInstanced(indexCount, 1, startIndexLocation, baseVertexLocation, 0);
+}
+
+
+inline void GraphicsContext::DrawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount,
+	uint32_t startVertexLocation, uint32_t startInstanceLocation)
+{
+	FlushImageBarriers();
 	m_dynamicDescriptorPool.CommitGraphicsRootDescriptorSets(m_commandList);
-	vkCmdDrawIndexed(m_commandList, indexCount, 1, startIndexLocation, baseVertexLocation, 0);
+	vkCmdDraw(m_commandList, vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
+}
+
+
+inline void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation,
+	int32_t baseVertexLocation, uint32_t startInstanceLocation)
+{
+	FlushImageBarriers();
+	m_dynamicDescriptorPool.CommitGraphicsRootDescriptorSets(m_commandList);
+	vkCmdDrawIndexed(m_commandList, indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
 }
 
 } // namespace Kodiak

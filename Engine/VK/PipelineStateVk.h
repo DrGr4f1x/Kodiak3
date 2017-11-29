@@ -100,6 +100,11 @@ struct ShaderBytecode
 {
 	const byte* binary;
 	size_t size;
+
+	operator bool() const
+	{
+		return binary != nullptr && size > 0;
+	}
 };
 
 
@@ -182,7 +187,6 @@ private:
 	ShaderBytecode m_hullShader{ nullptr, 0 };
 	ShaderBytecode m_domainShader{ nullptr, 0 };
 	ShaderBytecode m_geometryShader{ nullptr, 0 };
-	std::vector<VkPipelineShaderStageCreateInfo> m_shaderStages;
 
 	// Dynamic states
 	std::vector<VkDynamicState> m_dynamicStates;

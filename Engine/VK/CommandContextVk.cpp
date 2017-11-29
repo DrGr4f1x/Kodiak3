@@ -25,6 +25,9 @@ using namespace std;
 
 ContextManager g_contextManager;
 
+static const ResourceState VALID_COMPUTE_QUEUE_RESOURCE_STATES =
+ResourceState::NonPixelShaderResource | ResourceState::UnorderedAccess | ResourceState::CopyDest | ResourceState::CopySource;
+
 
 CommandContext* ContextManager::AllocateContext(CommandListType type)
 {
@@ -127,7 +130,7 @@ void CommandContext::Finish(bool waitForCompletion)
 {
 	assert(m_type == CommandListType::Direct || m_type == CommandListType::Compute);
 
-	//FlushImageBarriers();
+	FlushImageBarriers();
 	//FlushBufferBarriers();
 
 	// TODO
@@ -170,33 +173,101 @@ void CommandContext::Initialize()
 }
 
 
-void CommandContext::InitializeBuffer(GpuBuffer& dest, const void* initialData, size_t numBytes, bool useOffset, size_t offset)
+void CommandContext::InitializeTexture(Texture& dest, const void* initialData, size_t numBytes)
 {
+	auto device = GetDevice();
+
 	VkBufferCreateInfo stagingBufferInfo = {};
 	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	stagingBufferInfo.size = numBytes;
 	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+	stagingBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	VkBuffer stagingBuffer{ VK_NULL_HANDLE };
 	ThrowIfFailed(vkCreateBuffer(GetDevice(), &stagingBufferInfo, nullptr, &stagingBuffer));
 
 	VkMemoryRequirements memReqs;
-	vkGetBufferMemoryRequirements(GetDevice(), stagingBuffer, &memReqs);
+	vkGetBufferMemoryRequirements(device, stagingBuffer, &memReqs);
 
-	VkMemoryAllocateInfo memAlloc = {};
-	memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	VkMemoryAllocateInfo memAllocInfo = {};
+	memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	memAllocInfo.allocationSize = memReqs.size;
+	memAllocInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	void* data = nullptr;
 
 	// Copy to staging buffer with Map/Unmap
 	VkDeviceMemory stagingBufferMemory{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &stagingBufferMemory));
-	ThrowIfFailed(vkMapMemory(GetDevice(), stagingBufferMemory, 0, numBytes, 0, &data));
+	ThrowIfFailed(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingBufferMemory));
+	ThrowIfFailed(vkMapMemory(device, stagingBufferMemory, 0, numBytes, 0, &data));
 	memcpy(data, initialData, numBytes);
-	vkUnmapMemory(GetDevice(), stagingBufferMemory);
-	ThrowIfFailed(vkBindBufferMemory(GetDevice(), stagingBuffer, stagingBufferMemory, 0));
+	vkUnmapMemory(device, stagingBufferMemory);
+	ThrowIfFailed(vkBindBufferMemory(device, stagingBuffer, stagingBufferMemory, 0));
+
+	// Upload to GPU
+	CommandContext& context = CommandContext::Begin();
+
+	context.TransitionResource(dest, ResourceState::CopyDest, true);
+
+	// Copy single mip level from staging buffer to destination texture
+	VkBufferImageCopy bufferCopyRegion = {};
+	bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	bufferCopyRegion.imageSubresource.mipLevel = 0;
+	bufferCopyRegion.imageSubresource.baseArrayLayer = 0;
+	bufferCopyRegion.imageSubresource.layerCount = 1;
+	bufferCopyRegion.imageExtent.width = dest.GetWidth();
+	bufferCopyRegion.imageExtent.height = dest.GetHeight();
+	bufferCopyRegion.imageExtent.depth = 1;
+	bufferCopyRegion.bufferOffset = 0;
+
+	vkCmdCopyBufferToImage(
+		context.m_commandList,
+		stagingBuffer,
+		dest.m_image,
+		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		1,
+		&bufferCopyRegion);
+
+	context.TransitionResource(dest, ResourceState::GenericRead);
+
+	context.Finish(true);
+
+	// Destroy staging buffer and memory
+	vkDestroyBuffer(device, stagingBuffer, nullptr);
+	vkFreeMemory(device, stagingBufferMemory, nullptr);
+}
+
+
+void CommandContext::InitializeBuffer(GpuBuffer& dest, const void* initialData, size_t numBytes, bool useOffset, size_t offset)
+{
+	auto device = GetDevice();
+
+	VkBufferCreateInfo stagingBufferInfo = {};
+	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	stagingBufferInfo.size = numBytes;
+	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+	stagingBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	VkBuffer stagingBuffer{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkCreateBuffer(device, &stagingBufferInfo, nullptr, &stagingBuffer));
+
+	VkMemoryRequirements memReqs;
+	vkGetBufferMemoryRequirements(device, stagingBuffer, &memReqs);
+
+	VkMemoryAllocateInfo memAllocInfo = {};
+	memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	memAllocInfo.allocationSize = memReqs.size;
+	memAllocInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+	void* data = nullptr;
+
+	// Copy to staging buffer with Map/Unmap
+	VkDeviceMemory stagingBufferMemory{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingBufferMemory));
+	ThrowIfFailed(vkMapMemory(device, stagingBufferMemory, 0, numBytes, 0, &data));
+	memcpy(data, initialData, numBytes);
+	vkUnmapMemory(device, stagingBufferMemory);
+	ThrowIfFailed(vkBindBufferMemory(device, stagingBuffer, stagingBufferMemory, 0));
 
 	// Upload to GPU
 	CommandContext& context = CommandContext::Begin();
@@ -209,8 +280,113 @@ void CommandContext::InitializeBuffer(GpuBuffer& dest, const void* initialData, 
 	context.Finish(true);
 
 	// Destroy staging buffer and memory
-	vkDestroyBuffer(GetDevice(), stagingBuffer, nullptr);
-	vkFreeMemory(GetDevice(), stagingBufferMemory, nullptr);
+	vkDestroyBuffer(device, stagingBuffer, nullptr);
+	vkFreeMemory(device, stagingBufferMemory, nullptr);
+}
+
+
+void CommandContext::TransitionResource(Texture& texture, ResourceState newState, bool flushImmediate)
+{
+	assert_msg(newState != ResourceState::Undefined, "Can\'t transition to Undefined resource state");
+
+	ResourceState oldState = texture.m_usageState;
+
+	if (m_type == CommandListType::Compute)
+	{
+		assert((oldState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == oldState);
+		assert((newState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == newState);
+	}
+
+	if (oldState != newState)
+	{
+		assert_msg(m_numImageBarriersToFlush < 16, "Exceeded arbitrary limit on buffered image barriers");
+		VkImageMemoryBarrier& barrierDesc = m_pendingImageBarriers[m_numImageBarriersToFlush++];
+
+		barrierDesc.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		barrierDesc.pNext = nullptr;
+
+		barrierDesc.image = texture.m_image;
+
+		// Setup access flags and layout 
+		barrierDesc.srcAccessMask = texture.m_accessFlags;
+		barrierDesc.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+		switch (barrierDesc.oldLayout)
+		{
+		case VK_IMAGE_LAYOUT_UNDEFINED:
+			// Only valid as initial layout, memory contents are not preserved
+			// Can be accessed directly, no source dependency required
+			barrierDesc.srcAccessMask = 0;
+			break;
+		case VK_IMAGE_LAYOUT_PREINITIALIZED:
+			// Only valid as initial layout for linear images, preserves memory contents
+			// Make sure host writes to the image have been finished
+			barrierDesc.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+			break;
+		case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+			// Old layout is transfer destination
+			// Make sure any writes to the image have been finished
+			barrierDesc.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			break;
+		}
+
+		switch (newState)
+		{
+		case ResourceState::Clear:
+			barrierDesc.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			barrierDesc.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			break;
+		case ResourceState::RenderTarget:
+			barrierDesc.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			barrierDesc.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			break;
+		case ResourceState::PixelShaderResource:
+		case ResourceState::NonPixelShaderResource:
+		case ResourceState::GenericRead:
+			// Shader read (sampler, input attachment)
+			barrierDesc.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			barrierDesc.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			break;
+		case ResourceState::Present:
+			barrierDesc.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+			barrierDesc.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+			break;
+		case ResourceState::CopyDest:
+			barrierDesc.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			barrierDesc.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			break;
+		default:
+			assert(false);
+			break;
+		}
+
+		barrierDesc.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		barrierDesc.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+		// TODO this likely isn't correct
+		barrierDesc.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		barrierDesc.subresourceRange.baseMipLevel = 0;
+		barrierDesc.subresourceRange.levelCount = 1;
+		barrierDesc.subresourceRange.baseArrayLayer = 0;
+		barrierDesc.subresourceRange.layerCount = 1;
+
+		texture.m_layout = barrierDesc.newLayout;
+		texture.m_accessFlags = barrierDesc.dstAccessMask;
+		texture.m_usageState = newState;
+	}
+	else if (newState == ResourceState::UnorderedAccess)
+	{
+		// TODO
+		assert(false);
+#if 0
+		InsertUAVBarrier(Resource, FlushImmediate);
+#endif
+	}
+
+	if (flushImmediate || m_numImageBarriersToFlush == 16)
+	{
+		FlushImageBarriers();
+	}
 }
 
 

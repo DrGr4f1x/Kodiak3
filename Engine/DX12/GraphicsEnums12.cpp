@@ -25,6 +25,14 @@ const float Defaults::DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
 const byte Defaults::StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
 const byte Defaults::StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
 const float Defaults::Float32Max = D3D12_FLOAT32_MAX;
+
+const uint32_t Limits::MaxTextureDimension1D = D3D12_REQ_TEXTURE1D_U_DIMENSION;
+const uint32_t Limits::MaxTextureDimension2D = D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION;
+const uint32_t Limits::MaxTextureDimension3D = D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION;
+const uint32_t Limits::MaxTextureDimensionCube = D3D12_REQ_TEXTURECUBE_DIMENSION;
+const uint32_t Limits::MaxTexture1DArrayElements = D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION;
+const uint32_t Limits::MaxTexture2DArrayElements = D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION;
+const uint32_t Limits::MaxTextureMipLevels = D3D12_REQ_MIP_LEVELS;
 } // namespace Kodiak
 
 

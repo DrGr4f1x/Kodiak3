@@ -192,6 +192,12 @@ void GraphicsDevice::SubmitFrame()
 }
 
 
+void GraphicsDevice::WaitForGpuIdle()
+{
+	g_commandManager.IdleGPU();
+}
+
+
 void GraphicsDevice::CreateVulkanInstance()
 {
 	VkApplicationInfo appInfo = {};

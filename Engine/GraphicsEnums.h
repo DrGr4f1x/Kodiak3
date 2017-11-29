@@ -32,6 +32,18 @@ struct Defaults
 };
 
 
+struct Limits
+{
+	static const uint32_t MaxTextureDimension1D;
+	static const uint32_t MaxTextureDimension2D;
+	static const uint32_t MaxTextureDimension3D;
+	static const uint32_t MaxTextureDimensionCube;
+	static const uint32_t MaxTexture1DArrayElements;
+	static const uint32_t MaxTexture2DArrayElements;
+	static const uint32_t MaxTextureMipLevels;
+};
+
+
 inline uint32_t BitsPerPixel(Format format)
 {
 	switch (format)
@@ -102,5 +114,29 @@ inline uint32_t BitsPerPixel(Format format)
 		return 0;
 	}
 }
+
+
+inline Format MakeSRGB(Format format)
+{
+	switch (format)
+	{
+	case Format::R8G8B8A8_UNorm:
+		return Format::R8G8B8A8_UNorm_SRGB;
+	}
+
+	return format;
+}
+
+
+enum class TextureTarget
+{
+	Target1D,
+	Target1D_Array,
+	Target2D,
+	Target2D_Array,
+	TargetCube,
+	TargetCube_Array,
+	Target3D
+};
 
 } // namespace Kodiak

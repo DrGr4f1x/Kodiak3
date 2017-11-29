@@ -61,12 +61,16 @@ public:
 	{
 		m_pipelineLayout = rootSig.GetLayout();
 		m_graphicsHandleCache.ParseRootSignature(rootSig);
+
+		BindImmutableSamplers(VK_PIPELINE_BIND_POINT_GRAPHICS, rootSig);
 	}
 
 	void ParseComputeRootSignature(const RootSignature& rootSig)
 	{
 		m_pipelineLayout = rootSig.GetLayout();
 		m_computeHandleCache.ParseRootSignature(rootSig);
+
+		BindImmutableSamplers(VK_PIPELINE_BIND_POINT_GRAPHICS, rootSig);
 	}
 
 	// Upload any new descriptors in the cache to the shader-visible heap.
@@ -91,6 +95,8 @@ private:
 	void RetireUsedPools(std::shared_ptr<Fence> fence);
 
 	VkDescriptorPool GetDescriptorPool();
+
+	void BindImmutableSamplers(VkPipelineBindPoint bindPoint, const RootSignature& rootSig);
 
 	// Static methods
 	static VkDescriptorPool RequestDescriptorPool();
@@ -161,7 +167,7 @@ private:
 		void StageDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkDescriptorBufferInfo handles[]);
 		void StageDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkBufferView handles[]);
 
-		static const uint32_t kMaxNumDescriptorSets = 16;
+		static const uint32_t kMaxNumDescriptorSets = 8;
 		static const uint32_t kMaxDescriptors = 256;
 		uint32_t m_assignedDescriptorSetBitMap{ 0 };
 		uint32_t m_staleDescriptorSetBitMap{ 0 };
