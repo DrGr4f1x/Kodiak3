@@ -178,7 +178,7 @@ void DynamicDescriptorPool::DiscardDescriptorPools(std::shared_ptr<Fence> fence,
 void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& handleCache, VkCommandBuffer cmdBuffer, bool isCompute)
 {
 	std::vector<VkDescriptorSet> descriptorSets;
-	descriptorSets.reserve(16);
+	descriptorSets.reserve(8);
 
 	auto device = GetDevice();
 
@@ -234,15 +234,15 @@ void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& 
 				{
 				case DescriptorType::CBV:
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-					writeDescriptorSet.pBufferInfo = rangeDesc.bufferHandleStart + rangeIndex;
+					writeDescriptorSet.pBufferInfo = rangeDesc.bufferHandleStart + rangeDesc.offset;
 					break;
 				case DescriptorType::TextureSRV:
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-					writeDescriptorSet.pImageInfo = rangeDesc.imageHandleStart + rangeIndex;
+					writeDescriptorSet.pImageInfo = rangeDesc.imageHandleStart + rangeDesc.offset;
 					break;
 				case DescriptorType::BufferUAV:
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
-					writeDescriptorSet.pTexelBufferView = rangeDesc.texelBufferHandleStart + rangeIndex;
+					writeDescriptorSet.pTexelBufferView = rangeDesc.texelBufferHandleStart + rangeDesc.offset;
 					break;
 				}
 
@@ -406,6 +406,10 @@ void DynamicDescriptorPool::DescriptorHandleCache::ParseRootSignature(const Root
 
 		// Fill out info about this descriptor set
 		DescriptorSetCache& descriptorSet = m_descriptorSetCache[rootIndex];
+
+		descriptorSet.assignedBufferHandlesBitMap = 0;
+		descriptorSet.assignedImageHandlesBitMap = 0;
+		descriptorSet.assignedTexelBufferHandlesBitMap = 0;
 
 		switch (type)
 		{
