@@ -189,7 +189,7 @@ void RadialBlurApp::InitPSOs()
 	m_radialBlurPSO.SetRootSignature(m_radialBlurRootSig);
 	m_radialBlurPSO.SetRenderPass(m_renderPass);
 	m_radialBlurPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
-	m_radialBlurPSO.SetBlendState(CommonStates::BlendTraditionalAdditive());
+	m_radialBlurPSO.SetBlendState(CommonStates::BlendAdditive());
 	m_radialBlurPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 	m_radialBlurPSO.SetRasterizerState(CommonStates::RasterizerTwoSided());
 	m_radialBlurPSO.SetVertexShader(Shader::Load("RadialBlurVS"));

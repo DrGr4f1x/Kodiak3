@@ -1,13 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
     <ClCompile Include="Stdafx.cpp" />
     <ClCompile Include="RadialBlurApp.cpp" />
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
       <UniqueIdentifier>{54e70bbf-8e53-4b23-a824-ce91d562ce48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\HLSL">
+      <UniqueIdentifier>{8e4af89b-a327-4ea4-97b4-f0b939f66594}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\GLSL">
+      <UniqueIdentifier>{6886f360-1560-423d-aab9-c5bdc13f8bda}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -15,23 +21,43 @@
     <ClInclude Include="RadialBlurApp.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\PhongPassVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\PhongPassPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\ColorPassVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\ColorPassPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\RadialBlurVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\RadialBlurPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
+    <CustomBuild Include="Shaders\ColorPassPS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\PhongPassPS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ColorPassVS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\PhongPassVS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\RadialBlurPS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\RadialBlurVS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\RadialBlurVS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\RadialBlurPS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\PhongPassVS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </None>
+    <None Include="Shaders\PhongPassPS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </None>
+    <None Include="Shaders\ColorPassVS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </None>
+    <None Include="Shaders\ColorPassPS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </None>
   </ItemGroup>
 </Project>
