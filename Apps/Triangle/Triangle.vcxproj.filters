@@ -13,13 +13,27 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{ab9cb6f4-a653-4a16-b692-31e976a44e9e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\HLSL">
+      <UniqueIdentifier>{ae5ee4f1-587e-4de6-b4bc-d6c9a9d4dffe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\GLSL">
+      <UniqueIdentifier>{57c40999-af93-425a-8988-752a547eb7c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\TriangleVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\TrianglePS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
+    <CustomBuild Include="Shaders\TriangleVS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\TrianglePS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\TriangleVS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </None>
+    <None Include="Shaders\TrianglePS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </None>
   </ItemGroup>
 </Project>
