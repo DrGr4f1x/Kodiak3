@@ -10,6 +10,11 @@
 
 #pragma once
 
+#include "DepthBuffer.h"
+#include "Framebuffer.h"
+#include "RenderPass.h"
+
+
 namespace Kodiak
 {
 
@@ -64,10 +69,16 @@ protected:
 
 	std::unique_ptr<GraphicsDevice> m_graphicsDevice;
 
+	std::vector<Kodiak::FrameBufferPtr> m_framebuffers;
+	Kodiak::DepthBufferPtr	m_depthBuffer;
+	Kodiak::RenderPass		m_renderPass;
+
 private:
 	void Initialize();
 	void Finalize();
 	bool Tick();
+
+	void InitFramebuffer();
 
 	void CreateConsole(const std::string& title);
 };

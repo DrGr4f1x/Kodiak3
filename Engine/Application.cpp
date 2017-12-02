@@ -13,6 +13,7 @@
 #include "Application.h"
 
 #include "GraphicsDevice.h"
+#include "SwapChain.h"
 
 
 #pragma comment(lib, "runtimeobject.lib")
@@ -129,6 +130,8 @@ void Application::Initialize()
 	m_graphicsDevice = make_unique<GraphicsDevice>();
 	m_graphicsDevice->Initialize(m_name, m_hinst, m_hwnd, m_displayWidth, m_displayHeight);
 
+	InitFramebuffer();
+
 	Startup();
 }
 
@@ -136,6 +139,10 @@ void Application::Initialize()
 void Application::Finalize()
 {
 	Shutdown();
+
+	m_framebuffers.clear();
+	m_depthBuffer.reset();
+	m_renderPass.Destroy();
 
 	m_graphicsDevice->Destroy();
 	m_graphicsDevice.reset();
@@ -172,6 +179,30 @@ bool Application::Tick()
 	}
 
 	return res;
+}
+
+
+void Application::InitFramebuffer()
+{
+	auto swapChain = m_graphicsDevice->GetSwapChain();
+	auto colorFormat = swapChain->GetColorFormat();
+	auto depthFormat = m_graphicsDevice->GetDepthFormat();
+	m_renderPass.AddColorAttachment(colorFormat, ResourceState::Undefined, ResourceState::Present);
+	m_renderPass.AddDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
+	m_renderPass.Finalize();
+
+	// Depth stencil buffer for swap chain
+	m_depthBuffer = make_shared<DepthBuffer>(1.0f);
+	m_depthBuffer->Create("Depth Buffer", m_displayWidth, m_displayHeight, m_graphicsDevice->GetDepthFormat());
+
+	// Framebuffers for swap chain
+	const uint32_t imageCount = swapChain->GetImageCount();
+	m_framebuffers.resize(imageCount);
+	for (uint32_t i = 0; i < imageCount; ++i)
+	{
+		m_framebuffers[i] = make_shared<FrameBuffer>();
+		m_framebuffers[i]->Create(swapChain->GetColorBuffer(i), m_depthBuffer, m_renderPass);
+	}
 }
 
 

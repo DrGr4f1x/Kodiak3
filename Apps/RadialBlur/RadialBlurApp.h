@@ -11,8 +11,6 @@
 #pragma once
 
 #include "Application.h"
-#include "DepthBuffer.h"
-#include "Framebuffer.h"
 #include "GpuBuffer.h"
 #include "Model.h"
 #include "PipelineState.h"
@@ -69,12 +67,9 @@ private:
 
 	static const uint32_t	s_offscreenSize{ 512 };
 
-	Kodiak::RenderPass		m_renderPass;
 	Kodiak::RenderPass		m_offscreenRenderPass;
 
-	Kodiak::DepthBufferPtr	m_depthBuffer;
 	Kodiak::FrameBufferPtr	m_offscreenFramebuffer;
-	std::vector<Kodiak::FrameBufferPtr> m_framebuffers;
 
 	Kodiak::RootSignature	m_radialBlurRootSig;
 	Kodiak::RootSignature	m_sceneRootSig;

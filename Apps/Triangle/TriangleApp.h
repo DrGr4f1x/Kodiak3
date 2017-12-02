@@ -11,8 +11,6 @@
 #pragma once
 
 #include "Application.h"
-#include "DepthBuffer.h"
-#include "Framebuffer.h"
 #include "GpuBuffer.h"
 #include "PipelineState.h"
 #include "RenderPass.h"
@@ -61,12 +59,6 @@ private:
 
 	// Camera controls
 	float m_zoom{ -2.5f };
-
-	Kodiak::DepthBufferPtr	m_depthBuffer;
-
-	Kodiak::RenderPass		m_renderPass;
-
-	std::vector<Kodiak::FrameBufferPtr> m_framebuffers;
 
 	Kodiak::RootSignature	m_rootSig;
 	Kodiak::GraphicsPSO		m_pso;

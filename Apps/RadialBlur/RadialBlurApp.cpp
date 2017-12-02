@@ -59,7 +59,6 @@ void RadialBlurApp::Shutdown()
 	m_offscreenRenderPass.Destroy();
 
 	m_offscreenFramebuffer.reset();
-	m_framebuffers.clear();
 
 	m_sceneConstantBuffer.Destroy();
 
@@ -154,10 +153,7 @@ void RadialBlurApp::InitRenderPasses()
 
 	auto colorFormat = swapChain->GetColorFormat();
 	auto depthFormat = m_graphicsDevice->GetDepthFormat();
-	m_renderPass.AddColorAttachment(colorFormat, ResourceState::Undefined, ResourceState::Present);
-	m_renderPass.AddDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
-	m_renderPass.Finalize();
-
+	
 	colorFormat = Format::R8G8B8A8_UNorm;
 	m_offscreenRenderPass.AddColorAttachment(colorFormat, ResourceState::Undefined, ResourceState::PixelShaderResource);
 	m_offscreenRenderPass.AddDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
@@ -237,21 +233,6 @@ void RadialBlurApp::InitFramebuffers()
 
 		m_offscreenFramebuffer = make_shared<FrameBuffer>();
 		m_offscreenFramebuffer->Create(colorBuffer, depthBuffer, m_offscreenRenderPass);
-	}
-
-	// Depth stencil buffer for swap chain
-	m_depthBuffer = make_shared<DepthBuffer>(1.0f);
-	m_depthBuffer->Create("Depth Buffer", m_displayWidth, m_displayHeight, m_graphicsDevice->GetDepthFormat());
-
-	// Framebuffers for swap chain
-	auto swapChain = m_graphicsDevice->GetSwapChain();
-
-	const uint32_t imageCount = swapChain->GetImageCount();
-	m_framebuffers.resize(imageCount);
-	for (uint32_t i = 0; i < imageCount; ++i)
-	{
-		m_framebuffers[i] = make_shared<FrameBuffer>();
-		m_framebuffers[i]->Create(swapChain->GetColorBuffer(i), m_depthBuffer, m_renderPass);
 	}
 }
 

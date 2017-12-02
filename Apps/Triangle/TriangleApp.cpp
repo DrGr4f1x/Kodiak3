@@ -55,28 +55,6 @@ void TriangleApp::Startup()
 
 	UpdateConstantBuffer();
 
-	auto swapChain = m_graphicsDevice->GetSwapChain();
-
-	// Setup render pass
-	auto colorFormat = swapChain->GetColorFormat();
-	auto depthFormat = m_graphicsDevice->GetDepthFormat();
-	m_renderPass.AddColorAttachment(colorFormat, ResourceState::Undefined, ResourceState::Present);
-	m_renderPass.AddDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
-	m_renderPass.Finalize();
-
-	// Depth stencil buffer
-	m_depthBuffer = make_shared<DepthBuffer>(1.0f);
-	m_depthBuffer->Create("Depth Buffer", m_displayWidth, m_displayHeight, m_graphicsDevice->GetDepthFormat());
-
-	// Framebuffers
-	const uint32_t imageCount = swapChain->GetImageCount();
-	m_framebuffers.resize(imageCount);
-	for (uint32_t i = 0; i < imageCount; ++i)
-	{
-		m_framebuffers[i] = make_shared<FrameBuffer>();
-		m_framebuffers[i]->Create(swapChain->GetColorBuffer(i), m_depthBuffer, m_renderPass);
-	}
-
 	InitRootSig();
 	InitPSO();
 }
@@ -87,11 +65,7 @@ void TriangleApp::Shutdown()
 	m_vertexBuffer.Destroy();
 	m_indexBuffer.Destroy();
 	m_constantBuffer.Destroy();
-	m_depthBuffer.reset();
-	m_renderPass.Destroy();
 	m_rootSig.Destroy();
-
-	m_framebuffers.clear();
 }
 
 
