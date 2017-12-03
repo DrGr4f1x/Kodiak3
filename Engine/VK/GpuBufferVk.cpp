@@ -116,3 +116,17 @@ void ConstantBuffer::Update(size_t sizeInBytes, const void* data)
 	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
 	vkUnmapMemory(GetDevice(), GetResource());
 }
+
+
+void ConstantBuffer::Update(size_t sizeInBytes, size_t offset, const void* data)
+{
+	assert((sizeInBytes + offset) <= m_bufferSize);
+
+	// Map uniform buffer and update it
+	uint8_t* pData = nullptr;
+	ThrowIfFailed(vkMapMemory(GetDevice(), GetResource(), offset, sizeInBytes, 0, (void **)&pData));
+	memcpy(pData, data, sizeInBytes);
+	// Unmap after data has been copied
+	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
+	vkUnmapMemory(GetDevice(), GetResource());
+}

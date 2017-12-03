@@ -3,8 +3,37 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Stdafx.cpp" />
+    <ClCompile Include="TextureArrayApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="TextureArrayApp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{53a076da-4da2-4a51-adf8-ded6bc672a9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\GLSL">
+      <UniqueIdentifier>{c42be3ea-9acb-4bf3-8046-cba78bbed6cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\HLSL">
+      <UniqueIdentifier>{b6da3762-c9a0-4eff-bbd7-41598052ba3c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Shaders\InstancingPS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\InstancingVS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\InstancingVS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\InstancingPS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

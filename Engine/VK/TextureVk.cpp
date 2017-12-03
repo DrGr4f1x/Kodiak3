@@ -214,6 +214,74 @@ void Texture::Create2D(uint32_t pitch, uint32_t width, uint32_t height, Format f
 }
 
 
+void Texture::Create2DArray(uint32_t pitch, uint32_t width, uint32_t height, uint32_t arraySlices, Format format, const void* initData)
+{
+	assert(initData);
+
+	m_width = width;
+	m_height = height;
+	m_depthOrArraySize = arraySlices;
+	m_format = format;
+
+	auto device = GetDevice();
+
+	VkFormat vkFormat = static_cast<VkFormat>(format);
+	uint32_t size = width * height * arraySlices * BytesPerPixel(format);
+
+	// Create optimal tiled target image
+	VkImageCreateInfo imageCreateInfo = {};
+	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	imageCreateInfo.pNext = nullptr;
+	imageCreateInfo.flags = 0;
+	imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+	imageCreateInfo.format = vkFormat;
+	imageCreateInfo.mipLevels = 1;
+	imageCreateInfo.arrayLayers = arraySlices;
+	imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	imageCreateInfo.extent = { m_width, m_height, 1 };
+	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT;
+	// Ensure that the TRANSFER_DST bit is set for staging
+	if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
+	{
+		imageCreateInfo.usage |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+	}
+	ThrowIfFailed(vkCreateImage(device, &imageCreateInfo, nullptr, &m_image));
+
+	VkMemoryRequirements memReqs = {};
+	vkGetImageMemoryRequirements(device, m_image, &memReqs);
+
+	VkMemoryAllocateInfo memAllocInfo = {};
+	memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	memAllocInfo.allocationSize = memReqs.size;
+	memAllocInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+	ThrowIfFailed(vkAllocateMemory(device, &memAllocInfo, nullptr, &m_deviceMemory));
+	ThrowIfFailed(vkBindImageMemory(device, m_image, m_deviceMemory, 0));
+
+	// Upload to GPU
+	CommandContext::InitializeTexture(*this, initData, size);
+
+	// Create the image view (SRV)
+	VkImageViewCreateInfo colorImageView = {};
+	colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	colorImageView.pNext = nullptr;
+	colorImageView.flags = 0;
+	colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+	colorImageView.format = vkFormat;
+	colorImageView.subresourceRange = {};
+	colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	colorImageView.subresourceRange.baseMipLevel = 0;
+	colorImageView.subresourceRange.levelCount = 1;
+	colorImageView.subresourceRange.baseArrayLayer = 0;
+	colorImageView.subresourceRange.layerCount = arraySlices;
+	colorImageView.image = m_image;
+	ThrowIfFailed(vkCreateImageView(device, &colorImageView, nullptr, &m_imageView));
+}
+
+
 void Texture::Destroy()
 {
 	GpuResource::Destroy();

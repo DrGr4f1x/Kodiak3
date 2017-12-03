@@ -99,6 +99,7 @@ public:
 	void CreateDerivedViews() override;
 
 	void Update(size_t sizeInBytes, const void* data);
+	void Update(size_t sizeInBytes, size_t offset, const void* data);
 
 private:
 	D3D12_CPU_DESCRIPTOR_HANDLE m_cbv;

@@ -265,6 +265,11 @@ void GraphicsDevice::SelectPhysicalDevice()
 	vkGetPhysicalDeviceProperties(m_physicalDevice, &m_physicalDeviceProperties);
 	vkGetPhysicalDeviceFeatures(m_physicalDevice, &m_physicalDeviceSupportedFeatures);
 	vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &m_physicalDeviceMemoryProperties);
+
+	if (m_physicalDeviceSupportedFeatures.textureCompressionBC == VK_TRUE)
+	{
+		m_physicalDeviceEnabledFeatures.textureCompressionBC = VK_TRUE;
+	}
 }
 
 

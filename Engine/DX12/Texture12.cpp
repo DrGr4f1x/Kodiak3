@@ -76,6 +76,117 @@ shared_ptr<Texture> MakeTexture(const string& filename, F fn)
 	return manTex;
 }
 
+void GetSurfaceInfo(size_t width, size_t height, DXGI_FORMAT format, size_t& numBytes, size_t& rowBytes, size_t& numRows)
+{
+	numBytes = 0;
+	rowBytes = 0;
+	numRows = 0;
+
+	bool bc = false;
+	bool packed = false;
+	bool planar = false;
+	size_t bpe = 0;
+	switch (format)
+	{
+	case DXGI_FORMAT_BC1_TYPELESS:
+	case DXGI_FORMAT_BC1_UNORM:
+	case DXGI_FORMAT_BC1_UNORM_SRGB:
+	case DXGI_FORMAT_BC4_TYPELESS:
+	case DXGI_FORMAT_BC4_UNORM:
+	case DXGI_FORMAT_BC4_SNORM:
+		bc = true;
+		bpe = 8;
+		break;
+
+	case DXGI_FORMAT_BC2_TYPELESS:
+	case DXGI_FORMAT_BC2_UNORM:
+	case DXGI_FORMAT_BC2_UNORM_SRGB:
+	case DXGI_FORMAT_BC3_TYPELESS:
+	case DXGI_FORMAT_BC3_UNORM:
+	case DXGI_FORMAT_BC3_UNORM_SRGB:
+	case DXGI_FORMAT_BC5_TYPELESS:
+	case DXGI_FORMAT_BC5_UNORM:
+	case DXGI_FORMAT_BC5_SNORM:
+	case DXGI_FORMAT_BC6H_TYPELESS:
+	case DXGI_FORMAT_BC6H_UF16:
+	case DXGI_FORMAT_BC6H_SF16:
+	case DXGI_FORMAT_BC7_TYPELESS:
+	case DXGI_FORMAT_BC7_UNORM:
+	case DXGI_FORMAT_BC7_UNORM_SRGB:
+		bc = true;
+		bpe = 16;
+		break;
+
+	case DXGI_FORMAT_R8G8_B8G8_UNORM:
+	case DXGI_FORMAT_G8R8_G8B8_UNORM:
+	case DXGI_FORMAT_YUY2:
+		packed = true;
+		bpe = 4;
+		break;
+
+	case DXGI_FORMAT_Y210:
+	case DXGI_FORMAT_Y216:
+		packed = true;
+		bpe = 8;
+		break;
+
+	case DXGI_FORMAT_NV12:
+	case DXGI_FORMAT_420_OPAQUE:
+		planar = true;
+		bpe = 2;
+		break;
+
+	case DXGI_FORMAT_P010:
+	case DXGI_FORMAT_P016:
+		planar = true;
+		bpe = 4;
+		break;
+
+	}
+
+	if (bc)
+	{
+		size_t numBlocksWide = 0;
+		if (width > 0)
+		{
+			numBlocksWide = std::max<size_t>(1, (width + 3) / 4);
+		}
+		size_t numBlocksHigh = 0;
+		if (height > 0)
+		{
+			numBlocksHigh = std::max<size_t>(1, (height + 3) / 4);
+		}
+		rowBytes = numBlocksWide * bpe;
+		numRows = numBlocksHigh;
+		numBytes = rowBytes * numBlocksHigh;
+	}
+	else if (packed)
+	{
+		rowBytes = ((width + 1) >> 1) * bpe;
+		numRows = height;
+		numBytes = rowBytes * height;
+	}
+	else if (format == DXGI_FORMAT_NV11)
+	{
+		rowBytes = ((width + 3) >> 2) * 4;
+		numRows = height * 2; // Direct3D makes this simplifying assumption, although it is larger than the 4:1:1 data
+		numBytes = rowBytes * numRows;
+	}
+	else if (planar)
+	{
+		rowBytes = ((width + 1) >> 1) * bpe;
+		numBytes = (rowBytes * height) + ((rowBytes * height + 1) >> 1);
+		numRows = height + ((height + 1) >> 1);
+	}
+	else
+	{
+		size_t bpp = BitsPerPixel(MapDXGIFormatToEngine(format));
+		rowBytes = (width * bpp + 7) / 8; // round up to nearest byte
+		numRows = height;
+		numBytes = rowBytes * height;
+	}
+}
+
 } // anonymous namespace
 
 
@@ -194,6 +305,74 @@ void Texture::Create2D(uint32_t pitch, uint32_t width, uint32_t height, Format f
 		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 	device->CreateShaderResourceView(m_resource.Get(), nullptr, m_cpuDescriptorHandle);
+}
+
+
+void Texture::Create2DArray(uint32_t pitch, uint32_t width, uint32_t height, uint32_t arraySlices, Format format, const void* initData)
+{
+	m_width = width;
+	m_height = height;
+	m_depthOrArraySize = arraySlices;
+	m_format = format;
+
+	m_usageState = ResourceState::CopyDest;
+
+	D3D12_RESOURCE_DESC texDesc = {};
+	texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	texDesc.Width = width;
+	texDesc.Height = height;
+	texDesc.DepthOrArraySize = static_cast<UINT16>(arraySlices);
+	texDesc.MipLevels = 1;
+	texDesc.Format = static_cast<DXGI_FORMAT>(format);
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	D3D12_HEAP_PROPERTIES heapProps;
+	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProps.CreationNodeMask = 1;
+	heapProps.VisibleNodeMask = 1;
+
+	auto device = GetDevice();
+
+	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
+		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(m_resource.ReleaseAndGetAddressOf())));
+
+	m_resource->SetName(L"Texture");
+
+	unique_ptr<D3D12_SUBRESOURCE_DATA[]> subresources(new D3D12_SUBRESOURCE_DATA[arraySlices]);
+
+	size_t numBytes, rowBytes, numRows;
+	GetSurfaceInfo(width, height, texDesc.Format, numBytes, rowBytes, numRows);
+
+	const byte* initDataB = reinterpret_cast<const byte*>(initData);
+
+	for (uint32_t i = 0; i < arraySlices; ++i)
+	{
+		subresources[i].pData = initDataB;
+		subresources[i].RowPitch = rowBytes;
+		subresources[i].SlicePitch = numBytes;
+
+		initDataB += numBytes;
+	}
+
+	CommandContext::InitializeTexture(*this, arraySlices, subresources.get());
+
+	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
+	SRVDesc.Format = texDesc.Format;
+	SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	SRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
+	SRVDesc.Texture2DArray.MipLevels = (UINT)-1;
+	SRVDesc.Texture2DArray.ArraySize = m_depthOrArraySize;
+	device->CreateShaderResourceView(m_resource.Get(), &SRVDesc, m_cpuDescriptorHandle);
 }
 
 
