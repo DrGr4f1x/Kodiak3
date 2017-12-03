@@ -155,6 +155,8 @@ bool Application::Tick()
 {
 	auto timeStart = chrono::high_resolution_clock::now();
 
+	m_camera.Update();
+
 	bool res = Update();
 	if (res)
 	{

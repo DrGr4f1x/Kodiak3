@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "Camera.h"
 #include "DepthBuffer.h"
 #include "Framebuffer.h"
 #include "RenderPass.h"
@@ -63,6 +64,8 @@ protected:
 	float m_frameTimer{ 0.0f };
 	float m_timer{ 0.0f };
 	float m_timerSpeed{ 1.0f };
+
+	Math::Camera m_camera;
 
 	HINSTANCE m_hinst{ 0 };
 	HWND m_hwnd{ 0 };

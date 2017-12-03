@@ -49,6 +49,12 @@ void TextureApp::Startup()
 	vector<uint32_t> indexData = { 0,1,2, 2,3,0 };
 	m_indexBuffer.Create("Index buffer", indexData.size(), sizeof(uint32_t), indexData.data());
 
+	m_camera.SetPerspectiveMatrix(DirectX::XMConvertToRadians(60.0f),
+		(float)m_displayHeight / (float)m_displayWidth,
+		0.1f,
+		256.0f);
+	m_camera.SetPosition(Math::Vector3(0.0f, 0.0f, -m_zoom));
+
 	InitRootSig();
 	InitPSO();
 	InitConstantBuffer();
@@ -62,6 +68,8 @@ void TextureApp::Shutdown()
 	m_vertexBuffer.Destroy();
 	m_indexBuffer.Destroy();
 	m_constantBuffer.Destroy();
+
+	m_rootSig.Destroy();
 
 	m_texture.reset();
 }
@@ -159,16 +167,9 @@ void TextureApp::UpdateConstantBuffer()
 {
 	using namespace Math;
 
-	m_constants.projectionMatrix = Matrix4::MakePerspective(
-		DirectX::XMConvertToRadians(60.0f),
-		(float)m_displayWidth / (float)m_displayHeight,
-		0.1f,
-		256.0f);
-
-	Matrix4 viewMatrix = AffineTransform::MakeTranslation(Vector3(0.0f, 0.0f, m_zoom));
-
-	m_constants.modelMatrix = Matrix4(kIdentity);
-	m_constants.modelMatrix = Matrix4(AffineTransform::MakeTranslation(m_cameraPos)) * viewMatrix;
+	m_constants.projectionMatrix = m_camera.GetProjMatrix();
+	m_constants.modelMatrix = m_camera.GetViewMatrix();
+	m_constants.viewPos = m_camera.GetPosition();
 
 	m_constantBuffer.Update(sizeof(Constants), &m_constants);
 }

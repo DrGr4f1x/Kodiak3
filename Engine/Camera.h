@@ -34,7 +34,6 @@ public:
 	void SetRotation(Quaternion basisRotation);
 	void SetPosition(Vector3 worldPos);
 	void SetTransform(const AffineTransform& xform);
-	void SetTransform(const OrthogonalTransform& xform);
 
 	const Quaternion GetRotation() const { return m_cameraToWorld.GetRotation(); }
 	const Vector3 GetRightVec() const { return m_basis.GetX(); }
@@ -142,7 +141,7 @@ inline void BaseCamera::SetRotation(Quaternion basisRotation)
 }
 
 
-inline Camera::Camera() : m_reverseZ(true)
+inline Camera::Camera() : m_reverseZ(false)
 {
 	SetPerspectiveMatrix(XM_PIDIV4, 9.0f / 16.0f, 1.0f, 1000.0f);
 }
