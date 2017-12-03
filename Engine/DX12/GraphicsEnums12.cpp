@@ -99,6 +99,21 @@ Format Kodiak::MapDXGIFormatToEngine(DXGI_FORMAT format)
 		remapTable[DXGI_FORMAT_D32_FLOAT] = Format::D32_Float;
 		remapTable[DXGI_FORMAT_D32_FLOAT_S8X24_UINT] = Format::D32_Float_S8_UInt;
 
+		remapTable[DXGI_FORMAT_BC1_UNORM] = Format::BC1_UNorm;
+		remapTable[DXGI_FORMAT_BC1_UNORM_SRGB] = Format::BC1_UNorm_SRGB;
+		remapTable[DXGI_FORMAT_BC2_UNORM] = Format::BC2_UNorm;
+		remapTable[DXGI_FORMAT_BC2_UNORM_SRGB] = Format::BC2_UNorm_SRGB;
+		remapTable[DXGI_FORMAT_BC3_UNORM] = Format::BC3_UNorm;
+		remapTable[DXGI_FORMAT_BC3_UNORM_SRGB] = Format::BC3_UNorm_SRGB;
+		remapTable[DXGI_FORMAT_BC4_UNORM] = Format::BC4_UNorm;
+		remapTable[DXGI_FORMAT_BC4_SNORM] = Format::BC4_SNorm;
+		remapTable[DXGI_FORMAT_BC5_UNORM] = Format::BC5_UNorm;
+		remapTable[DXGI_FORMAT_BC5_SNORM] = Format::BC5_SNorm;
+		remapTable[DXGI_FORMAT_BC6H_SF16] = Format::BC6H_Float;
+		remapTable[DXGI_FORMAT_BC6H_UF16] = Format::BC6H_UFloat;
+		remapTable[DXGI_FORMAT_BC7_UNORM] = Format::BC7_UNorm;
+		remapTable[DXGI_FORMAT_BC7_UNORM_SRGB] = Format::BC7_UNorm_SRGB;
+
 		initialized = true;
 	}
 

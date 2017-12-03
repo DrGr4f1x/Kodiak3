@@ -110,6 +110,24 @@ inline uint32_t BitsPerPixel(Format format)
 	case Format::R8_UNorm:
 		return 8;
 
+	case Format::BC1_UNorm:
+	case Format::BC1_UNorm_SRGB:
+	case Format::BC4_UNorm:
+	case Format::BC4_SNorm:
+		return 4;
+
+	case Format::BC2_UNorm:
+	case Format::BC2_UNorm_SRGB:
+	case Format::BC3_UNorm:
+	case Format::BC3_UNorm_SRGB:
+	case Format::BC5_UNorm:
+	case Format::BC5_SNorm:
+	case Format::BC6H_Float:
+	case Format::BC6H_UFloat:
+	case Format::BC7_UNorm:
+	case Format::BC7_UNorm_SRGB:
+		return 8;
+
 	default:
 		return 0;
 	}

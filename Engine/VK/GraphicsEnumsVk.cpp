@@ -100,6 +100,21 @@ Format Kodiak::MapVulkanFormatToEngine(VkFormat format)
 		remapTable[VK_FORMAT_D32_SFLOAT] = Format::D32_Float;
 		remapTable[VK_FORMAT_D32_SFLOAT_S8_UINT] = Format::D32_Float_S8_UInt;
 
+		remapTable[VK_FORMAT_BC1_RGBA_UNORM_BLOCK] = Format::BC1_UNorm;
+		remapTable[VK_FORMAT_BC1_RGBA_SRGB_BLOCK] = Format::BC1_UNorm_SRGB;
+		remapTable[VK_FORMAT_BC2_UNORM_BLOCK] = Format::BC2_UNorm;
+		remapTable[VK_FORMAT_BC2_SRGB_BLOCK] = Format::BC2_UNorm_SRGB;
+		remapTable[VK_FORMAT_BC3_UNORM_BLOCK] = Format::BC3_UNorm;
+		remapTable[VK_FORMAT_BC3_SRGB_BLOCK] = Format::BC3_UNorm_SRGB;
+		remapTable[VK_FORMAT_BC4_UNORM_BLOCK] = Format::BC4_UNorm;
+		remapTable[VK_FORMAT_BC4_SNORM_BLOCK] = Format::BC4_SNorm;
+		remapTable[VK_FORMAT_BC5_UNORM_BLOCK] = Format::BC5_UNorm;
+		remapTable[VK_FORMAT_BC5_SNORM_BLOCK] = Format::BC5_SNorm;
+		remapTable[VK_FORMAT_BC6H_SFLOAT_BLOCK] = Format::BC6H_Float;
+		remapTable[VK_FORMAT_BC6H_UFLOAT_BLOCK] = Format::BC6H_UFloat;
+		remapTable[VK_FORMAT_BC7_UNORM_BLOCK] = Format::BC7_UNorm;
+		remapTable[VK_FORMAT_BC7_SRGB_BLOCK] = Format::BC7_UNorm_SRGB;
+
 		initialized = true;
 	}
 
