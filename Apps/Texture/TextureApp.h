@@ -12,6 +12,9 @@
 
 
 #include "Application.h"
+#include "GpuBuffer.h"
+#include "PipelineState.h"
+#include "RootSignature.h"
 #include "Texture.h"
 
 class TextureApp : public Kodiak::Application
@@ -23,13 +26,48 @@ public:
 	void Startup() final;
 	void Shutdown() final;
 
+	bool Update() final;
 	void Render() final;
 
 private:
+	void InitRootSig();
+	void InitPSO();
+	void InitConstantBuffer();
+
+	void UpdateConstantBuffer();
+
 	void LoadAssets();
 
 private:
-	
+	// Vertex layout for this example
+	struct Vertex
+	{
+		float position[3];
+		float uv[2];
+		float normal[3];
+	};
+
+	struct Constants
+	{
+		Math::Matrix4 projectionMatrix;
+		Math::Matrix4 modelMatrix;
+		Math::Vector3 viewPos;
+		float lodBias = 0.0f;
+	};
+
+	Kodiak::VertexBuffer	m_vertexBuffer;
+	Kodiak::IndexBuffer		m_indexBuffer;
+
+	Constants				m_constants;
+	Kodiak::ConstantBuffer	m_constantBuffer;
+
+	Kodiak::RootSignature	m_rootSig;
+	Kodiak::GraphicsPSO		m_pso;
+
 	// Assets
-	Kodiak::TexturePtr m_texture;
+	Kodiak::TexturePtr		m_texture;
+
+	// Camera controls
+	float m_zoom{ -2.5f };
+	Math::Vector3 m_cameraPos{ Math::kZero };
 };

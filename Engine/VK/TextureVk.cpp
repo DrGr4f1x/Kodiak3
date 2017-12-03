@@ -158,7 +158,7 @@ void Texture::Create2D(uint32_t pitch, uint32_t width, uint32_t height, Format f
 	auto device = GetDevice();
 
 	VkFormat vkFormat = static_cast<VkFormat>(format);
-	uint32_t size = width * BytesPerPixel(format);
+	uint32_t size = width * height * BytesPerPixel(format);
 
 	// Create optimal tiled target image
 	VkImageCreateInfo imageCreateInfo = {};
@@ -195,6 +195,22 @@ void Texture::Create2D(uint32_t pitch, uint32_t width, uint32_t height, Format f
 
 	// Upload to GPU
 	CommandContext::InitializeTexture(*this, initData, size);
+
+	// Create the image view (SRV)
+	VkImageViewCreateInfo colorImageView = {};
+	colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	colorImageView.pNext = nullptr;
+	colorImageView.flags = 0;
+	colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	colorImageView.format = vkFormat;
+	colorImageView.subresourceRange = {};
+	colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	colorImageView.subresourceRange.baseMipLevel = 0;
+	colorImageView.subresourceRange.levelCount = 1;
+	colorImageView.subresourceRange.baseArrayLayer = 0;
+	colorImageView.subresourceRange.layerCount = 1;
+	colorImageView.image = m_image;
+	ThrowIfFailed(vkCreateImageView(device, &colorImageView, nullptr, &m_imageView));
 }
 
 
