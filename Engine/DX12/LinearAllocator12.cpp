@@ -142,6 +142,9 @@ LinearAllocationPage* LinearAllocatorPageManager::CreateNewPage(size_t pageSize)
 
 void LinearAllocator::CleanupUsedPages(uint64_t fenceID)
 {
+	sm_pageManager[m_allocationType].FreeLargePages(fenceID, m_largePageList);
+	m_largePageList.clear();
+
 	if (m_curPage == nullptr)
 	{
 		return;
@@ -153,9 +156,6 @@ void LinearAllocator::CleanupUsedPages(uint64_t fenceID)
 
 	sm_pageManager[m_allocationType].DiscardPages(fenceID, m_retiredPages);
 	m_retiredPages.clear();
-
-	sm_pageManager[m_allocationType].FreeLargePages(fenceID, m_largePageList);
-	m_largePageList.clear();
 }
 
 

@@ -39,9 +39,9 @@ void TriangleApp::Startup()
 	// Setup vertices
 	vector<Vertex> vertexData =
 	{
-		{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } },
-		{ { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
-		{ {  0.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } }
+		{ { -1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } },
+		{ {  1.0f, -1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
+		{ {  0.0f,  1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } }
 	};
 	m_vertexBuffer.Create("Vertex buffer", vertexData.size(), sizeof(Vertex), vertexData.data());
 
@@ -51,6 +51,15 @@ void TriangleApp::Startup()
 
 	// Setup constant buffer
 	m_constantBuffer.Create("Constant buffer", 1, sizeof(m_vsConstants));
+
+	// Setup camera
+	m_camera.SetPerspectiveMatrix(
+		DirectX::XMConvertToRadians(60.0f),
+		(float)m_displayHeight / (float)m_displayWidth,
+		0.1f,
+		256.0f);
+	m_camera.SetPosition(Math::Vector3(0.0f, 0.0f, -m_zoom));
+	m_camera.Update();
 
 	UpdateConstantBuffer();
 
@@ -98,13 +107,9 @@ void TriangleApp::Render()
 void TriangleApp::UpdateConstantBuffer()
 {
 	// Update matrices
-	m_vsConstants.projectionMatrix = Math::Matrix4::MakePerspective(
-		DirectX::XMConvertToRadians(60.0f),
-		(float)m_displayWidth / (float)m_displayHeight,
-		0.1f,
-		256.0f);
+	m_vsConstants.projectionMatrix = m_camera.GetProjMatrix();
 
-	m_vsConstants.viewMatrix = Math::AffineTransform::MakeTranslation(Math::Vector3(0.0f, 0.0f, m_zoom));
+	m_vsConstants.viewMatrix = m_camera.GetViewMatrix();
 
 	m_vsConstants.modelMatrix = Math::Matrix4(Math::kIdentity);
 
@@ -140,8 +145,8 @@ void TriangleApp::InitPSO()
 	VertexStreamDesc vertexStreamDesc{ 0, sizeof(Vertex), InputClassification::PerVertexData };
 	VertexElementDesc vertexElements[] =
 	{
-		{ "Position", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
-		{ "Color", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 }
+		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
+		{ "COLOR", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 }
 	};
 	m_pso.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
 

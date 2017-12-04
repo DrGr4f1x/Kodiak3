@@ -19,19 +19,11 @@ struct VSOutput
 
 VSOutput main(VSInput input)
 {
-#if VK
-	VSOutput output;
-#else
 	VSOutput output = (VSOutput)0;
-#endif
 
 	output.color = input.color;
 	float4x4 modelToProjection = mul(projectionMatrix, mul(viewMatrix, modelMatrix));
 	output.position = mul(modelToProjection, float4(input.pos, 1.0));
-
-#if !VK
-	output.position.y = -output.position.y;
-#endif
 
 	return output;
 }

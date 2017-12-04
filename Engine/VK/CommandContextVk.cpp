@@ -462,8 +462,8 @@ void GraphicsContext::SetViewport(float x, float y, float w, float h, float minD
 {
 	VkViewport viewport = {};
 	viewport.x = x;
-	viewport.y = y;
-	viewport.height = h;
+	viewport.y = h;
+	viewport.height = -h;
 	viewport.width = w;
 	viewport.minDepth = minDepth;
 	viewport.maxDepth = maxDepth;
@@ -484,7 +484,7 @@ void GraphicsContext::SetScissor(uint32_t left, uint32_t top, uint32_t right, ui
 
 void GraphicsContext::SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 {
-	VkViewport vp{ (float)x, (float)y, (float)w, (float)h, 0.0f, 1.0f };
+	VkViewport vp{ (float)x, (float)h, (float)w, -1.0f * (float)h, 0.0f, 1.0f };
 	VkRect2D rect;
 	rect.extent.width = w;
 	rect.extent.height = h;
