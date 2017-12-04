@@ -17,7 +17,6 @@
 #include "CommonStates.h"
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
-#include "Shader.h"
 #include "SwapChain.h"
 
 
@@ -130,11 +129,8 @@ void TriangleApp::InitPSO()
 	m_pso.SetBlendState(CommonStates::BlendDisable());
 	m_pso.SetDepthStencilState(CommonStates::DepthStateReadOnlyReversed());
 
-	auto vs = Shader::Load("TriangleVS");
-	auto ps = Shader::Load("TrianglePS");
-
-	m_pso.SetVertexShader(vs);
-	m_pso.SetPixelShader(ps);
+	m_pso.SetVertexShader("TriangleVS");
+	m_pso.SetPixelShader("TrianglePS");
 
 	m_pso.SetRenderPass(m_renderPass);
 

@@ -16,7 +16,6 @@
 #include "CommonStates.h"
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
-#include "Shader.h"
 #include "SwapChain.h"
 
 
@@ -188,16 +187,16 @@ void RadialBlurApp::InitPSOs()
 	m_radialBlurPSO.SetBlendState(CommonStates::BlendAdditive());
 	m_radialBlurPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 	m_radialBlurPSO.SetRasterizerState(CommonStates::RasterizerTwoSided());
-	m_radialBlurPSO.SetVertexShader(Shader::Load("RadialBlurVS"));
-	m_radialBlurPSO.SetPixelShader(Shader::Load("RadialBlurPS"));
+	m_radialBlurPSO.SetVertexShader("RadialBlurVS");
+	m_radialBlurPSO.SetPixelShader("RadialBlurPS");
 
 	m_offscreenDisplayPSO = m_radialBlurPSO;
 	m_offscreenDisplayPSO.SetBlendState(CommonStates::BlendDisable());
 
 	m_phongPassPSO = m_offscreenDisplayPSO;
 	m_phongPassPSO.SetRootSignature(m_sceneRootSig);
-	m_phongPassPSO.SetVertexShader(Shader::Load("PhongPassVS"));
-	m_phongPassPSO.SetPixelShader(Shader::Load("PhongPassPS"));
+	m_phongPassPSO.SetVertexShader("PhongPassVS");
+	m_phongPassPSO.SetPixelShader("PhongPassPS");
 
 	VertexStreamDesc vertexStreamDesc{ 0, sizeof(Vertex), InputClassification::PerVertexData };
 	VertexElementDesc vertexElements[] =
@@ -211,8 +210,8 @@ void RadialBlurApp::InitPSOs()
 
 	m_colorPassPSO = m_phongPassPSO;
 	m_colorPassPSO.SetRenderPass(m_offscreenRenderPass);
-	m_colorPassPSO.SetVertexShader(Shader::Load("ColorPassVS"));
-	m_colorPassPSO.SetPixelShader(Shader::Load("ColorPassPS"));
+	m_colorPassPSO.SetVertexShader("ColorPassVS");
+	m_colorPassPSO.SetPixelShader("ColorPassPS");
 
 	m_radialBlurPSO.Finalize();
 	m_offscreenDisplayPSO.Finalize();

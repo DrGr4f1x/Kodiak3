@@ -140,6 +140,7 @@ public:
 	void SetViewport(float x, float y, float w, float h, float minDepth = 0.0f, float maxDepth = 1.0f);
 	void SetScissor(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom);
 	void SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+	void SetStencilRef(uint32_t stencilRef);
 
 	void SetPipelineState(const GraphicsPSO& PSO);
 	void SetRootConstantBuffer(uint32_t rootIndex, ConstantBuffer& constantBuffer);
@@ -164,6 +165,12 @@ public:
 inline void GraphicsContext::EndRenderPass()
 {
 	vkCmdEndRenderPass(m_commandList);
+}
+
+
+inline void GraphicsContext::SetStencilRef(uint32_t stencilRef)
+{
+	vkCmdSetStencilReference(m_commandList, VK_STENCIL_FRONT_AND_BACK, stencilRef);
 }
 
 

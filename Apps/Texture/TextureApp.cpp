@@ -16,7 +16,6 @@
 #include "CommonStates.h"
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
-#include "Shader.h"
 
 
 using namespace Kodiak;
@@ -131,11 +130,8 @@ void TextureApp::InitPSO()
 	m_pso.SetBlendState(CommonStates::BlendDisable());
 	m_pso.SetDepthStencilState(CommonStates::DepthStateReadOnlyReversed());
 
-	auto vs = Shader::Load("TextureVS");
-	auto ps = Shader::Load("TexturePS");
-
-	m_pso.SetVertexShader(vs);
-	m_pso.SetPixelShader(ps);
+	m_pso.SetVertexShader("TextureVS");
+	m_pso.SetPixelShader("TexturePS");
 
 	m_pso.SetRenderPass(m_renderPass);
 

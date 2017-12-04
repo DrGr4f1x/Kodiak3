@@ -3,8 +3,51 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Stdafx.cpp" />
+    <ClCompile Include="StencilBufferApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="StencilBufferApp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{9097c49d-94cc-43b4-8497-5672d1c753e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\GLSL">
+      <UniqueIdentifier>{b443b940-3279-4b14-919c-05e9a48c10dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\HLSL">
+      <UniqueIdentifier>{cbc5e254-56e6-4f7d-b33c-7b35d6a02e02}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Shaders\ToonVS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\ToonPS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </None>
+    <None Include="Shaders\OutlineVS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </None>
+    <None Include="Shaders\OutlinePS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\OutlineVS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\OutlinePS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\ToonVS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\ToonPS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

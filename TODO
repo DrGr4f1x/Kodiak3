@@ -2,3 +2,4 @@ General
 ** Move m_framebuffers into Application base class - everything uses this, don't need to set it up individually
 Camera movement/controls/use of Camera class for all Apps
 Standardize naming in shaders (e.g. pos vs position, uv vs texcoord, etc)
+Handle window resizing, etc.

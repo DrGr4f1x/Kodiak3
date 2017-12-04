@@ -31,7 +31,7 @@ public:
 	void SubmitFrame();
 
 	SwapChain* GetSwapChain() { return m_swapChain.get(); }
-	Format GetDepthFormat() const { return Format::D32_Float; }
+	Format GetDepthFormat() const { return Format::D32_Float_S8_UInt; }
 	uint32_t GetCurrentBuffer() const { return m_currentBuffer; }
 
 	void WaitForGpuIdle();

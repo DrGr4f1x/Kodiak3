@@ -21,7 +21,6 @@ namespace Kodiak
 // Forward declarations
 class RenderPass;
 class RootSignature;
-class Shader;
 
 
 struct RenderTargetBlendDesc
@@ -140,11 +139,11 @@ public:
 	void SetInputLayout(uint32_t numStreams, const VertexStreamDesc* vertexStreams, uint32_t numElements, const VertexElementDesc* inputElementDescs);
 	void SetPrimitiveRestart(IndexBufferStripCutValue ibProps);
 
-	void SetVertexShader(const Shader* vertexShader);
-	void SetPixelShader(const Shader* pixelShader);
-	void SetGeometryShader(const Shader* geometryShader);
-	void SetHullShader(const Shader* hullShader);
-	void SetDomainShader(const Shader* domainShader);
+	void SetVertexShader(const std::string& filename);
+	void SetPixelShader(const std::string& filename);
+	void SetGeometryShader(const std::string& filename);
+	void SetHullShader(const std::string& filename);
+	void SetDomainShader(const std::string& filename);
 
 	// Perform validation and compute a hash value for fast state block comparisons
 	void Finalize();
@@ -166,9 +165,9 @@ class ComputePSO : public PSO
 public:
 	ComputePSO();
 
-	void SetComputeShader(const void* binary, size_t size) { m_psoDesc.CS = CD3DX12_SHADER_BYTECODE(const_cast<void*>(binary), size); }
+	/*void SetComputeShader(const void* binary, size_t size) { m_psoDesc.CS = CD3DX12_SHADER_BYTECODE(const_cast<void*>(binary), size); }
 	void SetComputeShader(const D3D12_SHADER_BYTECODE& binary) { m_psoDesc.CS = binary; }
-	void SetComputeShader(const Shader* computeShader);
+	void SetComputeShader(const Shader* computeShader);*/
 
 	void Finalize();
 

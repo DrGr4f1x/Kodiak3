@@ -219,6 +219,7 @@ GraphicsPSO::GraphicsPSO()
 
 	m_dynamicStates.push_back(VK_DYNAMIC_STATE_VIEWPORT);
 	m_dynamicStates.push_back(VK_DYNAMIC_STATE_SCISSOR);
+	m_dynamicStates.push_back(VK_DYNAMIC_STATE_STENCIL_REFERENCE);
 }
 
 
@@ -359,8 +360,9 @@ void GraphicsPSO::SetPrimitiveRestart(IndexBufferStripCutValue ibProps)
 }
 
 
-void GraphicsPSO::SetVertexShader(const Shader* vertexShader)
+void GraphicsPSO::SetVertexShader(const string& filename)
 {
+	auto vertexShader = Shader::Load(filename);
 	assert(vertexShader != nullptr);
 	
 	m_vertexShader.binary = vertexShader->GetByteCode();
@@ -368,29 +370,37 @@ void GraphicsPSO::SetVertexShader(const Shader* vertexShader)
 }
 
 
-void GraphicsPSO::SetPixelShader(const Shader* pixelShader)
+void GraphicsPSO::SetPixelShader(const string& filename)
 {
+	auto pixelShader = Shader::Load(filename);
+
 	m_pixelShader.binary = pixelShader->GetByteCode();
 	m_pixelShader.size = pixelShader->GetByteCodeSize();
 }
 
 
-void GraphicsPSO::SetHullShader(const Shader* hullShader)
+void GraphicsPSO::SetHullShader(const string& filename)
 {
+	auto hullShader = Shader::Load(filename);
+
 	m_hullShader.binary = hullShader->GetByteCode();
 	m_hullShader.size = hullShader->GetByteCodeSize();
 }
 
 
-void GraphicsPSO::SetDomainShader(const Shader* domainShader)
+void GraphicsPSO::SetDomainShader(const string& filename)
 {
+	auto domainShader = Shader::Load(filename);
+
 	m_domainShader.binary = domainShader->GetByteCode();
 	m_domainShader.size = domainShader->GetByteCodeSize();
 }
 
 
-void GraphicsPSO::SetGeometryShader(const Shader* geometryShader)
+void GraphicsPSO::SetGeometryShader(const string& filename)
 {
+	auto geometryShader = Shader::Load(filename);
+
 	m_geometryShader.binary = geometryShader->GetByteCode();
 	m_geometryShader.size = geometryShader->GetByteCodeSize();
 }

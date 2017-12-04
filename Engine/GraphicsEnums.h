@@ -146,6 +146,12 @@ inline Format MakeSRGB(Format format)
 }
 
 
+inline bool IsStencilFormat(Format format)
+{
+	return format == Format::D24S8 || format == Format::D32_Float_S8_UInt;
+}
+
+
 enum class TextureTarget
 {
 	Target1D,

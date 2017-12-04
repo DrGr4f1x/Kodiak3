@@ -72,14 +72,14 @@ void RenderPass::AddColorAttachment(Format colorFormat, ResourceState initialSta
 }
 
 
-void RenderPass::AddDepthAttachment(Format colorFormat, ResourceState initialState, ResourceState finalState)
+void RenderPass::AddDepthAttachment(Format depthFormat, ResourceState initialState, ResourceState finalState)
 {
 	m_depthAttachment.flags = 0;
-	m_depthAttachment.format = static_cast<VkFormat>(colorFormat);
+	m_depthAttachment.format = static_cast<VkFormat>(depthFormat);
 	m_depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	m_depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	m_depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	m_depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	m_depthAttachment.stencilLoadOp = IsStencilFormat(depthFormat) ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 	m_depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 	m_depthAttachment.initialLayout = GetImageLayout(initialState);
 	m_depthAttachment.finalLayout = GetImageLayout(finalState);

@@ -286,32 +286,37 @@ void GraphicsPSO::SetInputLayout(uint32_t numStreams, const VertexStreamDesc* ve
 }
 
 
-void GraphicsPSO::SetVertexShader(const Shader* vertexShader)
+void GraphicsPSO::SetVertexShader(const string& filename)
 {
+	auto vertexShader = Shader::Load(filename);
 	m_psoDesc.VS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(vertexShader->GetByteCode()), vertexShader->GetByteCodeSize());
 }
 
 
-void GraphicsPSO::SetPixelShader(const Shader* pixelShader)
+void GraphicsPSO::SetPixelShader(const string& filename)
 {
+	auto pixelShader = Shader::Load(filename);
 	m_psoDesc.PS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(pixelShader->GetByteCode()), pixelShader->GetByteCodeSize());
 }
 
 
-void GraphicsPSO::SetGeometryShader(const Shader* geometryShader)
+void GraphicsPSO::SetGeometryShader(const string& filename)
 {
+	auto geometryShader = Shader::Load(filename);
 	m_psoDesc.GS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(geometryShader->GetByteCode()), geometryShader->GetByteCodeSize());
 }
 
 
-void GraphicsPSO::SetHullShader(const Shader* hullShader)
+void GraphicsPSO::SetHullShader(const string& filename)
 {
+	auto hullShader = Shader::Load(filename);
 	m_psoDesc.HS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(hullShader->GetByteCode()), hullShader->GetByteCodeSize());
 }
 
 
-void GraphicsPSO::SetDomainShader(const Shader* domainShader)
+void GraphicsPSO::SetDomainShader(const string& filename)
 {
+	auto domainShader = Shader::Load(filename);
 	m_psoDesc.DS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(domainShader->GetByteCode()), domainShader->GetByteCodeSize());
 }
 
@@ -372,10 +377,10 @@ ComputePSO::ComputePSO()
 }
 
 
-void ComputePSO::SetComputeShader(const Shader* computeShader)
-{
-	m_psoDesc.CS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(computeShader->GetByteCode()), computeShader->GetByteCodeSize());
-}
+//void ComputePSO::SetComputeShader(const Shader* computeShader)
+//{
+//	m_psoDesc.CS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(computeShader->GetByteCode()), computeShader->GetByteCodeSize());
+//}
 
 
 void ComputePSO::Finalize()

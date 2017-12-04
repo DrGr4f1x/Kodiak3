@@ -18,7 +18,6 @@ namespace Kodiak
 // Forward declarations
 class RenderPass;
 class RootSignature;
-class Shader;
 
 
 struct RenderTargetBlendDesc
@@ -151,11 +150,11 @@ public:
 	void SetInputLayout(uint32_t numStreams, const VertexStreamDesc* vertexStreams, uint32_t numElements, const VertexElementDesc* inputElementDescs);
 	void SetPrimitiveRestart(IndexBufferStripCutValue ibProps);
 
-	void SetVertexShader(const Kodiak::Shader* vertexShader);
-	void SetPixelShader(const Kodiak::Shader* pixelShader);
-	void SetGeometryShader(const Kodiak::Shader* geometryShader);
-	void SetHullShader(const Kodiak::Shader* hullShader);
-	void SetDomainShader(const Kodiak::Shader* domainShader);
+	void SetVertexShader(const std::string& filename);
+	void SetPixelShader(const std::string& filename);
+	void SetGeometryShader(const std::string& filename);
+	void SetHullShader(const std::string& filename);
+	void SetDomainShader(const std::string& filename);
 
 	void Finalize();
 
