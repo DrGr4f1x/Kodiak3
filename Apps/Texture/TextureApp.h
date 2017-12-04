@@ -49,7 +49,7 @@ private:
 
 	struct Constants
 	{
-		Math::Matrix4 projectionMatrix;
+		Math::Matrix4 viewProjectionMatrix;
 		Math::Matrix4 modelMatrix;
 		Math::Vector3 viewPos;
 		float lodBias = 0.0f;

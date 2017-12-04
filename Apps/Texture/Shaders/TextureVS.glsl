@@ -10,10 +10,10 @@ layout(location = 2) in vec3 inNormal;
 
 layout(binding = 0) uniform UBO
 {
-	mat4 projection;
-mat4 model;
-vec4 viewPos;
-float lodBias;
+	mat4 viewProjection;
+	mat4 model;
+	vec4 viewPos;
+	float lodBias;
 } ubo;
 
 layout(location = 0) out vec2 outUV;
@@ -34,11 +34,11 @@ void main()
 
 	vec3 worldPos = vec3(ubo.model * vec4(inPos, 1.0));
 
-	gl_Position = ubo.projection * ubo.model * vec4(inPos.xyz, 1.0);
+	gl_Position = ubo.viewProjection * ubo.model * vec4(inPos.xyz, 1.0);
 
 	vec4 pos = ubo.model * vec4(inPos, 1.0);
 	outNormal = mat3(inverse(transpose(ubo.model))) * inNormal;
-	vec3 lightPos = vec3(0.0);
+	vec3 lightPos = ubo.viewPos.xyz;
 	vec3 lPos = mat3(ubo.model) * lightPos.xyz;
 	outLightVec = lPos - pos.xyz;
 	outViewVec = ubo.viewPos.xyz - pos.xyz;

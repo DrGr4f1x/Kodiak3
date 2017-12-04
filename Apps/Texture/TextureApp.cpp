@@ -53,6 +53,7 @@ void TextureApp::Startup()
 		0.1f,
 		256.0f);
 	m_camera.SetPosition(Math::Vector3(0.0f, 0.0f, -m_zoom));
+	m_camera.Update();
 
 	InitRootSig();
 	InitPSO();
@@ -163,8 +164,8 @@ void TextureApp::UpdateConstantBuffer()
 {
 	using namespace Math;
 
-	m_constants.projectionMatrix = m_camera.GetProjMatrix();
-	m_constants.modelMatrix = m_camera.GetViewMatrix();
+	m_constants.viewProjectionMatrix = m_camera.GetViewProjMatrix();
+	m_constants.modelMatrix = Matrix4(kIdentity);
 	m_constants.viewPos = m_camera.GetPosition();
 
 	m_constantBuffer.Update(sizeof(Constants), &m_constants);

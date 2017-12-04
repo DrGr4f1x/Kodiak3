@@ -19,7 +19,7 @@ struct VSOutput
 
 cbuffer VSConstants : register(b0)
 {
-	float4x4 projectionMatrix;
+	float4x4 viewProjectionMatrix;
 	float4x4 modelMatrix;
 	float4 viewPos;
 	float lodBias;
@@ -35,12 +35,12 @@ VSOutput main(VSInput input)
 
 	float3 worldPos = mul(modelMatrix, float4(input.pos, 1.0f)).xyz;
 
-	float4x4 modelToProjection = mul(projectionMatrix, modelMatrix);
+	float4x4 modelToProjection = mul(viewProjectionMatrix, modelMatrix);
 	output.pos = mul(modelToProjection, float4(input.pos, 1.0f));
 	
 	output.normal = mul(transpose(modelMatrix), float4(input.normal, 0.0f)).xyz;
 
-	float3 lightPos = float3(0.0f, 0.0f, 0.0f);
+	float3 lightPos = viewPos.xyz;
 	lightPos = mul(modelMatrix, float4(lightPos, 0.0f)).xyz;
 
 	output.lightVec = lightPos - worldPos;
