@@ -107,10 +107,7 @@ void TriangleApp::Render()
 void TriangleApp::UpdateConstantBuffer()
 {
 	// Update matrices
-	m_vsConstants.projectionMatrix = m_camera.GetProjMatrix();
-
-	m_vsConstants.viewMatrix = m_camera.GetViewMatrix();
-
+	m_vsConstants.viewProjectionMatrix = m_camera.GetViewProjMatrix();
 	m_vsConstants.modelMatrix = Math::Matrix4(Math::kIdentity);
 
 	m_constantBuffer.Update(sizeof(m_vsConstants), &m_vsConstants);

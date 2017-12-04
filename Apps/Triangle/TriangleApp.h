@@ -52,9 +52,8 @@ private:
 
 	struct
 	{
-		Math::Matrix4 projectionMatrix;
+		Math::Matrix4 viewProjectionMatrix;
 		Math::Matrix4 modelMatrix;
-		Math::Matrix4 viewMatrix;
 	} m_vsConstants;
 
 	// Camera controls
