@@ -56,9 +56,8 @@ private:
 
 	struct Constants
 	{
-		// Global matrices
-		Math::Matrix4 projectionMatrix;
-		Math::Matrix4 viewMatrix;
+		// Global matrix
+		Math::Matrix4 viewProjectionMatrix;
 		
 		// Separate data for each instance
 		InstanceData* instance{ nullptr };

@@ -52,6 +52,19 @@ void TextureArrayApp::Startup()
 	InitRootSig();
 	InitPSO();
 
+	// Setup camera
+	{
+		using namespace Math;
+
+		m_camera.SetPerspectiveMatrix(
+			XMConvertToRadians(60.0f),
+			(float)m_displayHeight / (float)m_displayWidth,
+			0.001f,
+			256.0f);
+		m_camera.SetEyeAtUp(Vector3(0.0f, 1.0f, m_zoom), Vector3(0.0f, 0.0f, 0.0f), Vector3(kYUnitVector));
+		m_camera.Update();
+	}
+
 	// We have to load the texture first, so we know how many array slices there are
 	LoadAssets();
 	InitConstantBuffer();
@@ -124,7 +137,7 @@ void TextureArrayApp::InitPSO()
 	// Render state
 	m_pso.SetRasterizerState(CommonStates::RasterizerTwoSided());
 	m_pso.SetBlendState(CommonStates::BlendDisable());
-	m_pso.SetDepthStencilState(CommonStates::DepthStateReadOnlyReversed());
+	m_pso.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 
 	m_pso.SetVertexShader("InstancingVS");
 	m_pso.SetPixelShader("InstancingPS");
@@ -149,7 +162,7 @@ void TextureArrayApp::InitPSO()
 void TextureArrayApp::InitConstantBuffer()
 {
 	m_constants.instance = new InstanceData[m_layerCount];
-	size_t size = 2 * sizeof(Math::Matrix4) + (m_layerCount * sizeof(InstanceData));
+	size_t size = sizeof(Math::Matrix4) + (m_layerCount * sizeof(InstanceData));
 
 	m_constantBuffer.Create("Constant Buffer", 1, size);
 
@@ -158,7 +171,7 @@ void TextureArrayApp::InitConstantBuffer()
 	using namespace Math;
 
 	// Setup the per-instance data
-	float offset = -1.5f;
+	float offset = 1.5f;
 	float center = (m_layerCount * offset) / 2.0f;
 	for (uint32_t i = 0; i < m_layerCount; ++i)
 	{
@@ -167,7 +180,7 @@ void TextureArrayApp::InitConstantBuffer()
 		m_constants.instance[i].modelMatrix = transform;
 		m_constants.instance[i].arrayIndex.SetX(static_cast<float>(i));
 	}
-	m_constantBuffer.Update(m_layerCount * sizeof(InstanceData), 2 * sizeof(Matrix4), m_constants.instance);
+	m_constantBuffer.Update(m_layerCount * sizeof(InstanceData), sizeof(Matrix4), m_constants.instance);
 }
 
 
@@ -176,20 +189,10 @@ void TextureArrayApp::UpdateConstantBuffer()
 	using namespace Math;
 	using namespace DirectX;
 
-	m_constants.projectionMatrix = Matrix4::MakePerspective(
-		XMConvertToRadians(60.0f),
-		(float)m_displayWidth / (float)m_displayHeight,
-		0.001f,
-		256.0f);
+	m_constants.viewProjectionMatrix = m_camera.GetViewProjMatrix();
 
-	auto transform = AffineTransform::MakeTranslation(Vector3(0.0f, -1.0f, m_zoom));
-	transform = transform * AffineTransform::MakeXRotation(XMConvertToRadians(m_rotation.GetX()));
-	transform = transform * AffineTransform::MakeYRotation(XMConvertToRadians(m_rotation.GetY()));
-	transform = transform * AffineTransform::MakeZRotation(XMConvertToRadians(m_rotation.GetZ()));
-	m_constants.viewMatrix = transform;
-
-	// Just update the matrices
-	m_constantBuffer.Update(2 * sizeof(Matrix4), &m_constants);
+	// Just update the vp matrix
+	m_constantBuffer.Update(sizeof(Matrix4), &m_constants);
 }
 
 
