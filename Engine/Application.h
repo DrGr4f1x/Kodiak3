@@ -36,6 +36,8 @@ public:
 	virtual void Startup() {}
 	virtual void Shutdown() {}
 
+	virtual void HandleInputs() {}
+
 	virtual bool Update() { return true; }
 	virtual void Render() {}
 

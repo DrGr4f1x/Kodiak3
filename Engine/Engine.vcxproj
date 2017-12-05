@@ -364,6 +364,7 @@
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="GraphicsEnums.h" />
     <ClInclude Include="Hash.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="InputLayout.h" />
     <ClInclude Include="KTXTextureLoader.h" />
     <ClInclude Include="Math\BoundingPlane.h" />
@@ -594,6 +595,7 @@
     </ClCompile>
     <ClCompile Include="Filesystem.cpp" />
     <ClCompile Include="Hash.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="KTXTextureLoader.cpp" />
     <ClCompile Include="Math\Frustum.cpp" />
     <ClCompile Include="Model.cpp" />

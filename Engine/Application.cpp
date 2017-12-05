@@ -13,6 +13,7 @@
 #include "Application.h"
 
 #include "GraphicsDevice.h"
+#include "Input.h"
 #include "SwapChain.h"
 
 
@@ -132,6 +133,8 @@ void Application::Initialize()
 
 	InitFramebuffer();
 
+	g_input.Initialize(m_hwnd);
+
 	Startup();
 
 	m_isRunning = true;
@@ -149,6 +152,8 @@ void Application::Finalize()
 	m_graphicsDevice->Destroy();
 	m_graphicsDevice.reset();
 
+	g_input.Shutdown();
+
 	g_application = nullptr;
 }
 
@@ -160,11 +165,15 @@ bool Application::Tick()
 
 	auto timeStart = chrono::high_resolution_clock::now();
 
-	m_camera.Update();
+	g_input.Update(m_frameTimer);
+
+	HandleInputs();
 
 	bool res = Update();
 	if (res)
 	{
+		m_camera.Update();
+
 		m_graphicsDevice->PrepareFrame();
 
 		Render();

@@ -227,6 +227,7 @@
     <ClInclude Include="KTXTextureLoader.h">
       <Filter>Graphics\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="Input.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -371,6 +372,7 @@
     <ClCompile Include="KTXTextureLoader.cpp">
       <Filter>Graphics\Resources</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
