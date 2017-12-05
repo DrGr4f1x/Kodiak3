@@ -50,6 +50,7 @@ public:
 	void Pause() { m_paused = true; }
 	void Unpause() { m_paused = false; }
 	void TogglePause() { m_paused = !m_paused; }
+	void Stop() { m_isRunning = false; }
 
 	const std::string& GetDefaultShaderPath();
 
@@ -60,6 +61,7 @@ protected:
 	uint32_t m_displayHeight{ 720 };
 
 	// Application state
+	bool m_isRunning{ false };
 	bool m_paused{ false };
 	float m_frameTimer{ 0.0f };
 	float m_timer{ 0.0f };

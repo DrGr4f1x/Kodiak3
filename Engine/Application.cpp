@@ -133,6 +133,8 @@ void Application::Initialize()
 	InitFramebuffer();
 
 	Startup();
+
+	m_isRunning = true;
 }
 
 
@@ -153,6 +155,9 @@ void Application::Finalize()
 
 bool Application::Tick()
 {
+	if (!m_isRunning)
+		return false;
+
 	auto timeStart = chrono::high_resolution_clock::now();
 
 	m_camera.Update();
@@ -251,6 +256,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_CLOSE:
+		GetApplication()->Stop(); // TODO - Can we detect device removed in Vulkan?  This is hacky...
 		DestroyWindow(hWnd);
 		PostQuitMessage(0);
 		break;

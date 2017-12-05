@@ -77,6 +77,8 @@ void TextureArrayApp::Shutdown()
 	m_indexBuffer.Destroy();
 	m_constantBuffer.Destroy();
 
+	m_rootSig.Destroy();
+
 	m_texture.reset();
 
 	delete[] m_constants.instance;
