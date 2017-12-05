@@ -167,6 +167,14 @@ bool Application::Tick()
 
 	g_input.Update(m_frameTimer);
 
+	// Close on Escape key
+	if (g_input.IsFirstPressed(DigitalInput::kKey_escape))
+		return false;
+
+	// Pause or resume application
+	if (g_input.IsFirstPressed(DigitalInput::kKey_pause))
+		TogglePause();
+
 	HandleInputs();
 
 	bool res = Update();
@@ -247,18 +255,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 		break;
 	}
-
-	case WM_KEYDOWN:
-		switch (wParam)
-		{
-		case VK_ESCAPE:
-			PostQuitMessage(0);
-			break;
-		case VK_PAUSE:
-			g_application->TogglePause();
-			break;
-		}
-		break;
 
 	case WM_SIZE:
 		//Graphics::Resize((UINT)(UINT64)lParam & 0xFFFF, (UINT)(UINT64)lParam >> 16);
