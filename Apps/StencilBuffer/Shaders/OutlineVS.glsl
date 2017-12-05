@@ -6,10 +6,10 @@ layout(location = 2) in vec3 inNormal;
 
 layout(binding = 0) uniform UBO
 {
-	mat4 projection;
-mat4 model;
-vec4 lightPos;
-float outlineWidth;
+	mat4 viewProjection;
+	mat4 model;
+	vec4 lightPos;
+	float outlineWidth;
 } ubo;
 
 out gl_PerVertex
@@ -21,5 +21,5 @@ void main()
 {
 	// Extrude along normal
 	vec4 pos = vec4(inPos.xyz + inNormal * ubo.outlineWidth, inPos.w);
-	gl_Position = ubo.projection * ubo.model * pos;
+	gl_Position = ubo.viewProjection * ubo.model * pos;
 }

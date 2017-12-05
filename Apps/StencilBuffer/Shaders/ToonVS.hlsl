@@ -17,7 +17,7 @@ struct VSOutput
 
 cbuffer VSConstants : register(b0)
 {
-	float4x4 projectionMatrix;
+	float4x4 viewProjectionMatrix;
 	float4x4 modelMatrix;
 	float4 lightPos;
 };
@@ -29,7 +29,7 @@ VSOutput main(VSInput input)
 
 	output.color = float3(1.0f, 0.0f, 0.0f);
 
-	output.pos = mul(projectionMatrix, mul(modelMatrix, float4(input.pos, 1.0f)));
+	output.pos = mul(viewProjectionMatrix, mul(modelMatrix, float4(input.pos, 1.0f)));
 	output.normal = mul((float3x3)modelMatrix, input.normal);
 
 	float4 pos = mul(modelMatrix, float4(input.pos, 1.0f));

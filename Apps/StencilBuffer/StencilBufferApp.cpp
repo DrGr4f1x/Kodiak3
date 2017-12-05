@@ -206,8 +206,11 @@ void StencilBufferApp::InitConstantBuffer()
 
 void StencilBufferApp::UpdateConstantBuffer()
 {
-	m_constants.projectionMatrix = m_camera.GetProjMatrix();
-	m_constants.modelMatrix = m_camera.GetViewMatrix();
+	using namespace Math;
+
+	m_constants.viewProjectionMatrix = m_camera.GetViewProjMatrix();
+	m_constants.modelMatrix = Matrix4(kIdentity);
+	m_constants.lightPos = Vector4(m_camera.GetPosition(), 1.0f);
 
 	m_constantBuffer.Update(sizeof(m_constants), &m_constants);
 }

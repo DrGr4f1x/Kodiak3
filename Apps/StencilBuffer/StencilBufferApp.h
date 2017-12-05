@@ -41,7 +41,7 @@ private:
 private:
 	struct Constants
 	{
-		Math::Matrix4		projectionMatrix;
+		Math::Matrix4		viewProjectionMatrix;
 		Math::Matrix4		modelMatrix;
 		Math::Vector4		lightPos{ 0.0f, -2.0f, 1.0f, 0.0f };
 		float				outlineWidth = 0.05f;
