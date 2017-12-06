@@ -43,8 +43,10 @@ void StencilBufferApp::Startup()
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.1f, 
 		512.0f);
-	m_camera.SetEyeAtUp(Vector3(-0.08f, 3.6f, 8.4f), Vector3(0.0f, 3.6f, 0.0f), Vector3(kYUnitVector));
+	m_camera.SetPosition(Vector3(-0.08f, 3.6f, 8.4f));
 	m_camera.Update();
+
+	m_controller.SetSpeedScale(0.025f);
 
 	InitRootSig();
 	InitPSOs();
@@ -65,6 +67,8 @@ void StencilBufferApp::Shutdown()
 
 bool StencilBufferApp::Update()
 {
+	m_controller.Update(m_frameTimer);
+
 	UpdateConstantBuffer();
 
 	return true;

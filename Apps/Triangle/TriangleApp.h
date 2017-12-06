@@ -11,20 +11,26 @@
 #pragma once
 
 #include "Application.h"
+#include "CameraController.h"
 #include "GpuBuffer.h"
 #include "PipelineState.h"
 #include "RenderPass.h"
 #include "RootSignature.h"
 
+
 class TriangleApp : public Kodiak::Application
 {
 public:
-	TriangleApp() : Application("Triangle") {}
+	TriangleApp() 
+		: Application("Triangle")
+		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector)) 
+	{}
 
 	void Configure() final;
 	void Startup() final;
 	void Shutdown() final;
 
+	bool Update() final;
 	void Render() final;
 
 private:
@@ -58,6 +64,7 @@ private:
 
 	// Camera controls
 	float m_zoom{ -2.5f };
+	Kodiak::CameraController m_controller;
 
 	Kodiak::RootSignature	m_rootSig;
 	Kodiak::GraphicsPSO		m_pso;

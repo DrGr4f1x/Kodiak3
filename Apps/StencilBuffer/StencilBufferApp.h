@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Application.h"
+#include "CameraController.h"
 #include "GpuBuffer.h"
 #include "Model.h"
 #include "PipelineState.h"
@@ -20,7 +21,10 @@
 class StencilBufferApp : public Kodiak::Application
 {
 public:
-	StencilBufferApp() : Kodiak::Application("Stencil Buffer") {}
+	StencilBufferApp() 
+		: Kodiak::Application("Stencil Buffer")
+		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
+	{}
 
 	void Configure() final;
 	void Startup() final;
@@ -55,4 +59,6 @@ private:
 	Constants				m_constants;
 
 	Kodiak::ModelPtr		m_model;
+
+	Kodiak::CameraController m_controller;
 };

@@ -175,13 +175,9 @@ bool Application::Tick()
 	if (g_input.IsFirstPressed(DigitalInput::kKey_pause))
 		TogglePause();
 
-	HandleInputs();
-
 	bool res = Update();
 	if (res)
 	{
-		m_camera.Update();
-
 		m_graphicsDevice->PrepareFrame();
 
 		Render();

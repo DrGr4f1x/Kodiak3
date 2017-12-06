@@ -17,6 +17,7 @@
 #include "CommonStates.h"
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
+#include "Input.h"
 #include "SwapChain.h"
 
 
@@ -51,6 +52,7 @@ void TriangleApp::Startup()
 
 	// Setup constant buffer
 	m_constantBuffer.Create("Constant buffer", 1, sizeof(m_vsConstants));
+	m_vsConstants.modelMatrix = Math::Matrix4(Math::kIdentity);
 
 	// Setup camera
 	m_camera.SetPerspectiveMatrix(
@@ -60,6 +62,8 @@ void TriangleApp::Startup()
 		256.0f);
 	m_camera.SetPosition(Math::Vector3(0.0f, 0.0f, -m_zoom));
 	m_camera.Update();
+
+	m_controller.SetSpeedScale(0.025f);
 
 	UpdateConstantBuffer();
 
@@ -74,6 +78,16 @@ void TriangleApp::Shutdown()
 	m_indexBuffer.Destroy();
 	m_constantBuffer.Destroy();
 	m_rootSig.Destroy();
+}
+
+
+bool TriangleApp::Update()
+{
+	m_controller.Update(m_frameTimer);
+
+	UpdateConstantBuffer();
+
+	return true;
 }
 
 
@@ -108,8 +122,7 @@ void TriangleApp::UpdateConstantBuffer()
 {
 	// Update matrices
 	m_vsConstants.viewProjectionMatrix = m_camera.GetViewProjMatrix();
-	m_vsConstants.modelMatrix = Math::Matrix4(Math::kIdentity);
-
+	
 	m_constantBuffer.Update(sizeof(m_vsConstants), &m_vsConstants);
 }
 

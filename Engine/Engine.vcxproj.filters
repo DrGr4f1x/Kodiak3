@@ -228,6 +228,7 @@
       <Filter>Graphics\Resources</Filter>
     </ClInclude>
     <ClInclude Include="Input.h" />
+    <ClInclude Include="CameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -373,6 +374,7 @@
       <Filter>Graphics\Resources</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="CameraController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">

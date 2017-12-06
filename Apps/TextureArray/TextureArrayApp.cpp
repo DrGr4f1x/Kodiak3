@@ -61,8 +61,11 @@ void TextureArrayApp::Startup()
 			(float)m_displayHeight / (float)m_displayWidth,
 			0.001f,
 			256.0f);
-		m_camera.SetEyeAtUp(Vector3(0.0f, 1.0f, m_zoom), Vector3(0.0f, 0.0f, 0.0f), Vector3(kYUnitVector));
+		m_camera.SetPosition(Vector3(0.0f, -1.0f, -m_zoom));
+
 		m_camera.Update();
+
+		m_controller.SetSpeedScale(0.025f);
 	}
 
 	// We have to load the texture first, so we know how many array slices there are
@@ -87,6 +90,8 @@ void TextureArrayApp::Shutdown()
 
 bool TextureArrayApp::Update()
 {
+	m_controller.Update(m_frameTimer);
+
 	UpdateConstantBuffer();
 
 	return true;
@@ -178,7 +183,7 @@ void TextureArrayApp::InitConstantBuffer()
 	for (uint32_t i = 0; i < m_layerCount; ++i)
 	{
 		auto transform = AffineTransform::MakeTranslation(Vector3(0.0f, i * offset - center, 0.0f));
-		transform = transform * AffineTransform::MakeXRotation(DirectX::XMConvertToRadians(60.0f));
+		transform = transform * AffineTransform::MakeXRotation(DirectX::XMConvertToRadians(-60.0f));
 		m_constants.instance[i].modelMatrix = transform;
 		m_constants.instance[i].arrayIndex.SetX(static_cast<float>(i));
 	}

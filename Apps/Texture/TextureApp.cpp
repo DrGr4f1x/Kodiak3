@@ -55,6 +55,8 @@ void TextureApp::Startup()
 	m_camera.SetPosition(Math::Vector3(0.0f, 0.0f, -m_zoom));
 	m_camera.Update();
 
+	m_controller.SetSpeedScale(0.025f);
+
 	InitRootSig();
 	InitPSO();
 	InitConstantBuffer();
@@ -77,6 +79,8 @@ void TextureApp::Shutdown()
 
 bool TextureApp::Update()
 {
+	m_controller.Update(m_frameTimer);
+
 	UpdateConstantBuffer();
 
 	return true;

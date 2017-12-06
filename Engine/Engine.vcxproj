@@ -251,6 +251,7 @@
     <ClInclude Include="BinaryReader.h" />
     <ClInclude Include="BitmaskEnum.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraController.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="CommandContext.h" />
     <ClInclude Include="CommonStates.h" />
@@ -491,6 +492,7 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="BinaryReader.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="CommonStates.cpp" />
     <ClCompile Include="DX12\ColorBuffer12.cpp">

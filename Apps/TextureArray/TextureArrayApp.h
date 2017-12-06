@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Application.h"
+#include "CameraController.h"
 #include "GpuBuffer.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
@@ -19,7 +20,10 @@
 class TextureArrayApp : public Kodiak::Application
 {
 public:
-	TextureArrayApp() : Kodiak::Application("Texture Array") {}
+	TextureArrayApp() 
+		: Kodiak::Application("Texture Array")
+		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector)) 
+	{}
 
 	void Configure() final;
 	void Startup() final;
@@ -79,4 +83,5 @@ private:
 	// Camera controls
 	float m_zoom{ -15.0f };
 	Math::Vector3 m_rotation{ -15.0f, 35.0f, 0.0f };
+	Kodiak::CameraController m_controller;
 };
