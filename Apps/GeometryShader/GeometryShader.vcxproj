@@ -247,6 +247,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GeometryShaderApp.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Create</PrecompiledHeader>
@@ -258,6 +259,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GeometryShaderApp.h" />
     <ClInclude Include="Stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
