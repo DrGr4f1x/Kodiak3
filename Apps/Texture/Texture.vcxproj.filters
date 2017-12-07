@@ -21,11 +21,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="Shaders\TexturePS.glsl" />
-    <CustomBuild Include="Shaders\TexturePS.hlsl" />
-    <CustomBuild Include="Shaders\TextureVS.hlsl" />
     <CustomBuild Include="Shaders\TextureVS.glsl">
       <Filter>Shaders\GLSL</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\TexturePS.glsl">
+      <Filter>Shaders\GLSL</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\TextureVS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\TexturePS.hlsl">
+      <Filter>Shaders\HLSL</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
