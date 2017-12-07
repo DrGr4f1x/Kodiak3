@@ -20,8 +20,8 @@ float4 main(PSInput input) : SV_Target
 	//float3 eyeVec = normalize(input.eyePos);
 	//float3 reflected = normalize(reflect(-input.lightVec, input.normal));
 
-	float4 ambient = float4(0.0f, 0.0f, 0.0f, 1.0f);
-	float4 diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f) * max(dot(input.normal, input.lightVec), 0.0f);
+	float4 ambient = float4(0.1f, 0.1f, 0.1f, 1.0f);
+	float4 diffuse = float4(0.9f, 0.9f, 0.9f, 1.0f) * max(dot(input.normal, input.lightVec), 0.0f);
 
 	return (ambient + diffuse) * colorTex.Sample(linearSampler, input.uv);
 }

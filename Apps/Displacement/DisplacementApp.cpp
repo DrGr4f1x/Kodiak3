@@ -12,8 +12,10 @@
 
 #include "DisplacementApp.h"
 
+#include "CommandContext.h"
 #include "CommonStates.h"
 #include "Filesystem.h"
+#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
@@ -37,26 +39,82 @@ void DisplacementApp::Startup()
 	using namespace Math;
 
 	m_camera.SetPerspectiveMatrix(
-		DirectX::XMConvertToRadians(60.0f),
+		DirectX::XMConvertToRadians(45.0f),
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.1f,
-		512.0f);
-	m_camera.SetPosition(Vector3(-0.08f, 3.6f, 8.4f));
+		256.0f);
+	m_camera.SetPosition(Vector3(0.0f, 1.0f, 0.0f));
 	m_camera.Update();
 
-	m_controller.SetSpeedScale(0.025f);
+	m_controller.SetSpeedScale(0.0025f);
 
 	InitRootSig();
 	InitPSOs();
-	//InitConstantBuffer();
+	InitConstantBuffers();
 
-	//LoadAssets();
+	UpdateConstantBuffers();
+
+	LoadAssets();
 }
 
 
 void DisplacementApp::Shutdown()
 {
 	m_rootSig.Destroy();
+
+	m_hsConstantBuffer.Destroy();
+	m_dsConstantBuffer.Destroy();
+
+	m_texture.reset();
+	m_model.reset();
+}
+
+
+bool DisplacementApp::Update()
+{
+	m_controller.Update(m_frameTimer);
+
+	UpdateConstantBuffers();
+
+	return true;
+}
+
+
+void DisplacementApp::Render()
+{
+	auto& context = GraphicsContext::Begin("Render frame");
+
+	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
+
+	Color clearColor{ DirectX::Colors::Black };
+	context.BeginRenderPass(m_renderPass, *m_framebuffers[curFrame], clearColor, 1.0f, 0);
+
+	context.SetViewport(0.0f, 0.0f, (float)m_displayWidth, (float)m_displayHeight);
+
+	context.SetRootSignature(m_rootSig);
+	
+	context.SetConstantBuffer(0, 0, m_hsConstantBuffer);
+	context.SetConstantBuffer(1, 0, m_dsConstantBuffer);
+	context.SetSRV(1, 1, *m_texture);
+	context.SetSRV(2, 0, *m_texture);
+
+	context.SetIndexBuffer(m_model->GetIndexBuffer());
+	context.SetVertexBuffer(0, m_model->GetVertexBuffer());
+
+	if (m_split)
+	{
+		context.SetPipelineState(m_wireframePSO);
+		context.SetScissor(0u, 0u, m_displayWidth / 2, m_displayHeight);
+		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+	}
+
+	context.SetPipelineState(m_pso);
+	context.SetScissor(m_split ? m_displayWidth / 2 : 0u, 0u, m_displayWidth, m_displayHeight);
+	context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+
+	context.EndRenderPass();
+
+	context.Finish();
 }
 
 
@@ -68,7 +126,7 @@ void DisplacementApp::InitRootSig()
 	m_rootSig[1].SetTableRange(0, DescriptorType::CBV, 0, 1);
 	m_rootSig[1].SetTableRange(1, DescriptorType::TextureSRV, 0, 1);
 	m_rootSig[2].InitAsDescriptorRange(DescriptorType::TextureSRV, 0, 1, ShaderVisibility::Pixel);
-	m_rootSig.InitStaticSampler(0, CommonStates::SamplerLinearClamp());
+	m_rootSig.InitStaticSampler(0, CommonStates::SamplerLinearWrap());
 	m_rootSig.Finalize("Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
 }
 
@@ -78,7 +136,7 @@ void DisplacementApp::InitPSOs()
 	m_pso.SetRootSignature(m_rootSig);
 
 	// Render state
-	m_pso.SetRasterizerState(CommonStates::RasterizerTwoSided());
+	m_pso.SetRasterizerState(CommonStates::RasterizerDefault());
 	m_pso.SetBlendState(CommonStates::BlendDisable());
 	m_pso.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 
@@ -101,5 +159,43 @@ void DisplacementApp::InitPSOs()
 	};
 	m_pso.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
 
+	m_wireframePSO = m_pso;
+	m_wireframePSO.SetRasterizerState(CommonStates::RasterizerWireframe());
+
 	m_pso.Finalize();
+	m_wireframePSO.Finalize();
+}
+
+
+void DisplacementApp::InitConstantBuffers()
+{
+	m_hsConstants.tessLevel = 64.0f;
+	// TODO Fix this (bad resource transitions)
+	//m_hsConstantBuffer.Create("HS Constant Buffer", 1, sizeof(HSConstants), &m_hsConstants);
+	m_hsConstantBuffer.Create("HS Constant Buffer", 1, sizeof(HSConstants));
+
+	m_dsConstants.lightPos = Math::Vector4(0.0f, 5.0f, 0.0f, 0.0f);
+	m_dsConstants.tessAlpha = 1.0f;
+	m_dsConstants.tessStrength = 0.1f;
+	m_dsConstantBuffer.Create("DS Constant Buffer", 1, sizeof(DSConstants));
+}
+
+
+void DisplacementApp::UpdateConstantBuffers()
+{
+	m_hsConstantBuffer.Update(sizeof(m_hsConstants), &m_hsConstants);
+
+	m_dsConstants.lightPos.SetY(5.0f - m_dsConstants.tessStrength);
+	m_dsConstants.projectionMatrix = m_camera.GetProjMatrix();
+	m_dsConstants.modelMatrix = m_camera.GetViewMatrix();
+	m_dsConstantBuffer.Update(sizeof(m_dsConstants), &m_dsConstants);
+}
+
+
+void DisplacementApp::LoadAssets()
+{
+	m_texture = Texture::Load("stonefloor03_color_bc3_unorm.ktx");
+
+	auto layout = VertexLayout({ VertexComponent::Position, VertexComponent::Normal, VertexComponent::UV });
+	m_model = Model::Load("plane.obj", layout, 0.25f);
 }

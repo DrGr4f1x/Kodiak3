@@ -329,7 +329,7 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 			samplerBinding.binding = 0;
 			samplerBinding.descriptorCount = m_numSamplers;
 			samplerBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
-			samplerBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+			samplerBinding.stageFlags = VK_SHADER_STAGE_ALL;
 
 			// TODO
 			// This code assumes samplers are contiguous from 0 to m_numSamplers-1 and all have the same

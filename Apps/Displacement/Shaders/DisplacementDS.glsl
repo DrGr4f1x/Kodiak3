@@ -4,7 +4,7 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-layout(binding = 1, set = 0) uniform UBO
+layout(binding = 0, set = 1) uniform UBO
 {
 	mat4 projection;
 	mat4 model;
@@ -13,8 +13,8 @@ layout(binding = 1, set = 0) uniform UBO
 	float tessStrength;
 } ubo;
 
-layout(binding = 2, set = 0) uniform texture2D displacementTex;
-layout(binding = 0, set = 1) uniform sampler displacementSamp;
+layout(binding = 1, set = 1) uniform texture2D displacementTex;
+layout(binding = 0, set = 3) uniform sampler displacementSamp;
 
 layout(triangles, equal_spacing, ccw) in;
 

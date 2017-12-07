@@ -16,6 +16,7 @@
 #include "Model.h"
 #include "PipelineState.h"
 #include "RootSignature.h"
+#include "Texture.h"
 
 class DisplacementApp : public Kodiak::Application
 {
@@ -29,9 +30,17 @@ public:
 	void Startup() final;
 	void Shutdown() final;
 
+	bool Update() final;
+	void Render() final;
+
 private:
 	void InitRootSig();
 	void InitPSOs();
+	void InitConstantBuffers();
+
+	void UpdateConstantBuffers();
+
+	void LoadAssets();
 
 private:
 	struct Vertex
@@ -41,8 +50,35 @@ private:
 		float uv[2];
 	};
 
+	struct HSConstants
+	{
+		float tessLevel;
+	};
+
+	struct DSConstants
+	{
+		Math::Matrix4 projectionMatrix;
+		Math::Matrix4 modelMatrix;
+		Math::Vector4 lightPos;
+		float tessAlpha;
+		float tessStrength;
+	};
+
 	Kodiak::RootSignature	m_rootSig;
 	Kodiak::GraphicsPSO		m_pso;
+	Kodiak::GraphicsPSO		m_wireframePSO;
+
+	Kodiak::ConstantBuffer	m_hsConstantBuffer;
+	HSConstants				m_hsConstants;
+
+	Kodiak::ConstantBuffer	m_dsConstantBuffer;
+	DSConstants				m_dsConstants;
+
+	Kodiak::TexturePtr		m_texture;
+	Kodiak::ModelPtr		m_model;
 
 	Kodiak::CameraController m_controller;
+
+	// App features
+	bool m_split{ true };
 };

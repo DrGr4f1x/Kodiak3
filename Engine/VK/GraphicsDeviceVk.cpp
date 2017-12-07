@@ -270,6 +270,16 @@ void GraphicsDevice::SelectPhysicalDevice()
 	{
 		m_physicalDeviceEnabledFeatures.textureCompressionBC = VK_TRUE;
 	}
+
+	if (m_physicalDeviceSupportedFeatures.tessellationShader == VK_TRUE)
+	{
+		m_physicalDeviceEnabledFeatures.tessellationShader = VK_TRUE;
+	}
+
+	if (m_physicalDeviceSupportedFeatures.fillModeNonSolid == VK_TRUE)
+	{
+		m_physicalDeviceEnabledFeatures.fillModeNonSolid = VK_TRUE;
+	}
 }
 
 

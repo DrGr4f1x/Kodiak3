@@ -37,6 +37,7 @@ public:
 	static const RasterizerStateDesc& RasterizerTwoSided();
 	static const RasterizerStateDesc& RasterizerShadow();
 	static const RasterizerStateDesc& RasterizerShadowCW();
+	static const RasterizerStateDesc& RasterizerWireframe();
 
 	// Depth stencil states
 	static const DepthStencilStateDesc& DepthStateDisabled();

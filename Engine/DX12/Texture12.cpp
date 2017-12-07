@@ -293,10 +293,13 @@ void Texture::Create2D(uint32_t pitch, uint32_t width, uint32_t height, Format f
 
 	m_resource->SetName(L"Texture");
 
+	size_t numBytes, rowBytes, numRows;
+	GetSurfaceInfo(width, height, texDesc.Format, numBytes, rowBytes, numRows);
+
 	D3D12_SUBRESOURCE_DATA texResource;
 	texResource.pData = initData;
-	texResource.RowPitch = pitch * BytesPerPixel(format);
-	texResource.SlicePitch = texResource.RowPitch * height;
+	texResource.RowPitch = rowBytes;
+	texResource.SlicePitch = numBytes;
 
 	CommandContext::InitializeTexture(*this, 1, &texResource);
 

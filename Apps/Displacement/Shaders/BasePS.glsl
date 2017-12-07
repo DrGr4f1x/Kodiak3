@@ -4,8 +4,8 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-layout(binding = 3, set = 0) uniform texture2D colorTex;
-layout(binding = 1, set = 1) uniform sampler linearSampler;
+layout(binding = 0, set = 2) uniform texture2D colorTex;
+layout(binding = 0, set = 3) uniform sampler linearSampler;
 
 layout(location = 0) in vec3 inNormal;
 layout(location = 1) in vec2 inUV;
@@ -25,5 +25,6 @@ void main()
 	vec4 IAmbient = vec4(0.0, 0.0, 0.0, 1.0);
 	vec4 IDiffuse = vec4(1.0) * max(dot(inNormal, inLightVec), 0.0);
 
-	outFragColor = vec4((IAmbient + IDiffuse) * vec4(texture(sampler2D(colorTex, linearSampler), inUV).rgb, 1.0));
+	//outFragColor = vec4((IAmbient + IDiffuse) * vec4(texture(sampler2D(colorTex, linearSampler), inUV).rgb, 1.0));
+	outFragColor = vec4(texture(sampler2D(colorTex, linearSampler), inUV).rgb, 1.0);
 }

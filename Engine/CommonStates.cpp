@@ -294,6 +294,32 @@ const RasterizerStateDesc& CommonStates::RasterizerShadowCW()
 }
 
 
+const RasterizerStateDesc& CommonStates::RasterizerWireframe()
+{
+	static RasterizerStateDesc desc{};
+	static bool initialized = false;
+
+	if (!initialized)
+	{
+		desc.fillMode = FillMode::Wireframe;
+		desc.cullMode = CullMode::None;
+		desc.frontCounterClockwise = true;
+		desc.depthBias = Defaults::DepthBias;
+		desc.depthBiasClamp = Defaults::DepthBiasClamp;
+		desc.slopeScaledDepthBias = Defaults::SlopeScaledDepthBias;
+		desc.depthClipEnable = true;
+		desc.multisampleEnable = false;
+		desc.antialiasedLineEnable = false;
+		desc.forcedSampleCount = 0;
+		desc.conservativeRasterizationEnable = false;
+
+		initialized = true;
+	}
+
+	return desc;
+}
+
+
 const DepthStencilStateDesc& CommonStates::DepthStateDisabled()
 {
 	static DepthStencilStateDesc desc{};

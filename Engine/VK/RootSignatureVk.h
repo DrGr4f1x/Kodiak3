@@ -29,8 +29,7 @@ class RootParameter
 	friend class RootSignature;
 
 public:
-	RootParameter()
-	{}
+	RootParameter() = default;
 
 	~RootParameter();
 
@@ -52,6 +51,14 @@ public:
 		m_bindings.push_back(binding);
 	}
 
+
+	void InitAsDescriptorRange(DescriptorType type, uint32_t _register, uint32_t count, ShaderVisibility visibility = ShaderVisibility::All)
+	{
+		InitAsDescriptorTable(1, visibility);
+		SetTableRange(0, type, _register, count);
+	}
+
+
 	void InitAsDescriptorTable(uint32_t rangeCount, ShaderVisibility visibility = ShaderVisibility::All)
 	{
 		assert(m_type == RootParameterType::Invalid);
@@ -62,6 +69,7 @@ public:
 
 		m_bindings.reserve(rangeCount);
 	}
+
 
 	void SetTableRange(uint32_t rangeIndex, DescriptorType type, uint32_t shaderReg, uint32_t count, uint32_t space = 0)
 	{
@@ -85,13 +93,17 @@ public:
 		m_ranges.emplace_back(range);
 	}
 
+
 	VkDescriptorSetLayout GetLayout() { return m_descriptorSetLayout; }
 	constexpr VkDescriptorSetLayout GetLayout() const { return m_descriptorSetLayout; }
+
 
 	uint32_t GetNumRanges() const { return static_cast<uint32_t>(m_ranges.size()); }
 	const DescriptorRange& GetRangeDesc(uint32_t index) const { return m_ranges[index]; }
 
+
 	RootParameterType GetType() const { return m_type; }
+
 
 protected:
 	RootParameterType	m_type{ RootParameterType::Invalid };
