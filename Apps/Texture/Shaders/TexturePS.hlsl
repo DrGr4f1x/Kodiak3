@@ -1,5 +1,5 @@
-Texture2D gradientTex : register(t0);
-SamplerState linearSampler : register(s0);
+[[vk::binding(0,1)]] Texture2D gradientTex : register(t0);
+[[vk::binding(0,2)]] SamplerState linearSampler : register(s0);
 
 
 struct PSInput
