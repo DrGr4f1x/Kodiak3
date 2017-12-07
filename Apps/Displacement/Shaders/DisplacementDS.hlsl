@@ -50,7 +50,7 @@ DSOutput main(DSConstantInput constInput, float3 triCoords : SV_DomainLocation, 
 	float displacement = displacementMap.SampleLevel(linearSampler, output.uv, 0.0f).a;
 	pos.xyz += normalize(output.normal) * max(displacement, 0.0f) * tessStrength;
 
-	output.eyePos = pos;
+	output.eyePos = pos.xyz;
 	output.lightVec = normalize(lightPos.xyz - output.eyePos);
 
 	output.pos = mul(projectionMatrix, mul(modelMatrix, pos));

@@ -16,6 +16,7 @@
 #include "CommonStates.h"
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
+#include "Input.h"
 
 
 using namespace Kodiak;
