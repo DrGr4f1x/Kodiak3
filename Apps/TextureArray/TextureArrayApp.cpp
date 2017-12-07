@@ -65,7 +65,7 @@ void TextureArrayApp::Startup()
 
 		m_camera.Update();
 
-		m_controller.SetSpeedScale(0.025f);
+		m_controller.SetSpeedScale(0.005f);
 	}
 
 	// We have to load the texture first, so we know how many array slices there are
