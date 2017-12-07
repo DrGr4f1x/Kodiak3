@@ -262,86 +262,48 @@
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="TextureArrayApp.h" />
   </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="Shaders\InstancingPS.glsl">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
-      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(VULKAN_SDK)\Bin\glslc.exe --target-env=vulkan -o $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv %(FullPath)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(VULKAN_SDK)\Bin\glslc.exe --target-env=vulkan -o $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv %(FullPath)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(VULKAN_SDK)\Bin\glslc.exe --target-env=vulkan -o $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv %(FullPath)</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Compiling GLSL to SPIR-V...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Compiling GLSL to SPIR-V...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Compiling GLSL to SPIR-V...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
-    </CustomBuild>
-    <CustomBuild Include="Shaders\InstancingVS.glsl">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
-      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(VULKAN_SDK)\Bin\glslc.exe --target-env=vulkan -o $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv %(FullPath)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(VULKAN_SDK)\Bin\glslc.exe --target-env=vulkan -o $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv %(FullPath)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(VULKAN_SDK)\Bin\glslc.exe --target-env=vulkan -o $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv %(FullPath)</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Compiling GLSL to SPIR-V...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Compiling GLSL to SPIR-V...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Compiling GLSL to SPIR-V...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
+<ItemGroup>
     <CustomBuild Include="Shaders\InstancingPS.hlsl">
       <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Compiling HLSL to DXIL...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Compiling HLSL to DXIL...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Compiling HLSL to DXIL...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</ObjectFileOutput>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">5.0</ShaderModel>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Compiling HLSL to SPIR-V...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Compiling HLSL to SPIR-V...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Compiling HLSL to SPIR-V...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
     </CustomBuild>
     <CustomBuild Include="Shaders\InstancingVS.hlsl">
       <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Compiling HLSL to DXIL...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Compiling HLSL to DXIL...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Compiling HLSL to DXIL...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</ObjectFileOutput>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">5.0</ShaderModel>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Compiling HLSL to SPIR-V...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Compiling HLSL to SPIR-V...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Compiling HLSL to SPIR-V...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
