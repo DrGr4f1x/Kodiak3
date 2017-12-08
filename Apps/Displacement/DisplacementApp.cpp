@@ -44,7 +44,7 @@ void DisplacementApp::Startup()
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.1f,
 		256.0f);
-	m_camera.SetPosition(Vector3(0.0f, 1.0f, 0.0f));
+	m_camera.SetPosition(Vector3(0.0f, 0.25f, 0.0f));
 	m_camera.Update();
 
 	m_controller.SetSpeedScale(0.0025f);

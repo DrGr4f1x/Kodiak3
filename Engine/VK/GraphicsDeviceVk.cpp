@@ -276,6 +276,11 @@ void GraphicsDevice::SelectPhysicalDevice()
 		m_physicalDeviceEnabledFeatures.tessellationShader = VK_TRUE;
 	}
 
+	if (m_physicalDeviceSupportedFeatures.geometryShader == VK_TRUE)
+	{
+		m_physicalDeviceEnabledFeatures.geometryShader = VK_TRUE;
+	}
+
 	if (m_physicalDeviceSupportedFeatures.fillModeNonSolid == VK_TRUE)
 	{
 		m_physicalDeviceEnabledFeatures.fillModeNonSolid = VK_TRUE;
