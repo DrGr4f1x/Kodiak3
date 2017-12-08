@@ -46,7 +46,7 @@ void StencilBufferApp::Startup()
 	m_camera.SetPosition(Vector3(-0.08f, 3.6f, 8.4f));
 	m_camera.Update();
 
-	m_controller.SetSpeedScale(0.025f);
+	m_controller.SetSpeedScale(0.01f);
 
 	InitRootSig();
 	InitPSOs();

@@ -13,39 +13,19 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{0e4cfb9b-829e-4a4e-8829-2f6723ef0f07}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\GLSL">
-      <UniqueIdentifier>{51729471-2e0e-449e-84d8-8f3dc3967583}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\HLSL">
-      <UniqueIdentifier>{d1d1dece-aa8a-4d5e-af87-1106fb8d26ac}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\BasePS.glsl">
-      <Filter>Shaders\GLSL</Filter>
-    </None>
-    <None Include="Shaders\DisplacementHS.glsl">
-      <Filter>Shaders\GLSL</Filter>
-    </None>
-    <None Include="Shaders\DisplacementDS.glsl">
-      <Filter>Shaders\GLSL</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Shaders\BaseVS.glsl">
-      <Filter>Shaders\GLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\BaseVS.hlsl">
-      <Filter>Shaders\HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\BasePS.hlsl">
-      <Filter>Shaders\HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\DisplacementHS.hlsl">
-      <Filter>Shaders\HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\DisplacementDS.hlsl">
-      <Filter>Shaders\HLSL</Filter>
-    </FxCompile>
+    <CustomBuild Include="Shaders\BasePS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\BaseVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\DisplacementDS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\DisplacementHS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
