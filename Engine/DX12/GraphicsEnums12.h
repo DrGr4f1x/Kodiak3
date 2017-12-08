@@ -228,7 +228,6 @@ enum class DescriptorType
 	CBV,
 	Sampler,
 	TextureSRV,
-	ImageSRV,
 	ImageSampler,
 	BufferUAV,
 	ImageUAV
@@ -246,9 +245,6 @@ inline D3D12_DESCRIPTOR_RANGE_TYPE DescriptorTypeToDX12(DescriptorType type)
 		return D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
 		break;
 	case DescriptorType::TextureSRV:
-		return D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-		break;
-	case DescriptorType::ImageSRV:
 		return D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		break;
 	case DescriptorType::ImageSampler:

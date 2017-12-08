@@ -581,6 +581,55 @@ ComputePSO::ComputePSO()
 }
 
 
+void ComputePSO::SetComputeShader(const string& filename)
+{
+	auto computeShader = Shader::Load(filename);
+	assert(computeShader != nullptr);
+
+	m_computeShader.binary = computeShader->GetByteCode();
+	m_computeShader.size = computeShader->GetByteCodeSize();
+}
+
+
 void ComputePSO::Finalize()
 {
+	VkComputePipelineCreateInfo createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+	createInfo.pNext = nullptr;
+	createInfo.flags = 0;
+	createInfo.layout = m_rootSignature->GetLayout();
+
+	VkShaderModuleCreateInfo moduleCreateInfo{ VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
+	moduleCreateInfo.pNext = nullptr;
+	moduleCreateInfo.flags = 0;
+	moduleCreateInfo.codeSize = m_computeShader.size;
+	moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_computeShader.binary);
+
+	VkShaderModule module{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
+
+	createInfo.stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	createInfo.stage.pNext = nullptr;
+	createInfo.stage.flags = 0;
+	createInfo.stage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+	createInfo.stage.pName = "main";
+	createInfo.stage.module = module;
+	createInfo.stage.pSpecializationInfo = nullptr;
+
+	{
+		lock_guard<mutex> CS(s_pipelineMutex);
+
+		if (s_pipelineCache == VK_NULL_HANDLE)
+		{
+			VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
+			pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+			ThrowIfFailed(vkCreatePipelineCache(GetDevice(), &pipelineCacheCreateInfo, nullptr, &s_pipelineCache));
+		}
+
+		ThrowIfFailed(vkCreateComputePipelines(GetDevice(), s_pipelineCache, 1, &createInfo, nullptr, &m_pipeline));
+
+		s_graphicsPipelineCache.insert(m_pipeline);
+	}
+
+	vkDestroyShaderModule(GetDevice(), module, nullptr);
 }

@@ -30,5 +30,39 @@ public:
 	void Render() final;
 
 private:
+	void InitRootSigs();
+	void InitPSOs();
+	void InitConstantBuffer();
 
+	void LoadAssets();
+
+private:
+	// Vertex layout for this example
+	struct Vertex
+	{
+		float position[3];
+		float uv[2];
+	};
+
+	struct Constants
+	{
+		Math::Matrix4 viewProjectionMatrix;
+		Math::Matrix4 modelMatrix;
+	};
+
+	Kodiak::VertexBuffer	m_vertexBuffer;
+	Kodiak::IndexBuffer		m_indexBuffer;
+
+	Constants				m_constants;
+	Kodiak::ConstantBuffer	m_constantBuffer;
+
+	Kodiak::RootSignature	m_rootSig;
+	Kodiak::RootSignature	m_computeRootSig;
+
+	Kodiak::GraphicsPSO		m_pso;
+	Kodiak::ComputePSO		m_edgeDetectPSO;
+	Kodiak::ComputePSO		m_embossPSO;
+	Kodiak::ComputePSO		m_sharpenPSO;
+
+	Kodiak::TexturePtr		m_texture;
 };

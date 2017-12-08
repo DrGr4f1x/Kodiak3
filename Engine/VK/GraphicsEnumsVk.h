@@ -236,7 +236,6 @@ enum class DescriptorType
 	CBV,
 	Sampler,
 	TextureSRV,
-	ImageSRV,
 	BufferUAV,
 	ImageUAV
 };
@@ -253,9 +252,6 @@ inline VkDescriptorType DescriptorTypeToVulkan(DescriptorType type)
 		break;
 	case DescriptorType::TextureSRV:
 		return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-		break;
-	case DescriptorType::ImageSRV:
-		return VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
 		break;
 	case DescriptorType::BufferUAV:
 		return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;

@@ -165,9 +165,7 @@ class ComputePSO : public PSO
 public:
 	ComputePSO();
 
-	/*void SetComputeShader(const void* binary, size_t size) { m_psoDesc.CS = CD3DX12_SHADER_BYTECODE(const_cast<void*>(binary), size); }
-	void SetComputeShader(const D3D12_SHADER_BYTECODE& binary) { m_psoDesc.CS = binary; }
-	void SetComputeShader(const Shader* computeShader);*/
+	void SetComputeShader(const std::string& filename);
 
 	void Finalize();
 

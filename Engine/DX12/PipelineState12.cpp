@@ -377,10 +377,11 @@ ComputePSO::ComputePSO()
 }
 
 
-//void ComputePSO::SetComputeShader(const Shader* computeShader)
-//{
-//	m_psoDesc.CS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(computeShader->GetByteCode()), computeShader->GetByteCodeSize());
-//}
+void ComputePSO::SetComputeShader(const string& filename)
+{
+	auto computeShader = Shader::Load(filename);
+	m_psoDesc.CS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(computeShader->GetByteCode()), computeShader->GetByteCodeSize());
+}
 
 
 void ComputePSO::Finalize()

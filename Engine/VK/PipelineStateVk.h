@@ -199,10 +199,12 @@ class ComputePSO : public PSO
 public:
 	ComputePSO();
 
+	void SetComputeShader(const std::string& filename);
+
 	void Finalize();
 
 private:
-
+	ShaderBytecode m_computeShader{ nullptr, 0 };
 };
 
 } // namespace Kodiak

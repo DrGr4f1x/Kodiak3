@@ -422,15 +422,6 @@ void DynamicDescriptorPool::DescriptorHandleCache::ParseRootSignature(const Root
 			currentBufferOffset++;
 			break;
 
-		case RootParameterType::ImageSRV:
-			descriptorSet.rangeCount = 1;
-			descriptorSet.ranges[0].type = DescriptorType::ImageSRV;
-			descriptorSet.ranges[0].rangeSize = 1;
-			descriptorSet.ranges[0].offset = 0;
-			descriptorSet.ranges[0].imageHandleStart = &m_imageDescriptors[0] + currentImageOffset;
-			currentImageOffset++;
-			break;
-
 		case RootParameterType::TextureSRV:
 			descriptorSet.rangeCount = 1;
 			descriptorSet.ranges[0].type = DescriptorType::TextureSRV;
