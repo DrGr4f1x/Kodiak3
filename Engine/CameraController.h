@@ -23,6 +23,8 @@ public:
 
 	void Update(float dt);
 
+	void RefreshFromCamera();
+
 	void SlowMovement(bool enable) { m_fineMovement = enable; }
 	void SlowRotation(bool enable) { m_fineRotation = enable; }
 

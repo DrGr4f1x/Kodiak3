@@ -26,29 +26,7 @@ CameraController::CameraController(Camera& camera, Vector3 worldUp) : m_targetCa
 	m_worldNorth = Normalize(Cross(m_worldUp, Vector3(kXUnitVector)));
 	m_worldEast = Cross(m_worldNorth, m_worldUp);
 
-	m_horizontalLookSensitivity = 2.0f;
-	m_verticalLookSensitivity = 2.0f;
-	m_moveSpeed = 1000.0f;
-	m_strafeSpeed = 1000.0f;
-	m_mouseSensitivityX = 1.0f;
-	m_mouseSensitivityY = 1.0f;
-
-	m_currentPitch = Sin(Dot(camera.GetForwardVec(), m_worldUp));
-
-	Vector3 forward = Normalize(Cross(m_worldUp, camera.GetRightVec()));
-	m_currentHeading = ATan2(-Dot(forward, m_worldEast), Dot(forward, m_worldNorth));
-
-	m_speedScale = 1.0f;
-
-	m_fineMovement = false;
-	m_fineRotation = false;
-	m_momentum = true;
-
-	m_lastYaw = 0.0f;
-	m_lastPitch = 0.0f;
-	m_lastForward = 0.0f;
-	m_lastStrafe = 0.0f;
-	m_lastAscent = 0.0f;
+	RefreshFromCamera();
 }
 
 
@@ -122,6 +100,34 @@ void CameraController::Update(float deltaTime)
 	Vector3 position = orientation * Vector3(strafe, ascent, -forward) + m_targetCamera.GetPosition();
 	m_targetCamera.SetTransform(AffineTransform(orientation, position));
 	m_targetCamera.Update();
+}
+
+
+void CameraController::RefreshFromCamera()
+{
+	m_horizontalLookSensitivity = 2.0f;
+	m_verticalLookSensitivity = 2.0f;
+	m_moveSpeed = 1000.0f;
+	m_strafeSpeed = 1000.0f;
+	m_mouseSensitivityX = 1.0f;
+	m_mouseSensitivityY = 1.0f;
+
+	m_currentPitch = Sin(Dot(m_targetCamera.GetForwardVec(), m_worldUp));
+
+	Vector3 forward = Normalize(Cross(m_worldUp, m_targetCamera.GetRightVec()));
+	m_currentHeading = ATan2(-Dot(forward, m_worldEast), Dot(forward, m_worldNorth));
+
+	m_speedScale = 1.0f;
+
+	m_fineMovement = false;
+	m_fineRotation = false;
+	m_momentum = true;
+
+	m_lastYaw = 0.0f;
+	m_lastPitch = 0.0f;
+	m_lastForward = 0.0f;
+	m_lastStrafe = 0.0f;
+	m_lastAscent = 0.0f;
 }
 
 

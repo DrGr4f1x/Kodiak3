@@ -49,6 +49,7 @@ void GeometryShaderApp::Startup()
 	m_camera.Update();
 
 	m_controller.SetSpeedScale(0.01f);
+	m_controller.RefreshFromCamera();
 
 	UpdateConstantBuffer();
 

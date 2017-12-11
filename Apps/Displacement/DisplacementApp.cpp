@@ -47,6 +47,7 @@ void DisplacementApp::Startup()
 	m_camera.SetPosition(Vector3(0.0f, 0.25f, 0.0f));
 	m_camera.Update();
 
+	m_controller.RefreshFromCamera();
 	m_controller.SetSpeedScale(0.0025f);
 
 	InitRootSig();
