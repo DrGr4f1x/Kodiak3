@@ -12,7 +12,7 @@ float Convolve(float kernel[9], float data[9], float denom, float offset)
 		res += kernel[i] * data[i];
 	}
 
-	return clamp(res / denom, 0.0f, 1.0f);
+	return clamp((res / denom) + offset, 0.0f, 1.0f);
 }
 
 

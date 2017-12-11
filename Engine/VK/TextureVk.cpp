@@ -106,7 +106,7 @@ void Texture::Create1D(uint32_t pitch, uint32_t width, Format format, const void
 	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	imageCreateInfo.extent = { width, 1, 1 };
-	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT;
+	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
 	// Ensure that the TRANSFER_DST bit is set for staging
 	if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
 	{
@@ -174,7 +174,7 @@ void Texture::Create2D(uint32_t pitch, uint32_t width, uint32_t height, Format f
 	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	imageCreateInfo.extent = { m_width, m_height, 1 };
-	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT;
+	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
 	// Ensure that the TRANSFER_DST bit is set for staging
 	if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
 	{
@@ -242,7 +242,7 @@ void Texture::Create2DArray(uint32_t pitch, uint32_t width, uint32_t height, uin
 	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	imageCreateInfo.extent = { m_width, m_height, 1 };
-	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT;
+	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
 	// Ensure that the TRANSFER_DST bit is set for staging
 	if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
 	{

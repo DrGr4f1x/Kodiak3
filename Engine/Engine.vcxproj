@@ -253,6 +253,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="ColorBuffer.h" />
     <ClInclude Include="CommandContext.h" />
     <ClInclude Include="CommonStates.h" />
     <ClInclude Include="dds.h" />
@@ -391,7 +392,6 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="VectorMath.h" />
-    <ClInclude Include="VK\ColorBuffer.h" />
     <ClInclude Include="VK\ColorBufferVk.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>

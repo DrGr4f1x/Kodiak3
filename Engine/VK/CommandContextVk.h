@@ -78,6 +78,7 @@ public:
 	static void InitializeBuffer(GpuBuffer& dest, const void* initialData, size_t numBytes, bool useOffset = false, size_t offset = 0);
 
 	void TransitionResource(Texture& texture, ResourceState newState, bool flushImmediate = false);
+	void TransitionResource(ColorBuffer& colorBuffer, ResourceState newState, bool flushImmediate = false);
 	inline void FlushImageBarriers();
 
 protected:
@@ -102,24 +103,6 @@ private:
 
 	void Reset();
 };
-
-
-inline void CommandContext::FlushImageBarriers()
-{
-	if (m_numImageBarriersToFlush > 0)
-	{
-		vkCmdPipelineBarrier(
-			m_commandList,
-			VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-			VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-			0,
-			0, nullptr,
-			0, nullptr,
-			m_numImageBarriersToFlush, m_pendingImageBarriers);
-
-		m_numImageBarriersToFlush = 0;
-	}
-}
 
 
 class GraphicsContext : public CommandContext
@@ -160,6 +143,44 @@ public:
 	void DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation,
 		int32_t baseVertexLocation, uint32_t startInstanceLocation);
 };
+
+
+class ComputeContext : public CommandContext
+{
+public:
+	void SetRootSignature(const RootSignature& RootSig);
+
+	void SetPipelineState(const ComputePSO& PSO);
+	void SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer);
+	void SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
+	//void SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer);
+	void SetUAV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
+
+	void Dispatch(uint32_t groupCountX = 1, uint32_t groupCountY = 1, uint32_t groupCountZ = 1);
+	void Dispatch1D(uint32_t threadCountX, uint32_t groupSizeX = 64);
+	void Dispatch2D(uint32_t threadCountX, uint32_t threadCountY, uint32_t groupSizeX = 8, uint32_t groupSizeY = 8);
+	void Dispatch3D(uint32_t threadCountX, uint32_t threadCountY, uint32_t threadCountZ, uint32_t groupSizeX, uint32_t groupSizeY, uint32_t groupSizeZ);
+};
+
+
+inline void CommandContext::FlushImageBarriers()
+{
+	if (m_numImageBarriersToFlush > 0)
+	{
+		vkCmdPipelineBarrier(
+			m_commandList,
+			VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+			VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+			0,
+			0, nullptr,
+			0, nullptr,
+			m_numImageBarriersToFlush, m_pendingImageBarriers);
+
+		m_numImageBarriersToFlush = 0;
+	}
+}
 
 
 inline void GraphicsContext::EndRenderPass()
@@ -258,6 +279,77 @@ inline void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance
 	FlushImageBarriers();
 	m_dynamicDescriptorPool.CommitGraphicsRootDescriptorSets(m_commandList);
 	vkCmdDrawIndexed(m_commandList, indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
+}
+
+
+inline void ComputeContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer)
+{
+	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &constantBuffer.GetCBV());
+}
+
+
+inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture)
+{
+	VkDescriptorImageInfo descriptorInfo = {};
+	descriptorInfo.imageView = texture.GetSRV();
+	descriptorInfo.imageLayout = texture.m_layout;
+	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
+}
+
+
+inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
+{
+	VkDescriptorImageInfo descriptorInfo = {};
+	descriptorInfo.imageView = colorBuffer.GetSRV();
+	descriptorInfo.imageLayout = colorBuffer.m_layout;
+	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
+}
+
+
+// TODO
+//inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer)
+//{
+//	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &depthBuffer.GetDepthSRV());
+//}
+
+
+inline void ComputeContext::SetUAV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
+{
+	VkDescriptorImageInfo descriptorInfo = {};
+	descriptorInfo.imageView = colorBuffer.GetSRV();
+	descriptorInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
+}
+
+
+inline void ComputeContext::Dispatch(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ)
+{
+	FlushImageBarriers();
+	m_dynamicDescriptorPool.CommitComputeRootDescriptorSets(m_commandList);
+	vkCmdDispatch(m_commandList, groupCountX, groupCountY, groupCountZ);
+}
+
+
+inline void ComputeContext::Dispatch1D(uint32_t threadCountX, uint32_t groupSizeX)
+{
+	Dispatch(Math::DivideByMultiple(threadCountX, groupSizeX), 1, 1);
+}
+
+
+inline void ComputeContext::Dispatch2D(uint32_t threadCountX, uint32_t threadCountY, uint32_t groupSizeX, uint32_t groupSizeY)
+{
+	Dispatch(
+		Math::DivideByMultiple(threadCountX, groupSizeX),
+		Math::DivideByMultiple(threadCountY, groupSizeY), 1);
+}
+
+
+inline void ComputeContext::Dispatch3D(uint32_t threadCountX, uint32_t threadCountY, uint32_t threadCountZ, uint32_t groupSizeX, uint32_t groupSizeY, uint32_t groupSizeZ)
+{
+	Dispatch(
+		Math::DivideByMultiple(threadCountX, groupSizeX),
+		Math::DivideByMultiple(threadCountY, groupSizeY),
+		Math::DivideByMultiple(threadCountZ, groupSizeZ));
 }
 
 } // namespace Kodiak

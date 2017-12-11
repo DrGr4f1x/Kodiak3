@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Application.h"
+#include "ColorBuffer.h"
 #include "GpuBuffer.h"
 #include "PipelineState.h"
 #include "RenderPass.h"
@@ -64,5 +65,9 @@ private:
 	Kodiak::ComputePSO		m_embossPSO;
 	Kodiak::ComputePSO		m_sharpenPSO;
 
+	Kodiak::ColorBuffer		m_computeScratch;
+
 	Kodiak::TexturePtr		m_texture;
+
+	int32_t				m_curComputeTechnique{ 0 };
 };

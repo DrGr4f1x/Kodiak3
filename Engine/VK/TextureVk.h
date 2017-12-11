@@ -22,6 +22,8 @@ class ManagedTexture;
 class Texture : public GpuResource
 {
 	friend class CommandContext;
+	friend class GraphicsContext;
+	friend class ComputeContext;
 
 public:
 	Texture() = default;
@@ -78,8 +80,6 @@ protected:
 	VkImage			m_image{ VK_NULL_HANDLE };
 	VkImageLayout	m_layout{ VK_IMAGE_LAYOUT_GENERAL };
 	VkAccessFlags	m_accessFlags{ 0 };
-
-	ResourceState	m_usageState{ ResourceState::Common };
 
 	uint32_t m_width{ 0 };
 	uint32_t m_height{ 0 };

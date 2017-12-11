@@ -141,46 +141,6 @@ private:
 };
 
 
-inline void CommandContext::FlushResourceBarriers()
-{
-	if (m_numBarriersToFlush > 0)
-	{
-		m_commandList->ResourceBarrier(m_numBarriersToFlush, m_resourceBarrierBuffer);
-		m_numBarriersToFlush = 0;
-	}
-}
-
-
-inline void CommandContext::SetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12DescriptorHeap* heapPtr)
-{
-	if (m_currentDescriptorHeaps[type] != heapPtr)
-	{
-		m_currentDescriptorHeaps[type] = heapPtr;
-		BindDescriptorHeaps();
-	}
-}
-
-
-inline void CommandContext::SetDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEAP_TYPE type[], ID3D12DescriptorHeap* heapPtrs[])
-{
-	bool anyChanged = false;
-
-	for (uint32_t i = 0; i < heapCount; ++i)
-	{
-		if (m_currentDescriptorHeaps[type[i]] != heapPtrs[i])
-		{
-			m_currentDescriptorHeaps[type[i]] = heapPtrs[i];
-			anyChanged = true;
-		}
-	}
-
-	if (anyChanged)
-	{
-		BindDescriptorHeaps();
-	}
-}
-
-
 class GraphicsContext : public CommandContext
 {
 public:
@@ -229,8 +189,70 @@ public:
 };
 
 
+class ComputeContext : public CommandContext
+{
+public:
+	void SetRootSignature(const RootSignature& RootSig);
+
+	void SetPipelineState(const ComputePSO& PSO);
+	void SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer);
+	void SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer);
+	void SetUAV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
+
+	void Dispatch(uint32_t groupCountX = 1, uint32_t groupCountY = 1, uint32_t groupCountZ = 1);
+	void Dispatch1D(uint32_t threadCountX, uint32_t groupSizeX = 64);
+	void Dispatch2D(uint32_t threadCountX, uint32_t threadCountY, uint32_t groupSizeX = 8, uint32_t groupSizeY = 8);
+	void Dispatch3D(uint32_t threadCountX, uint32_t threadCountY, uint32_t threadCountZ, uint32_t groupSizeX, uint32_t groupSizeY, uint32_t groupSizeZ);
+};
+
+
+inline void CommandContext::FlushResourceBarriers()
+{
+	if (m_numBarriersToFlush > 0)
+	{
+		m_commandList->ResourceBarrier(m_numBarriersToFlush, m_resourceBarrierBuffer);
+		m_numBarriersToFlush = 0;
+	}
+}
+
+
+inline void CommandContext::SetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12DescriptorHeap* heapPtr)
+{
+	if (m_currentDescriptorHeaps[type] != heapPtr)
+	{
+		m_currentDescriptorHeaps[type] = heapPtr;
+		BindDescriptorHeaps();
+	}
+}
+
+
+inline void CommandContext::SetDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEAP_TYPE type[], ID3D12DescriptorHeap* heapPtrs[])
+{
+	bool anyChanged = false;
+
+	for (uint32_t i = 0; i < heapCount; ++i)
+	{
+		if (m_currentDescriptorHeaps[type[i]] != heapPtrs[i])
+		{
+			m_currentDescriptorHeaps[type[i]] = heapPtrs[i];
+			anyChanged = true;
+		}
+	}
+
+	if (anyChanged)
+	{
+		BindDescriptorHeaps();
+	}
+}
+
+
 inline void GraphicsContext::SetRootSignature(const RootSignature& rootSig)
 {
+	m_curComputeRootSignature = nullptr;
+
 	auto signature = rootSig.GetSignature();
 	if (signature == m_curGraphicsRootSignature)
 	{
@@ -253,6 +275,8 @@ inline void GraphicsContext::SetStencilRef(uint32_t stencilRef)
 
 inline void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 {
+	m_curComputePipelineState = nullptr;
+
 	auto pipelineState = pso.GetPipelineStateObject();
 	if (pipelineState != m_curGraphicsPipelineState)
 	{
@@ -352,6 +376,105 @@ inline void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance
 	m_dynamicViewDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
 	m_dynamicSamplerDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
 	m_commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
+}
+
+
+inline void ComputeContext::SetRootSignature(const RootSignature& rootSig)
+{
+	m_curGraphicsRootSignature = nullptr;
+
+	auto signature = rootSig.GetSignature();
+	if (signature == m_curComputeRootSignature)
+	{
+		return;
+	}
+
+	m_commandList->SetComputeRootSignature(signature);
+	m_curComputeRootSignature = signature;
+
+	m_dynamicViewDescriptorHeap.ParseComputeRootSignature(rootSig);
+	m_dynamicSamplerDescriptorHeap.ParseComputeRootSignature(rootSig);
+}
+
+
+inline void ComputeContext::SetPipelineState(const ComputePSO& pso)
+{
+	m_curGraphicsPipelineState = nullptr;
+
+	auto pipelineState = pso.GetPipelineStateObject();
+	if (pipelineState != m_curComputePipelineState)
+	{
+		m_commandList->SetPipelineState(pipelineState);
+		m_curComputePipelineState = pipelineState;
+	}
+}
+
+
+inline void ComputeContext::SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer)
+{
+	m_commandList->SetComputeRootConstantBufferView(rootIndex, constantBuffer.RootConstantBufferView());
+}
+
+
+inline void ComputeContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer)
+{
+	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &constantBuffer.GetCBV());
+}
+
+
+inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture)
+{
+	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &texture.GetSRV());
+}
+
+
+inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
+{
+	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &colorBuffer.GetSRV());
+}
+
+
+inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer)
+{
+	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &depthBuffer.GetDepthSRV());
+}
+
+
+inline void ComputeContext::SetUAV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
+{
+	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &colorBuffer.GetUAV());
+}
+
+
+inline void ComputeContext::Dispatch(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ)
+{
+	FlushResourceBarriers();
+	m_dynamicViewDescriptorHeap.CommitComputeRootDescriptorTables(m_commandList);
+	m_dynamicSamplerDescriptorHeap.CommitComputeRootDescriptorTables(m_commandList);
+	m_commandList->Dispatch(groupCountX, groupCountY, groupCountZ);
+}
+
+
+inline void ComputeContext::Dispatch1D(uint32_t threadCountX, uint32_t groupSizeX)
+{
+	Dispatch(Math::DivideByMultiple(threadCountX, groupSizeX), 1, 1);
+}
+
+
+inline void ComputeContext::Dispatch2D(uint32_t threadCountX, uint32_t threadCountY, uint32_t groupSizeX, uint32_t groupSizeY)
+{
+	Dispatch(
+		Math::DivideByMultiple(threadCountX, groupSizeX),
+		Math::DivideByMultiple(threadCountY, groupSizeY), 1);
+}
+
+
+inline void ComputeContext::Dispatch3D(uint32_t threadCountX, uint32_t threadCountY, uint32_t threadCountZ, uint32_t groupSizeX, uint32_t groupSizeY, uint32_t groupSizeZ)
+{
+	Dispatch(
+		Math::DivideByMultiple(threadCountX, groupSizeX),
+		Math::DivideByMultiple(threadCountY, groupSizeY),
+		Math::DivideByMultiple(threadCountZ, groupSizeZ));
 }
 
 } // namespace Kodiak

@@ -56,7 +56,7 @@ void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 	m_format = format;
 	m_layout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-	auto imageCreateInfo = DescribeTex2D(width, height, 1, numMips, format, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+	auto imageCreateInfo = DescribeTex2D(width, height, 1, numMips, format, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT);
 	CreateTextureResource(name, imageCreateInfo);
 	CreateDerivedViews(format, 1, numMips);
 }

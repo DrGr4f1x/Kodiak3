@@ -32,7 +32,8 @@ public:
 	const VkDeviceMemory GetResource() const { return m_deviceMemory; }
 
 protected:
-	VkDeviceMemory m_deviceMemory{ VK_NULL_HANDLE };
+	VkDeviceMemory	m_deviceMemory{ VK_NULL_HANDLE };
+	ResourceState	m_usageState{ ResourceState::Common };
 };
 
 } // namespace Kodiak

@@ -12,7 +12,7 @@ float Convolve(float kernel[9], float data[9], float denom, float offset)
 		res += kernel[i] * data[i];
 	}
 
-	return clamp(res / denom, 0.0f, 1.0f);
+	return clamp((res / denom) + offset, 0.0f, 1.0f);
 }
 
 
@@ -37,7 +37,7 @@ void main(uint3 DTid : SV_DispatchThreadId)
 	kernel[3] =  0.0; kernel[4] = -1.0; kernel[5] = 0.0;
 	kernel[6] =  0.0; kernel[7] =  0.0; kernel[8] = 2.0;
 
-	float t = Convolve(kernel, avg, 0.1f, 0.0f);
+	float t = Convolve(kernel, avg, 1.0f, 0.5f);
 	float4 res = float4(float3(t, t, t), 1.0f);
 
 	outputTex[DTid.xy] = res;

@@ -35,7 +35,9 @@ enum class ResourceState
 	ResolveSource =				D3D12_RESOURCE_STATE_RESOLVE_SOURCE,
 	GenericRead =				D3D12_RESOURCE_STATE_GENERIC_READ,
 	Present =					D3D12_RESOURCE_STATE_PRESENT,
-	Predication =				D3D12_RESOURCE_STATE_PREDICATION
+	Predication =				D3D12_RESOURCE_STATE_PREDICATION,
+	NonPixelShaderImage,
+	PixelShaderImage
 };
 
 template <> struct EnableBitmaskOperators<ResourceState> { static const bool enable = true; };
@@ -228,6 +230,7 @@ enum class DescriptorType
 	CBV,
 	Sampler,
 	TextureSRV,
+	ImageSRV,
 	ImageSampler,
 	BufferUAV,
 	ImageUAV
@@ -244,6 +247,7 @@ inline D3D12_DESCRIPTOR_RANGE_TYPE DescriptorTypeToDX12(DescriptorType type)
 	case DescriptorType::Sampler:
 		return D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
 		break;
+	case DescriptorType::ImageSRV:
 	case DescriptorType::TextureSRV:
 		return D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		break;
@@ -251,8 +255,6 @@ inline D3D12_DESCRIPTOR_RANGE_TYPE DescriptorTypeToDX12(DescriptorType type)
 		return D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		break;
 	case DescriptorType::BufferUAV:
-		return D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
-		break;
 	case DescriptorType::ImageUAV:
 		return D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 		break;

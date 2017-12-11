@@ -347,6 +347,14 @@ void CommandContext::TransitionResource(Texture& texture, ResourceState newState
 			barrierDesc.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 			barrierDesc.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			break;
+		case ResourceState::NonPixelShaderImage:
+			barrierDesc.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			barrierDesc.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+			break;
+		case ResourceState::UnorderedAccess:
+			barrierDesc.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+			barrierDesc.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+			break;
 		case ResourceState::Present:
 			barrierDesc.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
 			barrierDesc.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
@@ -373,6 +381,115 @@ void CommandContext::TransitionResource(Texture& texture, ResourceState newState
 		texture.m_layout = barrierDesc.newLayout;
 		texture.m_accessFlags = barrierDesc.dstAccessMask;
 		texture.m_usageState = newState;
+	}
+	else if (newState == ResourceState::UnorderedAccess)
+	{
+		// TODO
+		assert(false);
+#if 0
+		InsertUAVBarrier(Resource, FlushImmediate);
+#endif
+	}
+
+	if (flushImmediate || m_numImageBarriersToFlush == 16)
+	{
+		FlushImageBarriers();
+	}
+}
+
+
+void CommandContext::TransitionResource(ColorBuffer& colorBuffer, ResourceState newState, bool flushImmediate)
+{
+	assert_msg(newState != ResourceState::Undefined, "Can\'t transition to Undefined resource state");
+
+	ResourceState oldState = colorBuffer.m_usageState;
+
+	if (m_type == CommandListType::Compute)
+	{
+		assert((oldState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == oldState);
+		assert((newState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == newState);
+	}
+
+	if (oldState != newState)
+	{
+		assert_msg(m_numImageBarriersToFlush < 16, "Exceeded arbitrary limit on buffered image barriers");
+		VkImageMemoryBarrier& barrierDesc = m_pendingImageBarriers[m_numImageBarriersToFlush++];
+
+		barrierDesc.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		barrierDesc.pNext = nullptr;
+
+		barrierDesc.image = colorBuffer.m_image;
+
+		// Setup access flags and layout 
+		barrierDesc.srcAccessMask = colorBuffer.m_accessFlags;
+		barrierDesc.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+		switch (barrierDesc.oldLayout)
+		{
+		case VK_IMAGE_LAYOUT_UNDEFINED:
+			// Only valid as initial layout, memory contents are not preserved
+			// Can be accessed directly, no source dependency required
+			barrierDesc.srcAccessMask = 0;
+			break;
+		case VK_IMAGE_LAYOUT_PREINITIALIZED:
+			// Only valid as initial layout for linear images, preserves memory contents
+			// Make sure host writes to the image have been finished
+			barrierDesc.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+			break;
+		case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+			// Old layout is transfer destination
+			// Make sure any writes to the image have been finished
+			barrierDesc.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			break;
+		}
+
+		switch (newState)
+		{
+		case ResourceState::Clear:
+			barrierDesc.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			barrierDesc.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			break;
+		case ResourceState::RenderTarget:
+			barrierDesc.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			barrierDesc.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			break;
+		case ResourceState::PixelShaderResource:
+		case ResourceState::NonPixelShaderResource:
+		case ResourceState::GenericRead:
+			// Shader read (sampler, input attachment)
+			barrierDesc.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			barrierDesc.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			break;
+		case ResourceState::Present:
+			barrierDesc.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+			barrierDesc.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+			break;
+		case ResourceState::CopyDest:
+			barrierDesc.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			barrierDesc.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			break;
+		case ResourceState::UnorderedAccess:
+			barrierDesc.dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+			barrierDesc.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+			break;
+		default:
+			assert(false);
+			break;
+		}
+
+		barrierDesc.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		barrierDesc.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+		// TODO this likely isn't correct
+		barrierDesc.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		barrierDesc.subresourceRange.baseMipLevel = 0;
+		barrierDesc.subresourceRange.levelCount = 1;
+		barrierDesc.subresourceRange.baseArrayLayer = 0;
+		barrierDesc.subresourceRange.layerCount = colorBuffer.GetArraySize();
+
+		colorBuffer.m_layout = barrierDesc.newLayout;
+		colorBuffer.m_accessFlags = barrierDesc.dstAccessMask;
+		colorBuffer.m_usageState = newState;
 	}
 	else if (newState == ResourceState::UnorderedAccess)
 	{
@@ -452,6 +569,7 @@ void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer
 
 void GraphicsContext::SetRootSignature(const RootSignature& rootSig)
 {
+	m_curComputePipelineLayout = VK_NULL_HANDLE;
 	m_curGraphicsPipelineLayout = rootSig.GetLayout();
 
 	m_dynamicDescriptorPool.ParseGraphicsRootSignature(rootSig);
@@ -505,4 +623,26 @@ void GraphicsContext::SetRootConstantBuffer(uint32_t rootIndex, ConstantBuffer& 
 {
 	VkDescriptorBufferInfo bufferInfo = constantBuffer.GetDescriptorInfo();
 	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, 0, 1, &bufferInfo);
+}
+
+
+void ComputeContext::SetRootSignature(const RootSignature& rootSig)
+{
+	m_curGraphicsPipelineLayout = VK_NULL_HANDLE;
+	m_curComputePipelineLayout = rootSig.GetLayout();
+
+	m_dynamicDescriptorPool.ParseComputeRootSignature(rootSig);
+}
+
+
+void ComputeContext::SetPipelineState(const ComputePSO& pso)
+{
+	vkCmdBindPipeline(m_commandList, VK_PIPELINE_BIND_POINT_COMPUTE, pso.GetPipelineStateObject());
+}
+
+
+void ComputeContext::SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer)
+{
+	VkDescriptorBufferInfo bufferInfo = constantBuffer.GetDescriptorInfo();
+	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, 0, 1, &bufferInfo);
 }

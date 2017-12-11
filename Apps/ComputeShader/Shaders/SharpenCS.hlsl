@@ -12,7 +12,7 @@ float Convolve(float kernel[9], float data[9], float denom, float offset)
 		res += kernel[i] * data[i];
 	}
 
-	return clamp(res / denom, 0.0f, 1.0f);
+	return clamp((res / denom) + offset, 0.0f, 1.0f);
 }
 
 
@@ -20,7 +20,9 @@ float Convolve(float kernel[9], float data[9], float denom, float offset)
 void main(uint3 DTid : SV_DispatchThreadId)
 {
 	int n = -1;
-	float avg[9];
+	float temp_r[9];
+	float temp_g[9];
+	float temp_b[9];
 
 	for (int i = -1; i < 2; ++i)
 	{
@@ -28,17 +30,22 @@ void main(uint3 DTid : SV_DispatchThreadId)
 		{
 			n++;
 			float3 color = inputTex.Load(int3(DTid.x + i, DTid.y + j, 0)).xyz;
-			avg[n] = (color.r + color.g + color.b) / 3.0f;
+			temp_r[n] = color.r;
+			temp_g[n] = color.g;
+			temp_b[n] = color.b;
 		}
 	}
 
 	float kernel[9];
-	kernel[0] = -1.0; kernel[1] = -1.0; kernel[2] = -1.0;
-	kernel[3] = -1.0; kernel[4] =  9.0; kernel[5] = -1.0;
-	kernel[6] = -1.0; kernel[7] = -1.0; kernel[8] = -1.0;
+	kernel[0] = -1.0f; kernel[1] = -1.0f; kernel[2] = -1.0f;
+	kernel[3] = -1.0f; kernel[4] =  9.0f; kernel[5] = -1.0f;
+	kernel[6] = -1.0f; kernel[7] = -1.0f; kernel[8] = -1.0f;
 
-	float t = Convolve(kernel, avg, 0.1f, 0.0f);
-	float4 res = float4(float3(t, t, t), 1.0f);
+	float4 res = float4(
+		Convolve(kernel, temp_r, 1.0f, 0.0f),
+		Convolve(kernel, temp_g, 1.0f, 0.0f),
+		Convolve(kernel, temp_b, 1.0f, 0.0f),
+		1.0f);
 
 	outputTex[DTid.xy] = res;
 }

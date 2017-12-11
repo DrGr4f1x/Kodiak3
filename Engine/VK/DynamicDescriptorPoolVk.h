@@ -70,7 +70,7 @@ public:
 		m_pipelineLayout = rootSig.GetLayout();
 		m_computeHandleCache.ParseRootSignature(rootSig);
 
-		BindImmutableSamplers(VK_PIPELINE_BIND_POINT_GRAPHICS, rootSig);
+		BindImmutableSamplers(VK_PIPELINE_BIND_POINT_COMPUTE, rootSig);
 	}
 
 	// Upload any new descriptors in the cache to the shader-visible heap.
@@ -84,9 +84,9 @@ public:
 
 	inline void CommitComputeRootDescriptorSets(VkCommandBuffer commandList)
 	{
-		if (m_graphicsHandleCache.m_staleDescriptorSetBitMap != 0)
+		if (m_computeHandleCache.m_staleDescriptorSetBitMap != 0)
 		{
-			CopyAndBindStagedDescriptors(m_graphicsHandleCache, commandList, true);
+			CopyAndBindStagedDescriptors(m_computeHandleCache, commandList, true);
 		}
 	}
 

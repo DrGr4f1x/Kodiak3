@@ -16,6 +16,7 @@
 #include "CommandContext.h"
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
+#include "Input.h"
 
 
 using namespace Kodiak;
@@ -60,6 +61,8 @@ void ComputeShaderApp::Startup()
 	InitConstantBuffer();
 
 	LoadAssets();
+
+	m_computeScratch.Create("Compute Scratch", m_texture->GetWidth(), m_texture->GetHeight(), 1, Format::R8G8B8A8_UNorm);
 }
 
 
@@ -79,6 +82,25 @@ void ComputeShaderApp::Shutdown()
 
 bool ComputeShaderApp::Update()
 {
+	if (g_input.IsFirstPressed(DigitalInput::kKey_add))
+	{
+		++m_curComputeTechnique;
+	}
+	else if (g_input.IsFirstPressed(DigitalInput::kKey_subtract))
+	{
+		--m_curComputeTechnique;
+	}
+
+	if (m_curComputeTechnique < 0)
+	{
+		m_curComputeTechnique = 2;
+	}
+
+	if (m_curComputeTechnique > 2)
+	{
+		m_curComputeTechnique = 0;
+	}
+
 	return true;
 }
 
@@ -87,7 +109,39 @@ void ComputeShaderApp::Render()
 {
 	auto& context = GraphicsContext::Begin("Render frame");
 
+	// Compute
+	{
+		auto& computeContext = context.GetComputeContext();
+
+		computeContext.TransitionResource(m_computeScratch, ResourceState::UnorderedAccess);
+		computeContext.TransitionResource(*m_texture, ResourceState::NonPixelShaderImage);
+
+		computeContext.SetRootSignature(m_computeRootSig);
+		if (m_curComputeTechnique == 0)
+		{
+			computeContext.SetPipelineState(m_embossPSO);
+		}
+		else if (m_curComputeTechnique == 1)
+		{
+			computeContext.SetPipelineState(m_edgeDetectPSO);
+		}
+		else
+		{
+			computeContext.SetPipelineState(m_sharpenPSO);
+		}
+
+		computeContext.SetSRV(0, 0, *m_texture);
+		computeContext.SetUAV(0, 1, m_computeScratch);
+
+		computeContext.Dispatch2D(m_computeScratch.GetWidth(), m_computeScratch.GetHeight(), 16, 16);
+
+		computeContext.TransitionResource(m_computeScratch, ResourceState::PixelShaderResource);
+	}
+
+	// Graphics
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
+
+	context.TransitionResource(*m_texture, ResourceState::PixelShaderResource, true);
 
 	Color clearColor{ DirectX::Colors::Black };
 	context.BeginRenderPass(m_renderPass, *m_framebuffers[curFrame], clearColor, 1.0f, 0);
@@ -103,6 +157,11 @@ void ComputeShaderApp::Render()
 	context.SetVertexBuffer(0, m_vertexBuffer);
 	context.SetIndexBuffer(m_indexBuffer);
 
+	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
+
+	context.SetViewportAndScissor(m_displayWidth / 2, 0u, m_displayWidth / 2, m_displayHeight);
+	context.SetRootConstantBuffer(0, m_constantBuffer); // TODO - it shouldn't be necessary to do this in VK
+	context.SetSRV(1, 0, m_computeScratch);
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 
 	context.EndRenderPass();
@@ -121,7 +180,7 @@ void ComputeShaderApp::InitRootSigs()
 
 	m_computeRootSig.Reset(1);
 	m_computeRootSig[0].InitAsDescriptorTable(2, ShaderVisibility::Compute);
-	m_computeRootSig[0].SetTableRange(0, DescriptorType::TextureSRV, 0, 1);
+	m_computeRootSig[0].SetTableRange(0, DescriptorType::ImageSRV, 0, 1);
 	m_computeRootSig[0].SetTableRange(1, DescriptorType::ImageUAV, 0, 1);
 	m_computeRootSig.Finalize("Compute Root Sig");
 }

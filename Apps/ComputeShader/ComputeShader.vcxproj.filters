@@ -13,6 +13,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{c3a98b53-c4f4-4120-ad4f-c597e073a94e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\GLSL">
+      <UniqueIdentifier>{18ea7302-21df-4cf2-afab-02eee787af6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Shaders\TexturePS.hlsl">
@@ -21,12 +24,15 @@
     <CustomBuild Include="Shaders\TextureVS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\EdgeDetectCS.hlsl">
-      <Filter>Shaders</Filter>
-    </CustomBuild>
     <CustomBuild Include="Shaders\SharpenCS.hlsl" />
+    <CustomBuild Include="Shaders\EdgeDetectCS.glsl" />
+    <CustomBuild Include="Shaders\EmbossCS.glsl" />
+    <CustomBuild Include="Shaders\SharpenCS.glsl" />
+    <CustomBuild Include="Shaders\EdgeDetectCS.hlsl">
+      <Filter>Shaders\GLSL</Filter>
+    </CustomBuild>
     <CustomBuild Include="Shaders\EmbossCS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\GLSL</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

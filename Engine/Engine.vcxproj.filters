@@ -132,9 +132,6 @@
     <ClInclude Include="VK\PixelBufferVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
-    <ClInclude Include="VK\ColorBuffer.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="DX12\ColorBuffer12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
@@ -229,6 +226,9 @@
     </ClInclude>
     <ClInclude Include="Input.h" />
     <ClInclude Include="CameraController.h" />
+    <ClInclude Include="ColorBuffer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />

@@ -38,14 +38,10 @@ public:
 	// Create a color buffer from a swap chain buffer.  Unordered access is restricted.
 	void CreateFromSwapChain(const std::string& name, ID3D12Resource* baseResource);
 
-	// Create a color buffer.  If an address is supplied, memory will not be allocated.
-	// The vmem address allows you to alias buffers (which can be especially useful for
-	// reusing ESRAM across a frame.)
+	// Create a color buffer.
 	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips,	Format format);
 
-	// Create a color buffer.  If an address is supplied, memory will not be allocated.
-	// The vmem address allows you to alias buffers (which can be especially useful for
-	// reusing ESRAM across a frame.)
+	// Create a color buffer.
 	void CreateArray(const std::string& name, uint32_t width, uint32_t height, uint32_t arrayCount,	Format format);
 
 	// Get pre-created CPU-visible descriptor handles

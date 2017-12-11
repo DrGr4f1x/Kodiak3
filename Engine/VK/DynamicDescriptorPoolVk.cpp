@@ -136,7 +136,6 @@ VkDescriptorPool DynamicDescriptorPool::RequestDescriptorPool()
 		{
 			{ VK_DESCRIPTOR_TYPE_SAMPLER, kMaxSamplers },
 			{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, kMaxCombinedImageSamplers },
-			{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, kMaxCombinedImageSamplers },
 			{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, kMaxSampledImages },
 			{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, kMaxStorageImages },
 			{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, kMaxUniformTexelBuffers },
@@ -240,6 +239,11 @@ void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& 
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 					writeDescriptorSet.pImageInfo = rangeDesc.imageHandleStart + rangeDesc.offset;
 					break;
+				case DescriptorType::ImageSRV:
+				case DescriptorType::ImageUAV:
+					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+					writeDescriptorSet.pImageInfo = rangeDesc.imageHandleStart + rangeDesc.offset;
+					break;
 				case DescriptorType::BufferUAV:
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
 					writeDescriptorSet.pTexelBufferView = rangeDesc.texelBufferHandleStart + rangeDesc.offset;
@@ -310,7 +314,7 @@ void DynamicDescriptorPool::DescriptorHandleCache::StageDescriptorHandles(uint32
 	{
 		auto& rangeDesc = descriptorSet.ranges[rangeIndex];
 
-		if (rangeDesc.type != DescriptorType::TextureSRV) continue;
+		if (rangeDesc.type != DescriptorType::TextureSRV && rangeDesc.type != DescriptorType::ImageUAV && rangeDesc.type != DescriptorType::ImageSRV) continue;
 
 		if (offset >= rangeDesc.offset && offset < (rangeDesc.offset + rangeDesc.rangeSize))
 		{
@@ -431,6 +435,15 @@ void DynamicDescriptorPool::DescriptorHandleCache::ParseRootSignature(const Root
 			currentImageOffset++;
 			break;
 
+		case RootParameterType::ImageSRV:
+			descriptorSet.rangeCount = 1;
+			descriptorSet.ranges[0].type = DescriptorType::TextureSRV;
+			descriptorSet.ranges[0].rangeSize = 1;
+			descriptorSet.ranges[0].offset = 0;
+			descriptorSet.ranges[0].imageHandleStart = &m_imageDescriptors[0] + currentImageOffset;
+			currentImageOffset++;
+			break;
+
 		case RootParameterType::UAV:
 			descriptorSet.rangeCount = 1;
 			descriptorSet.ranges[0].type = DescriptorType::BufferUAV;
@@ -459,6 +472,16 @@ void DynamicDescriptorPool::DescriptorHandleCache::ParseRootSignature(const Root
 					break;
 				case DescriptorType::TextureSRV:
 					descriptorSet.ranges[rangeIndex].type = DescriptorType::TextureSRV;
+					descriptorSet.ranges[rangeIndex].imageHandleStart = &m_imageDescriptors[0] + currentImageOffset;
+					currentImageOffset += rangeDesc.numDescriptors;
+					break;
+				case DescriptorType::ImageSRV:
+					descriptorSet.ranges[rangeIndex].type = DescriptorType::ImageSRV;
+					descriptorSet.ranges[rangeIndex].imageHandleStart = &m_imageDescriptors[0] + currentImageOffset;
+					currentImageOffset += rangeDesc.numDescriptors;
+					break;
+				case DescriptorType::ImageUAV:
+					descriptorSet.ranges[rangeIndex].type = DescriptorType::ImageUAV;
 					descriptorSet.ranges[rangeIndex].imageHandleStart = &m_imageDescriptors[0] + currentImageOffset;
 					currentImageOffset += rangeDesc.numDescriptors;
 					break;

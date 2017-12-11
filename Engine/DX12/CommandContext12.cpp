@@ -190,6 +190,9 @@ void CommandContext::TransitionResource(GpuResource& resource, ResourceState new
 {
 	ResourceState oldState = resource.m_usageState;
 
+	if (newState == ResourceState::NonPixelShaderImage) newState = ResourceState::NonPixelShaderResource;
+	if (newState == ResourceState::PixelShaderImage) newState = ResourceState::PixelShaderResource;
+
 	if (m_type == CommandListType::Compute)
 	{
 		assert((oldState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == oldState);
@@ -234,6 +237,9 @@ void CommandContext::TransitionResource(GpuResource& resource, ResourceState new
 
 void CommandContext::BeginResourceTransition(GpuResource& resource, ResourceState newState, bool flushImmediate)
 {
+	if (newState == ResourceState::NonPixelShaderImage) newState = ResourceState::NonPixelShaderResource;
+	if (newState == ResourceState::PixelShaderImage) newState = ResourceState::PixelShaderResource;
+
 	// If it's already transitioning, finish that transition
 	if (resource.m_transitioningState != (D3D12_RESOURCE_STATES)-1)
 	{

@@ -16,12 +16,17 @@ namespace Kodiak
 
 class PixelBuffer : public GpuResource
 {
+	friend class CommandContext;
+	friend class GraphicsContext;
+	friend class ComputeContext;
+
 public:
 	void Destroy();
 
 	uint32_t GetWidth() const { return m_width; }
 	uint32_t GetHeight() const { return m_height; }
 	uint32_t GetDepth() const { return m_arraySize; }
+	uint32_t GetArraySize() const { return m_arraySize; }
 	Format GetFormat() const { return m_format; }
 
 protected:

@@ -362,7 +362,7 @@ void GraphicsDevice::CreateLogicalDevice()
 	vector<const char*> deviceExtensions(m_enabledExtensions);
 	deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 	deviceExtensions.push_back(VK_KHR_MAINTENANCE1_EXTENSION_NAME);
-	deviceExtensions.push_back(VK_KHR_MAINTENANCE2_EXTENSION_NAME);
+	//deviceExtensions.push_back(VK_KHR_MAINTENANCE2_EXTENSION_NAME);
 
 	VkDeviceCreateInfo deviceCreateInfo = {};
 	deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
