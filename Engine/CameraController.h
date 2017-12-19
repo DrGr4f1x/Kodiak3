@@ -15,15 +15,24 @@
 namespace Kodiak
 {
 
+enum class CameraMode
+{
+	WASD,
+	Orbit
+};
+
 class CameraController
 {
 public:
 	// Assumes worldUp is not the X basis vector
-	CameraController(Math::Camera& camera, Math::Vector3 worldUp);
+	CameraController(Math::Camera& camera, Math::Vector3 worldUp, CameraMode mode = CameraMode::WASD);
 
 	void Update(float dt);
 
 	void RefreshFromCamera();
+
+	void SetCameraMode(CameraMode mode);
+	void SetOrbitTarget(Math::Vector3 target, float minDistance);
 
 	void SlowMovement(bool enable) { m_fineMovement = enable; }
 	void SlowRotation(bool enable) { m_fineRotation = enable; }
@@ -36,6 +45,8 @@ private:
 	CameraController& operator=(const CameraController&) { return *this; }
 
 	void ApplyMomentum(float& oldValue, float& newValue, float deltaTime);
+
+	CameraMode m_mode;
 
 	Math::Vector3 m_worldUp;
 	Math::Vector3 m_worldNorth;
@@ -62,6 +73,9 @@ private:
 	float m_lastForward;
 	float m_lastStrafe;
 	float m_lastAscent;
+
+	Math::Vector3 m_orbitTarget{ 0.0f, 0.0f, 0.0f };
+	float m_minDistance{ 0.0f };
 };
 
 } // namespace Kodiak

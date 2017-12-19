@@ -20,7 +20,9 @@ using namespace Kodiak;
 using namespace Math;
 
 
-CameraController::CameraController(Camera& camera, Vector3 worldUp) : m_targetCamera(camera)
+CameraController::CameraController(Camera& camera, Vector3 worldUp, CameraMode mode) 
+	: m_targetCamera(camera)
+	, m_mode(mode)
 {
 	m_worldUp = Normalize(worldUp);
 	m_worldNorth = Normalize(Cross(m_worldUp, Vector3(kXUnitVector)));
@@ -78,27 +80,46 @@ void CameraController::Update(float deltaTime)
 		ApplyMomentum(m_lastAscent, ascent, deltaTime);
 	}
 
-	// don't apply momentum to mouse inputs
-	yaw += g_input.GetAnalogInput(AnalogInput::kAnalogMouseX) * m_mouseSensitivityX;
-	pitch += g_input.GetAnalogInput(AnalogInput::kAnalogMouseY) * m_mouseSensitivityY;
-
-	m_currentPitch += pitch;
-	m_currentPitch = DirectX::XMMin(XM_PIDIV2, m_currentPitch);
-	m_currentPitch = DirectX::XMMax(-XM_PIDIV2, m_currentPitch);
-
-	m_currentHeading -= yaw;
-	if (m_currentHeading > XM_PI)
+	if (m_mode == CameraMode::WASD)
 	{
-		m_currentHeading -= XM_2PI;
+		// don't apply momentum to mouse inputs
+		yaw += g_input.GetAnalogInput(AnalogInput::kAnalogMouseX) * m_mouseSensitivityX;
+		pitch += g_input.GetAnalogInput(AnalogInput::kAnalogMouseY) * m_mouseSensitivityY;
+
+		m_currentPitch += pitch;
+		m_currentPitch = DirectX::XMMin(XM_PIDIV2, m_currentPitch);
+		m_currentPitch = DirectX::XMMax(-XM_PIDIV2, m_currentPitch);
+
+		m_currentHeading -= yaw;
+		if (m_currentHeading > XM_PI)
+		{
+			m_currentHeading -= XM_2PI;
+		}
+		else if (m_currentHeading <= -XM_PI)
+		{
+			m_currentHeading += XM_2PI;
+		}
+
+		Matrix3 orientation = Matrix3(m_worldEast, m_worldUp, -m_worldNorth) * Matrix3::MakeYRotation(m_currentHeading) * Matrix3::MakeXRotation(m_currentPitch);
+		Vector3 position = orientation * Vector3(strafe, ascent, -forward) + m_targetCamera.GetPosition();
+		m_targetCamera.SetTransform(AffineTransform(orientation, position));
 	}
-	else if (m_currentHeading <= -XM_PI)
+	else
 	{
-		m_currentHeading += XM_2PI;
+		// TODO This has some gimbal-lock behavior.  Fix it!
+		float deltaYaw = g_input.GetAnalogInput(AnalogInput::kAnalogMouseX) * m_mouseSensitivityX;
+		float deltaPitch = g_input.GetAnalogInput(AnalogInput::kAnalogMouseY) * m_mouseSensitivityY;
+
+		Quaternion orientation = Quaternion(deltaPitch, deltaYaw, 0.0f) * m_targetCamera.GetRotation();
+		Vector3 zAxis = orientation * Vector3(kZUnitVector);
+		Vector3 origPos = m_targetCamera.GetPosition();
+		Vector3 deltaPos = m_orbitTarget - origPos;
+		Vector3 position = m_orbitTarget + Length(deltaPos) * zAxis;
+
+		m_targetCamera.SetLookDirection(-zAxis, Vector3(kYUnitVector));
+		m_targetCamera.SetPosition(position);
 	}
 
-	Matrix3 orientation = Matrix3(m_worldEast, m_worldUp, -m_worldNorth) * Matrix3::MakeYRotation(m_currentHeading) * Matrix3::MakeXRotation(m_currentPitch);
-	Vector3 position = orientation * Vector3(strafe, ascent, -forward) + m_targetCamera.GetPosition();
-	m_targetCamera.SetTransform(AffineTransform(orientation, position));
 	m_targetCamera.Update();
 }
 
@@ -128,6 +149,20 @@ void CameraController::RefreshFromCamera()
 	m_lastForward = 0.0f;
 	m_lastStrafe = 0.0f;
 	m_lastAscent = 0.0f;
+}
+
+
+void CameraController::SetCameraMode(CameraMode mode)
+{
+	m_mode = mode;
+}
+
+
+void CameraController::SetOrbitTarget(Math::Vector3 target, float minDistance)
+{
+	m_orbitTarget = target;
+	m_minDistance = fabsf(minDistance);
+	m_targetCamera.SetLookDirection(target - m_targetCamera.GetPosition(), m_worldUp);
 }
 
 

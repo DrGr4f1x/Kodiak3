@@ -48,6 +48,8 @@ void StencilBufferApp::Startup()
 
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.RefreshFromCamera();
+	m_controller.SetOrbitTarget(Vector3(0.0f, 4.0f, 0.0f), 4.0f);
+	m_controller.SetCameraMode(CameraMode::Orbit);
 
 	InitRootSig();
 	InitPSOs();
