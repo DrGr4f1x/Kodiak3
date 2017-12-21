@@ -55,11 +55,11 @@ private:
 	{
 		Math::Matrix4 viewProjectionMatrix;
 		Math::Matrix4 modelMatrix;
+		Math::Vector3 eyePos;
 	};
 
 	struct PSConstants
 	{
-		Math::Matrix4 invModelViewMatrix;
 		float lodBias;
 	};
 	Kodiak::RootSignature		m_modelRootSig;

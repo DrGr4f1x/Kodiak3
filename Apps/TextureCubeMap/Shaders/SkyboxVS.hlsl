@@ -10,6 +10,7 @@ cbuffer VSConstants : register(b0)
 {
 	float4x4 viewProjectionMatrix;
 	float4x4 modelMatrix;
+	float3 eyePos;
 }
 
 

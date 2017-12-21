@@ -213,14 +213,14 @@ void TextureCubeMapApp::UpdateConstantBuffers()
 	
 	m_vsSkyboxConstants.viewProjectionMatrix = m_camera.GetProjMatrix() * Invert(viewMatrix);
 	m_vsSkyboxConstants.modelMatrix = modelMatrix;
+	m_vsSkyboxConstants.eyePos = Math::Vector3(0.0f, 0.0f, 0.0f);
 	m_vsSkyboxConstantBuffer.Update(sizeof(m_vsSkyboxConstants), &m_vsSkyboxConstants);
 
 	m_vsModelConstants.viewProjectionMatrix = m_camera.GetViewProjMatrix();
 	m_vsModelConstants.modelMatrix = modelMatrix;
+	m_vsModelConstants.eyePos = m_camera.GetPosition();
 	m_vsModelConstantBuffer.Update(sizeof(m_vsModelConstants), &m_vsModelConstants);
 
-	Matrix4 modelViewMatrix = m_camera.GetViewMatrix() * modelMatrix;
-	m_psConstants.invModelViewMatrix = Invert(modelViewMatrix);
 	m_psConstants.lodBias = 0.0f;
 	m_psConstantBuffer.Update(sizeof(m_psConstants), &m_psConstants);
 }
