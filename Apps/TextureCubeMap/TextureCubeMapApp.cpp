@@ -52,6 +52,7 @@ void TextureCubeMapApp::Startup()
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.RefreshFromCamera();
 	m_controller.SetCameraMode(CameraMode::ArcBall);
+	m_controller.SetOrbitTarget(Math::Vector3(0.0f, 0.0f, 0.0f), 4.0f, 2.0f);
 
 	UpdateConstantBuffers();
 
@@ -73,6 +74,10 @@ void TextureCubeMapApp::Shutdown()
 bool TextureCubeMapApp::Update()
 {
 	m_controller.Update(m_frameTimer);
+
+	Math::Vector3 right = m_camera.GetRightVec();
+	Math::Vector3 up = m_camera.GetUpVec();
+	Math::Vector3 forward = m_camera.GetForwardVec();
 
 	UpdateConstantBuffers();
 
@@ -206,7 +211,7 @@ void TextureCubeMapApp::UpdateConstantBuffers()
 
 	Matrix4 viewMatrix = AffineTransform(m_camera.GetRotation(), Vector3(0.0f, 0.0f, 0.0f));
 	
-	m_vsSkyboxConstants.viewProjectionMatrix = m_camera.GetProjMatrix() * viewMatrix;
+	m_vsSkyboxConstants.viewProjectionMatrix = m_camera.GetProjMatrix() * Invert(viewMatrix);
 	m_vsSkyboxConstants.modelMatrix = modelMatrix;
 	m_vsSkyboxConstantBuffer.Update(sizeof(m_vsSkyboxConstants), &m_vsSkyboxConstants);
 

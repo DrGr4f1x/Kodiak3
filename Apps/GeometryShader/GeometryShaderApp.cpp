@@ -50,6 +50,8 @@ void GeometryShaderApp::Startup()
 
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.RefreshFromCamera();
+	m_controller.SetCameraMode(CameraMode::ArcBall);
+	m_controller.SetOrbitTarget(Math::Vector3(0.0f, 0.0f, 0.0f), 8.0f, 4.0f);
 
 	UpdateConstantBuffer();
 
