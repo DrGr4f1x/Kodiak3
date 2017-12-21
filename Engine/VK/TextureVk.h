@@ -51,6 +51,13 @@ public:
 		Create2DArray(width, width, height, arraySlices, format, initData);
 	}
 
+	// Create a 1-level cubemap texture
+	void CreateCube(uint32_t pitch, uint32_t width, uint32_t height, Format format, const void* initData);
+	void CreateCube(uint32_t width, uint32_t height, Format format, const void* initData)
+	{
+		CreateCube(width, width, height, format, initData);
+	}
+
 	// Accessors
 	uint32_t GetWidth() const { return m_width; }
 	uint32_t GetHeight() const { return m_height; }

@@ -20,9 +20,8 @@ using namespace Kodiak;
 using namespace Math;
 
 
-CameraController::CameraController(Camera& camera, Vector3 worldUp, CameraMode mode) 
+CameraController::CameraController(Camera& camera, Vector3 worldUp) 
 	: m_targetCamera(camera)
-	, m_mode(mode)
 {
 	m_worldUp = Normalize(worldUp);
 	m_worldNorth = Normalize(Cross(m_worldUp, Vector3(kXUnitVector)));
@@ -36,9 +35,6 @@ void CameraController::Update(float deltaTime)
 {
 	(deltaTime);
 
-	float timeScale = 1.0f;
-	timeScale *= m_speedScale;
-
 	if (g_input.IsFirstPressed(DigitalInput::kLThumbClick) || g_input.IsFirstPressed(DigitalInput::kKey_lshift))
 	{
 		m_fineMovement = !m_fineMovement;
@@ -49,75 +45,14 @@ void CameraController::Update(float deltaTime)
 		m_fineRotation = !m_fineRotation;
 	}
 
-	float speedScale = (m_fineMovement ? 0.1f : 1.0f) * timeScale;
-	float panScale = (m_fineRotation ? 0.5f : 1.0f) * timeScale;
-
-	float yaw = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickX) * m_horizontalLookSensitivity * panScale;
-	float pitch = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickY) * m_verticalLookSensitivity * panScale;
-
-	float forward = m_moveSpeed * speedScale * (
-		g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftStickY) +
-		(g_input.IsPressed(DigitalInput::kKey_w) ? deltaTime : 0.0f) +
-		(g_input.IsPressed(DigitalInput::kKey_s) ? -deltaTime : 0.0f));
-
-	float strafe = m_strafeSpeed * speedScale * (
-		g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftStickX) +
-		(g_input.IsPressed(DigitalInput::kKey_d) ? deltaTime : 0.0f) +
-		(g_input.IsPressed(DigitalInput::kKey_a) ? -deltaTime : 0.0f));
-
-	float ascent = m_strafeSpeed * speedScale * (
-		g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightTrigger) -
-		g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftTrigger) +
-		(g_input.IsPressed(DigitalInput::kKey_e) ? deltaTime : 0.0f) +
-		(g_input.IsPressed(DigitalInput::kKey_q) ? -deltaTime : 0.0f));
-
-	if (m_momentum)
+	switch (m_mode)
 	{
-		ApplyMomentum(m_lastYaw, yaw, deltaTime);
-		ApplyMomentum(m_lastPitch, pitch, deltaTime);
-		ApplyMomentum(m_lastForward, forward, deltaTime);
-		ApplyMomentum(m_lastStrafe, strafe, deltaTime);
-		ApplyMomentum(m_lastAscent, ascent, deltaTime);
-	}
-
-	if (m_mode == CameraMode::WASD)
-	{
-		// don't apply momentum to mouse inputs
-		yaw += g_input.GetAnalogInput(AnalogInput::kAnalogMouseX) * m_mouseSensitivityX;
-		pitch += g_input.GetAnalogInput(AnalogInput::kAnalogMouseY) * m_mouseSensitivityY;
-
-		m_currentPitch += pitch;
-		m_currentPitch = DirectX::XMMin(XM_PIDIV2, m_currentPitch);
-		m_currentPitch = DirectX::XMMax(-XM_PIDIV2, m_currentPitch);
-
-		m_currentHeading -= yaw;
-		if (m_currentHeading > XM_PI)
-		{
-			m_currentHeading -= XM_2PI;
-		}
-		else if (m_currentHeading <= -XM_PI)
-		{
-			m_currentHeading += XM_2PI;
-		}
-
-		Matrix3 orientation = Matrix3(m_worldEast, m_worldUp, -m_worldNorth) * Matrix3::MakeYRotation(m_currentHeading) * Matrix3::MakeXRotation(m_currentPitch);
-		Vector3 position = orientation * Vector3(strafe, ascent, -forward) + m_targetCamera.GetPosition();
-		m_targetCamera.SetTransform(AffineTransform(orientation, position));
-	}
-	else
-	{
-		// TODO This has some gimbal-lock behavior.  Fix it!
-		float deltaYaw = g_input.GetAnalogInput(AnalogInput::kAnalogMouseX) * m_mouseSensitivityX;
-		float deltaPitch = g_input.GetAnalogInput(AnalogInput::kAnalogMouseY) * m_mouseSensitivityY;
-
-		Quaternion orientation = Quaternion(deltaPitch, deltaYaw, 0.0f) * m_targetCamera.GetRotation();
-		Vector3 zAxis = orientation * Vector3(kZUnitVector);
-		Vector3 origPos = m_targetCamera.GetPosition();
-		Vector3 deltaPos = m_orbitTarget - origPos;
-		Vector3 position = m_orbitTarget + Length(deltaPos) * zAxis;
-
-		m_targetCamera.SetLookDirection(-zAxis, Vector3(kYUnitVector));
-		m_targetCamera.SetPosition(position);
+	case CameraMode::WASD:
+		UpdateWASD(deltaTime);
+		break;
+	case CameraMode::ArcBall:
+		UpdateArcBall(deltaTime);
+		break;
 	}
 
 	m_targetCamera.Update();
@@ -158,8 +93,9 @@ void CameraController::SetCameraMode(CameraMode mode)
 }
 
 
-void CameraController::SetOrbitTarget(Math::Vector3 target, float minDistance)
+void CameraController::SetOrbitTarget(Math::Vector3 target, float zoom, float minDistance)
 {
+	m_zoom = zoom;
 	m_orbitTarget = target;
 	m_minDistance = fabsf(minDistance);
 	m_targetCamera.SetLookDirection(target - m_targetCamera.GetPosition(), m_worldUp);
@@ -179,4 +115,126 @@ void CameraController::ApplyMomentum(float& oldValue, float& newValue, float del
 	}
 	oldValue = blendedValue;
 	newValue = blendedValue;
+}
+
+
+void CameraController::UpdateWASD(float deltaTime)
+{
+	(deltaTime);
+
+	float timeScale = 1.0f;
+	timeScale *= m_speedScale;
+
+	float speedScale = (m_fineMovement ? 0.1f : 1.0f) * timeScale;
+	float panScale = (m_fineRotation ? 0.5f : 1.0f) * timeScale;
+
+	float yaw = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickX) * m_horizontalLookSensitivity * panScale;
+	float pitch = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickY) * m_verticalLookSensitivity * panScale;
+
+	float forward = m_moveSpeed * speedScale * (
+		g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftStickY) +
+		(g_input.IsPressed(DigitalInput::kKey_w) ? deltaTime : 0.0f) +
+		(g_input.IsPressed(DigitalInput::kKey_s) ? -deltaTime : 0.0f));
+
+	float strafe = m_strafeSpeed * speedScale * (
+		g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftStickX) +
+		(g_input.IsPressed(DigitalInput::kKey_d) ? deltaTime : 0.0f) +
+		(g_input.IsPressed(DigitalInput::kKey_a) ? -deltaTime : 0.0f));
+
+	float ascent = m_strafeSpeed * speedScale * (
+		g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightTrigger) -
+		g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftTrigger) +
+		(g_input.IsPressed(DigitalInput::kKey_e) ? deltaTime : 0.0f) +
+		(g_input.IsPressed(DigitalInput::kKey_q) ? -deltaTime : 0.0f));
+
+	if (m_momentum)
+	{
+		ApplyMomentum(m_lastYaw, yaw, deltaTime);
+		ApplyMomentum(m_lastPitch, pitch, deltaTime);
+		ApplyMomentum(m_lastForward, forward, deltaTime);
+		ApplyMomentum(m_lastStrafe, strafe, deltaTime);
+		ApplyMomentum(m_lastAscent, ascent, deltaTime);
+	}
+
+	// don't apply momentum to mouse inputs
+	yaw += g_input.GetAnalogInput(AnalogInput::kAnalogMouseX) * m_mouseSensitivityX;
+	pitch += g_input.GetAnalogInput(AnalogInput::kAnalogMouseY) * m_mouseSensitivityY;
+
+	m_currentPitch += pitch;
+	m_currentPitch = DirectX::XMMin(XM_PIDIV2, m_currentPitch);
+	m_currentPitch = DirectX::XMMax(-XM_PIDIV2, m_currentPitch);
+
+	m_currentHeading -= yaw;
+	if (m_currentHeading > XM_PI)
+	{
+		m_currentHeading -= XM_2PI;
+	}
+	else if (m_currentHeading <= -XM_PI)
+	{
+		m_currentHeading += XM_2PI;
+	}
+
+	Matrix3 orientation = Matrix3(m_worldEast, m_worldUp, -m_worldNorth) * Matrix3::MakeYRotation(m_currentHeading) * Matrix3::MakeXRotation(m_currentPitch);
+	Vector3 position = orientation * Vector3(strafe, ascent, -forward) + m_targetCamera.GetPosition();
+	m_targetCamera.SetTransform(AffineTransform(orientation, position));
+}
+
+
+void CameraController::UpdateArcBall(float deltaTime)
+{
+	(deltaTime);
+
+	float timeScale = 1.0f;
+	timeScale *= m_speedScale;
+
+	float panScale = (m_fineRotation ? 0.5f : 1.0f) * timeScale;
+
+	float yaw = 0.0f;
+	float pitch = 0.0f;
+
+	yaw = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickX) * m_horizontalLookSensitivity * panScale;
+	pitch = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickY) * m_verticalLookSensitivity * panScale;
+
+	if (m_momentum)
+	{
+		ApplyMomentum(m_lastYaw, yaw, deltaTime);
+		ApplyMomentum(m_lastPitch, pitch, deltaTime);
+	}
+
+	// don't apply momentum to mouse inputs
+	if (g_input.GetCaptureMouse() || g_input.IsPressed(DigitalInput::kMouse0))
+	{
+		yaw += g_input.GetAnalogInput(AnalogInput::kAnalogMouseX) * m_mouseSensitivityX;
+		pitch += g_input.GetAnalogInput(AnalogInput::kAnalogMouseY) * m_mouseSensitivityY;
+	}
+
+	float oldPitch = m_currentPitch;
+	float oldHeading = m_currentHeading;
+
+	const float epsilon = 0.05f;
+	m_currentPitch += pitch;
+	m_currentPitch = DirectX::XMMin(XM_PIDIV2 - epsilon, m_currentPitch);
+	m_currentPitch = DirectX::XMMax(-XM_PIDIV2 + epsilon, m_currentPitch);
+
+	m_currentHeading -= yaw;
+	if (m_currentHeading > XM_PI)
+	{
+		m_currentHeading -= XM_2PI;
+	}
+	else if (m_currentHeading <= -XM_PI)
+	{
+		m_currentHeading += XM_2PI;
+	}
+
+	float deltaPitch = m_currentPitch - oldPitch;
+
+	float zoom = g_input.GetAnalogInput(AnalogInput::kAnalogMouseScroll);
+	m_zoom += zoom;
+	m_zoom = DirectX::XMMax(m_minDistance, m_zoom);
+
+	// ArcBall logic
+	Vector3 position = Quaternion(m_currentPitch, m_currentHeading, 0.0f) * (-1.0f * Vector3(kZUnitVector));
+	position = m_zoom * position;
+	position += m_orbitTarget;
+	m_targetCamera.SetEyeAtUp(position, m_orbitTarget, Vector3(kYUnitVector));
 }

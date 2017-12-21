@@ -192,6 +192,9 @@ public:
 	float GetAnalogInput(AnalogInput ai) const;
 	float GetTimeCorrectedAnalogInput(AnalogInput ai) const;
 
+	void SetCaptureMouse(bool capture) { m_captureMouse = capture; }
+	bool GetCaptureMouse() const { return m_captureMouse; }
+
 private:
 	void KbmBuildKeyMapping();
 	void KbmZeroInputs();
@@ -218,6 +221,7 @@ private:
 	IDirectInput8A* m_di{ nullptr };
 	IDirectInputDevice8A* m_keyboard{ nullptr };
 	IDirectInputDevice8A* m_mouse{ nullptr };
+	bool m_captureMouse{ true };
 };
 
 extern Input g_input;

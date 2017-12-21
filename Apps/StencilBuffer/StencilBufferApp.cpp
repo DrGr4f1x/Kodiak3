@@ -16,6 +16,7 @@
 #include "CommonStates.h"
 #include "GraphicsDevice.h"
 #include "Filesystem.h"
+#include "Input.h"
 #include "Shader.h"
 
 
@@ -31,6 +32,8 @@ void StencilBufferApp::Configure()
 	filesystem.SetDefaultRootDir();
 	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
 	filesystem.AddSearchPath("Data\\Models");
+
+	//g_input.SetCaptureMouse(false);
 }
 
 
@@ -48,8 +51,8 @@ void StencilBufferApp::Startup()
 
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.RefreshFromCamera();
-	m_controller.SetOrbitTarget(Vector3(0.0f, 4.0f, 0.0f), 4.0f);
-	m_controller.SetCameraMode(CameraMode::Orbit);
+	m_controller.SetOrbitTarget(Vector3(0.0f, 4.0f, 0.0f), 8.0f, 4.0f);
+	m_controller.SetCameraMode(CameraMode::ArcBall);
 
 	InitRootSig();
 	InitPSOs();

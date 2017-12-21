@@ -522,17 +522,17 @@ Format MapKTXFormatToEngine(uint32_t internalFormat, uint32_t format, uint32_t t
 		{ KTXInternalFormat::SRGB_DXT1, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::Unknown },				//FORMAT_RGB_DXT1_SRGB_BLOCK8,
 		{ KTXInternalFormat::RGBA_DXT1, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::BC1_UNorm },				//FORMAT_RGBA_DXT1_UNORM_BLOCK8,
 		{ KTXInternalFormat::SRGB_ALPHA_DXT1, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::BC1_UNorm_SRGB },	//FORMAT_RGBA_DXT1_SRGB_BLOCK8,
-		{ KTXInternalFormat::RGBA_DXT3, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::BC3_UNorm },				//FORMAT_RGBA_DXT3_UNORM_BLOCK16,
-		{ KTXInternalFormat::SRGB_ALPHA_DXT3, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::BC3_UNorm_SRGB },	//FORMAT_RGBA_DXT3_SRGB_BLOCK16,
+		{ KTXInternalFormat::RGBA_DXT3, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::BC2_UNorm },				//FORMAT_RGBA_DXT3_UNORM_BLOCK16,
+		{ KTXInternalFormat::SRGB_ALPHA_DXT3, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::BC2_UNorm_SRGB },	//FORMAT_RGBA_DXT3_SRGB_BLOCK16,
 		{ KTXInternalFormat::RGBA_DXT5, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::BC3_UNorm },				//FORMAT_RGBA_DXT5_UNORM_BLOCK16,
-		{ KTXInternalFormat::SRGB_ALPHA_DXT5, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::Unknown },			//FORMAT_RGBA_DXT5_SRGB_BLOCK16,
+		{ KTXInternalFormat::SRGB_ALPHA_DXT5, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::BC3_UNorm_SRGB },	//FORMAT_RGBA_DXT5_SRGB_BLOCK16,
 		{ KTXInternalFormat::R_ATI1N_UNORM, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::Unknown },			//FORMAT_R_ATI1N_UNORM_BLOCK8,
 		{ KTXInternalFormat::R_ATI1N_SNORM, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::Unknown },			//FORMAT_R_ATI1N_SNORM_BLOCK8,
 		{ KTXInternalFormat::RG_ATI2N_UNORM, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::Unknown },			//FORMAT_RG_ATI2N_UNORM_BLOCK16,
 		{ KTXInternalFormat::RG_ATI2N_SNORM, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::Unknown },			//FORMAT_RG_ATI2N_SNORM_BLOCK16,
 		{ KTXInternalFormat::RGB_BP_UNSIGNED_FLOAT, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::Unknown },	//FORMAT_RGB_BP_UFLOAT_BLOCK16,
 		{ KTXInternalFormat::RGB_BP_SIGNED_FLOAT, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::Unknown },		//FORMAT_RGB_BP_SFLOAT_BLOCK16,
-		{ KTXInternalFormat::RGB_BP_UNORM, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::Unknown },			//FORMAT_RGB_BP_UNORM,
+		{ KTXInternalFormat::RGB_BP_UNORM, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::Unknown },				//FORMAT_RGB_BP_UNORM,
 		{ KTXInternalFormat::SRGB_BP_UNORM, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::Unknown },			//FORMAT_RGB_BP_SRGB,
 
 		{ s_internalRGBETC, KTXExternalFormat::NONE, KTXTypeFormat::NONE, Format::Unknown },									//FORMAT_RGB_ETC2_UNORM_BLOCK8,
@@ -771,6 +771,10 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 	else if (target == TextureTarget::Target2D_Array)
 	{
 		texture->Create2DArray(width, height, arraySize, format, ktxData + offset + sizeof(uint32_t));
+	}
+	else if (target == TextureTarget::TargetCube)
+	{
+		texture->CreateCube(width, height, format, ktxData + offset + sizeof(uint32_t));
 	}
 	else
 	{

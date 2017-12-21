@@ -3,8 +3,29 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Stdafx.cpp" />
+    <ClCompile Include="TextureCubeMapApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="TextureCubeMapApp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{a76de759-8cf8-4ef7-9498-08bff3508323}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\ReflectVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\ReflectPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\SkyboxVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\SkyboxPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

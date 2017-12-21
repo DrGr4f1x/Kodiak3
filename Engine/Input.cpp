@@ -97,7 +97,9 @@ void Input::Initialize(HWND hwnd)
 	{
 		assert_msg(false, "Mouse SetDataFormat failed.");
 	}
-	if (FAILED(m_mouse->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE)))
+
+	uint32_t mouseFlags = m_captureMouse ? DISCL_EXCLUSIVE : DISCL_NONEXCLUSIVE;
+	if (FAILED(m_mouse->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | mouseFlags)))
 	{
 		assert_msg(false, "Mouse SetCooperativeLevel failed.");
 	}
