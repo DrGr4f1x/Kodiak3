@@ -36,6 +36,8 @@ public:
 	Format GetDepthFormat() const { return m_depthFormat; }
 	uint32_t GetCurrentBuffer() const { return m_currentBuffer; }
 
+	VkFormatProperties GetFormatProperties(Format format);
+
 	void WaitForGpuIdle();
 
 private:
@@ -112,6 +114,7 @@ private:
 // Utility methods and accessors
 VkDevice GetDevice();
 uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound = nullptr);
+VkFormatProperties GetFormatProperties(Format format);
 
 extern DescriptorSetAllocator g_descriptorSetAllocator;
 inline VkDescriptorSet AllocateDescriptorSet(VkDescriptorSetLayout layout)

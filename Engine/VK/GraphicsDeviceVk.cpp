@@ -194,6 +194,17 @@ void GraphicsDevice::SubmitFrame()
 }
 
 
+VkFormatProperties GraphicsDevice::GetFormatProperties(Format format)
+{
+	VkFormat vkFormat = static_cast<VkFormat>(format);
+	VkFormatProperties properties{};
+
+	vkGetPhysicalDeviceFormatProperties(m_physicalDevice, vkFormat, &properties);
+
+	return properties;
+}
+
+
 void GraphicsDevice::WaitForGpuIdle()
 {
 	g_commandManager.IdleGPU();
@@ -675,6 +686,12 @@ uint32_t Kodiak::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags pro
 	{
 		throw runtime_error("Could not find a matching memory type");
 	}
+}
+
+
+VkFormatProperties Kodiak::GetFormatProperties(Format format)
+{
+	return g_graphicsDevice->GetFormatProperties(format);
 }
 
 

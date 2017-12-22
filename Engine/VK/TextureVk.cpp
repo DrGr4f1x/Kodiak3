@@ -75,6 +75,23 @@ shared_ptr<Texture> MakeTexture(const string& filename, F fn)
 	return manTex;
 }
 
+bool QueryLinearTilingFeature(VkFormatProperties properties, VkFormatFeatureFlagBits flags)
+{
+	return (properties.linearTilingFeatures & flags) != 0;
+}
+
+
+bool QueryOptimalTilingFeature(VkFormatProperties properties, VkFormatFeatureFlagBits flags)
+{
+	return (properties.optimalTilingFeatures & flags) != 0;
+}
+
+
+bool QueryBufferFeature(VkFormatProperties properties, VkFormatFeatureFlagBits flags)
+{
+	return (properties.bufferFeatures & flags) != 0;
+}
+
 } // anonymous namespace
 
 
@@ -92,6 +109,14 @@ void Texture::Create1D(uint32_t pitch, uint32_t width, Format format, const void
 	VkFormat vkFormat = static_cast<VkFormat>(format);
 	uint32_t size = width * BytesPerPixel(format);
 
+	VkFormatProperties properties = GetFormatProperties(format);
+	VkImageUsageFlags additionalFlags = 0;
+
+	if (QueryOptimalTilingFeature(properties, VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT))
+	{
+		additionalFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
+	}
+
 	// Create optimal tiled target image
 	VkImageCreateInfo imageCreateInfo = {};
 	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -106,7 +131,7 @@ void Texture::Create1D(uint32_t pitch, uint32_t width, Format format, const void
 	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	imageCreateInfo.extent = { width, 1, 1 };
-	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
+	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | additionalFlags;
 	// Ensure that the TRANSFER_DST bit is set for staging
 	if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
 	{
@@ -160,6 +185,14 @@ void Texture::Create2D(uint32_t pitch, uint32_t width, uint32_t height, Format f
 	VkFormat vkFormat = static_cast<VkFormat>(format);
 	uint32_t size = width * height * BytesPerPixel(format);
 
+	VkFormatProperties properties = GetFormatProperties(format);
+	VkImageUsageFlags additionalFlags = 0;
+
+	if (QueryOptimalTilingFeature(properties, VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT))
+	{
+		additionalFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
+	}
+
 	// Create optimal tiled target image
 	VkImageCreateInfo imageCreateInfo = {};
 	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -174,7 +207,7 @@ void Texture::Create2D(uint32_t pitch, uint32_t width, uint32_t height, Format f
 	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	imageCreateInfo.extent = { m_width, m_height, 1 };
-	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
+	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | additionalFlags;
 	// Ensure that the TRANSFER_DST bit is set for staging
 	if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
 	{
@@ -228,6 +261,14 @@ void Texture::Create2DArray(uint32_t pitch, uint32_t width, uint32_t height, uin
 	VkFormat vkFormat = static_cast<VkFormat>(format);
 	uint32_t size = width * height * arraySlices * BytesPerPixel(format);
 
+	VkFormatProperties properties = GetFormatProperties(format);
+	VkImageUsageFlags additionalFlags = 0;
+
+	if (QueryOptimalTilingFeature(properties, VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT))
+	{
+		additionalFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
+	}
+
 	// Create optimal tiled target image
 	VkImageCreateInfo imageCreateInfo = {};
 	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -242,7 +283,7 @@ void Texture::Create2DArray(uint32_t pitch, uint32_t width, uint32_t height, uin
 	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	imageCreateInfo.extent = { m_width, m_height, 1 };
-	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
+	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | additionalFlags;
 	// Ensure that the TRANSFER_DST bit is set for staging
 	if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
 	{
@@ -296,6 +337,14 @@ void Texture::CreateCube(uint32_t pitch, uint32_t width, uint32_t height, Format
 	VkFormat vkFormat = static_cast<VkFormat>(format);
 	uint32_t size = width * height * 6 * BytesPerPixel(format);
 
+	VkFormatProperties properties = GetFormatProperties(format);
+	VkImageUsageFlags additionalFlags = 0;
+
+	if (QueryOptimalTilingFeature(properties, VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT))
+	{
+		additionalFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
+	}
+
 	// Create optimal tiled target image
 	VkImageCreateInfo imageCreateInfo = {};
 	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -310,7 +359,7 @@ void Texture::CreateCube(uint32_t pitch, uint32_t width, uint32_t height, Format
 	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	imageCreateInfo.extent = { m_width, m_height, 1 };
-	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
+	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | additionalFlags;
 	// Ensure that the TRANSFER_DST bit is set for staging
 	if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
 	{
