@@ -65,7 +65,7 @@ HRESULT BinaryReader::ReadEntireFile(const string& fileName, unique_ptr<byte[]>&
 	}
 
 	// Create enough space for the file data.
-	data.reset(new uint8_t[fileSize.LowPart]);
+	data.reset(new byte[fileSize.LowPart]);
 
 	if (!data)
 	{

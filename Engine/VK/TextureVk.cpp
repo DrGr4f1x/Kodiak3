@@ -103,6 +103,7 @@ void Texture::Create1D(uint32_t pitch, uint32_t width, Format format, const void
 	m_height = 1;
 	m_depthOrArraySize = 1;
 	m_format = format;
+	m_target = TextureTarget::Target1D;
 
 	auto device = GetDevice();
 
@@ -179,6 +180,7 @@ void Texture::Create2D(uint32_t pitch, uint32_t width, uint32_t height, Format f
 	m_height = height;
 	m_depthOrArraySize = 1;
 	m_format = format;
+	m_target = TextureTarget::Target2D;
 
 	auto device = GetDevice();
 
@@ -255,6 +257,7 @@ void Texture::Create2DArray(uint32_t pitch, uint32_t width, uint32_t height, uin
 	m_height = height;
 	m_depthOrArraySize = arraySlices;
 	m_format = format;
+	m_target = TextureTarget::Target2D_Array;
 
 	auto device = GetDevice();
 
@@ -331,6 +334,7 @@ void Texture::CreateCube(uint32_t pitch, uint32_t width, uint32_t height, Format
 	m_height = height;
 	m_depthOrArraySize = 6;
 	m_format = format;
+	m_target = TextureTarget::TargetCube;
 
 	auto device = GetDevice();
 
@@ -395,6 +399,84 @@ void Texture::CreateCube(uint32_t pitch, uint32_t width, uint32_t height, Format
 	colorImageView.subresourceRange.levelCount = 1;
 	colorImageView.subresourceRange.baseArrayLayer = 0;
 	colorImageView.subresourceRange.layerCount = 6;
+	colorImageView.image = m_image;
+	ThrowIfFailed(vkCreateImageView(device, &colorImageView, nullptr, &m_imageView));
+}
+
+
+void Texture::Create3D(uint32_t pitch, uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData)
+{
+	assert(initData);
+
+	m_width = width;
+	m_height = height;
+	m_depthOrArraySize = depth;
+	m_format = format;
+	m_target = TextureTarget::Target3D;
+
+	auto device = GetDevice();
+
+	VkFormat vkFormat = static_cast<VkFormat>(format);
+	uint32_t size = width * height * depth * BytesPerPixel(format);
+
+	VkFormatProperties properties = GetFormatProperties(format);
+	VkImageUsageFlags additionalFlags = 0;
+
+	if (QueryOptimalTilingFeature(properties, VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT))
+	{
+		additionalFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
+	}
+
+	// Create optimal tiled target image
+	VkImageCreateInfo imageCreateInfo = {};
+	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	imageCreateInfo.pNext = nullptr;
+	imageCreateInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+	imageCreateInfo.imageType = VK_IMAGE_TYPE_3D;
+	imageCreateInfo.format = vkFormat;
+	imageCreateInfo.mipLevels = 1;
+	imageCreateInfo.arrayLayers = 1;
+	imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	imageCreateInfo.extent = { m_width, m_height, m_depthOrArraySize };
+	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | additionalFlags;
+	// Ensure that the TRANSFER_DST bit is set for staging
+	if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
+	{
+		imageCreateInfo.usage |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+	}
+	ThrowIfFailed(vkCreateImage(device, &imageCreateInfo, nullptr, &m_image));
+
+	VkMemoryRequirements memReqs = {};
+	vkGetImageMemoryRequirements(device, m_image, &memReqs);
+
+	VkMemoryAllocateInfo memAllocInfo = {};
+	memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	memAllocInfo.allocationSize = memReqs.size;
+	memAllocInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+	ThrowIfFailed(vkAllocateMemory(device, &memAllocInfo, nullptr, &m_deviceMemory));
+	ThrowIfFailed(vkBindImageMemory(device, m_image, m_deviceMemory, 0));
+
+	// Upload to GPU
+	CommandContext::InitializeTexture(*this, initData, size);
+
+	// Create the image view (SRV)
+	VkImageViewCreateInfo colorImageView = {};
+	colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	colorImageView.pNext = nullptr;
+	colorImageView.flags = 0;
+	colorImageView.viewType = VK_IMAGE_VIEW_TYPE_3D;
+	colorImageView.format = vkFormat;
+	colorImageView.components = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A };
+	colorImageView.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+	colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	colorImageView.subresourceRange.baseMipLevel = 0;
+	colorImageView.subresourceRange.levelCount = 1;
+	colorImageView.subresourceRange.baseArrayLayer = 0;
+	colorImageView.subresourceRange.layerCount = 1;
 	colorImageView.image = m_image;
 	ThrowIfFailed(vkCreateImageView(device, &colorImageView, nullptr, &m_imageView));
 }

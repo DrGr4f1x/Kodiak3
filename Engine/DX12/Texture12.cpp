@@ -445,6 +445,66 @@ void Texture::CreateCube(uint32_t pitch, uint32_t width, uint32_t height, Format
 }
 
 
+void Texture::Create3D(uint32_t pitch, uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData)
+{
+	m_width = width;
+	m_height = height;
+	m_depthOrArraySize = depth;
+	m_format = format;
+
+	m_usageState = ResourceState::CopyDest;
+
+	D3D12_RESOURCE_DESC texDesc = {};
+	texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE3D;
+	texDesc.Width = width;
+	texDesc.Height = height;
+	texDesc.DepthOrArraySize = depth;
+	texDesc.MipLevels = 1;
+	texDesc.Format = static_cast<DXGI_FORMAT>(format);
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	D3D12_HEAP_PROPERTIES heapProps;
+	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProps.CreationNodeMask = 1;
+	heapProps.VisibleNodeMask = 1;
+
+	auto device = GetDevice();
+
+	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
+		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(m_resource.ReleaseAndGetAddressOf())));
+
+	m_resource->SetName(L"Texture");
+
+	unique_ptr<D3D12_SUBRESOURCE_DATA[]> subresources(new D3D12_SUBRESOURCE_DATA[depth]);
+
+	size_t numBytes, rowBytes, numRows;
+	GetSurfaceInfo(width, height, texDesc.Format, numBytes, rowBytes, numRows);
+
+	D3D12_SUBRESOURCE_DATA texResource;
+	texResource.pData = initData;
+	texResource.RowPitch = rowBytes;
+	texResource.SlicePitch = numBytes;
+
+	CommandContext::InitializeTexture(*this, 1, &texResource);
+
+	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
+	SRVDesc.Format = texDesc.Format;
+	SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	SRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
+	SRVDesc.Texture3D.MipLevels = (UINT)-1;
+	device->CreateShaderResourceView(m_resource.Get(), &SRVDesc, m_cpuDescriptorHandle);
+}
+
+
 shared_ptr<Texture> Texture::Load(const string& filename, bool sRgb)
 {
 	auto& filesystem = Filesystem::GetInstance();

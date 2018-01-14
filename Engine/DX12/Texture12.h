@@ -55,6 +55,13 @@ public:
 		CreateCube(width, width, height, format, initData);
 	}
 
+	// Create a volume texture
+	void Create3D(uint32_t pitch, uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData);
+	void Create3D(uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData)
+	{
+		Create3D(width, width, height, depth, format, initData);
+	}
+
 	// Accessors
 	uint32_t GetWidth() const { return m_width; }
 	uint32_t GetHeight() const { return m_height; }

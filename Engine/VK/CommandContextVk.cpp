@@ -214,10 +214,10 @@ void CommandContext::InitializeTexture(Texture& dest, const void* initialData, s
 	bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	bufferCopyRegion.imageSubresource.mipLevel = 0;
 	bufferCopyRegion.imageSubresource.baseArrayLayer = 0;
-	bufferCopyRegion.imageSubresource.layerCount = dest.GetArraySize();
+	bufferCopyRegion.imageSubresource.layerCount = dest.GetTextureTarget() == TextureTarget::Target3D ? 1 : dest.GetArraySize();
 	bufferCopyRegion.imageExtent.width = dest.GetWidth();
 	bufferCopyRegion.imageExtent.height = dest.GetHeight();
-	bufferCopyRegion.imageExtent.depth = 1;
+	bufferCopyRegion.imageExtent.depth = dest.GetTextureTarget() == TextureTarget::Target3D ? dest.GetArraySize() : 1;
 	bufferCopyRegion.bufferOffset = 0;
 
 	vkCmdCopyBufferToImage(
@@ -376,7 +376,7 @@ void CommandContext::TransitionResource(Texture& texture, ResourceState newState
 		barrierDesc.subresourceRange.baseMipLevel = 0;
 		barrierDesc.subresourceRange.levelCount = 1;
 		barrierDesc.subresourceRange.baseArrayLayer = 0;
-		barrierDesc.subresourceRange.layerCount = texture.GetArraySize();
+		barrierDesc.subresourceRange.layerCount = texture.GetTextureTarget() == TextureTarget::Target3D ? 1 : texture.GetArraySize();
 
 		texture.m_layout = barrierDesc.newLayout;
 		texture.m_accessFlags = barrierDesc.dstAccessMask;

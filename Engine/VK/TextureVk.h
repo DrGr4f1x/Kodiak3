@@ -58,12 +58,20 @@ public:
 		CreateCube(width, width, height, format, initData);
 	}
 
+	// Create a volume texture
+	void Create3D(uint32_t pitch, uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData);
+	void Create3D(uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData)
+	{
+		Create3D(width, width, height, depth, format, initData);
+	}
+
 	// Accessors
 	uint32_t GetWidth() const { return m_width; }
 	uint32_t GetHeight() const { return m_height; }
 	uint32_t GetDepth() const { return m_depthOrArraySize; }
 	uint32_t GetArraySize() const { return m_depthOrArraySize; }
 	Format GetFormat() const { return m_format; }
+	TextureTarget GetTextureTarget() const { return m_target; }
 
 	static std::shared_ptr<Texture> Load(const std::string& filename, bool sRgb = false);
 	static std::shared_ptr<Texture> GetBlackTex2D();
@@ -92,6 +100,7 @@ protected:
 	uint32_t m_height{ 0 };
 	uint32_t m_depthOrArraySize{ 0 };
 	Format m_format{ Format::Unknown };
+	TextureTarget m_target;
 };
 
 using TexturePtr = std::shared_ptr<Texture>;
