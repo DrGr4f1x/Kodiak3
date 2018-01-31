@@ -31,39 +31,19 @@ public:
 	~Texture() { Destroy(); }
 
 	// Create a 1-level 1D texture
-	void Create1D(uint32_t pitch, uint32_t width, Format format, const void* initData);
-	void Create1D(uint32_t width, Format format, const void* initData)
-	{
-		Create1D(width, width, format, initData);
-	}
+	void Create1D(uint32_t width, Format format, const void* initData);
 
 	// Create a 1-level 2D texture
-	void Create2D(uint32_t pitch, uint32_t width, uint32_t height, Format format, const void* initData);
-	void Create2D(uint32_t width, uint32_t height, Format format, const void* initData)
-	{
-		Create2D(width, width, height, format, initData);
-	}
+	void Create2D(uint32_t width, uint32_t height, Format format, const void* initData);
 
 	// Create a 1-level 2D texture array
-	void Create2DArray(uint32_t pitch, uint32_t width, uint32_t height, uint32_t arraySlices, Format format, const void* initData);
-	void Create2DArray(uint32_t width, uint32_t height, uint32_t arraySlices, Format format, const void* initData)
-	{
-		Create2DArray(width, width, height, arraySlices, format, initData);
-	}
+	void Create2DArray(uint32_t width, uint32_t height, uint32_t arraySize, Format format, const void* initData);
 
 	// Create a 1-level cubemap texture
-	void CreateCube(uint32_t pitch, uint32_t width, uint32_t height, Format format, const void* initData);
-	void CreateCube(uint32_t width, uint32_t height, Format format, const void* initData)
-	{
-		CreateCube(width, width, height, format, initData);
-	}
+	void CreateCube(uint32_t width, uint32_t height, Format format, const void* initData);
 
 	// Create a volume texture
-	void Create3D(uint32_t pitch, uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData);
-	void Create3D(uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData)
-	{
-		Create3D(width, width, height, depth, format, initData);
-	}
+	void Create3D(uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData);
 
 	// Accessors
 	uint32_t GetWidth() const { return m_width; }
@@ -71,7 +51,7 @@ public:
 	uint32_t GetDepth() const { return m_depthOrArraySize; }
 	uint32_t GetArraySize() const { return m_depthOrArraySize; }
 	Format GetFormat() const { return m_format; }
-	TextureTarget GetTextureTarget() const { return m_target; }
+	TextureType GetTextureType() const { return m_type; }
 
 	static std::shared_ptr<Texture> Load(const std::string& filename, bool sRgb = false);
 	static std::shared_ptr<Texture> GetBlackTex2D();
@@ -90,6 +70,8 @@ protected:
 	void LoadDDS(const std::string& fullpath, bool sRgb);
 	void LoadKTX(const std::string& fullpath, bool sRgb);
 
+	void CreateInternal(TextureType type, uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips, Format format, const void* initData);
+
 protected:
 	VkImageView		m_imageView{ VK_NULL_HANDLE };
 	VkImage			m_image{ VK_NULL_HANDLE };
@@ -100,7 +82,7 @@ protected:
 	uint32_t m_height{ 0 };
 	uint32_t m_depthOrArraySize{ 0 };
 	Format m_format{ Format::Unknown };
-	TextureTarget m_target;
+	TextureType m_type;
 };
 
 using TexturePtr = std::shared_ptr<Texture>;
