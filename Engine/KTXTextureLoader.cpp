@@ -621,41 +621,41 @@ Format MapKTXFormatToEngine(uint32_t internalFormat, uint32_t format, uint32_t t
 }
 
 
-inline TextureTarget GetTarget(const KTXHeader10& header)
+inline TextureType GetTarget(const KTXHeader10& header)
 {
 	if (header.numberOfFaces > 1)
 	{
 		if (header.numberOfArrayElements > 0)
 		{
-			return TextureTarget::TargetCube_Array;
+			return TextureType::TextureCube_Array;
 		}
 		else
 		{
-			return TextureTarget::TargetCube;
+			return TextureType::TextureCube;
 		}
 	}
 	else if (header.numberOfArrayElements > 0)
 	{
 		if (header.pixelHeight == 0)
 		{
-			return TextureTarget::Target1D_Array;
+			return TextureType::Texture1D_Array;
 		}
 		else
 		{
-			return TextureTarget::Target2D_Array;
+			return TextureType::Texture2D_Array;
 		}
 	}
 	else if (header.pixelHeight == 0)
 	{
-		return TextureTarget::Target1D;
+		return TextureType::Texture1D;
 	}
 	else if (header.pixelDepth > 0)
 	{
-		return TextureTarget::Target3D;
+		return TextureType::Texture3D;
 	}
 	else
 	{
-		return TextureTarget::Target2D;
+		return TextureType::Texture2D;
 	}
 }
 
@@ -663,7 +663,7 @@ inline TextureTarget GetTarget(const KTXHeader10& header)
 
 
 HRESULT Kodiak::CreateKTXTextureFromMemory(
-	const uint8_t* ktxData,
+	const byte* ktxData,
 	size_t ktxDataSize,
 	size_t maxsize,
 	bool forceSRGB,
@@ -705,7 +705,7 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 	}
 
 	auto target = GetTarget(header);
-	bool isCubeMap = (target == TextureTarget::TargetCube || target == TextureTarget::TargetCube_Array);
+	bool isCubeMap = (target == TextureType::TextureCube || target == TextureType::TextureCube_Array);
 
 	// Bound sizes (for security purposes we don't trust KTX file metadata larger than the D3D 11.x hardware requirements)
 	if (numMips > Limits::MaxTextureMipLevels)
@@ -715,8 +715,8 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 
 	switch (target)
 	{
-	case TextureTarget::Target1D:
-	case TextureTarget::Target1D_Array:
+	case TextureType::Texture1D:
+	case TextureType::Texture1D_Array:
 		if ((header.numberOfArrayElements > Limits::MaxTexture1DArrayElements) ||
 			(header.pixelWidth > Limits::MaxTextureDimension1D))
 		{
@@ -724,8 +724,8 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 		}
 		break;
 
-	case TextureTarget::Target2D:
-	case TextureTarget::Target2D_Array:
+	case TextureType::Texture2D:
+	case TextureType::Texture2D_Array:
 		if ((arraySize > Limits::MaxTexture2DArrayElements) ||
 			(header.pixelWidth > Limits::MaxTextureDimension2D) ||
 			(header.pixelHeight > Limits::MaxTextureDimension2D))
@@ -734,8 +734,8 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 		}
 		break;
 
-	case TextureTarget::TargetCube:
-	case TextureTarget::TargetCube_Array:
+	case TextureType::TextureCube:
+	case TextureType::TextureCube_Array:
 		// This is the right bound because we set arraySize to (NumCubes*6) above
 		if ((arraySize > Limits::MaxTexture2DArrayElements) ||
 			(header.pixelWidth > Limits::MaxTextureDimensionCube) ||
@@ -745,7 +745,7 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 		}
 		break;
 
-	case TextureTarget::Target3D:
+	case TextureType::Texture3D:
 		if ((arraySize > 1) ||
 			(header.pixelWidth > Limits::MaxTextureDimension3D) ||
 			(header.pixelHeight > Limits::MaxTextureDimension3D) ||
@@ -760,19 +760,19 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 	}
 
 	// Create the texture
-	if (target == TextureTarget::Target1D)
+	if (target == TextureType::Texture1D)
 	{
 		texture->Create1D(width, format, ktxData + offset + sizeof(uint32_t));
 	}
-	else if (target == TextureTarget::Target2D)
+	else if (target == TextureType::Texture2D)
 	{
 		texture->Create2D(width, height, format, ktxData + offset + sizeof(uint32_t));
 	}
-	else if (target == TextureTarget::Target2D_Array)
+	else if (target == TextureType::Texture2D_Array)
 	{
 		texture->Create2DArray(width, height, arraySize, format, ktxData + offset + sizeof(uint32_t));
 	}
-	else if (target == TextureTarget::TargetCube)
+	else if (target == TextureType::TextureCube)
 	{
 		texture->CreateCube(width, height, format, ktxData + offset + sizeof(uint32_t));
 	}

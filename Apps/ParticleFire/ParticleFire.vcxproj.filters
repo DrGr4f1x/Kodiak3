@@ -3,8 +3,21 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Stdafx.cpp" />
+    <ClCompile Include="ParticleFireApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="ParticleFireApp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{13b044ca-b599-4c21-93be-7058d0cb633e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Shaders\ParticlePS.hlsl" />
+    <CustomBuild Include="Shaders\ParticleVS.hlsl" />
+    <CustomBuild Include="Shaders\NormalMapPS.hlsl" />
+    <CustomBuild Include="Shaders\NormalMapVS.hlsl" />
   </ItemGroup>
 </Project>

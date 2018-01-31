@@ -187,6 +187,72 @@ void GetSurfaceInfo(size_t width, size_t height, DXGI_FORMAT format, size_t& num
 	}
 }
 
+
+D3D12_UAV_DIMENSION GetUAVDimension(TextureType type, bool isArray)
+{
+	switch (type)
+	{
+	case TextureType::Texture1D:
+		return (isArray) ? D3D12_UAV_DIMENSION_TEXTURE1DARRAY : D3D12_UAV_DIMENSION_TEXTURE1D;
+	case TextureType::Texture2D:
+		return (isArray) ? D3D12_UAV_DIMENSION_TEXTURE2DARRAY : D3D12_UAV_DIMENSION_TEXTURE2D;
+	case TextureType::TextureCube:
+		return D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
+	default:
+		assert(false);
+		return D3D12_UAV_DIMENSION_UNKNOWN;
+	}
+}
+
+
+// TODO MSAA support here
+D3D12_SRV_DIMENSION GetSRVDimension(TextureType type)
+{
+	switch (type)
+	{
+	case TextureType::Texture1D:
+		return D3D12_SRV_DIMENSION_TEXTURE1D;
+	case TextureType::Texture1D_Array:
+		return D3D12_SRV_DIMENSION_TEXTURE1DARRAY;
+	case TextureType::Texture2D:
+		return D3D12_SRV_DIMENSION_TEXTURE2D;
+	case TextureType::Texture2D_Array:
+		return D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
+	case TextureType::Texture3D:
+		return D3D12_SRV_DIMENSION_TEXTURE3D;
+	case TextureType::TextureCube:
+		return D3D12_SRV_DIMENSION_TEXTURECUBE;
+	case TextureType::TextureCube_Array:
+		return D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
+	default:
+		assert(false);
+		return D3D12_SRV_DIMENSION_UNKNOWN;
+	}
+}
+
+
+D3D12_RESOURCE_DIMENSION GetResourceDimension(TextureType type)
+{
+	switch (type)
+	{
+	case TextureType::Texture1D:
+	case TextureType::Texture1D_Array:
+		return D3D12_RESOURCE_DIMENSION_TEXTURE1D;
+
+	case TextureType::Texture2D:
+	case TextureType::Texture2D_Array:
+	case TextureType::TextureCube:
+	case TextureType::TextureCube_Array:
+		return D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+
+	case TextureType::Texture3D:
+		return D3D12_RESOURCE_DIMENSION_TEXTURE3D;
+	default:
+		assert(false);
+		return D3D12_RESOURCE_DIMENSION_UNKNOWN;
+	}
+}
+
 } // anonymous namespace
 
 
@@ -201,307 +267,39 @@ Texture::Texture(D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {}
 
 
-void Texture::Create1D(uint32_t pitch, uint32_t width, Format format, const void* initData)
+void Texture::Create1D(uint32_t width, Format format, const void* initData)
 {
-	m_width = width;
-	m_height = 1;
-	m_depthOrArraySize = 1;
-	m_format = format;
-
-	m_usageState = ResourceState::CopyDest;
-
-	D3D12_RESOURCE_DESC texDesc = {};
-	texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE1D;
-	texDesc.Width = width;
-	texDesc.Height = 1;
-	texDesc.DepthOrArraySize = 1;
-	texDesc.MipLevels = 1;
-	texDesc.Format = static_cast<DXGI_FORMAT>(format);
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0;
-	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	D3D12_HEAP_PROPERTIES heapProps;
-	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	heapProps.CreationNodeMask = 1;
-	heapProps.VisibleNodeMask = 1;
-
-	auto device = GetDevice();
-
-	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
-		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(m_resource.ReleaseAndGetAddressOf())));
-
-	m_resource->SetName(L"Texture");
-
-	D3D12_SUBRESOURCE_DATA texResource;
-	texResource.pData = initData;
-	texResource.RowPitch = pitch * BytesPerPixel(format);
-	texResource.SlicePitch = texResource.RowPitch;
-
-	CommandContext::InitializeTexture(*this, 1, &texResource);
-
-	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
-	{
-		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	}
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
-	SRVDesc.Format = texDesc.Format;
-	SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	SRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D;
-	SRVDesc.Texture1D.MipLevels = (UINT)-1;
-
-	device->CreateShaderResourceView(m_resource.Get(), &SRVDesc, m_cpuDescriptorHandle);
+	CreateInternal(TextureType::Texture1D, width, 1, 1, 1, format, initData);
 }
 
 
-void Texture::Create2D(uint32_t pitch, uint32_t width, uint32_t height, Format format, const void* initData)
+void Texture::Create2D(uint32_t width, uint32_t height, Format format, const void* initData)
 {
-	m_width = width;
-	m_height = height;
-	m_depthOrArraySize = 1;
-	m_format = format;
-
-	m_usageState = ResourceState::CopyDest;
-
-	D3D12_RESOURCE_DESC texDesc = {};
-	texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	texDesc.Width = width;
-	texDesc.Height = height;
-	texDesc.DepthOrArraySize = 1;
-	texDesc.MipLevels = 1;
-	texDesc.Format = static_cast<DXGI_FORMAT>(format);
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0;
-	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	D3D12_HEAP_PROPERTIES heapProps;
-	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	heapProps.CreationNodeMask = 1;
-	heapProps.VisibleNodeMask = 1;
-
-	auto device = GetDevice();
-
-	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
-		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(m_resource.ReleaseAndGetAddressOf())));
-
-	m_resource->SetName(L"Texture");
-
-	size_t numBytes, rowBytes, numRows;
-	GetSurfaceInfo(width, height, texDesc.Format, numBytes, rowBytes, numRows);
-
-	D3D12_SUBRESOURCE_DATA texResource;
-	texResource.pData = initData;
-	texResource.RowPitch = rowBytes;
-	texResource.SlicePitch = numBytes;
-
-	CommandContext::InitializeTexture(*this, 1, &texResource);
-
-	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
-	{
-		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	}
-	device->CreateShaderResourceView(m_resource.Get(), nullptr, m_cpuDescriptorHandle);
+	CreateInternal(TextureType::Texture2D, width, height, 1, 1, format, initData);
 }
 
 
-void Texture::Create2DArray(uint32_t pitch, uint32_t width, uint32_t height, uint32_t arraySlices, Format format, const void* initData)
+void Texture::Create2DMips(uint32_t width, uint32_t height, Format format, const std::vector<byte*>& initData)
 {
-	m_width = width;
-	m_height = height;
-	m_depthOrArraySize = arraySlices;
-	m_format = format;
 
-	m_usageState = ResourceState::CopyDest;
-
-	D3D12_RESOURCE_DESC texDesc = {};
-	texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	texDesc.Width = width;
-	texDesc.Height = height;
-	texDesc.DepthOrArraySize = static_cast<UINT16>(arraySlices);
-	texDesc.MipLevels = 1;
-	texDesc.Format = static_cast<DXGI_FORMAT>(format);
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0;
-	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	D3D12_HEAP_PROPERTIES heapProps;
-	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	heapProps.CreationNodeMask = 1;
-	heapProps.VisibleNodeMask = 1;
-
-	auto device = GetDevice();
-
-	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
-		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(m_resource.ReleaseAndGetAddressOf())));
-
-	m_resource->SetName(L"Texture");
-
-	unique_ptr<D3D12_SUBRESOURCE_DATA[]> subresources(new D3D12_SUBRESOURCE_DATA[arraySlices]);
-
-	size_t numBytes, rowBytes, numRows;
-	GetSurfaceInfo(width, height, texDesc.Format, numBytes, rowBytes, numRows);
-
-	const byte* initDataB = reinterpret_cast<const byte*>(initData);
-
-	for (uint32_t i = 0; i < arraySlices; ++i)
-	{
-		subresources[i].pData = initDataB;
-		subresources[i].RowPitch = rowBytes;
-		subresources[i].SlicePitch = numBytes;
-
-		initDataB += numBytes;
-	}
-
-	CommandContext::InitializeTexture(*this, arraySlices, subresources.get());
-
-	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
-	{
-		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	}
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
-	SRVDesc.Format = texDesc.Format;
-	SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	SRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
-	SRVDesc.Texture2DArray.MipLevels = (UINT)-1;
-	SRVDesc.Texture2DArray.ArraySize = m_depthOrArraySize;
-	device->CreateShaderResourceView(m_resource.Get(), &SRVDesc, m_cpuDescriptorHandle);
 }
 
 
-void Texture::CreateCube(uint32_t pitch, uint32_t width, uint32_t height, Format format, const void* initData)
+void Texture::Create2DArray(uint32_t width, uint32_t height, uint32_t arraySize, Format format, const void* initData)
 {
-	m_width = width;
-	m_height = height;
-	m_depthOrArraySize = 6;
-	m_format = format;
-
-	m_usageState = ResourceState::CopyDest;
-
-	D3D12_RESOURCE_DESC texDesc = {};
-	texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	texDesc.Width = width;
-	texDesc.Height = height;
-	texDesc.DepthOrArraySize = 6;
-	texDesc.MipLevels = 1;
-	texDesc.Format = static_cast<DXGI_FORMAT>(format);
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0;
-	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	D3D12_HEAP_PROPERTIES heapProps;
-	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	heapProps.CreationNodeMask = 1;
-	heapProps.VisibleNodeMask = 1;
-
-	auto device = GetDevice();
-
-	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
-		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(m_resource.ReleaseAndGetAddressOf())));
-
-	m_resource->SetName(L"Texture");
-
-	unique_ptr<D3D12_SUBRESOURCE_DATA[]> subresources(new D3D12_SUBRESOURCE_DATA[6]);
-
-	size_t numBytes, rowBytes, numRows;
-	GetSurfaceInfo(width, height, texDesc.Format, numBytes, rowBytes, numRows);
-
-	const byte* initDataB = reinterpret_cast<const byte*>(initData);
-
-	for (uint32_t i = 0; i < 6; ++i)
-	{
-		subresources[i].pData = initDataB;
-		subresources[i].RowPitch = rowBytes;
-		subresources[i].SlicePitch = numBytes;
-
-		initDataB += numBytes;
-	}
-
-	CommandContext::InitializeTexture(*this, 6, subresources.get());
-
-	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
-	{
-		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	}
-	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
-	SRVDesc.Format = texDesc.Format;
-	SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	SRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-	SRVDesc.TextureCube.MipLevels = (UINT)-1;
-	device->CreateShaderResourceView(m_resource.Get(), &SRVDesc, m_cpuDescriptorHandle);
+	CreateInternal(TextureType::Texture2D_Array, width, height, arraySize, 1, format, initData);
 }
 
 
-void Texture::Create3D(uint32_t pitch, uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData)
+void Texture::CreateCube(uint32_t width, uint32_t height, Format format, const void* initData)
 {
-	m_width = width;
-	m_height = height;
-	m_depthOrArraySize = depth;
-	m_format = format;
+	CreateInternal(TextureType::TextureCube, width, height, 6, 1, format, initData);
+}
 
-	m_usageState = ResourceState::CopyDest;
 
-	D3D12_RESOURCE_DESC texDesc = {};
-	texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE3D;
-	texDesc.Width = width;
-	texDesc.Height = height;
-	texDesc.DepthOrArraySize = depth;
-	texDesc.MipLevels = 1;
-	texDesc.Format = static_cast<DXGI_FORMAT>(format);
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0;
-	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	D3D12_HEAP_PROPERTIES heapProps;
-	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	heapProps.CreationNodeMask = 1;
-	heapProps.VisibleNodeMask = 1;
-
-	auto device = GetDevice();
-
-	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
-		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(m_resource.ReleaseAndGetAddressOf())));
-
-	m_resource->SetName(L"Texture");
-
-	unique_ptr<D3D12_SUBRESOURCE_DATA[]> subresources(new D3D12_SUBRESOURCE_DATA[depth]);
-
-	size_t numBytes, rowBytes, numRows;
-	GetSurfaceInfo(width, height, texDesc.Format, numBytes, rowBytes, numRows);
-
-	D3D12_SUBRESOURCE_DATA texResource;
-	texResource.pData = initData;
-	texResource.RowPitch = rowBytes;
-	texResource.SlicePitch = numBytes;
-
-	CommandContext::InitializeTexture(*this, 1, &texResource);
-
-	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
-	{
-		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	}
-	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
-	SRVDesc.Format = texDesc.Format;
-	SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	SRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
-	SRVDesc.Texture3D.MipLevels = (UINT)-1;
-	device->CreateShaderResourceView(m_resource.Get(), &SRVDesc, m_cpuDescriptorHandle);
+void Texture::Create3D(uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData)
+{
+	CreateInternal(TextureType::Texture3D, width, height, depth, 1, format, initData);
 }
 
 
@@ -605,6 +403,101 @@ void Texture::LoadKTX(const string& fullpath, bool sRgb)
 	auto device = GetDevice();
 
 	ThrowIfFailed(CreateKTXTextureFromMemory(data.get(), dataSize, 0, sRgb, this));
+}
+
+
+void Texture::CreateInternal(TextureType type, uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips, Format format, const void* initData)
+{
+	m_width = width;
+	m_height = height;
+	m_depthOrArraySize = depthOrArraySize;
+	m_format = format;
+	
+	m_usageState = ResourceState::CopyDest;
+
+	D3D12_RESOURCE_DESC texDesc = {};
+	texDesc.Dimension = GetResourceDimension(type);
+	texDesc.Width = width;
+	texDesc.Height = height;
+	texDesc.DepthOrArraySize = static_cast<UINT16>(m_depthOrArraySize);
+	texDesc.MipLevels = numMips;
+	texDesc.Format = static_cast<DXGI_FORMAT>(format);
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	D3D12_HEAP_PROPERTIES heapProps;
+	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProps.CreationNodeMask = 1;
+	heapProps.VisibleNodeMask = 1;
+
+	auto device = GetDevice();
+
+	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
+		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(m_resource.ReleaseAndGetAddressOf())));
+
+	m_resource->SetName(L"Texture");
+
+	uint32_t arraySize = (type == TextureType::Texture3D) ? 1 : m_depthOrArraySize;
+
+	unique_ptr<D3D12_SUBRESOURCE_DATA[]> subresources(new D3D12_SUBRESOURCE_DATA[arraySize]);
+
+	size_t numBytes, rowBytes, numRows;
+	GetSurfaceInfo(width, height, texDesc.Format, numBytes, rowBytes, numRows);
+
+	const byte* initDataB = reinterpret_cast<const byte*>(initData);
+
+	for (uint32_t i = 0; i < arraySize; ++i)
+	{
+		subresources[i].pData = initDataB;
+		subresources[i].RowPitch = rowBytes;
+		subresources[i].SlicePitch = numBytes;
+
+		initDataB += numBytes;
+	}
+
+	CommandContext::InitializeTexture(*this, arraySize, subresources.get());
+
+	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
+	SRVDesc.Format = texDesc.Format;
+	SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	SRVDesc.ViewDimension = GetSRVDimension(type);
+	switch (type)
+	{
+	case TextureType::Texture1D:
+		SRVDesc.Texture1D.MipLevels = (UINT)-1;
+		break;
+	case TextureType::Texture1D_Array:
+		SRVDesc.Texture1DArray.MipLevels = (UINT)-1;
+		SRVDesc.Texture1DArray.ArraySize = m_depthOrArraySize;
+		break;
+	case TextureType::Texture2D:
+		SRVDesc.Texture2D.MipLevels = (UINT)-1;
+		break;
+	case TextureType::Texture2D_Array:
+		SRVDesc.Texture2DArray.MipLevels = (UINT)-1;
+		SRVDesc.Texture2DArray.ArraySize = m_depthOrArraySize;
+		break;
+	case TextureType::TextureCube:
+		SRVDesc.TextureCube.MipLevels = (UINT)-1;
+		break;
+	case TextureType::TextureCube_Array:
+		SRVDesc.TextureCubeArray.MipLevels = (UINT)-1;
+		SRVDesc.TextureCubeArray.NumCubes = m_depthOrArraySize;
+		break;
+	case TextureType::Texture3D:
+		SRVDesc.Texture3D.MipLevels = (UINT)-1;
+		break;
+	}
+	device->CreateShaderResourceView(m_resource.Get(), &SRVDesc, m_cpuDescriptorHandle);
 }
 
 

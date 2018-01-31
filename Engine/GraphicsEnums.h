@@ -152,15 +152,15 @@ inline bool IsStencilFormat(Format format)
 }
 
 
-enum class TextureTarget
+enum class TextureType
 {
-	Target1D,
-	Target1D_Array,
-	Target2D,
-	Target2D_Array,
-	TargetCube,
-	TargetCube_Array,
-	Target3D
+	Texture1D,
+	Texture1D_Array,
+	Texture2D,
+	Texture2D_Array,
+	TextureCube,
+	TextureCube_Array,
+	Texture3D
 };
 
 } // namespace Kodiak

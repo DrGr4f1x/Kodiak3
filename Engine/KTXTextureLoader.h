@@ -18,7 +18,7 @@ class Texture;
 
 
 HRESULT __cdecl CreateKTXTextureFromMemory(
-	const uint8_t* ktxData,
+	const byte* ktxData,
 	size_t ktxDataSize,
 	size_t maxsize,
 	bool forceSRGB,
