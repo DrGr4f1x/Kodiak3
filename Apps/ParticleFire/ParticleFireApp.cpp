@@ -45,14 +45,11 @@ void ParticleFireApp::Startup()
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.001f,
 		256.0f);
-	m_camera.SetPosition(Math::Vector3(0.0f, 0.0f, m_zoom));
-
-	m_camera.Update();
+	m_camera.SetPosition(Math::Vector3(-48.48f, -33.9f, -48.48f));
 
 	m_controller.SetSpeedScale(0.01f);
-	m_controller.RefreshFromCamera();
 	m_controller.SetCameraMode(CameraMode::ArcBall);
-	m_controller.SetOrbitTarget(Math::Vector3(0.0f, 0.0f, 0.0f), m_zoom, 2.0f);
+	m_controller.SetOrbitTarget(Math::Vector3(0.0f, 0.0f, 0.0f), Math::Length(m_camera.GetPosition()), 2.0f);
 
 	UpdateConstantBuffers();
 

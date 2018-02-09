@@ -44,14 +44,11 @@ void GeometryShaderApp::Startup()
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.001f,
 		256.0f);
-	m_camera.SetPosition(Math::Vector3(0.0f, 0.0f, 8.0f));
-
-	m_camera.Update();
+	m_camera.SetPosition(Math::Vector3(-3.38f, 0.0f, -7.25f));
 
 	m_controller.SetSpeedScale(0.01f);
-	m_controller.RefreshFromCamera();
 	m_controller.SetCameraMode(CameraMode::ArcBall);
-	m_controller.SetOrbitTarget(Math::Vector3(0.0f, 0.0f, 0.0f), 8.0f, 4.0f);
+	m_controller.SetOrbitTarget(Math::Vector3(0.0f, 0.0f, 0.0f), Math::Length(m_camera.GetPosition()), 4.0f);
 
 	UpdateConstantBuffer();
 

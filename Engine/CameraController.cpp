@@ -99,6 +99,8 @@ void CameraController::SetOrbitTarget(Math::Vector3 target, float zoom, float mi
 	m_orbitTarget = target;
 	m_minDistance = fabsf(minDistance);
 	m_targetCamera.SetLookDirection(target - m_targetCamera.GetPosition(), m_worldUp);
+	m_targetCamera.Update();
+	RefreshFromCamera();
 }
 
 
@@ -208,11 +210,8 @@ void CameraController::UpdateArcBall(float deltaTime)
 		pitch += g_input.GetAnalogInput(AnalogInput::kAnalogMouseY) * m_mouseSensitivityY;
 	}
 
-	float oldPitch = m_currentPitch;
-	float oldHeading = m_currentHeading;
-
 	const float epsilon = 0.05f;
-	m_currentPitch += pitch;
+	m_currentPitch -= pitch;
 	m_currentPitch = DirectX::XMMin(XM_PIDIV2 - epsilon, m_currentPitch);
 	m_currentPitch = DirectX::XMMax(-XM_PIDIV2 + epsilon, m_currentPitch);
 
@@ -225,8 +224,6 @@ void CameraController::UpdateArcBall(float deltaTime)
 	{
 		m_currentHeading += XM_2PI;
 	}
-
-	float deltaPitch = m_currentPitch - oldPitch;
 
 	float zoom = g_input.GetAnalogInput(AnalogInput::kAnalogMouseScroll);
 	m_zoom += zoom;
