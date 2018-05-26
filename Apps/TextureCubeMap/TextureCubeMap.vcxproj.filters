@@ -15,17 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\ReflectVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\ReflectPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\SkyboxVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\SkyboxPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
+    <CustomBuild Include="Shaders\ReflectPS.hlsl" />
+    <CustomBuild Include="Shaders\ReflectVS.hlsl" />
+    <CustomBuild Include="Shaders\SkyboxPS.hlsl" />
+    <CustomBuild Include="Shaders\SkyboxVS.hlsl" />
   </ItemGroup>
 </Project>

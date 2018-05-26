@@ -46,13 +46,12 @@ void StencilBufferApp::Startup()
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.1f, 
 		512.0f);
-	m_camera.SetPosition(Vector3(-0.08f, 3.6f, 8.4f));
+	m_camera.SetPosition(Vector3(-4.838f, 3.23f, -7.05f));
 	m_camera.Update();
 
 	m_controller.SetSpeedScale(0.01f);
-	m_controller.RefreshFromCamera();
-	m_controller.SetOrbitTarget(Vector3(0.0f, 4.0f, 0.0f), 8.0f, 4.0f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);
+	m_controller.SetOrbitTarget(Math::Vector3(0.0f, 3.5f, 0.0f), Math::Length(m_camera.GetPosition()), 0.25f);
 
 	InitRootSig();
 	InitPSOs();

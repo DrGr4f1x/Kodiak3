@@ -3,9 +3,10 @@ General
 ** Fix flipped y-axis in Vulkan viewport
 ** Camera movement/controls/use of Camera class for all Apps
 ** Get CameraController to respect initial camera orientation (extract initial pitch and heading)
+** Implement an orbit camera mode
 
 Standardize naming in shaders (e.g. pos vs position, uv vs texcoord, etc)
 Handle window resizing, etc.
 Use inverted Z in all demos
-Implement an orbit camera mode
 Fix DX12 constant buffer Create() w/ initial data (use DisplacementApp m_hsConstantBuffer as easy test)
+

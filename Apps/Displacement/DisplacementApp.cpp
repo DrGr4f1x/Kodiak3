@@ -45,7 +45,6 @@ void DisplacementApp::Startup()
 		0.1f,
 		256.0f);
 	m_camera.SetPosition(Vector3(0.830579f, -0.427525f, -0.830579f));
-	m_camera.Update();
 
 	m_controller.SetSpeedScale(0.0025f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);

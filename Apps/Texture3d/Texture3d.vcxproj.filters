@@ -15,11 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\Texture3dVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Texture3dPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
+    <CustomBuild Include="Shaders\Texture3dPS.hlsl" />
+    <CustomBuild Include="Shaders\Texture3dVS.hlsl" />
   </ItemGroup>
 </Project>

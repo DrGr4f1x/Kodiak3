@@ -15,20 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\BaseVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\BasePS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\BaseGS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\MeshVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\MeshPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
+    <CustomBuild Include="Shaders\BasePS.hlsl" />
+    <CustomBuild Include="Shaders\BaseVS.hlsl" />
+    <CustomBuild Include="Shaders\BaseGS.hlsl" />
+    <CustomBuild Include="Shaders\MeshPS.hlsl" />
+    <CustomBuild Include="Shaders\MeshVS.hlsl" />
   </ItemGroup>
 </Project>
