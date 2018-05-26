@@ -62,6 +62,7 @@ Format Kodiak::MapVulkanFormatToEngine(VkFormat format)
 		remapTable[VK_FORMAT_R8G8_UINT] = Format::R8G8_UInt;
 		remapTable[VK_FORMAT_R8G8_SINT] = Format::R8G8_SInt;
 		remapTable[VK_FORMAT_R8G8B8A8_UNORM] = Format::R8G8B8A8_UNorm;
+		remapTable[VK_FORMAT_R8G8B8A8_SRGB] = Format::R8G8B8A8_UNorm_SRGB;
 		remapTable[VK_FORMAT_R8G8B8A8_SNORM] = Format::R8G8B8A8_SNorm;
 		remapTable[VK_FORMAT_R8G8B8A8_UINT] = Format::R8G8B8A8_UInt;
 		remapTable[VK_FORMAT_R8G8B8A8_SINT] = Format::R8G8B8A8_SInt;

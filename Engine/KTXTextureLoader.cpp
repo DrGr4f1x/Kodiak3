@@ -699,13 +699,16 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 	auto format = MapKTXFormatToEngine(header.glInternalFormat, header.glFormat, header.glType);
 	assert(format != Format::Unknown);
 
+	size_t blockSize = BlockSize(format);
+	assert(blockSize != 0);
+
 	if (forceSRGB)
 	{
 		format = MakeSRGB(format);
 	}
 
 	auto target = GetTarget(header);
-	bool isCubeMap = (target == TextureType::TextureCube || target == TextureType::TextureCube_Array);
+	const bool isCubeMap = (target == TextureType::TextureCube || target == TextureType::TextureCube_Array);
 
 	// Bound sizes (for security purposes we don't trust KTX file metadata larger than the D3D 11.x hardware requirements)
 	if (numMips > Limits::MaxTextureMipLevels)
@@ -759,28 +762,33 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 		return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
 	}
 
+	TextureInitializer init(
+		target,
+		format,
+		width,
+		height,
+		isCubeMap ? arraySize * 6 : max(arraySize, depth),
+		numMips);
+
 	// Create the texture
-	if (target == TextureType::Texture1D)
+	for (uint32_t mip = 0; mip < numMips; ++mip)
 	{
-		texture->Create1D(width, format, ktxData + offset + sizeof(uint32_t));
+		offset += sizeof(uint32_t);
+
+		auto faceSize = init.GetFaceSize(mip);
+
+		uint32_t arraySlice = 0;
+		for (uint32_t slice = 0; slice < arraySize; ++slice)
+		{
+			for (uint32_t face = 0; face < (isCubeMap ? 6u : 1u); ++face, ++arraySlice)
+			{
+				init.SetData(arraySlice, mip, ktxData + offset);
+				offset += max(blockSize, Math::AlignUp(faceSize, 4u));
+			}
+		}
 	}
-	else if (target == TextureType::Texture2D)
-	{
-		texture->Create2D(width, height, format, ktxData + offset + sizeof(uint32_t));
-	}
-	else if (target == TextureType::Texture2D_Array)
-	{
-		texture->Create2DArray(width, height, arraySize, format, ktxData + offset + sizeof(uint32_t));
-	}
-	else if (target == TextureType::TextureCube)
-	{
-		texture->CreateCube(width, height, format, ktxData + offset + sizeof(uint32_t));
-	}
-	else
-	{
-		assert_msg(false, "Only 1D and 2D textures are supported (for now)");
-		return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
-	}
+
+	texture->Create(init);
 
 	return S_OK;
 }

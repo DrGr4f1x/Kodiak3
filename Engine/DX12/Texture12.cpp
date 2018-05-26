@@ -28,12 +28,6 @@ using namespace std;
 namespace
 {
 
-uint32_t BytesPerPixel(Format format)
-{
-	return BitsPerPixel(format) / 8;
-}
-
-
 map<string, shared_ptr<ManagedTexture>> s_textureCache;
 
 
@@ -256,6 +250,53 @@ D3D12_RESOURCE_DIMENSION GetResourceDimension(TextureType type)
 } // anonymous namespace
 
 
+void TextureInitializer::Initialize()
+{
+	DXGI_FORMAT format = static_cast<DXGI_FORMAT>(m_format);
+
+	size_t index = 0;
+	for (uint32_t i = 0; i < m_depthOrArraySize; ++i)
+	{
+		uint32_t width = m_width;
+		uint32_t height = m_height;
+		uint32_t depth = m_depthOrArraySize;
+
+		for (uint32_t j = 0; j < m_numMips; ++j)
+		{
+			size_t numBytes;
+			size_t rowBytes;
+			size_t numRows;
+			GetSurfaceInfo(width, height, format, numBytes, rowBytes, numRows);
+
+			if (i == 0)
+			{
+				m_faceSize[j] = numBytes;
+			}
+
+			m_data[index].pData = nullptr;
+			m_data[index].RowPitch = static_cast<UINT>(rowBytes);
+			m_data[index].SlicePitch = static_cast<UINT>(numBytes);
+			++index;
+
+			width = width >> 1;
+			height = height >> 1;
+			depth = depth >> 1;
+
+			width = (width == 0) ? 1 : width;
+			height = (height == 0) ? 1 : height;
+			depth = (depth == 0) ? 1 : depth;
+		}
+	}
+}
+
+
+void TextureInitializer::SetData(uint32_t slice, uint32_t mipLevel, const void* data)
+{
+	int index = slice * m_numMips + mipLevel;
+	m_data[index].pData = data;
+}
+
+
 Texture::Texture()
 {
 	m_cpuDescriptorHandle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
@@ -269,37 +310,108 @@ Texture::Texture(D3D12_CPU_DESCRIPTOR_HANDLE handle)
 
 void Texture::Create1D(uint32_t width, Format format, const void* initData)
 {
-	CreateInternal(TextureType::Texture1D, width, 1, 1, 1, format, initData);
+	TextureInitializer init(TextureType::Texture1D, format, width, 1, 1, 1);
+	init.SetData(0, 0, initData);
+
+	Create(init);
 }
 
 
 void Texture::Create2D(uint32_t width, uint32_t height, Format format, const void* initData)
 {
-	CreateInternal(TextureType::Texture2D, width, height, 1, 1, format, initData);
-}
+	TextureInitializer init(TextureType::Texture2D, format, width, height, 1, 1);
+	init.SetData(0, 0, initData);
 
-
-void Texture::Create2DMips(uint32_t width, uint32_t height, Format format, const std::vector<byte*>& initData)
-{
-
-}
-
-
-void Texture::Create2DArray(uint32_t width, uint32_t height, uint32_t arraySize, Format format, const void* initData)
-{
-	CreateInternal(TextureType::Texture2D_Array, width, height, arraySize, 1, format, initData);
-}
-
-
-void Texture::CreateCube(uint32_t width, uint32_t height, Format format, const void* initData)
-{
-	CreateInternal(TextureType::TextureCube, width, height, 6, 1, format, initData);
+	Create(init);
 }
 
 
 void Texture::Create3D(uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData)
 {
-	CreateInternal(TextureType::Texture3D, width, height, depth, 1, format, initData);
+	TextureInitializer init(TextureType::Texture3D, format, width, height, depth, 1);
+	init.SetData(0, 0, initData);
+
+	Create(init);
+}
+
+
+void Texture::Create(TextureInitializer& init)
+{
+	m_width = init.m_width;
+	m_height = init.m_height;
+	m_depthOrArraySize = init.m_depthOrArraySize;
+	m_format = init.m_format;
+	m_numMips = init.m_numMips;
+
+	m_usageState = ResourceState::CopyDest;
+
+	D3D12_RESOURCE_DESC texDesc = {};
+	texDesc.Dimension = GetResourceDimension(init.m_type);
+	texDesc.Width = m_width;
+	texDesc.Height = m_height;
+	texDesc.DepthOrArraySize = static_cast<UINT16>(m_depthOrArraySize);
+	texDesc.MipLevels = m_numMips;
+	texDesc.Format = static_cast<DXGI_FORMAT>(m_format);
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	D3D12_HEAP_PROPERTIES heapProps;
+	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProps.CreationNodeMask = 1;
+	heapProps.VisibleNodeMask = 1;
+
+	auto device = GetDevice();
+
+	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
+		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(m_resource.ReleaseAndGetAddressOf())));
+
+	m_resource->SetName(L"Texture");
+
+	uint32_t arraySize = (init.m_type == TextureType::Texture3D) ? 1 : m_depthOrArraySize;
+
+	CommandContext::InitializeTexture(*this, arraySize * m_numMips, init.m_data.data());
+
+	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
+	SRVDesc.Format = texDesc.Format;
+	SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	SRVDesc.ViewDimension = GetSRVDimension(init.m_type);
+	switch (init.m_type)
+	{
+	case TextureType::Texture1D:
+		SRVDesc.Texture1D.MipLevels = (UINT)-1;
+		break;
+	case TextureType::Texture1D_Array:
+		SRVDesc.Texture1DArray.MipLevels = (UINT)-1;
+		SRVDesc.Texture1DArray.ArraySize = m_depthOrArraySize;
+		break;
+	case TextureType::Texture2D:
+		SRVDesc.Texture2D.MipLevels = (UINT)-1;
+		break;
+	case TextureType::Texture2D_Array:
+		SRVDesc.Texture2DArray.MipLevels = (UINT)-1;
+		SRVDesc.Texture2DArray.ArraySize = m_depthOrArraySize;
+		break;
+	case TextureType::TextureCube:
+		SRVDesc.TextureCube.MipLevels = (UINT)-1;
+		break;
+	case TextureType::TextureCube_Array:
+		SRVDesc.TextureCubeArray.MipLevels = (UINT)-1;
+		SRVDesc.TextureCubeArray.NumCubes = m_depthOrArraySize;
+		break;
+	case TextureType::Texture3D:
+		SRVDesc.Texture3D.MipLevels = (UINT)-1;
+		break;
+	}
+	device->CreateShaderResourceView(m_resource.Get(), &SRVDesc, m_cpuDescriptorHandle);
 }
 
 
@@ -406,101 +518,6 @@ void Texture::LoadKTX(const string& fullpath, bool sRgb)
 }
 
 
-void Texture::CreateInternal(TextureType type, uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips, Format format, const void* initData)
-{
-	m_width = width;
-	m_height = height;
-	m_depthOrArraySize = depthOrArraySize;
-	m_format = format;
-	
-	m_usageState = ResourceState::CopyDest;
-
-	D3D12_RESOURCE_DESC texDesc = {};
-	texDesc.Dimension = GetResourceDimension(type);
-	texDesc.Width = width;
-	texDesc.Height = height;
-	texDesc.DepthOrArraySize = static_cast<UINT16>(m_depthOrArraySize);
-	texDesc.MipLevels = numMips;
-	texDesc.Format = static_cast<DXGI_FORMAT>(format);
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0;
-	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	D3D12_HEAP_PROPERTIES heapProps;
-	heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	heapProps.CreationNodeMask = 1;
-	heapProps.VisibleNodeMask = 1;
-
-	auto device = GetDevice();
-
-	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
-		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(m_resource.ReleaseAndGetAddressOf())));
-
-	m_resource->SetName(L"Texture");
-
-	uint32_t arraySize = (type == TextureType::Texture3D) ? 1 : m_depthOrArraySize;
-
-	unique_ptr<D3D12_SUBRESOURCE_DATA[]> subresources(new D3D12_SUBRESOURCE_DATA[arraySize]);
-
-	size_t numBytes, rowBytes, numRows;
-	GetSurfaceInfo(width, height, texDesc.Format, numBytes, rowBytes, numRows);
-
-	const byte* initDataB = reinterpret_cast<const byte*>(initData);
-
-	for (uint32_t i = 0; i < arraySize; ++i)
-	{
-		subresources[i].pData = initDataB;
-		subresources[i].RowPitch = rowBytes;
-		subresources[i].SlicePitch = numBytes;
-
-		initDataB += numBytes;
-	}
-
-	CommandContext::InitializeTexture(*this, arraySize, subresources.get());
-
-	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
-	{
-		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	}
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
-	SRVDesc.Format = texDesc.Format;
-	SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	SRVDesc.ViewDimension = GetSRVDimension(type);
-	switch (type)
-	{
-	case TextureType::Texture1D:
-		SRVDesc.Texture1D.MipLevels = (UINT)-1;
-		break;
-	case TextureType::Texture1D_Array:
-		SRVDesc.Texture1DArray.MipLevels = (UINT)-1;
-		SRVDesc.Texture1DArray.ArraySize = m_depthOrArraySize;
-		break;
-	case TextureType::Texture2D:
-		SRVDesc.Texture2D.MipLevels = (UINT)-1;
-		break;
-	case TextureType::Texture2D_Array:
-		SRVDesc.Texture2DArray.MipLevels = (UINT)-1;
-		SRVDesc.Texture2DArray.ArraySize = m_depthOrArraySize;
-		break;
-	case TextureType::TextureCube:
-		SRVDesc.TextureCube.MipLevels = (UINT)-1;
-		break;
-	case TextureType::TextureCube_Array:
-		SRVDesc.TextureCubeArray.MipLevels = (UINT)-1;
-		SRVDesc.TextureCubeArray.NumCubes = m_depthOrArraySize;
-		break;
-	case TextureType::Texture3D:
-		SRVDesc.Texture3D.MipLevels = (UINT)-1;
-		break;
-	}
-	device->CreateShaderResourceView(m_resource.Get(), &SRVDesc, m_cpuDescriptorHandle);
-}
-
-
 void ManagedTexture::WaitForLoad() const
 {
 	volatile D3D12_CPU_DESCRIPTOR_HANDLE& volHandle = (volatile D3D12_CPU_DESCRIPTOR_HANDLE&)m_cpuDescriptorHandle;
@@ -516,4 +533,10 @@ void ManagedTexture::SetToInvalidTexture()
 {
 	m_cpuDescriptorHandle = Texture::GetMagentaTex2D()->GetSRV();
 	m_isValid = false;
+}
+
+
+uint32_t Kodiak::BytesPerPixel(Format format)
+{
+	return BitsPerPixel(format) / 8;
 }

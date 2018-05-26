@@ -173,7 +173,7 @@ void CommandContext::Initialize()
 }
 
 
-void CommandContext::InitializeTexture(Texture& dest, const void* initialData, size_t numBytes)
+void CommandContext::InitializeTexture(Texture& dest, size_t numBytes, const void* initData, uint32_t numBuffers, VkBufferImageCopy bufferCopies[])
 {
 	auto device = GetDevice();
 
@@ -200,7 +200,7 @@ void CommandContext::InitializeTexture(Texture& dest, const void* initialData, s
 	VkDeviceMemory stagingBufferMemory{ VK_NULL_HANDLE };
 	ThrowIfFailed(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingBufferMemory));
 	ThrowIfFailed(vkMapMemory(device, stagingBufferMemory, 0, numBytes, 0, &data));
-	memcpy(data, initialData, numBytes);
+	memcpy(data, initData, numBytes);
 	vkUnmapMemory(device, stagingBufferMemory);
 	ThrowIfFailed(vkBindBufferMemory(device, stagingBuffer, stagingBufferMemory, 0));
 
@@ -209,24 +209,13 @@ void CommandContext::InitializeTexture(Texture& dest, const void* initialData, s
 
 	context.TransitionResource(dest, ResourceState::CopyDest, true);
 
-	// Copy single mip level from staging buffer to destination texture
-	VkBufferImageCopy bufferCopyRegion = {};
-	bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	bufferCopyRegion.imageSubresource.mipLevel = 0;
-	bufferCopyRegion.imageSubresource.baseArrayLayer = 0;
-	bufferCopyRegion.imageSubresource.layerCount = dest.GetTextureType() == TextureType::Texture3D ? 1 : dest.GetArraySize();
-	bufferCopyRegion.imageExtent.width = dest.GetWidth();
-	bufferCopyRegion.imageExtent.height = dest.GetHeight();
-	bufferCopyRegion.imageExtent.depth = dest.GetTextureType() == TextureType::Texture3D ? dest.GetArraySize() : 1;
-	bufferCopyRegion.bufferOffset = 0;
-
 	vkCmdCopyBufferToImage(
 		context.m_commandList,
 		stagingBuffer,
 		dest.m_image,
 		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-		1,
-		&bufferCopyRegion);
+		numBuffers,
+		bufferCopies);
 
 	context.TransitionResource(dest, ResourceState::GenericRead);
 
@@ -374,7 +363,7 @@ void CommandContext::TransitionResource(Texture& texture, ResourceState newState
 		// TODO this likely isn't correct
 		barrierDesc.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		barrierDesc.subresourceRange.baseMipLevel = 0;
-		barrierDesc.subresourceRange.levelCount = 1;
+		barrierDesc.subresourceRange.levelCount = texture.GetNumMips();
 		barrierDesc.subresourceRange.baseArrayLayer = 0;
 		barrierDesc.subresourceRange.layerCount = texture.GetTextureType() == TextureType::Texture3D ? 1 : texture.GetArraySize();
 

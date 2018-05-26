@@ -19,6 +19,46 @@ namespace Kodiak
 class ManagedTexture;
 
 
+class TextureInitializer
+{
+	friend class Texture;
+
+public:
+	TextureInitializer(TextureType type, Format format, uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips)
+		: m_type(type)
+		, m_format(format)
+		, m_width(width)
+		, m_height(height)
+		, m_depthOrArraySize(depthOrArraySize)
+		, m_numMips(numMips)
+		, m_data(m_depthOrArraySize * m_numMips)
+		, m_faceSize(numMips)
+	{
+		Initialize();
+	}
+
+	void SetData(uint32_t slice, uint32_t mipLevel, const void* data);
+	size_t GetFaceSize(uint32_t mipLevel) const
+	{
+		return m_faceSize[mipLevel];
+	}
+
+private:
+	void Initialize();
+
+private:
+	TextureType	m_type;
+	Format m_format;
+	uint32_t m_width;
+	uint32_t m_height;
+	uint32_t m_depthOrArraySize;
+	uint32_t m_numMips;
+
+	std::vector<D3D12_SUBRESOURCE_DATA> m_data;
+	std::vector<size_t>					m_faceSize;
+};
+
+
 class Texture : public GpuResource
 {
 	friend class CommandContext;
@@ -33,17 +73,11 @@ public:
 	// Create a 1-level 2D texture
 	void Create2D(uint32_t width, uint32_t height, Format format, const void* initData);
 
-	// Create a 2D texture with mips
-	void Create2DMips(uint32_t width, uint32_t height, Format format, const std::vector<byte*>& initData);
-
-	// Create a 1-level 2D texture array
-	void Create2DArray(uint32_t width, uint32_t height, uint32_t arraySize, Format format, const void* initData);
-
-	// Create a 1-level cubemap texture
-	void CreateCube(uint32_t width, uint32_t height, Format format, const void* initData);
-
 	// Create a volume texture
 	void Create3D(uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData);
+
+	// Create a texture from an initializer
+	void Create(TextureInitializer& init);
 
 	// Accessors
 	uint32_t GetWidth() const { return m_width; }
@@ -74,8 +108,6 @@ protected:
 	void LoadDDS(const std::string& fullpath, bool sRgb);
 	void LoadKTX(const std::string& fullpath, bool sRgb);
 
-	void CreateInternal(TextureType type, uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips, Format format, const void* initData);
-
 protected:
 	D3D12_CPU_DESCRIPTOR_HANDLE m_cpuDescriptorHandle;
 
@@ -103,5 +135,8 @@ private:
 	std::string m_mapKey;		// For deleting from the map later
 	bool m_isValid;
 };
+
+
+uint32_t BytesPerPixel(Format format);
 
 } // namespace Kodiak

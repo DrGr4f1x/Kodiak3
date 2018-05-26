@@ -44,7 +44,7 @@ VSOutput main(VSInput input)
 	lightPos = mul(modelMatrix, float4(lightPos, 0.0f)).xyz;
 
 	output.lightVec = lightPos - worldPos;
-	output.viewVec = viewPos - worldPos;
+	output.viewVec = viewPos.xyz - worldPos;
 
 	return output;
 }
