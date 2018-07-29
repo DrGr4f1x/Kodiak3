@@ -95,7 +95,7 @@ void TextureApp::Render()
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
 	Color clearColor{ DirectX::Colors::Black };
-	context.BeginRenderPass(m_renderPass, *m_framebuffers[curFrame], clearColor, 1.0f, 0);
+	context.BeginRenderPass(m_defaultRenderPass, *m_defaultFramebuffers[curFrame], clearColor, 1.0f, 0);
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -139,7 +139,7 @@ void TextureApp::InitPSO()
 	m_pso.SetVertexShader("TextureVS");
 	m_pso.SetPixelShader("TexturePS");
 
-	m_pso.SetRenderPass(m_renderPass);
+	m_pso.SetRenderPass(m_defaultRenderPass);
 
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 

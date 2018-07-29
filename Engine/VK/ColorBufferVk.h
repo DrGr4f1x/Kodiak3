@@ -38,6 +38,13 @@ public:
 
 	const Color& GetClearColor() const { return m_clearColor; }
 
+	void SetMsaaMode(uint32_t numColorSamples, uint32_t numCoverageSamples)
+	{
+		assert(numCoverageSamples >= numColorSamples);
+		m_fragmentCount = numColorSamples;
+		m_sampleCount = numCoverageSamples;
+	}
+
 protected:
 	// Compute the number of texture levels needed to reduce to 1x1.  This uses
 	// _BitScanReverse to find the highest set bit.  Each dimension reduces by
@@ -54,6 +61,8 @@ protected:
 	Color			m_clearColor;
 	VkImageView		m_imageView{ VK_NULL_HANDLE };
 	uint32_t		m_numMipMaps;
+	uint32_t		m_fragmentCount{ 1 };
+	uint32_t		m_sampleCount{ 1 };
 	bool			m_ownsImage{ true };
 
 private:

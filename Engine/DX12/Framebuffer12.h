@@ -21,25 +21,30 @@ class RenderPass;
 
 class FrameBuffer
 {
+	friend class GraphicsContext;
+
 public:
 	~FrameBuffer() { Destroy(); }
 
 	void Destroy();
 
-	void Create(ColorBufferPtr& rtv, RenderPass& renderpass);
-	void Create(ColorBufferPtr& rtv, DepthBufferPtr& dsv, RenderPass& renderpass);
+	void SetColorBuffer(uint32_t index, ColorBufferPtr buffer);
+	void SetDepthBuffer(DepthBufferPtr buffer);
+	void SetResolveBuffer(uint32_t index, ColorBufferPtr buffer);
 
-	ColorBufferPtr& GetColorBuffer(uint32_t index);
-	DepthBufferPtr& GetDepthBuffer() { return m_depthBuffer; }
+	ColorBufferPtr GetColorBuffer(uint32_t index) const;
 
-	size_t GetNumColorBuffers() const { return m_colorBuffers.size(); }
+	uint32_t GetNumColorBuffers() const;
+	uint32_t GetNumResolveBuffers() const;
 
-	bool HasDepthBuffer() const { return m_hasDepthBuffer; }
+	bool HasDepthBuffer() const { return m_depthBuffer != nullptr; }
+
+	void Finalize(RenderPass& renderpass) {}
 
 private:
-	std::vector<ColorBufferPtr> m_colorBuffers;
+	std::array<ColorBufferPtr, 8> m_colorBuffers;
+	std::array<ColorBufferPtr, 8> m_resolveBuffers;
 	DepthBufferPtr m_depthBuffer;
-	bool m_hasDepthBuffer{ false };
 };
 
 using FrameBufferPtr = std::shared_ptr<FrameBuffer>;

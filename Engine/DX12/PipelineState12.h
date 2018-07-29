@@ -134,6 +134,7 @@ public:
 	void SetRasterizerState(const RasterizerStateDesc& rasterizerDesc);
 	void SetDepthStencilState(const DepthStencilStateDesc& depthStencilDesc);
 	void SetSampleMask(uint32_t sampleMask);
+	void SetMsaaState(uint32_t numSamples);
 	void SetPrimitiveTopology(PrimitiveTopology topology);
 	void SetRenderPass(const RenderPass& renderpass);
 	void SetInputLayout(uint32_t numStreams, const VertexStreamDesc* vertexStreams, uint32_t numElements, const VertexElementDesc* inputElementDescs);

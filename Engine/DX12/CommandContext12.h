@@ -123,12 +123,15 @@ protected:
 	D3D12_PRIMITIVE_TOPOLOGY m_curPrimitiveTopology;
 
 	// Current render targets
-	std::array<ColorBuffer*, 8> m_renderTargets;
-	std::array<ResourceState, 8> m_renderTargetStates;
+	std::array<ColorBuffer*, 8>		m_renderTargets;
+	std::array<ResourceState, 8>	m_renderTargetStates;
+	std::array<ColorBuffer*, 8>		m_resolveTargets;
+	std::array<ResourceState, 8>	m_resolveTargetStates;
 	DepthBuffer* m_depthTarget;
 	ResourceState m_depthTargetState;
 	bool m_depthTargetValid{ false };
 	uint32_t m_numRenderTargets{ 0 };
+	uint32_t m_numResolveTargets{ 0 };
 
 	std::string m_id;
 

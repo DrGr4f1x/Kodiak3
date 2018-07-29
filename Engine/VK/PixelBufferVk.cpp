@@ -17,6 +17,31 @@
 using namespace Kodiak;
 
 
+VkSampleCountFlagBits Kodiak::SamplesToFlags(uint32_t numSamples)
+{
+	switch (numSamples)
+	{
+	case 1:
+		return VK_SAMPLE_COUNT_1_BIT;
+	case 2:
+		return VK_SAMPLE_COUNT_2_BIT;
+	case 4:
+		return VK_SAMPLE_COUNT_4_BIT;
+	case 8:
+		return VK_SAMPLE_COUNT_8_BIT;
+	case 16:
+		return VK_SAMPLE_COUNT_16_BIT;
+	case 32:
+		return VK_SAMPLE_COUNT_32_BIT;
+	case 64:
+		return VK_SAMPLE_COUNT_64_BIT;
+	default:
+		assert(false);
+		return VK_SAMPLE_COUNT_1_BIT;
+	}
+}
+
+
 void PixelBuffer::Destroy()
 {
 	if (m_image != VK_NULL_HANDLE)
@@ -29,7 +54,8 @@ void PixelBuffer::Destroy()
 }
 
 
-VkImageCreateInfo PixelBuffer::DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips, Format format, VkImageUsageFlags usageFlags)
+VkImageCreateInfo PixelBuffer::DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips, 
+	uint32_t numSamples, Format format, VkImageUsageFlags usageFlags)
 {
 	VkImageCreateInfo imageCreateInfo = {};
 	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -39,7 +65,7 @@ VkImageCreateInfo PixelBuffer::DescribeTex2D(uint32_t width, uint32_t height, ui
 	imageCreateInfo.extent = { width, height, 1 };
 	imageCreateInfo.mipLevels = numMips;
 	imageCreateInfo.arrayLayers = depthOrArraySize;
-	imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	imageCreateInfo.samples = SamplesToFlags(numSamples);
 	imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 	imageCreateInfo.usage = usageFlags;
 	imageCreateInfo.flags = 0;

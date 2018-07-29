@@ -15,9 +15,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="Shaders\ParticlePS.hlsl" />
-    <CustomBuild Include="Shaders\ParticleVS.hlsl" />
-    <CustomBuild Include="Shaders\NormalMapPS.hlsl" />
-    <CustomBuild Include="Shaders\NormalMapVS.hlsl" />
+    <CustomBuild Include="Shaders\NormalMapPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\NormalMapVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ParticlePS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ParticleVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

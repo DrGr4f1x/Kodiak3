@@ -25,7 +25,9 @@ public:
 	ParticleFireApp()
 		: Kodiak::Application("Particle Fire")
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
-	{}
+	{
+		m_timerSpeed = 2.0f;
+	}
 
 	void Configure() final;
 	void Startup() final;

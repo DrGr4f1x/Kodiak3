@@ -221,6 +221,12 @@ void GraphicsPSO::SetSampleMask(uint32_t sampleMask)
 }
 
 
+void GraphicsPSO::SetMsaaState(uint32_t numSamples)
+{
+	m_psoDesc.SampleDesc.Count = numSamples;
+}
+
+
 void GraphicsPSO::SetPrimitiveTopology(PrimitiveTopology topology)
 {
 	m_psoDesc.PrimitiveTopologyType = MapPrimitiveTopologyToD3DType(topology);
@@ -239,16 +245,14 @@ void GraphicsPSO::SetRenderPass(const RenderPass& renderpass)
 	uint32_t numRTVs = static_cast<uint32_t>(renderpass.GetNumColorAttachments());
 	for (uint32_t i = 0; i < numRTVs; ++i)
 	{
-		m_psoDesc.RTVFormats[i] = static_cast<DXGI_FORMAT>(renderpass.GetColorFormat(i));
+		m_psoDesc.RTVFormats[i] = static_cast<DXGI_FORMAT>(renderpass.m_colorAttachments[i].format);
 	}
 	for (uint32_t i = numRTVs; i < m_psoDesc.NumRenderTargets; ++i)
 	{
 		m_psoDesc.RTVFormats[i] = DXGI_FORMAT_UNKNOWN;
 	}
 	m_psoDesc.NumRenderTargets = numRTVs;
-	m_psoDesc.DSVFormat = static_cast<DXGI_FORMAT>(renderpass.GetDepthFormat());
-	m_psoDesc.SampleDesc.Count = 1;
-	m_psoDesc.SampleDesc.Quality = 0;
+	m_psoDesc.DSVFormat = static_cast<DXGI_FORMAT>(renderpass.m_depthAttachment.format);
 }
 
 

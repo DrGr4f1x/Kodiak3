@@ -24,7 +24,10 @@ using namespace std;
 
 void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t height, Format format)
 {
-	auto resourceDesc = DescribeTex2D(width, height, 1, 1, format, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+	const uint32_t arraySize = 1;
+	const uint32_t numMips = 1;
+	const uint32_t numSamples = 1;
+	auto resourceDesc = DescribeTex2D(width, height, arraySize, numMips, numSamples, format, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
 
 	D3D12_CLEAR_VALUE clearValue = {};
 	clearValue.Format = static_cast<DXGI_FORMAT>(format);
@@ -38,8 +41,9 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 
 void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t height, uint32_t samples, Format format)
 {
-	auto resourceDesc = DescribeTex2D(width, height, 1, 1, format, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
-	resourceDesc.SampleDesc.Count = samples;
+	const uint32_t arraySize = 1;
+	const uint32_t numMips = 1;
+	auto resourceDesc = DescribeTex2D(width, height, arraySize, numMips, samples, format, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
 
 	D3D12_CLEAR_VALUE clearValue = {};
 	clearValue.Format = static_cast<DXGI_FORMAT>(format);

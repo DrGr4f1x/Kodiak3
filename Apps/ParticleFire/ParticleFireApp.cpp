@@ -86,7 +86,7 @@ void ParticleFireApp::Render()
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
 	Color clearColor{ DirectX::Colors::Black };
-	context.BeginRenderPass(m_renderPass, *m_framebuffers[curFrame], clearColor, 1.0f, 0);
+	context.BeginRenderPass(m_defaultRenderPass, *m_defaultFramebuffers[curFrame], clearColor, 1.0f, 0);
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -127,7 +127,7 @@ void ParticleFireApp::InitPSOs()
 	// Model
 	{
 		m_modelPSO.SetRootSignature(m_rootSig);
-		m_modelPSO.SetRenderPass(m_renderPass);
+		m_modelPSO.SetRenderPass(m_defaultRenderPass);
 
 		m_modelPSO.SetBlendState(CommonStates::BlendDisable());
 		m_modelPSO.SetRasterizerState(CommonStates::RasterizerDefaultCW());

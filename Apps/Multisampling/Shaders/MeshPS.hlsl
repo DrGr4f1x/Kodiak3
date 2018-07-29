@@ -1,0 +1,28 @@
+struct PSInput
+{
+	float4 position : SV_Position;
+	float3 color : COLOR;
+	float3 normal : NORMAL;
+	float2 texcoord : TEXCOORD0;
+	float3 lightVec : TEXCOORD1;
+	float3 viewVec : TEXCOORD2;
+};
+
+[[vk::binding(0, 1)]]
+Texture2D colorTex : register(t0);
+[[vk::binding(0, 2)]]
+SamplerState linearSampler : register(s0);
+
+float4 main(PSInput input) : SV_TARGET
+{
+	float4 color = colorTex.Sample(linearSampler, input.texcoord);
+
+	float3 N = normalize(input.normal);
+	float3 L = normalize(input.lightVec);
+	float3 V = normalize(input.viewVec);
+	float3 R = reflect(-L, N);
+	float3 diffuse = max(dot(N, L), 0.0) * input.color;
+	float3 specular = pow(max(dot(R, V), 0.0), 16.0) * float3(0.75, 0.75, 0.75);
+
+	return float4(diffuse * color.rgb + specular, 1.0);
+}

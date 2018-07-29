@@ -16,20 +16,17 @@ namespace Kodiak
 class RenderPass
 {
 	friend class GraphicsPSO;
+	friend class GraphicsContext;
+
 public:
 	void Destroy() {}
 
-	void AddColorAttachment(Format colorFormat, ResourceState initialState, ResourceState finalState);
-	void AddDepthAttachment(Format depthFormat, ResourceState initialState, ResourceState finalState);
+	void SetColorAttachment(uint32_t index, Format colorFormat, ResourceState initialState, ResourceState finalState);
+	void SetDepthAttachment(Format depthFormat, ResourceState initialState, ResourceState finalState);
+	void SetResolveAttachment(uint32_t index, Format colorFormat, ResourceState initialState, ResourceState finalState);
 
-	Format GetColorFormat(uint32_t index) const { return m_colorAttachments[index].format; }
-	Format GetDepthFormat() const { return m_depthAttachment.format; }
-
-	ResourceState GetFinalColorState(uint32_t index) const;
-	ResourceState GetFinalDepthState() const;
-
-	size_t GetNumColorAttachments() const { return m_colorAttachments.size(); }
-	bool HasDepthAttachment() const { return m_hasDepthAttachment; }
+	uint32_t GetNumColorAttachments() const;
+	uint32_t GetNumResolveAttachments() const;
 
 	void Finalize() {}
 
@@ -39,11 +36,12 @@ private:
 		Format format{ Format::Unknown };
 		ResourceState initialState;
 		ResourceState finalState;
+		bool isValid{ false };
 	};
 
-	std::vector<AttachmentDesc> m_colorAttachments;
+	std::array<AttachmentDesc, 8> m_colorAttachments;
+	std::array<AttachmentDesc, 8> m_resolveAttachments;
 	AttachmentDesc m_depthAttachment;
-	bool m_hasDepthAttachment{ false };
 };
 
 } // namespace Kodiak

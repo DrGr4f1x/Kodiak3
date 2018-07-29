@@ -50,6 +50,10 @@ private:
 	uint32_t m_destHeight{ 0 };
 
 	Microsoft::WRL::ComPtr<ID3D12Device> m_device;
+	Microsoft::WRL::ComPtr<ID3D12Device1> m_device1;
+	Microsoft::WRL::ComPtr<ID3D12Device2> m_device2;
+	Microsoft::WRL::ComPtr<ID3D12Device3> m_device3;
+	Microsoft::WRL::ComPtr<ID3D12Device4> m_device4;
 
 	bool m_typedUAVLoadSupport_R11G11B10_FLOAT{ false };
 	bool m_typedUAVLoadSupport_R16G16B16A16_FLOAT{ false };

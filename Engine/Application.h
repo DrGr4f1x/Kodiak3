@@ -69,14 +69,14 @@ protected:
 
 	Math::Camera m_camera;
 
-	HINSTANCE m_hinst{ 0 };
-	HWND m_hwnd{ 0 };
+	HINSTANCE	m_hinst{ 0 };
+	HWND		m_hwnd{ 0 };
 
-	std::unique_ptr<GraphicsDevice> m_graphicsDevice;
+	std::unique_ptr<GraphicsDevice>			m_graphicsDevice;
 
-	std::vector<Kodiak::FrameBufferPtr> m_framebuffers;
-	Kodiak::DepthBufferPtr	m_depthBuffer;
-	Kodiak::RenderPass		m_renderPass;
+	std::vector<Kodiak::FrameBufferPtr>		m_defaultFramebuffers;
+	Kodiak::DepthBufferPtr					m_defaultDepthBuffer;
+	Kodiak::RenderPass						m_defaultRenderPass;
 
 private:
 	void Initialize();

@@ -88,7 +88,7 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
 				continue;
 
-			if (desc.DedicatedVideoMemory > maxSize && SUCCEEDED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, MY_IID_PPV_ARGS(&pDevice))))
+			if (desc.DedicatedVideoMemory > maxSize && SUCCEEDED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_12_0, MY_IID_PPV_ARGS(&pDevice))))
 			{
 				pAdapter->GetDesc1(&desc);
 				Utility::Printf(L"D3D12-capable hardware found:  %s (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
@@ -147,6 +147,30 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 #endif
 
 	g_device = m_device.Get();
+
+	ID3D12Device1* pDevice1 = nullptr;
+	if (SUCCEEDED(m_device->QueryInterface(MY_IID_PPV_ARGS(&pDevice1))))
+	{
+		m_device1.Attach(pDevice1);
+	}
+
+	ID3D12Device2* pDevice2 = nullptr;
+	if (SUCCEEDED(m_device->QueryInterface(MY_IID_PPV_ARGS(&pDevice2))))
+	{
+		m_device2.Attach(pDevice2);
+	}
+
+	ID3D12Device3* pDevice3 = nullptr;
+	if (SUCCEEDED(m_device->QueryInterface(MY_IID_PPV_ARGS(&pDevice3))))
+	{
+		m_device3.Attach(pDevice3);
+	}
+
+	ID3D12Device4* pDevice4 = nullptr;
+	if (SUCCEEDED(m_device->QueryInterface(MY_IID_PPV_ARGS(&pDevice4))))
+	{
+		m_device4.Attach(pDevice4);
+	}
 
 #if _DEBUG
 	ID3D12InfoQueue* pInfoQueue = nullptr;
@@ -223,6 +247,12 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 				m_typedUAVLoadSupport_R16G16B16A16_FLOAT = true;
 			}
 		}
+	}
+
+	D3D12_FEATURE_DATA_D3D12_OPTIONS5 featureData5 = {};
+	if (SUCCEEDED(m_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &featureData5, sizeof(featureData5))))
+	{
+
 	}
 
 	g_commandManager.Create(m_device.Get());

@@ -34,7 +34,24 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 {
 	m_format = format;
 
-	auto imageCreateInfo = DescribeTex2D(width, height, 1, 1, format, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
+	const uint32_t arraySize = 1;
+	const uint32_t numMips = 1;
+	const uint32_t numSamples = 1;
+	const VkImageUsageFlags flags = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+	auto imageCreateInfo = DescribeTex2D(width, height, arraySize, numMips, numSamples, format, flags);
+	CreateTextureResource(name, imageCreateInfo);
+	CreateDerivedViews(format);
+}
+
+
+void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numSamples, Format format)
+{
+	m_format = format;
+
+	const uint32_t arraySize = 1;
+	const uint32_t numMips = 1;
+	const VkImageUsageFlags flags = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+	auto imageCreateInfo = DescribeTex2D(width, height, arraySize, numMips, numSamples, format, flags);
 	CreateTextureResource(name, imageCreateInfo);
 	CreateDerivedViews(format);
 }

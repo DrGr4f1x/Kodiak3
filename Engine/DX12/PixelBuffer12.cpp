@@ -322,6 +322,7 @@ void PixelBuffer::AssociateWithResource(const std::string& name, ID3D12Resource*
 	m_width = (uint32_t)resourceDesc.Width;		// We don't care about large virtual textures yet
 	m_height = resourceDesc.Height;
 	m_arraySize = resourceDesc.DepthOrArraySize;
+	m_numSamples = resourceDesc.SampleDesc.Count;
 	m_format = MapDXGIFormatToEngine(resourceDesc.Format);
 
 #ifndef _RELEASE
@@ -352,11 +353,12 @@ void PixelBuffer::CreateTextureResource(const std::string& name, const D3D12_RES
 
 
 D3D12_RESOURCE_DESC PixelBuffer::DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthOrArraySize,
-	uint32_t numMips, Format format, uint32_t flags)
+	uint32_t numMips, uint32_t numSamples, Format format, uint32_t flags)
 {
 	m_width = width;
 	m_height = height;
 	m_arraySize = depthOrArraySize;
+	m_numSamples = numSamples;
 	m_format = format;
 
 	D3D12_RESOURCE_DESC desc = {};
@@ -368,7 +370,7 @@ D3D12_RESOURCE_DESC PixelBuffer::DescribeTex2D(uint32_t width, uint32_t height, 
 	desc.Height = (UINT)height;
 	desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	desc.MipLevels = (UINT16)numMips;
-	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Count = numSamples;
 	desc.SampleDesc.Quality = 0;
 	desc.Width = (UINT64)width;
 

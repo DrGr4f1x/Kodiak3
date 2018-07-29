@@ -145,6 +145,7 @@ public:
 	void SetRasterizerState(const RasterizerStateDesc& stateDesc);
 	void SetDepthStencilState(const DepthStencilStateDesc& stateDesc);
 	void SetSampleMask(uint32_t sampleMask);
+	void SetMsaaState(uint32_t numSamples);
 	void SetPrimitiveTopology(PrimitiveTopology topology);
 	void SetRenderPass(RenderPass& renderpass);
 	void SetInputLayout(uint32_t numStreams, const VertexStreamDesc* vertexStreams, uint32_t numElements, const VertexElementDesc* inputElementDescs);

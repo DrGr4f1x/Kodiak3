@@ -54,7 +54,6 @@ void RadialBlurApp::Shutdown()
 	m_model.reset();
 	m_gradientTex.reset();
 
-	m_renderPass.Destroy();
 	m_offscreenRenderPass.Destroy();
 
 	m_offscreenFramebuffer.reset();
@@ -113,7 +112,7 @@ void RadialBlurApp::Render()
 		uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
 		Color clearColor{ DirectX::Colors::Black };
-		context.BeginRenderPass(m_renderPass, *m_framebuffers[curFrame], clearColor, 1.0f, 0);
+		context.BeginRenderPass(m_defaultRenderPass, *m_defaultFramebuffers[curFrame], clearColor, 1.0f, 0);
 
 		context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -154,8 +153,8 @@ void RadialBlurApp::InitRenderPasses()
 	auto depthFormat = m_graphicsDevice->GetDepthFormat();
 	
 	colorFormat = Format::R8G8B8A8_UNorm;
-	m_offscreenRenderPass.AddColorAttachment(colorFormat, ResourceState::Undefined, ResourceState::PixelShaderResource);
-	m_offscreenRenderPass.AddDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
+	m_offscreenRenderPass.SetColorAttachment(0, colorFormat, ResourceState::Undefined, ResourceState::PixelShaderResource);
+	m_offscreenRenderPass.SetDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
 	m_offscreenRenderPass.Finalize();
 }
 
@@ -182,7 +181,7 @@ void RadialBlurApp::InitRootSigs()
 void RadialBlurApp::InitPSOs()
 {
 	m_radialBlurPSO.SetRootSignature(m_radialBlurRootSig);
-	m_radialBlurPSO.SetRenderPass(m_renderPass);
+	m_radialBlurPSO.SetRenderPass(m_defaultRenderPass);
 	m_radialBlurPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 	m_radialBlurPSO.SetBlendState(CommonStates::BlendAdditive());
 	m_radialBlurPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
@@ -231,7 +230,9 @@ void RadialBlurApp::InitFramebuffers()
 		depthBuffer->Create("Offscreen Depth Buffer", s_offscreenSize, s_offscreenSize, m_graphicsDevice->GetDepthFormat());
 
 		m_offscreenFramebuffer = make_shared<FrameBuffer>();
-		m_offscreenFramebuffer->Create(colorBuffer, depthBuffer, m_offscreenRenderPass);
+		m_offscreenFramebuffer->SetColorBuffer(0, colorBuffer);
+		m_offscreenFramebuffer->SetDepthBuffer(depthBuffer);
+		m_offscreenFramebuffer->Finalize(m_offscreenRenderPass);
 	}
 }
 

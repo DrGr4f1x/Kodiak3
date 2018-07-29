@@ -18,8 +18,9 @@ class RenderPass
 public:
 	void Destroy();
 
-	void AddColorAttachment(Format colorFormat, ResourceState initialState, ResourceState finalState);
-	void AddDepthAttachment(Format depthFormat, ResourceState initialState, ResourceState finalState);
+	void SetColorAttachment(uint32_t index, Format colorFormat, ResourceState initialState, ResourceState finalState);
+	void SetDepthAttachment(Format depthFormat, ResourceState initialState, ResourceState finalState);
+	void SetResolveAttachment(uint32_t index, Format colorFormat, ResourceState initialState, ResourceState finalState);
 
 	void Finalize();
 
@@ -27,8 +28,11 @@ public:
 
 private:
 	VkRenderPass m_renderPass{ VK_NULL_HANDLE };
-	std::vector<VkAttachmentDescription> m_colorAttachments;
+
+	std::array<VkAttachmentDescription, 8> m_colorAttachments;
+	std::array<VkAttachmentDescription, 8> m_resolveAttachments;
 	VkAttachmentDescription m_depthAttachment;
+	
 	bool m_hasDepthAttachment{ false };
 };
 

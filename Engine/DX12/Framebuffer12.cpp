@@ -19,34 +19,67 @@ using namespace std;
 
 void FrameBuffer::Destroy()
 {
-	m_colorBuffers.clear();
+	for (uint32_t i = 0; i < 8; ++i)
+	{
+		m_colorBuffers[i].reset();
+		m_resolveBuffers[i].reset();
+	}
 
 	m_depthBuffer.reset();
-	m_hasDepthBuffer = false;
 }
 
 
-void FrameBuffer::Create(ColorBufferPtr& rtv, RenderPass& renderpass)
+void FrameBuffer::SetColorBuffer(uint32_t index, ColorBufferPtr buffer)
 {
-	m_colorBuffers.clear();
+	assert(index < 8);
 
-	m_colorBuffers.push_back(rtv);
-	m_hasDepthBuffer = false;
+	m_colorBuffers[index] = buffer;
 }
 
 
-void FrameBuffer::Create(ColorBufferPtr& rtv, DepthBufferPtr& dsv, RenderPass& renderpass)
+void FrameBuffer::SetDepthBuffer(DepthBufferPtr buffer)
 {
-	m_colorBuffers.clear();
-
-	m_colorBuffers.push_back(rtv);
-	m_depthBuffer = dsv;
-	m_hasDepthBuffer = true;
+	m_depthBuffer = buffer;
 }
 
 
-ColorBufferPtr& FrameBuffer::GetColorBuffer(uint32_t index)
+void FrameBuffer::SetResolveBuffer(uint32_t index, ColorBufferPtr buffer)
 {
-	assert(index < (uint32_t)m_colorBuffers.size());
+	assert(index < 8);
+
+	m_resolveBuffers[index] = buffer;
+}
+
+
+ColorBufferPtr FrameBuffer::GetColorBuffer(uint32_t index) const
+{
+	assert(index < 8);
+
 	return m_colorBuffers[index];
+}
+
+
+uint32_t FrameBuffer::GetNumColorBuffers() const
+{
+	uint32_t count = 0;
+
+	for (uint32_t i = 0; i < 8; ++i)
+	{
+		count += m_colorBuffers[i] != nullptr ? 1 : 0;
+	}
+
+	return count;
+}
+
+
+uint32_t FrameBuffer::GetNumResolveBuffers() const
+{
+	uint32_t count = 0;
+
+	for (uint32_t i = 0; i < 8; ++i)
+	{
+		count += m_resolveBuffers[i] != nullptr ? 1 : 0;
+	}
+
+	return count;
 }

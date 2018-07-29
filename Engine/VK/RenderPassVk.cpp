@@ -54,25 +54,21 @@ void RenderPass::Destroy()
 }
 
 
-void RenderPass::AddColorAttachment(Format colorFormat, ResourceState initialState, ResourceState finalState)
+void RenderPass::SetColorAttachment(uint32_t index, Format colorFormat, ResourceState initialState, ResourceState finalState)
 {
-	VkAttachmentDescription attachment = {};
-
-	attachment.flags = 0;
-	attachment.format = static_cast<VkFormat>(colorFormat);
-	attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-	attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	attachment.initialLayout = GetImageLayout(initialState);
-	attachment.finalLayout = GetImageLayout(finalState);
-
-	m_colorAttachments.emplace_back(attachment);
+	m_colorAttachments[index].flags = 0;
+	m_colorAttachments[index].format = static_cast<VkFormat>(colorFormat);
+	m_colorAttachments[index].samples = VK_SAMPLE_COUNT_1_BIT;
+	m_colorAttachments[index].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	m_colorAttachments[index].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	m_colorAttachments[index].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	m_colorAttachments[index].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	m_colorAttachments[index].initialLayout = GetImageLayout(initialState);
+	m_colorAttachments[index].finalLayout = GetImageLayout(finalState);
 }
 
 
-void RenderPass::AddDepthAttachment(Format depthFormat, ResourceState initialState, ResourceState finalState)
+void RenderPass::SetDepthAttachment(Format depthFormat, ResourceState initialState, ResourceState finalState)
 {
 	m_depthAttachment.flags = 0;
 	m_depthAttachment.format = static_cast<VkFormat>(depthFormat);
@@ -85,6 +81,20 @@ void RenderPass::AddDepthAttachment(Format depthFormat, ResourceState initialSta
 	m_depthAttachment.finalLayout = GetImageLayout(finalState);
 
 	m_hasDepthAttachment = true;
+}
+
+
+void RenderPass::SetResolveAttachment(uint32_t index, Format colorFormat, ResourceState initialState, ResourceState finalState)
+{
+	m_resolveAttachments[index].flags = 0;
+	m_resolveAttachments[index].format = static_cast<VkFormat>(colorFormat);
+	m_resolveAttachments[index].samples = VK_SAMPLE_COUNT_1_BIT;
+	m_resolveAttachments[index].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	m_resolveAttachments[index].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	m_resolveAttachments[index].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	m_resolveAttachments[index].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	m_resolveAttachments[index].initialLayout = GetImageLayout(initialState);
+	m_resolveAttachments[index].finalLayout = GetImageLayout(finalState);
 }
 
 

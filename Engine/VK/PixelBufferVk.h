@@ -30,7 +30,8 @@ public:
 	Format GetFormat() const { return m_format; }
 
 protected:
-	VkImageCreateInfo DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips, Format format, VkImageUsageFlags flags);
+	VkImageCreateInfo DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips, 
+		uint32_t numSamples, Format format, VkImageUsageFlags flags);
 
 	void CreateTextureResource(const std::string& name, const VkImageCreateInfo& imageCreateInfo);
 
@@ -44,5 +45,7 @@ protected:
 	VkImageLayout	m_layout{ VK_IMAGE_LAYOUT_GENERAL };
 	VkAccessFlags	m_accessFlags{ 0 };
 };
+
+VkSampleCountFlagBits SamplesToFlags(uint32_t numSamples);
 
 } // namespace Kodiak

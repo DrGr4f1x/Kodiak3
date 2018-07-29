@@ -84,7 +84,7 @@ void GeometryShaderApp::Render()
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
 	Color clearColor{ DirectX::Colors::Black };
-	context.BeginRenderPass(m_renderPass, *m_framebuffers[curFrame], clearColor, 1.0f, 0);
+	context.BeginRenderPass(m_defaultRenderPass, *m_defaultFramebuffers[curFrame], clearColor, 1.0f, 0);
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -128,7 +128,7 @@ void GeometryShaderApp::InitRootSigs()
 void GeometryShaderApp::InitPSOs()
 {
 	m_meshPSO.SetRootSignature(m_meshRootSig);
-	m_meshPSO.SetRenderPass(m_renderPass);
+	m_meshPSO.SetRenderPass(m_defaultRenderPass);
 
 	m_meshPSO.SetBlendState(CommonStates::BlendDisable());
 	m_meshPSO.SetRasterizerState(CommonStates::RasterizerDefaultCW());
@@ -152,7 +152,7 @@ void GeometryShaderApp::InitPSOs()
 
 	
 	m_geomPSO.SetRootSignature(m_geomRootSig);
-	m_geomPSO.SetRenderPass(m_renderPass);
+	m_geomPSO.SetRenderPass(m_defaultRenderPass);
 
 	m_geomPSO.SetBlendState(CommonStates::BlendDisable());
 	m_geomPSO.SetRasterizerState(CommonStates::RasterizerDefault());

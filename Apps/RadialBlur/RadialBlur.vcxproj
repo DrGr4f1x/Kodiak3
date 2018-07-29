@@ -31,7 +31,7 @@
     <ProjectGuid>{BE2CB1E5-17A8-45C3-B01F-879D1D0147CB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>RadialBlur</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17677.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'" Label="Configuration">

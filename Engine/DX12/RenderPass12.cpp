@@ -16,34 +16,58 @@
 using namespace Kodiak;
 
 
-void RenderPass::AddColorAttachment(Format colorFormat, ResourceState initialState, ResourceState finalState)
+void RenderPass::SetColorAttachment(uint32_t index, Format colorFormat, ResourceState initialState, ResourceState finalState)
 {
-	AttachmentDesc desc;
-	desc.format = colorFormat;
-	desc.initialState = initialState;
-	desc.finalState = finalState;
-	m_colorAttachments.emplace_back(desc);
+	assert(index < 8);
+
+	m_colorAttachments[index].format = colorFormat;
+	m_colorAttachments[index].initialState = initialState;
+	m_colorAttachments[index].finalState = finalState;
+	m_colorAttachments[index].isValid = true;
 }
 
 
-void RenderPass::AddDepthAttachment(Format depthFormat, ResourceState initialState, ResourceState finalState)
+void RenderPass::SetDepthAttachment(Format depthFormat, ResourceState initialState, ResourceState finalState)
 {
 	m_depthAttachment.format = depthFormat;
 	m_depthAttachment.initialState = initialState;
 	m_depthAttachment.finalState = finalState;
-	m_hasDepthAttachment = true;
+	m_depthAttachment.isValid = true;
 }
 
 
-ResourceState RenderPass::GetFinalColorState(uint32_t index) const
+void RenderPass::SetResolveAttachment(uint32_t index, Format colorFormat, ResourceState initialState, ResourceState finalState)
 {
-	assert(index < (uint32_t)m_colorAttachments.size());
-	return m_colorAttachments[index].finalState;
+	assert(index < 8);
+
+	m_resolveAttachments[index].format = colorFormat;
+	m_resolveAttachments[index].initialState = initialState;
+	m_resolveAttachments[index].finalState = finalState;
+	m_resolveAttachments[index].isValid = true;
 }
 
 
-ResourceState RenderPass::GetFinalDepthState() const
+uint32_t RenderPass::GetNumColorAttachments() const
 {
-	assert(m_hasDepthAttachment);
-	return m_depthAttachment.finalState;
+	uint32_t count = 0;
+
+	for (uint32_t i = 0; i < 8; ++i)
+	{
+		count += m_colorAttachments[i].isValid ? 1 : 0;
+	}
+
+	return count;
+}
+
+
+uint32_t RenderPass::GetNumResolveAttachments() const
+{
+	uint32_t count = 0;
+
+	for (uint32_t i = 0; i < 8; ++i)
+	{
+		count += m_resolveAttachments[i].isValid ? 1 : 0;
+	}
+
+	return count;
 }

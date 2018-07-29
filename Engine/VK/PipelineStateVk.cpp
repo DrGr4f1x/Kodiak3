@@ -16,6 +16,7 @@
 #include "Shader.h"
 
 #include "GraphicsDeviceVk.h"
+#include "PixelBufferVk.h"
 #include "RenderPassVk.h"
 #include "RootSignatureVk.h"
 
@@ -297,6 +298,12 @@ void GraphicsPSO::SetDepthStencilState(const DepthStencilStateDesc& stateDesc)
 void GraphicsPSO::SetSampleMask(uint32_t sampleMask)
 {
 	// TODO hook this up to multisample state
+}
+
+
+void GraphicsPSO::SetMsaaState(uint32_t numSamples)
+{
+	m_multisampleInfo.rasterizationSamples = SamplesToFlags(numSamples);
 }
 
 

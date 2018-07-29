@@ -38,8 +38,9 @@ void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 	Format format)
 {
 	numMips = (numMips == 0 ? ComputeNumMips(width, height) : numMips);
+	const uint32_t numSamples = 1;
 	auto flags = CombineResourceFlags();
-	auto resourceDesc = DescribeTex2D(width, height, 1, numMips, format, flags);
+	auto resourceDesc = DescribeTex2D(width, height, 1, numMips, numSamples, format, flags);
 
 	resourceDesc.SampleDesc.Count = m_fragmentCount;
 	resourceDesc.SampleDesc.Quality = 0;
@@ -60,7 +61,9 @@ void ColorBuffer::CreateArray(const std::string& name, uint32_t width, uint32_t 
 	Format format)
 {
 	auto flags = CombineResourceFlags();
-	auto resourceDesc = DescribeTex2D(width, height, arrayCount, 1, format, flags);
+	const uint32_t numMips = 1;
+	const uint32_t numSamples = 1;
+	auto resourceDesc = DescribeTex2D(width, height, arrayCount, numMips, numSamples, format, flags);
 
 	D3D12_CLEAR_VALUE clearValue = {};
 	clearValue.Format = static_cast<DXGI_FORMAT>(format);
