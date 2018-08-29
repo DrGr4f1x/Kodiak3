@@ -28,27 +28,29 @@ public:
 
 	void Destroy();
 
-	void Create(ColorBufferPtr& rtv, RenderPass& renderpass);
-	void Create(ColorBufferPtr& rtv, DepthBufferPtr& dsv, RenderPass& renderpass);
+	void SetColorBuffer(uint32_t index, ColorBufferPtr buffer);
+	void SetDepthBuffer(DepthBufferPtr buffer);
+	void SetResolveBuffer(uint32_t index, ColorBufferPtr buffer);
 
-	ColorBufferPtr& GetColorBuffer(uint32_t index);
-	DepthBufferPtr& GetDepthBuffer() { return m_depthBuffer; }
+	uint32_t GetWidth() const;
+	uint32_t GetHeight() const;
 
-	size_t GetNumColorBuffers() const { return m_colorBuffers.size(); }
+	ColorBufferPtr GetColorBuffer(uint32_t index) const;
+
+	uint32_t GetNumColorBuffers() const;
+	uint32_t GetNumResolveBuffers() const;
+
+	void Finalize(RenderPass& renderpass);
 
 	// TODO MRTs
 
 	VkFramebuffer GetFramebuffer() { return m_framebuffer; }
 
-	uint32_t GetWidth() const { return m_width; }
-	uint32_t GetHeight() const { return m_height; }
-
 private:
-	uint32_t m_width{ 0 };
-	uint32_t m_height{ 0 };
 	VkFramebuffer m_framebuffer{ VK_NULL_HANDLE };
 
-	std::vector<ColorBufferPtr> m_colorBuffers;
+	std::array<ColorBufferPtr, 8> m_colorBuffers;
+	std::array<ColorBufferPtr, 8> m_resolveBuffers;
 	DepthBufferPtr m_depthBuffer;
 };
 

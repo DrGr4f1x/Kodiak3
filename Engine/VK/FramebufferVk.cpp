@@ -23,67 +23,113 @@ using namespace Kodiak;
 
 void FrameBuffer::Destroy()
 {
-	m_width = m_height = 0;
-
 	vkDestroyFramebuffer(GetDevice(), m_framebuffer, nullptr);
 	m_framebuffer = VK_NULL_HANDLE;
 }
 
 
-void FrameBuffer::Create(ColorBufferPtr& rtv, RenderPass& renderpass)
+void FrameBuffer::SetColorBuffer(uint32_t index, ColorBufferPtr buffer)
 {
-	m_width = rtv->GetWidth();
-	m_height = rtv->GetHeight();
+	assert(index < 8);
 
-	VkImageView attachment = rtv->GetRTV();
-
-	VkFramebufferCreateInfo frameBufferCreateInfo = {};
-	frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-	frameBufferCreateInfo.pNext = nullptr;
-	frameBufferCreateInfo.renderPass = renderpass.GetRenderPass();
-	frameBufferCreateInfo.attachmentCount = 1;
-	frameBufferCreateInfo.pAttachments = &attachment;
-	frameBufferCreateInfo.width = rtv->GetWidth();
-	frameBufferCreateInfo.height = rtv->GetHeight();
-	frameBufferCreateInfo.layers = 1;
-
-	ThrowIfFailed(vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &m_framebuffer));
-
-	m_colorBuffers.clear();
-
-	m_colorBuffers.push_back(rtv);
-	m_depthBuffer.reset();
+	m_colorBuffers[index] = buffer;
 }
 
 
-void FrameBuffer::Create(ColorBufferPtr& rtv, DepthBufferPtr& dsv, RenderPass& renderpass)
+void FrameBuffer::SetDepthBuffer(DepthBufferPtr buffer)
 {
-	m_width = rtv->GetWidth();
-	m_height = rtv->GetHeight();
-
-	VkImageView attachments[2] = { rtv->GetRTV(), dsv->GetDSV() };
-
-	VkFramebufferCreateInfo frameBufferCreateInfo = {};
-	frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-	frameBufferCreateInfo.pNext = nullptr;
-	frameBufferCreateInfo.renderPass = renderpass.GetRenderPass();
-	frameBufferCreateInfo.attachmentCount = 2;
-	frameBufferCreateInfo.pAttachments = attachments;
-	frameBufferCreateInfo.width = rtv->GetWidth();
-	frameBufferCreateInfo.height = rtv->GetHeight();
-	frameBufferCreateInfo.layers = 1;
-
-	ThrowIfFailed(vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &m_framebuffer));
-
-	m_colorBuffers.clear();
-
-	m_colorBuffers.push_back(rtv);
-	m_depthBuffer = dsv;
+	m_depthBuffer = buffer;
 }
 
 
-ColorBufferPtr& FrameBuffer::GetColorBuffer(uint32_t index)
+void FrameBuffer::SetResolveBuffer(uint32_t index, ColorBufferPtr buffer)
 {
-	assert(index < (uint32_t)m_colorBuffers.size());
+	assert(index < 8);
+
+	m_resolveBuffers[index] = buffer;
+}
+
+
+uint32_t FrameBuffer::GetWidth() const
+{
+	return m_colorBuffers[0]->GetWidth();
+}
+
+
+uint32_t FrameBuffer::GetHeight() const
+{
+	return m_colorBuffers[0]->GetHeight();
+}
+
+
+ColorBufferPtr FrameBuffer::GetColorBuffer(uint32_t index) const
+{
+	assert(index < 8);
+
 	return m_colorBuffers[index];
+}
+
+
+uint32_t FrameBuffer::GetNumColorBuffers() const
+{
+	uint32_t count = 0;
+
+	for (uint32_t i = 0; i < 8; ++i)
+	{
+		count += m_colorBuffers[i] != nullptr ? 1 : 0;
+	}
+
+	return count;
+}
+
+
+uint32_t FrameBuffer::GetNumResolveBuffers() const
+{
+	uint32_t count = 0;
+
+	for (uint32_t i = 0; i < 8; ++i)
+	{
+		count += m_resolveBuffers[i] != nullptr ? 1 : 0;
+	}
+
+	return count;
+}
+
+
+void FrameBuffer::Finalize(RenderPass& renderPass)
+{
+	std::array<VkImageView, 9> attachments;
+	int curAttachment = 0;
+
+	uint32_t width = 0;
+	uint32_t height = 0;
+
+	for (int i = 0; i < 8; ++i)
+	{
+		if (m_colorBuffers[i])
+		{
+			attachments[curAttachment] = m_colorBuffers[i]->GetRTV();
+			++curAttachment;
+			width = m_colorBuffers[i]->GetWidth();
+			height = m_colorBuffers[i]->GetHeight();
+		}
+	}
+
+	if (m_depthBuffer)
+	{
+		attachments[curAttachment] = m_depthBuffer->GetDSV();
+		++curAttachment;
+	}
+
+	VkFramebufferCreateInfo frameBufferCreateInfo = {};
+	frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+	frameBufferCreateInfo.pNext = nullptr;
+	frameBufferCreateInfo.renderPass = renderPass.GetRenderPass();
+	frameBufferCreateInfo.attachmentCount = curAttachment;
+	frameBufferCreateInfo.pAttachments = &attachments[0];
+	frameBufferCreateInfo.width = width;
+	frameBufferCreateInfo.height = height;
+	frameBufferCreateInfo.layers = 1;
+
+	ThrowIfFailed(vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &m_framebuffer));
 }

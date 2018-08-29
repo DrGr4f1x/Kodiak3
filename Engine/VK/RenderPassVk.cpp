@@ -103,7 +103,7 @@ void RenderPass::Finalize()
 	vector<VkAttachmentDescription> attachments(m_colorAttachments.begin(), m_colorAttachments.end());
 	if (m_hasDepthAttachment)
 	{
-		attachments.emplace_back(m_depthAttachment);
+		attachments[1] = m_depthAttachment;
 	}
 
 	// TODO Handle subpasses
