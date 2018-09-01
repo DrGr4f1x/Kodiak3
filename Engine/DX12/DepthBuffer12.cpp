@@ -57,12 +57,11 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 
 void DepthBuffer::CreateDerivedViews(Format format)
 {
-	auto resource = m_resource.Get();
 	auto dxFormat = static_cast<DXGI_FORMAT>(format);
 
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
 	dsvDesc.Format = GetDSVFormat(dxFormat);
-	if (resource->GetDesc().SampleDesc.Count == 1)
+	if (m_resource->GetDesc().SampleDesc.Count == 1)
 	{
 		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 		dsvDesc.Texture2D.MipSlice = 0;
@@ -81,10 +80,10 @@ void DepthBuffer::CreateDerivedViews(Format format)
 	auto device = GetDevice();
 
 	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-	device->CreateDepthStencilView(resource, &dsvDesc, m_dsv[0]);
+	device->CreateDepthStencilView(m_resource, &dsvDesc, m_dsv[0]);
 
 	dsvDesc.Flags = D3D12_DSV_FLAG_READ_ONLY_DEPTH;
-	device->CreateDepthStencilView(resource, &dsvDesc, m_dsv[1]);
+	device->CreateDepthStencilView(m_resource, &dsvDesc, m_dsv[1]);
 
 	DXGI_FORMAT stencilReadFormat = GetStencilFormat(dxFormat);
 	if (stencilReadFormat != DXGI_FORMAT_UNKNOWN)
@@ -96,10 +95,10 @@ void DepthBuffer::CreateDerivedViews(Format format)
 		}
 
 		dsvDesc.Flags = D3D12_DSV_FLAG_READ_ONLY_STENCIL;
-		device->CreateDepthStencilView(resource, &dsvDesc, m_dsv[2]);
+		device->CreateDepthStencilView(m_resource, &dsvDesc, m_dsv[2]);
 
 		dsvDesc.Flags = D3D12_DSV_FLAG_READ_ONLY_DEPTH | D3D12_DSV_FLAG_READ_ONLY_STENCIL;
-		device->CreateDepthStencilView(resource, &dsvDesc, m_dsv[3]);
+		device->CreateDepthStencilView(m_resource, &dsvDesc, m_dsv[3]);
 	}
 	else
 	{
@@ -125,7 +124,7 @@ void DepthBuffer::CreateDerivedViews(Format format)
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DMS;
 	}
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	device->CreateShaderResourceView(resource, &srvDesc, m_depthSRV);
+	device->CreateShaderResourceView(m_resource, &srvDesc, m_depthSRV);
 
 	if (stencilReadFormat != DXGI_FORMAT_UNKNOWN)
 	{
@@ -136,6 +135,6 @@ void DepthBuffer::CreateDerivedViews(Format format)
 
 		srvDesc.Format = stencilReadFormat;
 		srvDesc.Texture2D.PlaneSlice = stencilReadFormat == DXGI_FORMAT_X32_TYPELESS_G8X24_UINT ? 1 : 0;
-		device->CreateShaderResourceView(resource, &srvDesc, m_stencilSRV);
+		device->CreateShaderResourceView(m_resource, &srvDesc, m_stencilSRV);
 	}
 }

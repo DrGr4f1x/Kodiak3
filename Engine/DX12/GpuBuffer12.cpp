@@ -19,9 +19,12 @@
 using namespace Kodiak;
 
 
+GpuBuffer::~GpuBuffer() = default;
+
+
 void GpuBuffer::Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData)
 {
-	GpuResource::Destroy();
+	m_resource = nullptr;
 
 	if (m_forceAlign256)
 	{
@@ -43,9 +46,7 @@ void GpuBuffer::Create(const std::string& name, size_t numElements, size_t eleme
 
 	assert_succeeded(
 		GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
-			&resourceDesc, static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(&m_resource)) );
-
-	m_gpuVirtualAddress = m_resource->GetGPUVirtualAddress();
+			&resourceDesc, static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, IID_PPV_ARGS(&m_resource)) );
 
 	if (initialData)
 	{
@@ -96,7 +97,7 @@ void IndexBuffer::CreateDerivedViews()
 	{
 		m_srv = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
-	GetDevice()->CreateShaderResourceView(m_resource.Get(), &srvDesc, m_srv);
+	GetDevice()->CreateShaderResourceView(m_resource, &srvDesc, m_srv);
 
 
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
@@ -109,10 +110,10 @@ void IndexBuffer::CreateDerivedViews()
 	{
 		m_uav = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
-	GetDevice()->CreateUnorderedAccessView(m_resource.Get(), nullptr, &uavDesc, m_uav);
+	GetDevice()->CreateUnorderedAccessView(m_resource, nullptr, &uavDesc, m_uav);
 
 
-	m_ibv.BufferLocation = m_gpuVirtualAddress;
+	m_ibv.BufferLocation = m_resource->GetGPUVirtualAddress();
 	m_ibv.Format = m_elementSize == sizeof(uint32_t) ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R16_UINT;
 	m_ibv.SizeInBytes = static_cast<UINT>(m_bufferSize);
 }
@@ -132,7 +133,7 @@ void VertexBuffer::CreateDerivedViews()
 	{
 		m_srv = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
-	GetDevice()->CreateShaderResourceView(m_resource.Get(), &srvDesc, m_srv);
+	GetDevice()->CreateShaderResourceView(m_resource, &srvDesc, m_srv);
 
 
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
@@ -143,7 +144,7 @@ void VertexBuffer::CreateDerivedViews()
 	uavDesc.Buffer.StructureByteStride = (UINT)m_elementSize;
 	uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
 
-	m_vbv.BufferLocation = m_gpuVirtualAddress;
+	m_vbv.BufferLocation = m_resource->GetGPUVirtualAddress();
 	m_vbv.SizeInBytes = static_cast<UINT>(m_bufferSize);
 	m_vbv.StrideInBytes = (UINT)m_elementSize;
 }
@@ -154,7 +155,7 @@ void ConstantBuffer::CreateDerivedViews()
 	UINT size = static_cast<UINT>(Math::AlignUp(m_bufferSize, 16));
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-	cbvDesc.BufferLocation = m_gpuVirtualAddress;
+	cbvDesc.BufferLocation = m_resource->GetGPUVirtualAddress();
 	cbvDesc.SizeInBytes = size;
 
 	m_cbv = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);

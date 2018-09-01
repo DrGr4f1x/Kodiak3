@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "GpuResource12.h"
+#include "GpuResource.h"
 
 namespace Kodiak
 {
@@ -94,7 +94,7 @@ public:
 
 	void Destroy()
 	{
-		GpuResource::Destroy();
+		m_resource = nullptr;
 		m_cpuDescriptorHandle.ptr = 0;
 	}
 

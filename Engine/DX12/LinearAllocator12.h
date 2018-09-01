@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "GpuResource12.h"
+#include "GpuResource.h"
 
 // Constant blocks must be multiples of 16 constants @ 16 bytes each
 #define DEFAULT_ALIGN 256

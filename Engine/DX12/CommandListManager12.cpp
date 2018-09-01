@@ -93,10 +93,10 @@ void CommandQueue::Create(ID3D12Device* device)
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 	queueDesc.Type = m_type;
 	queueDesc.NodeMask = 1;
-	ThrowIfFailed(device->CreateCommandQueue(&queueDesc, MY_IID_PPV_ARGS(&m_commandQueue)));
-	m_commandQueue->SetName(L"CommandListManager::m_CommandQueue");
+	ThrowIfFailed(device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_commandQueue)));
+	m_commandQueue->SetName(L"CommandListManager::m_commandQueue");
 
-	assert_succeeded(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, MY_IID_PPV_ARGS(&m_fence)));
+	assert_succeeded(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
 	m_fence->SetName(L"CommandListManager::m_pFence");
 	m_fence->Signal((uint64_t)m_type << 56);
 
@@ -133,7 +133,7 @@ void CommandListManager::CreateNewCommandList(CommandListType type, ID3D12Graphi
 	case CommandListType::Copy: *allocator = m_copyQueue.RequestAllocator(); break;
 	}
 
-	assert_succeeded(m_device->CreateCommandList(1, static_cast<D3D12_COMMAND_LIST_TYPE>(type), *allocator, nullptr, MY_IID_PPV_ARGS(commandList)));
+	assert_succeeded(m_device->CreateCommandList(1, static_cast<D3D12_COMMAND_LIST_TYPE>(type), *allocator, nullptr, IID_PPV_ARGS(commandList)));
 	(*commandList)->SetName(L"CommandList");
 }
 

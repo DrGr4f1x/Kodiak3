@@ -36,6 +36,8 @@ public:
 
 	void WaitForGpuIdle();
 
+	void ReleaseResource(PlatformHandle handle);
+
 private:
 	bool m_initialized{ false };
 

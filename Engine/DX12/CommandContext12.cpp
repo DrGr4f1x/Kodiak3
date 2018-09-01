@@ -155,13 +155,13 @@ void CommandContext::Initialize()
 
 void CommandContext::InitializeTexture(GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA subData[])
 {
-	uint64_t uploadBufferSize = GetRequiredIntermediateSize(dest.GetResource(), 0, numSubresources);
+	uint64_t uploadBufferSize = GetRequiredIntermediateSize(dest.m_resource, 0, numSubresources);
 
 	CommandContext& initContext = CommandContext::Begin();
 
 	// copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
 	DynAlloc mem = initContext.ReserveUploadMemory(uploadBufferSize);
-	UpdateSubresources(initContext.m_commandList, dest.GetResource(), mem.buffer.GetResource(), 0, 0, numSubresources, subData);
+	UpdateSubresources(initContext.m_commandList, dest.m_resource, mem.buffer.m_resource, 0, 0, numSubresources, subData);
 	initContext.TransitionResource(dest, ResourceState::GenericRead);
 
 	// Execute the command list and wait for it to finish so we can release the upload buffer
@@ -178,7 +178,7 @@ void CommandContext::InitializeBuffer(GpuResource& dest, const void* bufferData,
 
 	// copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
 	initContext.TransitionResource(dest, ResourceState::CopyDest, true);
-	initContext.m_commandList->CopyBufferRegion(dest.GetResource(), offset, mem.buffer.GetResource(), 0, numBytes);
+	initContext.m_commandList->CopyBufferRegion(dest.m_resource, offset, mem.buffer.m_resource, 0, numBytes);
 	initContext.TransitionResource(dest, ResourceState::GenericRead, true);
 
 	// Execute the command list and wait for it to finish so we can release the upload buffer
@@ -205,7 +205,7 @@ void CommandContext::TransitionResource(GpuResource& resource, ResourceState new
 		D3D12_RESOURCE_BARRIER& barrierDesc = m_resourceBarrierBuffer[m_numBarriersToFlush++];
 
 		barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrierDesc.Transition.pResource = resource.GetResource();
+		barrierDesc.Transition.pResource = resource.m_resource;
 		barrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		barrierDesc.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(oldState);
 		barrierDesc.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(newState);
@@ -254,7 +254,7 @@ void CommandContext::BeginResourceTransition(GpuResource& resource, ResourceStat
 		D3D12_RESOURCE_BARRIER& barrierDesc = m_resourceBarrierBuffer[m_numBarriersToFlush++];
 
 		barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrierDesc.Transition.pResource = resource.GetResource();
+		barrierDesc.Transition.pResource = resource.m_resource;
 		barrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		barrierDesc.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(oldState);
 		barrierDesc.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(newState);
@@ -278,7 +278,7 @@ void CommandContext::InsertUAVBarrier(GpuResource& resource, bool flushImmediate
 
 	barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
 	barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrierDesc.UAV.pResource = resource.GetResource();
+	barrierDesc.UAV.pResource = resource.m_resource;
 
 	if (flushImmediate)
 	{
@@ -294,8 +294,8 @@ void CommandContext::InsertAliasBarrier(GpuResource& before, GpuResource& after,
 
 	barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_ALIASING;
 	barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrierDesc.Aliasing.pResourceBefore = before.GetResource();
-	barrierDesc.Aliasing.pResourceAfter = after.GetResource();
+	barrierDesc.Aliasing.pResourceBefore = before.m_resource;
+	barrierDesc.Aliasing.pResourceAfter = after.m_resource;
 
 	if (flushImmediate)
 	{
@@ -519,7 +519,7 @@ void GraphicsContext::EndRenderPass()
 	for (uint32_t i = 0; i < m_numResolveTargets; ++i)
 	{
 		auto dxgiFormat = static_cast<DXGI_FORMAT>(m_renderTargets[i]->GetFormat());
-		m_commandList->ResolveSubresource(m_resolveTargets[i]->GetResource(), 0, m_renderTargets[i]->GetResource(), 0, dxgiFormat);
+		m_commandList->ResolveSubresource(m_resolveTargets[i]->m_resource, 0, m_renderTargets[i]->m_resource, 0, dxgiFormat);
 	}
 
 	// Transition render targets to final states

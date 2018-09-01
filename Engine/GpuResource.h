@@ -10,10 +10,25 @@
 
 #pragma once
 
-#if defined(DX12)
-#include "DX12\GpuResource12.h"
-#elif defined(VK)
-#include "VK\GpuResourceVk.h"
-#else
-#error "No graphics API defined"
-#endif
+
+namespace Kodiak
+{
+
+class GpuResource
+{
+	friend class CommandContext;
+	friend class GraphicsContext;
+	friend class ComputeContext;
+
+public:
+	GpuResource();
+	GpuResource(const ResourceHandle& resource, ResourceState initialState);
+	virtual ~GpuResource() = 0;
+
+protected:
+	ResourceHandle m_resource;
+	ResourceState m_usageState;
+	ResourceState m_transitioningState;
+};
+
+} // namespace Kodiak

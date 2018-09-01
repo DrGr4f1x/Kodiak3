@@ -25,7 +25,8 @@ void GpuBuffer::Destroy()
 	vkDestroyBuffer(GetDevice(), m_buffer, nullptr);
 	m_buffer = VK_NULL_HANDLE;
 	
-	GpuResource::Destroy();
+	// TODO
+	m_resource = nullptr;
 }
 
 
@@ -53,20 +54,22 @@ void GpuBuffer::CreateBuffer(const string& name, size_t numElements, size_t elem
 	memAlloc.allocationSize = memReqs.size;
 	memAlloc.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, memFlags);
 
-	ThrowIfFailed(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &m_deviceMemory));
+	VkDeviceMemory mem{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &mem));
+	m_resource = CreateHandle(mem);
 
 	if (initialData && bHostMappable)
 	{
 		void* data = nullptr;
-		ThrowIfFailed(vkMapMemory(GetDevice(), m_deviceMemory, 0, m_bufferSize, 0, &data));
+		ThrowIfFailed(vkMapMemory(GetDevice(), *m_resource, 0, m_bufferSize, 0, &data));
 		memcpy(data, initialData, m_bufferSize);
-		vkUnmapMemory(GetDevice(), m_deviceMemory);
+		vkUnmapMemory(GetDevice(), *m_resource);
 	}
 
-	ThrowIfFailed(vkBindBufferMemory(GetDevice(), m_buffer, m_deviceMemory, 0));
+	ThrowIfFailed(vkBindBufferMemory(GetDevice(), m_buffer, *m_resource, 0));
 
 	SetDebugName(m_buffer, name);
-	SetDebugName(m_deviceMemory, name + " memory");
+	SetDebugName(*m_resource, name + " memory");
 
 	// Upload to GPU
 	if (initialData && !bHostMappable)
@@ -110,11 +113,11 @@ void ConstantBuffer::Update(size_t sizeInBytes, const void* data)
 
 	// Map uniform buffer and update it
 	uint8_t* pData = nullptr;
-	ThrowIfFailed(vkMapMemory(GetDevice(), GetResource(), 0, sizeInBytes, 0, (void **)&pData));
+	ThrowIfFailed(vkMapMemory(GetDevice(), *m_resource, 0, sizeInBytes, 0, (void **)&pData));
 	memcpy(pData, data, sizeInBytes);
 	// Unmap after data has been copied
 	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
-	vkUnmapMemory(GetDevice(), GetResource());
+	vkUnmapMemory(GetDevice(), *m_resource);
 }
 
 
@@ -124,9 +127,9 @@ void ConstantBuffer::Update(size_t sizeInBytes, size_t offset, const void* data)
 
 	// Map uniform buffer and update it
 	uint8_t* pData = nullptr;
-	ThrowIfFailed(vkMapMemory(GetDevice(), GetResource(), offset, sizeInBytes, 0, (void **)&pData));
+	ThrowIfFailed(vkMapMemory(GetDevice(), *m_resource, offset, sizeInBytes, 0, (void **)&pData));
 	memcpy(pData, data, sizeInBytes);
 	// Unmap after data has been copied
 	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
-	vkUnmapMemory(GetDevice(), GetResource());
+	vkUnmapMemory(GetDevice(), *m_resource);
 }

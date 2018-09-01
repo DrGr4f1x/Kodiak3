@@ -51,7 +51,7 @@ ID3D12DescriptorHeap* DescriptorAllocator::RequestNewHeap(D3D12_DESCRIPTOR_HEAP_
 	desc.NodeMask = 1;
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> pHeap;
-	assert_succeeded(GetDevice()->CreateDescriptorHeap(&desc, MY_IID_PPV_ARGS(&pHeap)));
+	assert_succeeded(GetDevice()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&pHeap)));
 	sm_descriptorHeapPool.emplace_back(pHeap);
 	return pHeap.Get();
 }
@@ -82,7 +82,7 @@ void UserDescriptorHeap::Create(const std::string& debugHeapName)
 {
 	auto device = GetDevice();
 
-	assert_succeeded(device->CreateDescriptorHeap(&m_heapDesc, MY_IID_PPV_ARGS(m_heap.ReleaseAndGetAddressOf())));
+	assert_succeeded(device->CreateDescriptorHeap(&m_heapDesc, IID_PPV_ARGS(m_heap.ReleaseAndGetAddressOf())));
 #ifdef RELEASE
 	(void)debugHeapName;
 #else

@@ -56,7 +56,7 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 
 #if _DEBUG
 	Microsoft::WRL::ComPtr<ID3D12Debug> debugInterface;
-	if (SUCCEEDED(D3D12GetDebugInterface(MY_IID_PPV_ARGS(&debugInterface))))
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface))))
 	{
 		debugInterface->EnableDebugLayer();
 	}
@@ -70,7 +70,7 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 
 	// Obtain the DXGI factory
 	Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
-	assert_succeeded(CreateDXGIFactory2(0, MY_IID_PPV_ARGS(&dxgiFactory)));
+	assert_succeeded(CreateDXGIFactory2(0, IID_PPV_ARGS(&dxgiFactory)));
 
 	// Create the D3D graphics device
 	Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter;
@@ -88,7 +88,7 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
 				continue;
 
-			if (desc.DedicatedVideoMemory > maxSize && SUCCEEDED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_12_0, MY_IID_PPV_ARGS(&pDevice))))
+			if (desc.DedicatedVideoMemory > maxSize && SUCCEEDED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&pDevice))))
 			{
 				pAdapter->GetDesc1(&desc);
 				Utility::Printf(L"D3D12-capable hardware found:  %s (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
@@ -114,7 +114,7 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 		}
 
 		assert_succeeded(dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&pAdapter)));
-		assert_succeeded(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, MY_IID_PPV_ARGS(&pDevice)));
+		assert_succeeded(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice)));
 		m_device = pDevice;
 	}
 #ifndef _RELEASE
@@ -149,32 +149,32 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 	g_device = m_device.Get();
 
 	ID3D12Device1* pDevice1 = nullptr;
-	if (SUCCEEDED(m_device->QueryInterface(MY_IID_PPV_ARGS(&pDevice1))))
+	if (SUCCEEDED(m_device->QueryInterface(IID_PPV_ARGS(&pDevice1))))
 	{
 		m_device1.Attach(pDevice1);
 	}
 
 	ID3D12Device2* pDevice2 = nullptr;
-	if (SUCCEEDED(m_device->QueryInterface(MY_IID_PPV_ARGS(&pDevice2))))
+	if (SUCCEEDED(m_device->QueryInterface(IID_PPV_ARGS(&pDevice2))))
 	{
 		m_device2.Attach(pDevice2);
 	}
 
 	ID3D12Device3* pDevice3 = nullptr;
-	if (SUCCEEDED(m_device->QueryInterface(MY_IID_PPV_ARGS(&pDevice3))))
+	if (SUCCEEDED(m_device->QueryInterface(IID_PPV_ARGS(&pDevice3))))
 	{
 		m_device3.Attach(pDevice3);
 	}
 
 	ID3D12Device4* pDevice4 = nullptr;
-	if (SUCCEEDED(m_device->QueryInterface(MY_IID_PPV_ARGS(&pDevice4))))
+	if (SUCCEEDED(m_device->QueryInterface(IID_PPV_ARGS(&pDevice4))))
 	{
 		m_device4.Attach(pDevice4);
 	}
 
 #if _DEBUG
 	ID3D12InfoQueue* pInfoQueue = nullptr;
-	if (SUCCEEDED(m_device->QueryInterface(MY_IID_PPV_ARGS(&pInfoQueue))))
+	if (SUCCEEDED(m_device->QueryInterface(IID_PPV_ARGS(&pInfoQueue))))
 	{
 		// Suppress whole categories of messages
 		//D3D12_MESSAGE_CATEGORY Categories[] = {};
@@ -313,6 +313,12 @@ void GraphicsDevice::SubmitFrame()
 void GraphicsDevice::WaitForGpuIdle()
 {
 	g_commandManager.IdleGPU();
+}
+
+
+void GraphicsDevice::ReleaseResource(PlatformHandle handle)
+{
+
 }
 
 

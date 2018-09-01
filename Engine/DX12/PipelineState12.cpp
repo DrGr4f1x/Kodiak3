@@ -360,7 +360,7 @@ void GraphicsPSO::Finalize()
 
 	if (firstCompile)
 	{
-		assert_succeeded(GetDevice()->CreateGraphicsPipelineState(&m_psoDesc, MY_IID_PPV_ARGS(&m_pso)));
+		assert_succeeded(GetDevice()->CreateGraphicsPipelineState(&m_psoDesc, IID_PPV_ARGS(&m_pso)));
 		s_graphicsPSOHashMap[hashCode].Attach(m_pso);
 	}
 	else
@@ -418,7 +418,7 @@ void ComputePSO::Finalize()
 
 	if (firstCompile)
 	{
-		assert_succeeded(GetDevice()->CreateComputePipelineState(&m_psoDesc, MY_IID_PPV_ARGS(&m_pso)));
+		assert_succeeded(GetDevice()->CreateComputePipelineState(&m_psoDesc, IID_PPV_ARGS(&m_pso)));
 		s_computePSOHashMap[hashCode].Attach(m_pso);
 	}
 	else

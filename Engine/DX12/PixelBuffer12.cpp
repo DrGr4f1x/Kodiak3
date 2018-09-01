@@ -335,14 +335,13 @@ void PixelBuffer::AssociateWithResource(const std::string& name, ID3D12Resource*
 
 void PixelBuffer::CreateTextureResource(const std::string& name, const D3D12_RESOURCE_DESC& resourceDesc, D3D12_CLEAR_VALUE clearValue)
 {
-	GpuResource::Destroy();
+	m_resource = nullptr;
 
 	CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_DEFAULT);
 	assert_succeeded(GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
-		&resourceDesc, D3D12_RESOURCE_STATE_COMMON, &clearValue, MY_IID_PPV_ARGS(&m_resource)));
+		&resourceDesc, D3D12_RESOURCE_STATE_COMMON, &clearValue, IID_PPV_ARGS(&m_resource)));
 
 	m_usageState = ResourceState::Common;
-	m_gpuVirtualAddress = D3D12_GPU_VIRTUAL_ADDRESS_NULL;
 
 #ifndef _RELEASE
 	m_resource->SetName(MakeWStr(name).c_str());

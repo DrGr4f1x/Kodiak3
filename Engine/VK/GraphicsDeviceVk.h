@@ -40,6 +40,8 @@ public:
 
 	void WaitForGpuIdle();
 
+	void ReleaseResource(PlatformHandle handle);
+
 private:
 	void CreateVulkanInstance();
 	void SelectPhysicalDevice();
@@ -108,6 +110,14 @@ private:
 	uint32_t m_currentBuffer{ 0 };
 
 	Format m_depthFormat{ Format::Unknown };
+
+	// Deferred resource release
+	struct DeferredRelease
+	{
+		size_t frameId;
+		PlatformHandle handle;
+	};
+	std::queue<DeferredRelease> m_deferredReleaseQueue;
 };
 
 

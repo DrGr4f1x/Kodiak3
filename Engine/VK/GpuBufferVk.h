@@ -11,7 +11,7 @@
 #pragma once
 
 
-#include "GpuResourceVk.h"
+#include "GpuResource.h"
 
 
 namespace Kodiak

@@ -211,6 +211,15 @@ void GraphicsDevice::WaitForGpuIdle()
 }
 
 
+void GraphicsDevice::ReleaseResource(PlatformHandle handle)
+{
+	/*if (handle)
+	{
+		m_deferredReleaseQueue.push();
+	}*/
+}
+
+
 void GraphicsDevice::CreateVulkanInstance()
 {
 	VkApplicationInfo appInfo = {};

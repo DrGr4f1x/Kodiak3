@@ -419,8 +419,11 @@ void Texture::Create(TextureInitializer& init)
 	memAllocInfo.allocationSize = memReqs.size;
 	memAllocInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-	ThrowIfFailed(vkAllocateMemory(device, &memAllocInfo, nullptr, &m_deviceMemory));
-	ThrowIfFailed(vkBindImageMemory(device, m_image, m_deviceMemory, 0));
+	VkDeviceMemory mem{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkAllocateMemory(device, &memAllocInfo, nullptr, &mem));
+	m_resource = CreateHandle(mem);
+
+	ThrowIfFailed(vkBindImageMemory(device, m_image, *m_resource, 0));
 
 	// Setup buffer copy regions for each mip level
 	uint32_t effectiveArraySize = m_type == TextureType::Texture3D ? 1 : m_depthOrArraySize;
@@ -489,7 +492,8 @@ void Texture::Create(TextureInitializer& init)
 
 void Texture::Destroy()
 {
-	GpuResource::Destroy();
+	// TODO
+	m_resource = nullptr;
 
 	auto device = GetDevice();
 

@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "GpuResource12.h"
+#include "GpuResource.h"
 
 namespace Kodiak
 {
@@ -18,7 +18,7 @@ namespace Kodiak
 class GpuBuffer : public GpuResource
 {
 public:
-	virtual ~GpuBuffer() { Destroy(); }
+	~GpuBuffer();
 
 	const D3D12_CPU_DESCRIPTOR_HANDLE& GetUAV() const { return m_uav; }
 	const D3D12_CPU_DESCRIPTOR_HANDLE& GetSRV() const { return m_srv; }
@@ -30,7 +30,7 @@ public:
 	// Create a buffer.  If initial data is provided, it will be copied into the buffer using the default command context.
 	void Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData = nullptr);
 
-	D3D12_GPU_VIRTUAL_ADDRESS RootConstantBufferView() const { return m_gpuVirtualAddress; }
+	D3D12_GPU_VIRTUAL_ADDRESS RootConstantBufferView() const { return m_resource->GetGPUVirtualAddress(); }
 
 protected:
 	GpuBuffer()

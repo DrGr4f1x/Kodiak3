@@ -183,7 +183,7 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 			pOutBlob.GetAddressOf(), pErrorBlob.GetAddressOf()));
 
 		assert_succeeded(GetDevice()->CreateRootSignature(1, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(),
-			MY_IID_PPV_ARGS(&m_signature)));
+			IID_PPV_ARGS(&m_signature)));
 
 		m_signature->SetName(MakeWStr(name).c_str());
 

@@ -50,7 +50,7 @@ void SwapChain::Create(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, ui
 	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i)
 	{
 		Microsoft::WRL::ComPtr<ID3D12Resource> displayPlane;
-		assert_succeeded(m_swapChain->GetBuffer(i, MY_IID_PPV_ARGS(&displayPlane)));
+		assert_succeeded(m_swapChain->GetBuffer(i, IID_PPV_ARGS(&displayPlane)));
 
 		ColorBufferPtr buffer = make_shared<ColorBuffer>();
 		buffer->CreateFromSwapChain("Primary SwapChain Buffer", displayPlane.Detach());

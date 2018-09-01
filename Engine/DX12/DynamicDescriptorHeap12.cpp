@@ -57,7 +57,7 @@ ID3D12DescriptorHeap* DynamicDescriptorHeap::RequestDescriptorHeap(D3D12_DESCRIP
 		heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		heapDesc.NodeMask = 1;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heapPtr;
-		assert_succeeded(GetDevice()->CreateDescriptorHeap(&heapDesc, MY_IID_PPV_ARGS(&heapPtr)));
+		assert_succeeded(GetDevice()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&heapPtr)));
 		sm_descriptorHeapPool[idx].emplace_back(heapPtr);
 		return heapPtr.Get();
 	}

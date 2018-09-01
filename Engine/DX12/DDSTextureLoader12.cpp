@@ -15,7 +15,7 @@
 #include "dds.h"
 
 #include "CommandContext12.h"
-#include "GpuResource12.h"
+#include "GpuResource.h"
 
 
 using namespace Kodiak;
@@ -834,7 +834,7 @@ static HRESULT CreateD3DResources(ID3D12Device* d3dDevice,
 
 		ID3D12Resource* tex = nullptr;
 		hr = d3dDevice->CreateCommittedResource(&HeapProps, D3D12_HEAP_FLAG_NONE, &ResourceDesc,
-			D3D12_RESOURCE_STATE_COPY_DEST, nullptr, MY_IID_PPV_ARGS(&tex));
+			D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&tex));
 
 		if (SUCCEEDED(hr) && tex != nullptr)
 		{
@@ -875,7 +875,7 @@ static HRESULT CreateD3DResources(ID3D12Device* d3dDevice,
 
 		ID3D12Resource* tex = nullptr;
 		hr = d3dDevice->CreateCommittedResource(&HeapProps, D3D12_HEAP_FLAG_NONE, &ResourceDesc,
-			D3D12_RESOURCE_STATE_COPY_DEST, nullptr, MY_IID_PPV_ARGS(&tex));
+			D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&tex));
 
 		if (SUCCEEDED(hr) && tex != 0)
 		{
@@ -934,7 +934,7 @@ static HRESULT CreateD3DResources(ID3D12Device* d3dDevice,
 
 		ID3D12Resource* tex = nullptr;
 		hr = d3dDevice->CreateCommittedResource(&HeapProps, D3D12_HEAP_FLAG_NONE, &ResourceDesc,
-			D3D12_RESOURCE_STATE_COPY_DEST, nullptr, MY_IID_PPV_ARGS(&tex));
+			D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&tex));
 
 		if (SUCCEEDED(hr) && tex != nullptr)
 		{
@@ -1185,8 +1185,9 @@ static HRESULT CreateTextureFromDDS(ID3D12Device* d3dDevice,
 
 		if (SUCCEEDED(hr))
 		{
-			GpuResource DestTexture(*texture, ResourceState::CopyDest);
-			CommandContext::InitializeTexture(DestTexture, subresourceCount, initData.get());
+			assert(false); // TODO sort this out
+			//GpuResource DestTexture(*texture, ResourceState::CopyDest);
+			//CommandContext::InitializeTexture(DestTexture, subresourceCount, initData.get());
 		}
 	}
 

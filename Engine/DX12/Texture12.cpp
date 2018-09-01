@@ -367,7 +367,7 @@ void Texture::Create(TextureInitializer& init)
 	auto device = GetDevice();
 
 	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
-		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, MY_IID_PPV_ARGS(m_resource.ReleaseAndGetAddressOf())));
+		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, IID_PPV_ARGS(&m_resource)));
 
 	m_resource->SetName(L"Texture");
 
@@ -411,7 +411,7 @@ void Texture::Create(TextureInitializer& init)
 		SRVDesc.Texture3D.MipLevels = (UINT)-1;
 		break;
 	}
-	device->CreateShaderResourceView(m_resource.Get(), &SRVDesc, m_cpuDescriptorHandle);
+	device->CreateShaderResourceView(m_resource, &SRVDesc, m_cpuDescriptorHandle);
 }
 
 

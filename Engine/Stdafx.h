@@ -48,66 +48,11 @@ inline void ThrowIfFailed(HRESULT hr)
 	}
 }
 
-// DirectX common
-#if defined(DX12)
-#include <D3Dcompiler.h>
-#include <dxgi1_4.h>
-#include <d2d1_3.h>
-#include <dwrite_2.h>
-#include <wincodec.h>
-#define MY_IID_PPV_ARGS IID_PPV_ARGS
-#endif
-
 // Graphics APIs
 #if defined(DX12)
-#include <d3d12.h>
-#include <d3d11on12.h>
-#include <pix.h>
-#include "d3dx12.h"
-
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
-
-#define D3D12_GPU_VIRTUAL_ADDRESS_NULL      ((D3D12_GPU_VIRTUAL_ADDRESS)0)
-#define D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN   ((D3D12_GPU_VIRTUAL_ADDRESS)-1)
-
-const std::string s_apiPrefixString = "[DirectX 12]";
-
-const std::string s_defaultShaderPath = "Shaders\\DXIL";
-
-#ifndef SAFE_RELEASE
-#define SAFE_RELEASE(x) if (x != nullptr) { x->Release(); x = nullptr; }
-#endif
-
+#include "DX12\Platform12.h"
 #elif defined(VK)
-
-#define FORCE_VULKAN_VALIDATION 0
-#define ENABLE_VULKAN_VALIDATION (_DEBUG || FORCE_VULKAN_VALIDATION)
-
-#define FORCE_VULKAN_DEBUG_MARKUP 0
-#define ENABLE_VULKAN_DEBUG_MARKUP (_DEBUG || _PROFILE || FORCE_VULKAN_DEBUG_MARKUP)
-
-#define VK_USE_PLATFORM_WIN32_KHR
-#include <vulkan.h>
-
-#pragma comment(lib, "vulkan-1.lib")
-
-// Custom define for better code readability
-#define VK_FLAGS_NONE 0
-// Default fence timeout in nanoseconds
-#define DEFAULT_FENCE_TIMEOUT 100000000000
-
-const std::string s_apiPrefixString = "[Vulkan]";
-
-const std::string s_defaultShaderPath = "Shaders\\SPIR-V";
-
-inline void ThrowIfFailed(VkResult res)
-{
-	if (res != VK_SUCCESS)
-	{
-		throw;
-	}
-}
+#include "VK\PlatformVk.h"
 #else
 #error No graphics API defined!
 #endif
@@ -129,6 +74,7 @@ inline void ThrowIfFailed(VkResult res)
 #include <unordered_map>
 #include <vector>
 
+
 inline std::wstring MakeWStr(const std::string& str)
 {
 	return std::wstring(str.begin(), str.end());
@@ -139,6 +85,7 @@ inline std::string MakeStr(const std::wstring& wstr)
 {
 	return std::string(wstr.begin(), wstr.end());
 }
+
 
 // Engine headers
 #include "BitmaskEnum.h"

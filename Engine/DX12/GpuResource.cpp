@@ -10,7 +10,7 @@
 
 #include "Stdafx.h"
 
-#include "GpuResource12.h"
+#include "GpuResource.h"
 
 
 using namespace Kodiak;
@@ -20,20 +20,14 @@ GpuResource::GpuResource()
 	: m_resource(nullptr)
 	, m_usageState(ResourceState::Undefined)
 	, m_transitioningState(ResourceState::Undefined)
-	, m_gpuVirtualAddress(D3D12_GPU_VIRTUAL_ADDRESS_NULL)
 {}
 
 
-GpuResource::GpuResource(ID3D12Resource* resource, ResourceState initialState)
+GpuResource::GpuResource(const ResourceHandle& resource, ResourceState initialState)
 	: m_resource(resource)
 	, m_usageState(initialState)
 	, m_transitioningState(ResourceState::Undefined)
-	, m_gpuVirtualAddress(D3D12_GPU_VIRTUAL_ADDRESS_NULL)
 {}
 
 
-void GpuResource::Destroy()
-{
-	m_resource = nullptr;
-	m_gpuVirtualAddress = D3D12_GPU_VIRTUAL_ADDRESS_NULL;
-}
+GpuResource::~GpuResource() = default;

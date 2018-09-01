@@ -30,7 +30,7 @@ void ColorBuffer::CreateFromSwapChain(const std::string& name, ID3D12Resource* b
 	//Graphics::g_Device->CreateUnorderedAccessView(m_pResource.Get(), nullptr, nullptr, m_UAVHandle[0]);
 
 	m_rtvHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	GetDevice()->CreateRenderTargetView(m_resource.Get(), nullptr, m_rtvHandle);
+	GetDevice()->CreateRenderTargetView(m_resource, nullptr, m_rtvHandle);
 }
 
 
@@ -136,15 +136,13 @@ void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t
 		m_srvHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
-	auto resource = m_resource.Get();
-
 	auto device = GetDevice();
 
 	// Create the render target view
-	device->CreateRenderTargetView(resource, &rtvDesc, m_rtvHandle);
+	device->CreateRenderTargetView(m_resource, &rtvDesc, m_rtvHandle);
 
 	// Create the shader resource view
-	device->CreateShaderResourceView(resource, &srvDesc, m_srvHandle);
+	device->CreateShaderResourceView(m_resource, &srvDesc, m_srvHandle);
 
 	if (m_fragmentCount > 1)
 	{
@@ -159,7 +157,7 @@ void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t
 			m_uavHandle[i] = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
 
-		device->CreateUnorderedAccessView(resource, nullptr, &uavDesc, m_uavHandle[i]);
+		device->CreateUnorderedAccessView(m_resource, nullptr, &uavDesc, m_uavHandle[i]);
 
 		uavDesc.Texture2D.MipSlice++;
 	}

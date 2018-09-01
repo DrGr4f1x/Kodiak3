@@ -62,12 +62,6 @@
     <ClInclude Include="GpuResource.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="VK\GpuResourceVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\GpuResource12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="GpuBuffer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -229,6 +223,15 @@
     <ClInclude Include="ColorBuffer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="VK\PlatformVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\Platform12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\HandleVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -257,12 +260,6 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\GpuResourceVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\GpuResource12.cpp">
-      <Filter>Graphics\DX12</Filter>
     </ClCompile>
     <ClCompile Include="VK\GpuBufferVk.cpp">
       <Filter>Graphics\VK</Filter>
@@ -375,6 +372,12 @@
     </ClCompile>
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="CameraController.cpp" />
+    <ClCompile Include="DX12\GpuResource.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\HandleVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">

@@ -50,7 +50,8 @@ void PixelBuffer::Destroy()
 		m_image = VK_NULL_HANDLE;
 	}
 
-	GpuResource::Destroy();
+	// TODO
+	m_resource = nullptr;
 }
 
 
@@ -92,10 +93,13 @@ void PixelBuffer::CreateTextureResource(const std::string& name, const VkImageCr
 	memoryAllocateInfo.pNext = nullptr;
 	memoryAllocateInfo.allocationSize = memReqs.size;
 	memoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	ThrowIfFailed(vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &m_deviceMemory));
 
-	ThrowIfFailed(vkBindImageMemory(device, m_image, m_deviceMemory, 0));
+	VkDeviceMemory mem{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &mem));
+	m_resource = CreateHandle(mem);
+
+	ThrowIfFailed(vkBindImageMemory(device, m_image, *m_resource, 0));
 
 	SetDebugName(m_image, name + " image");
-	SetDebugName(m_deviceMemory, name + " memory");
+	SetDebugName(*m_resource, name + " memory");
 }

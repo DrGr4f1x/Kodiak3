@@ -10,21 +10,23 @@
 
 #include "Stdafx.h"
 
-#include "GpuResourceVk.h"
+#include "HandleVk.h"
 
 #include "GraphicsDeviceVk.h"
 
 
-using namespace Kodiak;
-
-
-GpuResource::GpuResource(VkDeviceMemory memory)
-	: m_deviceMemory(memory)
-{}
-
-
-void GpuResource::Destroy()
+namespace Kodiak
 {
-	vkFreeMemory(GetDevice(), m_deviceMemory, nullptr);
-	m_deviceMemory = VK_NULL_HANDLE;
+
+template<> VkHandle<VkDeviceMemory>::~VkHandle()
+{
+	if (m_wrapped != VK_NULL_HANDLE)
+	{
+		vkFreeMemory(GetDevice(), m_wrapped, nullptr);
+		m_wrapped = VK_NULL_HANDLE;
+	}
 }
+
+template VkHandle<VkDeviceMemory>::~VkHandle();
+
+} // namespace Kodiak
