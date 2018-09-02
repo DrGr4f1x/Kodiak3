@@ -64,9 +64,6 @@ void DisplacementApp::Shutdown()
 {
 	m_rootSig.Destroy();
 
-	m_hsConstantBuffer.Destroy();
-	m_dsConstantBuffer.Destroy();
-
 	m_texture.reset();
 	m_model.reset();
 }

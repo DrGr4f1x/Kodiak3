@@ -68,11 +68,6 @@ void ComputeShaderApp::Startup()
 
 void ComputeShaderApp::Shutdown()
 {
-	m_vertexBuffer.Destroy();
-	m_indexBuffer.Destroy();
-
-	m_constantBuffer.Destroy();
-
 	m_rootSig.Destroy();
 	m_computeRootSig.Destroy();
 

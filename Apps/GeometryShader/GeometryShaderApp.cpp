@@ -60,8 +60,6 @@ void GeometryShaderApp::Shutdown()
 {
 	m_model.reset();
 
-	m_constantBuffer.Destroy();
-
 	m_meshRootSig.Destroy();
 	m_geomRootSig.Destroy();
 }

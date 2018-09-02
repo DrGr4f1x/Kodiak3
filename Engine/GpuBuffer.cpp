@@ -12,12 +12,16 @@
 
 #include "GpuBuffer.h"
 
+#include "GraphicsDevice.h"
+
 
 using namespace Kodiak;
 
 
 GpuBuffer::~GpuBuffer()
-{}
+{
+	g_graphicsDevice->ReleaseResource(m_resource);
+}
 
 
 void IndexBuffer::CreateDerivedViews()

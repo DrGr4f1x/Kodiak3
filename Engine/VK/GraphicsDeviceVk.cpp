@@ -107,7 +107,6 @@ namespace
 {
 
 DeviceHandle g_device{ nullptr };
-GraphicsDevice* g_graphicsDevice{ nullptr };
 
 Format BackBufferColorFormat = Format::R10G10B10A2_UNorm;
 Format DepthFormat = Format::D32_Float_S8_UInt;
@@ -253,7 +252,6 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	void Destroy()
 	{
 		g_device = nullptr;
-		g_graphicsDevice = nullptr;
 
 		for (int i = 0; i < NumSwapChainBuffers; ++i)
 		{
@@ -906,7 +904,6 @@ void GraphicsDevice::PlatformCreate()
 	m_platformData->CreateLogicalDevice();
 
 	g_device = m_platformData->device;
-	g_graphicsDevice = this;
 
 	m_platformData->InitSurface(m_hinst, m_hwnd);
 	m_platformData->CreateSwapChain(&m_width, &m_height, false /* vsync */);

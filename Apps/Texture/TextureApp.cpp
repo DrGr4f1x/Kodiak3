@@ -68,10 +68,6 @@ void TextureApp::Startup()
 
 void TextureApp::Shutdown()
 {
-	m_vertexBuffer.Destroy();
-	m_indexBuffer.Destroy();
-	m_constantBuffer.Destroy();
-
 	m_rootSig.Destroy();
 
 	m_texture.reset();

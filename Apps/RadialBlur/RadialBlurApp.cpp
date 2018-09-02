@@ -57,8 +57,6 @@ void RadialBlurApp::Shutdown()
 
 	m_offscreenFramebuffer.reset();
 
-	m_sceneConstantBuffer.Destroy();
-
 	m_radialBlurRootSig.Destroy();
 	m_sceneRootSig.Destroy();
 }

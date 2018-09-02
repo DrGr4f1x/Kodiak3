@@ -44,6 +44,8 @@ public:
 #endif
 
 private:
+	void ReleaseDeferredResources(uint32_t frameIndex);
+
 	// Platform-specific methods
 	void PlatformCreate();
 	void PlatformPresent();
@@ -65,10 +67,15 @@ private:
 
 	uint64_t m_frameNumber{ 0 };
 
+	// Deferred resource release
+	std::array<std::vector<PlatformHandle>, NumSwapChainBuffers> m_deferredReleasePages;
+
 	// Platform-specific implementation
 	struct PlatformData;
 	PlatformData* m_platformData{ nullptr };
 };
+
+extern GraphicsDevice* g_graphicsDevice;
 
 const DeviceHandle& GetDevice();
 #if VK

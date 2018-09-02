@@ -179,9 +179,6 @@ void Texture3dApp::Shutdown()
 {
 	m_rootSig.Destroy();
 
-	m_vertexBuffer.Destroy();
-	m_indexBuffer.Destroy();
-
 	m_texture.reset();
 }
 

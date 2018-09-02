@@ -66,7 +66,6 @@ void StencilBufferApp::Shutdown()
 	m_model.reset();
 
 	m_rootSig.Destroy();
-	m_constantBuffer.Destroy();
 }
 
 

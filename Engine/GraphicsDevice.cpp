@@ -22,6 +22,12 @@ using namespace Kodiak;
 using namespace std;
 
 
+namespace Kodiak
+{
+GraphicsDevice* g_graphicsDevice = nullptr;
+} // namespace Kodiak
+
+
 GraphicsDevice::GraphicsDevice() = default;
 
 
@@ -38,6 +44,8 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 	m_height = height;
 
 	PlatformCreate();
+
+	g_graphicsDevice = this;
 }
 
 
@@ -66,8 +74,14 @@ void GraphicsDevice::Destroy()
 	}
 
 	// Flush pending deferred resources here
+	for (int i = 0; i < NumSwapChainBuffers; ++i)
+	{
+		ReleaseDeferredResources(i);
+	}
 
 	PlatformDestroyData();
+
+	g_graphicsDevice = nullptr;
 }
 
 
@@ -80,6 +94,8 @@ void GraphicsDevice::SubmitFrame()
 	m_currentBuffer = (m_currentBuffer + 1) % NumSwapChainBuffers;
 
 	PlatformPresent();
+
+	ReleaseDeferredResources(m_currentBuffer);
 
 	++m_frameNumber;
 }
@@ -94,5 +110,11 @@ ColorBufferPtr GraphicsDevice::GetBackBuffer(uint32_t index) const
 
 void GraphicsDevice::ReleaseResource(PlatformHandle handle)
 {
+	m_deferredReleasePages[m_currentBuffer].push_back(handle);
+}
 
+
+void GraphicsDevice::ReleaseDeferredResources(uint32_t frameIndex)
+{
+	m_deferredReleasePages[frameIndex].clear();
 }
