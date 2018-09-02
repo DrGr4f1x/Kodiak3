@@ -19,7 +19,7 @@ using namespace Kodiak;
 
 void ColorBuffer::Destroy()
 {
-	vkDestroyImageView(*GetDevice(), m_imageView, nullptr);
+	vkDestroyImageView(GetDevice(), m_imageView, nullptr);
 	m_imageView = VK_NULL_HANDLE;
 	
 	if (m_ownsImage)
@@ -87,5 +87,5 @@ void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t
 	imageViewInfo.subresourceRange.baseArrayLayer = 0;
 	imageViewInfo.subresourceRange.layerCount = arraySize;
 
-	ThrowIfFailed(vkCreateImageView(*GetDevice(), &imageViewInfo, nullptr, &m_imageView));
+	ThrowIfFailed(vkCreateImageView(GetDevice(), &imageViewInfo, nullptr, &m_imageView));
 }

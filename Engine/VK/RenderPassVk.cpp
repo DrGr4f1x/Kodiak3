@@ -49,7 +49,7 @@ VkImageLayout GetImageLayout(ResourceState state)
 
 void RenderPass::Destroy()
 {
-	vkDestroyRenderPass(*GetDevice(), m_renderPass, nullptr);
+	vkDestroyRenderPass(GetDevice(), m_renderPass, nullptr);
 	m_renderPass = VK_NULL_HANDLE;
 }
 
@@ -155,5 +155,5 @@ void RenderPass::Finalize()
 	renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
 	renderPassInfo.pDependencies = dependencies.data();
 
-	ThrowIfFailed(vkCreateRenderPass(*GetDevice(), &renderPassInfo, nullptr, &m_renderPass));
+	ThrowIfFailed(vkCreateRenderPass(GetDevice(), &renderPassInfo, nullptr, &m_renderPass));
 }

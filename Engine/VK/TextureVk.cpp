@@ -377,7 +377,7 @@ void Texture::Create(TextureInitializer& init)
 	m_numMips = init.m_numMips;
 	m_type = init.m_type;
 
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 
 	VkFormat vkFormat = static_cast<VkFormat>(m_format);
 	
@@ -421,9 +421,9 @@ void Texture::Create(TextureInitializer& init)
 
 	VkDeviceMemory mem{ VK_NULL_HANDLE };
 	ThrowIfFailed(vkAllocateMemory(device, &memAllocInfo, nullptr, &mem));
-	m_resource = CreateHandle(mem);
+	m_resource = ResourceHandle::Create(mem);
 
-	ThrowIfFailed(vkBindImageMemory(device, m_image, *m_resource, 0));
+	ThrowIfFailed(vkBindImageMemory(device, m_image, m_resource, 0));
 
 	// Setup buffer copy regions for each mip level
 	uint32_t effectiveArraySize = m_type == TextureType::Texture3D ? 1 : m_depthOrArraySize;
@@ -495,7 +495,7 @@ void Texture::Destroy()
 	// TODO
 	m_resource = nullptr;
 
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 
 	vkDestroyImageView(device, m_imageView, nullptr);
 	m_imageView = VK_NULL_HANDLE;

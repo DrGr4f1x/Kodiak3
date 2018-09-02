@@ -36,7 +36,7 @@ VSOutput main(VSInput input)
 	VSOutput output = (VSOutput)0;
 
 	float3 vertPos = mul(modelMatrix, float4(input.pos, 1.0f)).xyz;
-	output.lightDir = normalize(lightPos - vertPos);
+	output.lightDir = normalize(lightPos.xyz - vertPos);
 
 	float3x3 tbnMatrix;
 	tbnMatrix[0] = mul((float3x3)normalMatrix, input.tangent);

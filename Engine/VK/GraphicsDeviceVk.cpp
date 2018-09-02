@@ -131,7 +131,7 @@ void SetDebugName(uint64_t obj, VkDebugReportObjectTypeEXT objType, const char* 
 		nameInfo.objectType = objType;
 		nameInfo.object = obj;
 		nameInfo.pObjectName = name;
-		vkDebugMarkerSetObjectName(*g_device, &nameInfo);
+		vkDebugMarkerSetObjectName(g_device, &nameInfo);
 	}
 }
 #endif
@@ -179,15 +179,15 @@ InstanceHandle CreateInstance(const string& appName)
 		Utility::ExitFatal("Could not create Vulkan instance", "Fatal error");
 	}
 
-	return VkHandle<VkInstance>::Create(instance);
+	return InstanceHandle::Create(instance);
 }
 
 
 void InitializeDebugging(const InstanceHandle& instance, VkDebugReportFlagsEXT flags, VkDebugReportCallbackEXT callBack)
 {
-	CreateDebugReportCallback = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(*instance, "vkCreateDebugReportCallbackEXT"));
-	DestroyDebugReportCallback = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(*instance, "vkDestroyDebugReportCallbackEXT"));
-	dbgBreakCallback = reinterpret_cast<PFN_vkDebugReportMessageEXT>(vkGetInstanceProcAddr(*instance, "vkDebugReportMessageEXT"));
+	CreateDebugReportCallback = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT"));
+	DestroyDebugReportCallback = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT"));
+	dbgBreakCallback = reinterpret_cast<PFN_vkDebugReportMessageEXT>(vkGetInstanceProcAddr(instance, "vkDebugReportMessageEXT"));
 
 	VkDebugReportCallbackCreateInfoEXT dbgCreateInfo = {};
 	dbgCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
@@ -195,7 +195,7 @@ void InitializeDebugging(const InstanceHandle& instance, VkDebugReportFlagsEXT f
 	dbgCreateInfo.flags = flags;
 
 	VkResult err = CreateDebugReportCallback(
-		*instance,
+		instance,
 		&dbgCreateInfo,
 		nullptr,
 		(callBack != VK_NULL_HANDLE) ? &callBack : &msgCallback);
@@ -257,16 +257,16 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		for (int i = 0; i < NumSwapChainBuffers; ++i)
 		{
-			vkDestroyFence(*device, presentFences[i], nullptr);
+			vkDestroyFence(device, presentFences[i], nullptr);
 			presentFences[i] = VK_NULL_HANDLE;
 		}
 
-		FreeDebugCallback(*instance);
+		FreeDebugCallback(instance);
 
-		vkDestroySurfaceKHR(*instance, surface, nullptr);
+		vkDestroySurfaceKHR(instance, surface, nullptr);
 		surface = VK_NULL_HANDLE;
 
-		vkDestroySwapchainKHR(*device, swapChain, nullptr);
+		vkDestroySwapchainKHR(device, swapChain, nullptr);
 		swapChain = VK_NULL_HANDLE;
 
 		device = nullptr;
@@ -277,11 +277,11 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	{
 		uint32_t gpuCount = 0;
 		// Get number of available physical devices
-		ThrowIfFailed(vkEnumeratePhysicalDevices(*instance, &gpuCount, nullptr));
+		ThrowIfFailed(vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr));
 		assert(gpuCount > 0);
 		// Enumerate devices
 		vector<VkPhysicalDevice> physicalDevices(gpuCount);
-		auto res = vkEnumeratePhysicalDevices(*instance, &gpuCount, physicalDevices.data());
+		auto res = vkEnumeratePhysicalDevices(instance, &gpuCount, physicalDevices.data());
 		if (res)
 		{
 			Utility::ExitFatal("Could not enumerate physical devices", "Fatal error");
@@ -339,19 +339,19 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		if (extensionPresent)
 		{
 			vkDebugMarkerSetObjectTag =
-				reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT>(vkGetInstanceProcAddr(*instance, "vkDebugMarkerSetObjectTagEXT"));
+				reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT>(vkGetInstanceProcAddr(instance, "vkDebugMarkerSetObjectTagEXT"));
 
 			vkDebugMarkerSetObjectName =
-				reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(vkGetInstanceProcAddr(*instance, "vkDebugMarkerSetObjectNameEXT"));
+				reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(vkGetInstanceProcAddr(instance, "vkDebugMarkerSetObjectNameEXT"));
 
 			vkCmdDebugMarkerBegin =
-				reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(vkGetInstanceProcAddr(*instance, "vkCmdDebugMarkerBeginEXT"));
+				reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(vkGetInstanceProcAddr(instance, "vkCmdDebugMarkerBeginEXT"));
 
 			vkCmdDebugMarkerEnd =
-				reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(vkGetInstanceProcAddr(*instance, "vkCmdDebugMarkerEndEXT"));
+				reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(vkGetInstanceProcAddr(instance, "vkCmdDebugMarkerEndEXT"));
 
 			vkCmdDebugMarkerInsert =
-				reinterpret_cast<PFN_vkCmdDebugMarkerInsertEXT>(vkGetInstanceProcAddr(*instance, "vkCmdDebugMarkerInsertEXT"));
+				reinterpret_cast<PFN_vkCmdDebugMarkerInsertEXT>(vkGetInstanceProcAddr(instance, "vkCmdDebugMarkerInsertEXT"));
 
 			if (vkDebugMarkerSetObjectName)
 			{
@@ -460,10 +460,10 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		VkResult result = vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice);
 		ThrowIfFailed(result);
 
-		device = VkHandle<VkDevice>::Create(logicalDevice);
+		device = DeviceHandle::Create(logicalDevice);
 
 		// Get a graphics queue from the device
-		vkGetDeviceQueue(*device, queueFamilyIndices.graphics, 0, &graphicsQueue);
+		vkGetDeviceQueue(device, queueFamilyIndices.graphics, 0, &graphicsQueue);
 	}
 
 	uint32_t GetQueueFamilyIndex(VkQueueFlagBits queueFlags)
@@ -526,7 +526,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 		surfaceCreateInfo.hinstance = hInstance;
 		surfaceCreateInfo.hwnd = hWnd;
-		err = vkCreateWin32SurfaceKHR(*instance, &surfaceCreateInfo, nullptr, &surface);
+		err = vkCreateWin32SurfaceKHR(instance, &surfaceCreateInfo, nullptr, &surface);
 
 		if (err != VK_SUCCESS)
 		{
@@ -766,22 +766,22 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 			swapchainCI.imageUsage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 		}
 
-		ThrowIfFailed(vkCreateSwapchainKHR(*device, &swapchainCI, nullptr, &swapChain));
+		ThrowIfFailed(vkCreateSwapchainKHR(device, &swapchainCI, nullptr, &swapChain));
 
 		// If an existing swap chain is re-created, destroy the old swap chain
 		// This also cleans up all the presentable images
 		if (oldSwapchain != VK_NULL_HANDLE)
 		{
-			vkDestroySwapchainKHR(*device, oldSwapchain, nullptr);
+			vkDestroySwapchainKHR(device, oldSwapchain, nullptr);
 		}
 
 		uint32_t imageCount{ 0 };
-		ThrowIfFailed(vkGetSwapchainImagesKHR(*device, swapChain, &imageCount, nullptr));
+		ThrowIfFailed(vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr));
 
 		assert(imageCount == NumSwapChainBuffers);
 
 		// Get the swap chain images
-		ThrowIfFailed(vkGetSwapchainImagesKHR(*device, swapChain, &imageCount, images.data()));
+		ThrowIfFailed(vkGetSwapchainImagesKHR(device, swapChain, &imageCount, images.data()));
 	}
 
 	void CreateFences()
@@ -792,7 +792,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 			fenceInfo.pNext = nullptr;
 			fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 			
-			vkCreateFence(*device, &fenceInfo, nullptr, &presentFences[i]);
+			vkCreateFence(device, &fenceInfo, nullptr, &presentFences[i]);
 		}
 	}
 
@@ -937,7 +937,7 @@ void GraphicsDevice::PlatformPresent()
 	vkQueuePresentKHR(m_platformData->graphicsQueue, &presentInfo);
 
 	// Flip
-	VkDevice device = *m_platformData->device;
+	VkDevice device = m_platformData->device;
 
 	vkWaitForFences(device, 1, &m_platformData->presentFences[m_currentBuffer], false, UINT64_MAX);
 	uint32_t nextBuffer = (m_currentBuffer + 1) % NumSwapChainBuffers;

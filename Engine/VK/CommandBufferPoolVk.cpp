@@ -42,7 +42,7 @@ void CommandBufferPool::Create(uint32_t queueFamilyIndex)
 	commandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 	commandPoolInfo.queueFamilyIndex = queueFamilyIndex;
 
-	ThrowIfFailed(vkCreateCommandPool(*GetDevice(), &commandPoolInfo, nullptr, &m_commandPool));
+	ThrowIfFailed(vkCreateCommandPool(GetDevice(), &commandPoolInfo, nullptr, &m_commandPool));
 	// TODO
 	//SetDebugName(m_commandPool, "CommandBufferPool::m_commandPool");
 }
@@ -62,7 +62,7 @@ void CommandBufferPool::Destroy()
 		m_readyCommandBuffers.pop();
 	}
 
-	auto device = *GetDevice();
+	auto device = GetDevice();
 
 	if (!m_commandBufferPool.empty())
 	{
@@ -103,7 +103,7 @@ VkCommandBuffer CommandBufferPool::RequestCommandBuffer()
 		allocInfo.commandBufferCount = 1;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 
-		ThrowIfFailed(vkAllocateCommandBuffers(*GetDevice(), &allocInfo, &commandBuffer));
+		ThrowIfFailed(vkAllocateCommandBuffers(GetDevice(), &allocInfo, &commandBuffer));
 		stringstream sstr;
 		sstr << "CommandBuffer " << m_commandBufferPool.size();
 		// TODO

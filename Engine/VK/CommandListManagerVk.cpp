@@ -37,7 +37,7 @@ Fence::~Fence()
 
 bool Fence::IsComplete() const
 {
-	return VK_SUCCESS == vkGetFenceStatus(*GetDevice(), m_fence);
+	return VK_SUCCESS == vkGetFenceStatus(GetDevice(), m_fence);
 }
 
 CommandQueue::CommandQueue(CommandListType type)
@@ -91,7 +91,7 @@ bool CommandQueue::IsFenceComplete(shared_ptr<Fence> fence)
 
 void CommandQueue::WaitForFence(shared_ptr<Fence> fence)
 {
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 	VkResult res;
 	do
 	{
@@ -133,7 +133,7 @@ shared_ptr<Fence> CommandQueue::ExecuteCommandList(VkCommandBuffer cmdList, VkSe
 	fenceInfo.pNext = nullptr;
 	fenceInfo.flags = 0;
 	VkFence fence;
-	ThrowIfFailed(vkCreateFence(*GetDevice(), &fenceInfo, nullptr, &fence));
+	ThrowIfFailed(vkCreateFence(GetDevice(), &fenceInfo, nullptr, &fence));
 
 	ThrowIfFailed(vkQueueSubmit(m_queue, 1, &submitInfo, fence));
 
@@ -190,7 +190,7 @@ void CommandListManager::Destroy()
 
 	lock_guard<mutex> CS(m_fenceMutex);
 
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 
 	auto it = begin(m_retiredFences);
 	while (it != end(m_retiredFences))
@@ -229,7 +229,7 @@ void CommandListManager::DestroyRetiredFences()
 {
 	lock_guard<mutex> CS(m_fenceMutex);
 
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 
 	auto it = begin(m_retiredFences);
 	while (it != end(m_retiredFences))

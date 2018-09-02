@@ -38,7 +38,7 @@ VSOutput main(VSInput input)
 	float3 lightPos = float3(0.0f, 0.0f, 0.0f);
 	float3 lPos = mul((float3x3)modelMatrix, lightPos);
 	output.lightVec = lPos - worldPos;
-	output.viewVec = viewPos - worldPos;
+	output.viewVec = viewPos.xyz - worldPos;
 
 	return output;
 }

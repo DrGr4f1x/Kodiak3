@@ -24,20 +24,28 @@ template <typename VkType>
 class VkHandle : public VkBaseHandle
 {
 public:
-	VkHandle(VkType wrapped) : m_wrapped(wrapped) {}
+	class VkPointer : public std::shared_ptr<VkHandle<VkType>>
+	{
+	public:
+		using Super = std::shared_ptr<VkHandle<VkType>>;
+
+		VkPointer() = default;
+		VkPointer(VkHandle<VkType>* handle) : Super(handle) {}
+		static VkPointer Create(VkType wrapped) { return VkPointer(new VkHandle(wrapped)); }
+		operator VkType() const { return Get()->m_wrapped; }
+
+	private:
+		VkHandle<VkType>* Get() const { return Super::get(); }
+	};
+
 	~VkHandle()
 	{
 		static_assert(false, "VkHandle missing template specialization for destructor");
 	}
 
-	static std::shared_ptr<VkHandle> Create(VkType wrapped)
-	{
-		return std::make_shared<VkHandle>(wrapped);
-	}
-
-	operator VkType() const { return m_wrapped; }
-
 private:
+	friend class VkPointer;
+	VkHandle(VkType wrapped) : m_wrapped(wrapped) {}
 	VkType m_wrapped;
 };
 

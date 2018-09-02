@@ -144,7 +144,7 @@ void PSO::DestroyAll()
 {
 	lock_guard<mutex> CS(s_pipelineMutex);
 
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 
 	for (auto& pso : s_graphicsPipelineCache)
 	{
@@ -417,7 +417,7 @@ void GraphicsPSO::Finalize()
 {
 	vector<VkPipelineShaderStageCreateInfo> shaderStages;
 
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 
 	// Vertex shader
 	if (m_vertexShader)
@@ -602,7 +602,7 @@ void ComputePSO::SetComputeShader(const string& filename)
 
 void ComputePSO::Finalize()
 {
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 
 	VkComputePipelineCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;

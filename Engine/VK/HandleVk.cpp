@@ -42,7 +42,7 @@ template<> VkHandle<VkDeviceMemory>::~VkHandle()
 {
 	if (m_wrapped != VK_NULL_HANDLE)
 	{
-		vkFreeMemory(*GetDevice(), m_wrapped, nullptr);
+		vkFreeMemory(GetDevice(), m_wrapped, nullptr);
 		m_wrapped = VK_NULL_HANDLE;
 	}
 }

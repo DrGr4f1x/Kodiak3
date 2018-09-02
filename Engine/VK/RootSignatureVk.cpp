@@ -154,7 +154,7 @@ VkBool32 IsComparisonEnabled(TextureFilter filter)
 
 RootParameter::~RootParameter()
 {
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 
 	vkDestroyDescriptorSetLayout(device, m_descriptorSetLayout, nullptr);
 	m_descriptorSetLayout = VK_NULL_HANDLE;
@@ -162,7 +162,7 @@ RootParameter::~RootParameter()
 
 void RootSignature::DestroyAll()
 {
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 
 	for (auto& layoutPair : s_pipelineLayoutHashMap)
 	{
@@ -176,7 +176,7 @@ void RootSignature::Destroy()
 {
 	m_paramArray.reset(nullptr);
 
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 
 	vkDestroyDescriptorSetLayout(device, m_samplerLayout, nullptr);
 
@@ -303,7 +303,7 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 		vector<VkDescriptorSetLayout> descriptorSetLayouts;
 		descriptorSetLayouts.reserve(m_numParameters);
 
-		VkDevice device = *GetDevice();
+		VkDevice device = GetDevice();
 
 		// Gather the descriptor layouts and push constants
 		for (uint32_t i = 0; i < m_numParameters; ++i)

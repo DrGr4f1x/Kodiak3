@@ -35,7 +35,7 @@ void DynamicDescriptorPool::DestroyAll()
 {
 	lock_guard<mutex> CS(sm_mutex);
 
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 
 	for (auto& pool : sm_descriptorPool)
 	{
@@ -118,7 +118,7 @@ VkDescriptorPool DynamicDescriptorPool::RequestDescriptorPool()
 		sm_retiredDescriptorPools.pop();
 	}
 
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 
 	if (!sm_availableDescriptorPools.empty())
 	{
@@ -179,7 +179,7 @@ void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& 
 	vector<VkDescriptorSet> descriptorSets;
 	descriptorSets.reserve(8);
 
-	VkDevice device = *GetDevice();
+	VkDevice device = GetDevice();
 
 	uint32_t rootIndex = 0;
 	uint32_t staleParams = handleCache.m_staleDescriptorSetBitMap;

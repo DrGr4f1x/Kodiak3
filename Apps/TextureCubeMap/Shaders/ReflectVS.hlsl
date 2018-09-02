@@ -37,7 +37,7 @@ VSOutput main(VSInput input)
 	output.lightVec = lightPos - pos.xyz;
 	output.viewVec = -pos.xyz;
 
-	float3 incident = normalize(normalize(pos) - eyePos);
+	float3 incident = normalize(normalize(pos.xyz) - eyePos);
 	output.reflected = reflect(incident, output.normal);
 
 	return output;
