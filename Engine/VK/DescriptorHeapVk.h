@@ -30,4 +30,11 @@ protected:
 	VkDescriptorPool m_descriptorPool{ VK_NULL_HANDLE };
 };
 
+
+extern DescriptorSetAllocator g_descriptorSetAllocator;
+inline VkDescriptorSet AllocateDescriptorSet(VkDescriptorSetLayout layout)
+{
+	return g_descriptorSetAllocator.Allocate(layout);
+}
+
 } // namespace Kodiak

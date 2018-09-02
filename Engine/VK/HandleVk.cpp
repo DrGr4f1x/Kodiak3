@@ -12,21 +12,45 @@
 
 #include "HandleVk.h"
 
-#include "GraphicsDeviceVk.h"
+#include "GraphicsDevice.h"
 
 
 namespace Kodiak
 {
 
-template<> VkHandle<VkDeviceMemory>::~VkHandle()
+template<> VkHandle<VkInstance>::~VkHandle()
 {
 	if (m_wrapped != VK_NULL_HANDLE)
 	{
-		vkFreeMemory(GetDevice(), m_wrapped, nullptr);
+		vkDestroyInstance(m_wrapped, nullptr);
 		m_wrapped = VK_NULL_HANDLE;
 	}
 }
 
+
+template<> VkHandle<VkDevice>::~VkHandle()
+{
+	if (m_wrapped != VK_NULL_HANDLE)
+	{
+		vkDestroyDevice(m_wrapped, nullptr);
+		m_wrapped = VK_NULL_HANDLE;
+	}
+}
+
+
+template<> VkHandle<VkDeviceMemory>::~VkHandle()
+{
+	if (m_wrapped != VK_NULL_HANDLE)
+	{
+		vkFreeMemory(*GetDevice(), m_wrapped, nullptr);
+		m_wrapped = VK_NULL_HANDLE;
+	}
+}
+
+
+// Instantiate templates to avoid linker issues
+template VkHandle<VkInstance>::~VkHandle();
+template VkHandle<VkDevice>::~VkHandle();
 template VkHandle<VkDeviceMemory>::~VkHandle();
 
 } // namespace Kodiak

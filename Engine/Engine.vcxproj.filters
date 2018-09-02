@@ -4,20 +4,8 @@
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Utility.h" />
-    <ClInclude Include="DX12\SwapChain12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\SwapChainVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
     <ClInclude Include="GraphicsDevice.h">
       <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\GraphicsDevice12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\GraphicsDeviceVk.h">
-      <Filter>Graphics\VK</Filter>
     </ClInclude>
     <ClInclude Include="DX12\CommandListManager12.h">
       <Filter>Graphics\DX12</Filter>
@@ -89,9 +77,6 @@
     </ClInclude>
     <ClInclude Include="DX12\LinearAllocator12.h">
       <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="SwapChain.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Filesystem.h" />
     <ClInclude Include="DX12\RootSignature12.h">
@@ -237,12 +222,6 @@
     <ClCompile Include="Stdafx.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Utility.cpp" />
-    <ClCompile Include="DX12\SwapChain12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\SwapChainVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
     <ClCompile Include="DX12\GraphicsDevice12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
@@ -377,6 +356,9 @@
     </ClCompile>
     <ClCompile Include="VK\HandleVk.cpp">
       <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

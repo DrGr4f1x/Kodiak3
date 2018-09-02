@@ -12,7 +12,7 @@
 
 #include "DepthBufferVk.h"
 
-#include "GraphicsDeviceVk.h"
+#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
@@ -22,7 +22,7 @@ void DepthBuffer::Destroy()
 {
 	if (m_dsv != VK_NULL_HANDLE)
 	{
-		vkDestroyImageView(GetDevice(), m_dsv, nullptr);
+		vkDestroyImageView(*GetDevice(), m_dsv, nullptr);
 		m_dsv = VK_NULL_HANDLE;
 	}
 
@@ -81,5 +81,5 @@ void DepthBuffer::CreateDerivedViews(Format format)
 	imageViewCreateInfo.subresourceRange.layerCount = 1;
 	imageViewCreateInfo.image = m_image;
 
-	ThrowIfFailed(vkCreateImageView(GetDevice(), &imageViewCreateInfo, nullptr, &m_dsv));
+	ThrowIfFailed(vkCreateImageView(*GetDevice(), &imageViewCreateInfo, nullptr, &m_dsv));
 }

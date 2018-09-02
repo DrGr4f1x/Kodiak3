@@ -16,7 +16,6 @@
 #include "CommonStates.h"
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
-#include "SwapChain.h"
 
 
 using namespace Kodiak;
@@ -111,8 +110,7 @@ void MultisamplingApp::Render()
 
 void MultisamplingApp::InitRenderTargets()
 {
-	auto swapChain = m_graphicsDevice->GetSwapChain();
-	auto colorFormat = swapChain->GetColorFormat();
+	auto colorFormat = m_graphicsDevice->GetColorFormat();
 	auto depthFormat = m_graphicsDevice->GetDepthFormat();
 
 	m_renderPass.SetColorAttachment(0, colorFormat, ResourceState::RenderTarget, ResourceState::CopySource);

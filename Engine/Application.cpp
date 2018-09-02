@@ -14,7 +14,6 @@
 
 #include "GraphicsDevice.h"
 #include "Input.h"
-#include "SwapChain.h"
 
 
 #pragma comment(lib, "runtimeobject.lib")
@@ -145,7 +144,11 @@ void Application::Finalize()
 {
 	Shutdown();
 
-	m_defaultFramebuffers.clear();
+	for (int i = 0; i < NumSwapChainBuffers; ++i)
+	{
+		m_defaultFramebuffers[i] = nullptr;
+	}
+
 	m_defaultDepthBuffer.reset();
 	m_defaultRenderPass.Destroy();
 
@@ -178,8 +181,6 @@ bool Application::Tick()
 	bool res = Update();
 	if (res)
 	{
-		m_graphicsDevice->PrepareFrame();
-
 		Render();
 
 		m_graphicsDevice->SubmitFrame();
@@ -204,8 +205,7 @@ bool Application::Tick()
 
 void Application::InitFramebuffer()
 {
-	auto swapChain = m_graphicsDevice->GetSwapChain();
-	auto colorFormat = swapChain->GetColorFormat();
+	auto colorFormat = m_graphicsDevice->GetColorFormat();
 	auto depthFormat = m_graphicsDevice->GetDepthFormat();
 	m_defaultRenderPass.SetColorAttachment(0, colorFormat, ResourceState::Undefined, ResourceState::Present);
 	m_defaultRenderPass.SetDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
@@ -216,13 +216,11 @@ void Application::InitFramebuffer()
 	m_defaultDepthBuffer->Create("Depth Buffer", m_displayWidth, m_displayHeight, m_graphicsDevice->GetDepthFormat());
 
 	// Framebuffers for swap chain
-	const uint32_t imageCount = swapChain->GetImageCount();
-	m_defaultFramebuffers.resize(imageCount);
-	for (uint32_t i = 0; i < imageCount; ++i)
+	for (uint32_t i = 0; i < NumSwapChainBuffers; ++i)
 	{
 		m_defaultFramebuffers[i] = make_shared<FrameBuffer>();
 		
-		m_defaultFramebuffers[i]->SetColorBuffer(0, swapChain->GetColorBuffer(i));
+		m_defaultFramebuffers[i]->SetColorBuffer(0, m_graphicsDevice->GetBackBuffer(i));
 		m_defaultFramebuffers[i]->SetDepthBuffer(m_defaultDepthBuffer);
 		m_defaultFramebuffers[i]->Finalize(m_defaultRenderPass);
 	}

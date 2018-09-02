@@ -35,11 +35,26 @@ const std::string s_defaultShaderPath = "Shaders\\DXIL";
 namespace Kodiak
 {
 
+// COM types
+DECLARE_COM_PTR(IUnknown);
+
+// DXGI types
+DECLARE_COM_PTR(IDXGIFactory4);
+DECLARE_COM_PTR(IDXGISwapChain1);
+
+// DirectX 12 types
 DECLARE_COM_PTR(ID3D12Device);
 DECLARE_COM_PTR(ID3D12Resource);
-DECLARE_COM_PTR(IUnknown);
+
+#if _DEBUG
+DECLARE_COM_PTR(ID3D12Debug);
+#endif
 
 using PlatformHandle = IUnknownPtr;
 using ResourceHandle = ID3D12ResourcePtr;
+using DeviceHandle = ID3D12DevicePtr;
+using SwapChainHandle = IDXGISwapChain1Ptr;
+
+static const uint32_t NumSwapChainBuffers = 3;
 
 } // namespace Kodiak

@@ -47,6 +47,9 @@ std::shared_ptr<VkHandle<VkType>> CreateHandle(VkType wrapped)
 	return VkHandle<VkType>::Create(wrapped);
 }
 
+// Template specializations for destructors
+template<> VkHandle<VkInstance>::~VkHandle();
+template<> VkHandle<VkDevice>::~VkHandle();
 template<> VkHandle<VkDeviceMemory>::~VkHandle();
 
 } // namespace Kodiak

@@ -13,7 +13,7 @@
 #include "CommandContextVk.h"
 
 #include "CommandListManagerVk.h"
-#include "GraphicsDeviceVk.h"
+#include "GraphicsDevice.h"
 #include "PipelineStateVk.h"
 #include "RenderPassVk.h"
 #include "RootSignatureVk.h"
@@ -82,13 +82,13 @@ CommandContext::CommandContext(CommandListType type)
 	semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 	semaphoreCreateInfo.pNext = nullptr;
 	
-	ThrowIfFailed(vkCreateSemaphore(GetDevice(), &semaphoreCreateInfo, nullptr, &m_signalSemaphore));
+	ThrowIfFailed(vkCreateSemaphore(*GetDevice(), &semaphoreCreateInfo, nullptr, &m_signalSemaphore));
 }
 
 
 CommandContext::~CommandContext()
 {
-	vkDestroySemaphore(GetDevice(), m_signalSemaphore, nullptr);
+	vkDestroySemaphore(*GetDevice(), m_signalSemaphore, nullptr);
 }
 
 
@@ -175,7 +175,7 @@ void CommandContext::Initialize()
 
 void CommandContext::InitializeTexture(Texture& dest, size_t numBytes, const void* initData, uint32_t numBuffers, VkBufferImageCopy bufferCopies[])
 {
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	VkBufferCreateInfo stagingBufferInfo = {};
 	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -184,7 +184,7 @@ void CommandContext::InitializeTexture(Texture& dest, size_t numBytes, const voi
 	stagingBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	VkBuffer stagingBuffer{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateBuffer(GetDevice(), &stagingBufferInfo, nullptr, &stagingBuffer));
+	ThrowIfFailed(vkCreateBuffer(device, &stagingBufferInfo, nullptr, &stagingBuffer));
 
 	VkMemoryRequirements memReqs;
 	vkGetBufferMemoryRequirements(device, stagingBuffer, &memReqs);
@@ -229,7 +229,7 @@ void CommandContext::InitializeTexture(Texture& dest, size_t numBytes, const voi
 
 void CommandContext::InitializeBuffer(GpuBuffer& dest, const void* initialData, size_t numBytes, bool useOffset, size_t offset)
 {
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	VkBufferCreateInfo stagingBufferInfo = {};
 	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

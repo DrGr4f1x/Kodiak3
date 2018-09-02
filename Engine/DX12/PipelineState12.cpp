@@ -17,7 +17,7 @@
 #include "Hash.h"
 #include "Shader.h"
 
-#include "GraphicsDevice12.h"
+#include "GraphicsDevice.h"
 #include "RenderPass12.h"
 #include "RootSignature12.h"
 

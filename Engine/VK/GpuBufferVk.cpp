@@ -13,7 +13,7 @@
 #include "GpuBufferVk.h"
 
 #include "CommandContextVk.h"
-#include "GraphicsDeviceVk.h"
+#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
@@ -22,7 +22,7 @@ using namespace std;
 
 void GpuBuffer::Destroy()
 {
-	vkDestroyBuffer(GetDevice(), m_buffer, nullptr);
+	vkDestroyBuffer(*GetDevice(), m_buffer, nullptr);
 	m_buffer = VK_NULL_HANDLE;
 	
 	// TODO
@@ -32,6 +32,8 @@ void GpuBuffer::Destroy()
 
 void GpuBuffer::CreateBuffer(const string& name, size_t numElements, size_t elementSize, VkBufferUsageFlagBits flags, bool bHostMappable, const void* initialData)
 {
+	VkDevice device = *GetDevice();
+
 	m_elementCount = numElements;
 	m_elementSize = elementSize;
 	m_bufferSize = numElements * elementSize;
@@ -40,10 +42,10 @@ void GpuBuffer::CreateBuffer(const string& name, size_t numElements, size_t elem
 	vertexbufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	vertexbufferInfo.size = m_bufferSize;
 	vertexbufferInfo.usage = flags | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-	ThrowIfFailed(vkCreateBuffer(GetDevice(), &vertexbufferInfo, nullptr, &m_buffer));
+	ThrowIfFailed(vkCreateBuffer(device, &vertexbufferInfo, nullptr, &m_buffer));
 
 	VkMemoryRequirements memReqs;
-	vkGetBufferMemoryRequirements(GetDevice(), m_buffer, &memReqs);
+	vkGetBufferMemoryRequirements(device, m_buffer, &memReqs);
 
 	VkMemoryPropertyFlags memFlags = bHostMappable ?
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT :
@@ -55,21 +57,22 @@ void GpuBuffer::CreateBuffer(const string& name, size_t numElements, size_t elem
 	memAlloc.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, memFlags);
 
 	VkDeviceMemory mem{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &mem));
+	ThrowIfFailed(vkAllocateMemory(device, &memAlloc, nullptr, &mem));
 	m_resource = CreateHandle(mem);
 
 	if (initialData && bHostMappable)
 	{
 		void* data = nullptr;
-		ThrowIfFailed(vkMapMemory(GetDevice(), *m_resource, 0, m_bufferSize, 0, &data));
+		ThrowIfFailed(vkMapMemory(device, *m_resource, 0, m_bufferSize, 0, &data));
 		memcpy(data, initialData, m_bufferSize);
-		vkUnmapMemory(GetDevice(), *m_resource);
+		vkUnmapMemory(device, *m_resource);
 	}
 
-	ThrowIfFailed(vkBindBufferMemory(GetDevice(), m_buffer, *m_resource, 0));
+	ThrowIfFailed(vkBindBufferMemory(device, m_buffer, *m_resource, 0));
 
-	SetDebugName(m_buffer, name);
-	SetDebugName(*m_resource, name + " memory");
+	// TODO
+	//SetDebugName(m_buffer, name);
+	//SetDebugName(*m_resource, name + " memory");
 
 	// Upload to GPU
 	if (initialData && !bHostMappable)
@@ -111,13 +114,15 @@ void ConstantBuffer::Update(size_t sizeInBytes, const void* data)
 {
 	assert(sizeInBytes <= m_bufferSize);
 
+	VkDevice device = *GetDevice();
+
 	// Map uniform buffer and update it
 	uint8_t* pData = nullptr;
-	ThrowIfFailed(vkMapMemory(GetDevice(), *m_resource, 0, sizeInBytes, 0, (void **)&pData));
+	ThrowIfFailed(vkMapMemory(device, *m_resource, 0, sizeInBytes, 0, (void **)&pData));
 	memcpy(pData, data, sizeInBytes);
 	// Unmap after data has been copied
 	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
-	vkUnmapMemory(GetDevice(), *m_resource);
+	vkUnmapMemory(device, *m_resource);
 }
 
 
@@ -125,11 +130,13 @@ void ConstantBuffer::Update(size_t sizeInBytes, size_t offset, const void* data)
 {
 	assert((sizeInBytes + offset) <= m_bufferSize);
 
+	VkDevice device = *GetDevice();
+
 	// Map uniform buffer and update it
 	uint8_t* pData = nullptr;
-	ThrowIfFailed(vkMapMemory(GetDevice(), *m_resource, offset, sizeInBytes, 0, (void **)&pData));
+	ThrowIfFailed(vkMapMemory(device, *m_resource, offset, sizeInBytes, 0, (void **)&pData));
 	memcpy(pData, data, sizeInBytes);
 	// Unmap after data has been copied
 	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
-	vkUnmapMemory(GetDevice(), *m_resource);
+	vkUnmapMemory(device, *m_resource);
 }

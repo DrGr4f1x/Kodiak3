@@ -14,7 +14,7 @@
 
 #include "CommandContextVk.h"
 #include "CommandListManagerVk.h"
-#include "GraphicsDeviceVk.h"
+#include "GraphicsDevice.h"
 #include "RootSignatureVk.h"
 
 using namespace Kodiak;
@@ -35,7 +35,7 @@ void DynamicDescriptorPool::DestroyAll()
 {
 	lock_guard<mutex> CS(sm_mutex);
 
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	for (auto& pool : sm_descriptorPool)
 	{
@@ -118,7 +118,7 @@ VkDescriptorPool DynamicDescriptorPool::RequestDescriptorPool()
 		sm_retiredDescriptorPools.pop();
 	}
 
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	if (!sm_availableDescriptorPools.empty())
 	{
@@ -176,10 +176,10 @@ void DynamicDescriptorPool::DiscardDescriptorPools(std::shared_ptr<Fence> fence,
 
 void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& handleCache, VkCommandBuffer cmdBuffer, bool isCompute)
 {
-	std::vector<VkDescriptorSet> descriptorSets;
+	vector<VkDescriptorSet> descriptorSets;
 	descriptorSets.reserve(8);
 
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	uint32_t rootIndex = 0;
 	uint32_t staleParams = handleCache.m_staleDescriptorSetBitMap;

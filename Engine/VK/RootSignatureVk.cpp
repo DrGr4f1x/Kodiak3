@@ -12,10 +12,11 @@
 
 #include "RootSignatureVk.h"
 
+#include "DescriptorHeap.h"
 #include "Hash.h"
 #include "SamplerState.h"
 
-#include "GraphicsDeviceVk.h"
+#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
@@ -153,7 +154,7 @@ VkBool32 IsComparisonEnabled(TextureFilter filter)
 
 RootParameter::~RootParameter()
 {
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	vkDestroyDescriptorSetLayout(device, m_descriptorSetLayout, nullptr);
 	m_descriptorSetLayout = VK_NULL_HANDLE;
@@ -161,7 +162,7 @@ RootParameter::~RootParameter()
 
 void RootSignature::DestroyAll()
 {
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	for (auto& layoutPair : s_pipelineLayoutHashMap)
 	{
@@ -175,7 +176,7 @@ void RootSignature::Destroy()
 {
 	m_paramArray.reset(nullptr);
 
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	vkDestroyDescriptorSetLayout(device, m_samplerLayout, nullptr);
 
@@ -302,7 +303,7 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 		vector<VkDescriptorSetLayout> descriptorSetLayouts;
 		descriptorSetLayouts.reserve(m_numParameters);
 
-		auto device = GetDevice();
+		VkDevice device = *GetDevice();
 
 		// Gather the descriptor layouts and push constants
 		for (uint32_t i = 0; i < m_numParameters; ++i)

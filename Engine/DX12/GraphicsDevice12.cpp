@@ -10,7 +10,7 @@
 
 #include "Stdafx.h"
 
-#include "GraphicsDevice12.h"
+#include "GraphicsDevice.h"
 
 #include "Shader.h"
 
@@ -18,7 +18,6 @@
 #include "CommandListManager12.h"
 #include "PipelineState12.h"
 #include "RootSignature12.h"
-#include "SwapChain12.h"
 #include "Texture12.h"
 
 
@@ -29,152 +28,17 @@ using namespace std;
 namespace
 {
 
-ID3D12Device* g_device{ nullptr };
+ID3D12DevicePtr g_device;
 
-} // anonymous namespace
-
-
-GraphicsDevice::GraphicsDevice() = default;
+const Format BackBufferColorFormat = Format::R10G10B10A2_UNorm;
+const Format DepthFormat = Format::D32_Float_S8_UInt;
 
 
-GraphicsDevice::~GraphicsDevice() = default;
-
-
-void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND hWnd, uint32_t width, uint32_t height)
+void ConfigureInfoQueue(ID3D12Device* device)
 {
-	assert(!m_initialized);
-
-	m_appName = appName;
-
-	m_hinst = hInstance;
-	m_hwnd = hWnd;
-
-	m_width = m_destWidth = width;
-	m_height = m_destHeight = height;
-
-	Microsoft::WRL::ComPtr<ID3D12Device> pDevice;
-
-#if _DEBUG
-	Microsoft::WRL::ComPtr<ID3D12Debug> debugInterface;
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface))))
-	{
-		debugInterface->EnableDebugLayer();
-	}
-	else
-	{
-		Utility::Print("WARNING:  Unable to enable D3D12 debug validation layer\n");
-	}
-#endif
-
-	ThrowIfFailed(D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModels, nullptr, nullptr));
-
-	// Obtain the DXGI factory
-	Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
-	assert_succeeded(CreateDXGIFactory2(0, IID_PPV_ARGS(&dxgiFactory)));
-
-	// Create the D3D graphics device
-	Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter;
-
-	static const bool bUseWarpDriver = false;
-
-	if (!bUseWarpDriver)
-	{
-		size_t maxSize = 0;
-
-		for (uint32_t idx = 0; DXGI_ERROR_NOT_FOUND != dxgiFactory->EnumAdapters1(idx, &pAdapter); ++idx)
-		{
-			DXGI_ADAPTER_DESC1 desc;
-			pAdapter->GetDesc1(&desc);
-			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
-				continue;
-
-			if (desc.DedicatedVideoMemory > maxSize && SUCCEEDED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&pDevice))))
-			{
-				pAdapter->GetDesc1(&desc);
-				Utility::Printf(L"D3D12-capable hardware found:  %s (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
-				maxSize = desc.DedicatedVideoMemory;
-			}
-		}
-
-		if (maxSize > 0)
-		{
-			m_device = pDevice;
-		}
-	}
-
-	if (m_device == nullptr)
-	{
-		if (bUseWarpDriver)
-		{
-			Utility::Print("WARP software adapter requested.  Initializing...\n");
-		}
-		else
-		{
-			Utility::Print("Failed to find a hardware adapter.  Falling back to WARP.\n");
-		}
-
-		assert_succeeded(dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&pAdapter)));
-		assert_succeeded(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice)));
-		m_device = pDevice;
-	}
-#ifndef _RELEASE
-	else
-	{
-		bool bDeveloperModeEnabled = false;
-
-		// Look in the Windows Registry to determine if Developer Mode is enabled
-		HKEY hKey;
-		LSTATUS result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock", 0, KEY_READ, &hKey);
-		if (result == ERROR_SUCCESS)
-		{
-			DWORD keyValue, keySize = sizeof(DWORD);
-			result = RegQueryValueEx(hKey, "AllowDevelopmentWithoutDevLicense", 0, nullptr, (byte*)&keyValue, &keySize);
-			if (result == ERROR_SUCCESS && keyValue == 1)
-			{
-				bDeveloperModeEnabled = true;
-			}
-			RegCloseKey(hKey);
-		}
-
-		warn_once_if_not(bDeveloperModeEnabled, "Enable Developer Mode on Windows 10 to get consistent profiling results");
-
-		// Prevent the GPU from overclocking or underclocking to get consistent timings
-		if (bDeveloperModeEnabled)
-		{
-			m_device->SetStablePowerState(TRUE);
-		}
-	}
-#endif
-
-	g_device = m_device.Get();
-
-	ID3D12Device1* pDevice1 = nullptr;
-	if (SUCCEEDED(m_device->QueryInterface(IID_PPV_ARGS(&pDevice1))))
-	{
-		m_device1.Attach(pDevice1);
-	}
-
-	ID3D12Device2* pDevice2 = nullptr;
-	if (SUCCEEDED(m_device->QueryInterface(IID_PPV_ARGS(&pDevice2))))
-	{
-		m_device2.Attach(pDevice2);
-	}
-
-	ID3D12Device3* pDevice3 = nullptr;
-	if (SUCCEEDED(m_device->QueryInterface(IID_PPV_ARGS(&pDevice3))))
-	{
-		m_device3.Attach(pDevice3);
-	}
-
-	ID3D12Device4* pDevice4 = nullptr;
-	if (SUCCEEDED(m_device->QueryInterface(IID_PPV_ARGS(&pDevice4))))
-	{
-		m_device4.Attach(pDevice4);
-	}
-
 #if _DEBUG
 	ID3D12InfoQueue* pInfoQueue = nullptr;
-	if (SUCCEEDED(m_device->QueryInterface(IID_PPV_ARGS(&pInfoQueue))))
+	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&pInfoQueue))))
 	{
 		// Suppress whole categories of messages
 		//D3D12_MESSAGE_CATEGORY Categories[] = {};
@@ -218,96 +82,76 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 		pInfoQueue->Release();
 	}
 #endif
-
-	// We like to do read-modify-write operations on UAVs during post processing.  To support that, we
-	// need to either have the hardware do typed UAV loads of R11G11B10_FLOAT or we need to manually
-	// decode an R32_UINT representation of the same buffer.  This code determines if we get the hardware
-	// load support.
-	D3D12_FEATURE_DATA_D3D12_OPTIONS featureData = {};
-	if (SUCCEEDED(m_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &featureData, sizeof(featureData))))
-	{
-		if (featureData.TypedUAVLoadAdditionalFormats)
-		{
-			D3D12_FEATURE_DATA_FORMAT_SUPPORT support =
-			{
-				DXGI_FORMAT_R11G11B10_FLOAT, D3D12_FORMAT_SUPPORT1_NONE, D3D12_FORMAT_SUPPORT2_NONE
-			};
-
-			if (SUCCEEDED(m_device->CheckFeatureSupport(D3D12_FEATURE_FORMAT_SUPPORT, &support, sizeof(support))) &&
-				(support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_LOAD) != 0)
-			{
-				m_typedUAVLoadSupport_R11G11B10_FLOAT = true;
-			}
-
-			support.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-
-			if (SUCCEEDED(m_device->CheckFeatureSupport(D3D12_FEATURE_FORMAT_SUPPORT, &support, sizeof(support))) &&
-				(support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_LOAD) != 0)
-			{
-				m_typedUAVLoadSupport_R16G16B16A16_FLOAT = true;
-			}
-		}
-	}
-
-	D3D12_FEATURE_DATA_D3D12_OPTIONS5 featureData5 = {};
-	if (SUCCEEDED(m_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &featureData5, sizeof(featureData5))))
-	{
-
-	}
-
-	g_commandManager.Create(m_device.Get());
-
-	m_swapChain = make_unique<SwapChain>();
-	m_swapChain->Create(dxgiFactory.Get(), m_hwnd, m_width, m_height, Format::R10G10B10A2_UNorm);
-
-	m_initialized = true;
 }
 
 
-void GraphicsDevice::Destroy()
+IDXGISwapChain1Ptr CreateSwapChain(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height)
 {
-	g_commandManager.IdleGPU();
+	IDXGISwapChain1Ptr swapChain;
 
-	CommandContext::DestroyAllContexts();
-	g_commandManager.Shutdown();
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+	swapChainDesc.Width = width;
+	swapChainDesc.Height = height;
+	swapChainDesc.Format = static_cast<DXGI_FORMAT>(BackBufferColorFormat);
+	swapChainDesc.Scaling = DXGI_SCALING_NONE;
+	swapChainDesc.SampleDesc.Quality = 0;
+	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swapChainDesc.BufferCount = NumSwapChainBuffers;
+	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 
-	PSO::DestroyAll();
-	Shader::DestroyAll();
-	RootSignature::DestroyAll();
-
-	DescriptorAllocator::DestroyAll();
-	Texture::DestroyAll();
-
-	m_swapChain->Destroy();
-	m_swapChain.reset();
-
-#if defined(_DEBUG)
-	ID3D12DebugDevice* debugInterface;
-	if (SUCCEEDED(m_device->QueryInterface(&debugInterface)))
-	{
-		debugInterface->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
-		debugInterface->Release();
-	}
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) // Win32
+	assert_succeeded(dxgiFactory->CreateSwapChainForHwnd(g_commandManager.GetCommandQueue(), hWnd, &swapChainDesc, nullptr, nullptr, &swapChain));
+#else // UWP
+	assert_succeeded(dxgiFactory->CreateSwapChainForCoreWindow(g_commandManager.GetCommandQueue(), (IUnknown*)GameCore::g_window.Get(), &swapChainDesc, nullptr, &m_swapChain));
 #endif
 
-	g_device = nullptr;
-
-	m_device.Reset();
+	return swapChain;
 }
 
-
-void GraphicsDevice::PrepareFrame()
-{}
+} // anonymous namespace
 
 
-void GraphicsDevice::SubmitFrame()
+namespace Kodiak
 {
-	m_currentBuffer = (m_currentBuffer + 1) % m_swapChain->GetImageCount();
 
-	UINT presentInterval = 0;
+struct GraphicsDevice::PlatformData : public NonCopyable
+{
+	PlatformData() = default;
+	~PlatformData() { Destroy(); }
 
-	m_swapChain->Present(presentInterval);
+	void Destroy()
+	{
+		swapChain = nullptr;
+
+#if defined(_DEBUG)
+		ID3D12DebugDevice* debugInterface;
+		if (SUCCEEDED(device->QueryInterface(&debugInterface)))
+		{
+			debugInterface->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
+			debugInterface->Release();
+		}
+#endif
+		
+		g_device = nullptr;
+		device = nullptr;
+	}
+
+	ID3D12DevicePtr device;
+	IDXGISwapChain1Ptr swapChain;
+};
+
+
+const DeviceHandle& GetDevice()
+{
+	return g_device;
 }
+
+} // namespace Kodiak
+
+
+GraphicsDevice::~GraphicsDevice() = default;
 
 
 void GraphicsDevice::WaitForGpuIdle()
@@ -316,13 +160,161 @@ void GraphicsDevice::WaitForGpuIdle()
 }
 
 
-void GraphicsDevice::ReleaseResource(PlatformHandle handle)
+Format GraphicsDevice::GetColorFormat() const
 {
-
+	return BackBufferColorFormat;
 }
 
 
-ID3D12Device* Kodiak::GetDevice()
+Format GraphicsDevice::GetDepthFormat() const
 {
-	return g_device;
+	return DepthFormat;
+}
+
+
+const DeviceHandle& GraphicsDevice::GetDevice()
+{
+	assert(m_platformData);
+
+	return m_platformData->device;
+}
+
+
+void GraphicsDevice::PlatformCreate()
+{
+	m_platformData = new PlatformData;
+
+#if _DEBUG
+	ID3D12DebugPtr debugInterface;
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface))))
+	{
+		debugInterface->EnableDebugLayer();
+	}
+	else
+	{
+		Utility::Print("WARNING:  Unable to enable D3D12 debug validation layer\n");
+	}
+#endif
+
+	ThrowIfFailed(D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModels, nullptr, nullptr));
+
+	// Obtain the DXGI factory
+	IDXGIFactory4Ptr dxgiFactory;
+	assert_succeeded(CreateDXGIFactory2(0, IID_PPV_ARGS(&dxgiFactory)));
+
+	// Create the D3D graphics device
+	Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter;
+
+	static const bool bUseWarpDriver = false;
+
+	ID3D12DevicePtr pDevice;
+
+	if (!bUseWarpDriver)
+	{
+		size_t maxSize = 0;
+
+		for (uint32_t idx = 0; DXGI_ERROR_NOT_FOUND != dxgiFactory->EnumAdapters1(idx, &pAdapter); ++idx)
+		{
+			DXGI_ADAPTER_DESC1 desc;
+			pAdapter->GetDesc1(&desc);
+			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+				continue;
+
+			if (desc.DedicatedVideoMemory > maxSize && SUCCEEDED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&pDevice))))
+			{
+				pAdapter->GetDesc1(&desc);
+				Utility::Printf(L"D3D12-capable hardware found:  %s (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
+				maxSize = desc.DedicatedVideoMemory;
+			}
+		}
+
+		if (maxSize > 0)
+		{
+			m_platformData->device = pDevice;
+		}
+	}
+
+	if (!m_platformData->device)
+	{
+		if (bUseWarpDriver)
+		{
+			Utility::Print("WARP software adapter requested.  Initializing...\n");
+		}
+		else
+		{
+			Utility::Print("Failed to find a hardware adapter.  Falling back to WARP.\n");
+		}
+
+		assert_succeeded(dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&pAdapter)));
+		assert_succeeded(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice)));
+		m_platformData->device = pDevice;
+	}
+#ifndef _RELEASE
+	else
+	{
+		bool bDeveloperModeEnabled = false;
+
+		// Look in the Windows Registry to determine if Developer Mode is enabled
+		HKEY hKey;
+		LSTATUS result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock", 0, KEY_READ, &hKey);
+		if (result == ERROR_SUCCESS)
+		{
+			DWORD keyValue, keySize = sizeof(DWORD);
+			result = RegQueryValueEx(hKey, "AllowDevelopmentWithoutDevLicense", 0, nullptr, (byte*)&keyValue, &keySize);
+			if (result == ERROR_SUCCESS && keyValue == 1)
+			{
+				bDeveloperModeEnabled = true;
+			}
+			RegCloseKey(hKey);
+		}
+
+		warn_once_if_not(bDeveloperModeEnabled, "Enable Developer Mode on Windows 10 to get consistent profiling results");
+
+		// Prevent the GPU from overclocking or underclocking to get consistent timings
+		if (bDeveloperModeEnabled)
+		{
+			m_platformData->device->SetStablePowerState(TRUE);
+		}
+	}
+#endif
+
+	g_device = m_platformData->device;
+
+	ConfigureInfoQueue(m_platformData->device);
+
+	g_commandManager.Create(m_platformData->device);
+
+	m_platformData->swapChain = CreateSwapChain(dxgiFactory, m_hwnd, m_width, m_height);
+
+	for (int i = 0; i < NumSwapChainBuffers; ++i)
+	{
+		ID3D12ResourcePtr displayPlane;
+		assert_succeeded(m_platformData->swapChain->GetBuffer(i, IID_PPV_ARGS(&displayPlane)));
+
+		ColorBufferPtr buffer = make_shared<ColorBuffer>();
+		buffer->CreateFromSwapChain("Primary SwapChain Buffer", displayPlane.Detach());
+
+		m_swapChainBuffers[i] = buffer;
+	}
+}
+
+
+void GraphicsDevice::PlatformPresent()
+{
+	UINT presentInterval = 0;
+
+	m_platformData->swapChain->Present(presentInterval, 0);
+}
+
+
+void GraphicsDevice::PlatformDestroyData()
+{
+	delete m_platformData;
+	m_platformData = nullptr;
+}
+
+
+void GraphicsDevice::PlatformDestroy()
+{
+	g_commandManager.Shutdown();
 }

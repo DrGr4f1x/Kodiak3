@@ -15,7 +15,9 @@
 
 #include "DepthBuffer12.h"
 
-#include "GraphicsDevice12.h"
+#include "GraphicsDevice.h"
+
+#include "DescriptorHeap12.h"
 
 
 using namespace Kodiak;

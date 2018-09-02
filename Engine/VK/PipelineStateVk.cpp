@@ -15,7 +15,7 @@
 #include "Hash.h"
 #include "Shader.h"
 
-#include "GraphicsDeviceVk.h"
+#include "GraphicsDevice.h"
 #include "PixelBufferVk.h"
 #include "RenderPassVk.h"
 #include "RootSignatureVk.h"
@@ -144,7 +144,7 @@ void PSO::DestroyAll()
 {
 	lock_guard<mutex> CS(s_pipelineMutex);
 
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	for (auto& pso : s_graphicsPipelineCache)
 	{
@@ -415,7 +415,9 @@ void GraphicsPSO::SetGeometryShader(const string& filename)
 
 void GraphicsPSO::Finalize()
 {
-	std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
+	vector<VkPipelineShaderStageCreateInfo> shaderStages;
+
+	VkDevice device = *GetDevice();
 
 	// Vertex shader
 	if (m_vertexShader)
@@ -427,7 +429,7 @@ void GraphicsPSO::Finalize()
 		moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_vertexShader.binary);
 
 		VkShaderModule module{ VK_NULL_HANDLE };
-		ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
+		ThrowIfFailed(vkCreateShaderModule(device, &moduleCreateInfo, nullptr, &module));
 
 		VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
 		createInfo.pNext = nullptr;
@@ -450,7 +452,7 @@ void GraphicsPSO::Finalize()
 		moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_pixelShader.binary);
 
 		VkShaderModule module{ VK_NULL_HANDLE };
-		ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
+		ThrowIfFailed(vkCreateShaderModule(device, &moduleCreateInfo, nullptr, &module));
 
 		VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
 		createInfo.pNext = nullptr;
@@ -473,7 +475,7 @@ void GraphicsPSO::Finalize()
 		moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_hullShader.binary);
 
 		VkShaderModule module{ VK_NULL_HANDLE };
-		ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
+		ThrowIfFailed(vkCreateShaderModule(device, &moduleCreateInfo, nullptr, &module));
 
 		VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
 		createInfo.pNext = nullptr;
@@ -496,7 +498,7 @@ void GraphicsPSO::Finalize()
 		moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_domainShader.binary);
 
 		VkShaderModule module{ VK_NULL_HANDLE };
-		ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
+		ThrowIfFailed(vkCreateShaderModule(device, &moduleCreateInfo, nullptr, &module));
 
 		VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
 		createInfo.pNext = nullptr;
@@ -519,7 +521,7 @@ void GraphicsPSO::Finalize()
 		moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_geometryShader.binary);
 
 		VkShaderModule module{ VK_NULL_HANDLE };
-		ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
+		ThrowIfFailed(vkCreateShaderModule(device, &moduleCreateInfo, nullptr, &module));
 
 		VkPipelineShaderStageCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
 		createInfo.pNext = nullptr;
@@ -566,10 +568,10 @@ void GraphicsPSO::Finalize()
 		{
 			VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 			pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-			ThrowIfFailed(vkCreatePipelineCache(GetDevice(), &pipelineCacheCreateInfo, nullptr, &s_pipelineCache));
+			ThrowIfFailed(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &s_pipelineCache));
 		}
 
-		ThrowIfFailed(vkCreateGraphicsPipelines(GetDevice(), s_pipelineCache, 1, &createInfo, nullptr, &m_pipeline));
+		ThrowIfFailed(vkCreateGraphicsPipelines(device, s_pipelineCache, 1, &createInfo, nullptr, &m_pipeline));
 
 		s_graphicsPipelineCache.insert(m_pipeline);
 	}
@@ -577,7 +579,7 @@ void GraphicsPSO::Finalize()
 	// Clean up shader modules
 	for (auto& shaderStage : shaderStages)
 	{
-		vkDestroyShaderModule(GetDevice(), shaderStage.module, nullptr);
+		vkDestroyShaderModule(device, shaderStage.module, nullptr);
 	}
 	shaderStages.clear();
 }
@@ -600,6 +602,8 @@ void ComputePSO::SetComputeShader(const string& filename)
 
 void ComputePSO::Finalize()
 {
+	VkDevice device = *GetDevice();
+
 	VkComputePipelineCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
 	createInfo.pNext = nullptr;
@@ -613,7 +617,7 @@ void ComputePSO::Finalize()
 	moduleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_computeShader.binary);
 
 	VkShaderModule module{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateShaderModule(GetDevice(), &moduleCreateInfo, nullptr, &module));
+	ThrowIfFailed(vkCreateShaderModule(device, &moduleCreateInfo, nullptr, &module));
 
 	createInfo.stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	createInfo.stage.pNext = nullptr;
@@ -630,13 +634,13 @@ void ComputePSO::Finalize()
 		{
 			VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
 			pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-			ThrowIfFailed(vkCreatePipelineCache(GetDevice(), &pipelineCacheCreateInfo, nullptr, &s_pipelineCache));
+			ThrowIfFailed(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &s_pipelineCache));
 		}
 
-		ThrowIfFailed(vkCreateComputePipelines(GetDevice(), s_pipelineCache, 1, &createInfo, nullptr, &m_pipeline));
+		ThrowIfFailed(vkCreateComputePipelines(device, s_pipelineCache, 1, &createInfo, nullptr, &m_pipeline));
 
 		s_graphicsPipelineCache.insert(m_pipeline);
 	}
 
-	vkDestroyShaderModule(GetDevice(), module, nullptr);
+	vkDestroyShaderModule(device, module, nullptr);
 }

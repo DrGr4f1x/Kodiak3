@@ -17,7 +17,7 @@
 #include "KTXTextureLoader.h"
 
 #include "CommandContextVk.h"
-#include "GraphicsDeviceVk.h"
+#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
@@ -377,7 +377,7 @@ void Texture::Create(TextureInitializer& init)
 	m_numMips = init.m_numMips;
 	m_type = init.m_type;
 
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	VkFormat vkFormat = static_cast<VkFormat>(m_format);
 	
@@ -495,7 +495,7 @@ void Texture::Destroy()
 	// TODO
 	m_resource = nullptr;
 
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	vkDestroyImageView(device, m_imageView, nullptr);
 	m_imageView = VK_NULL_HANDLE;

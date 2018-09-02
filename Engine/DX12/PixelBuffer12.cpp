@@ -15,7 +15,7 @@
 
 #include "PixelBuffer12.h"
 
-#include "GraphicsDevice12.h"
+#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;

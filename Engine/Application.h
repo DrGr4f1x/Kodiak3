@@ -74,7 +74,8 @@ protected:
 
 	std::unique_ptr<GraphicsDevice>			m_graphicsDevice;
 
-	std::vector<Kodiak::FrameBufferPtr>		m_defaultFramebuffers;
+	std::array<Kodiak::FrameBufferPtr, NumSwapChainBuffers>
+											m_defaultFramebuffers;
 	Kodiak::DepthBufferPtr					m_defaultDepthBuffer;
 	Kodiak::RenderPass						m_defaultRenderPass;
 

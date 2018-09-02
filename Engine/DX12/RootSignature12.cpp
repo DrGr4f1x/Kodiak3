@@ -18,7 +18,7 @@
 #include "Hash.h"
 #include "SamplerState.h"
 
-#include "GraphicsDevice12.h"
+#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;

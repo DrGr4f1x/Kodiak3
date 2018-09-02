@@ -10,10 +10,70 @@
 
 #pragma once
 
-#if defined(DX12)
-#include "DX12\GraphicsDevice12.h"
-#elif defined(VK)
-#include "VK\GraphicsDeviceVk.h"
-#else
-#error "No graphics API defined"
+#include "ColorBuffer.h"
+
+namespace Kodiak
+{
+
+class GraphicsDevice
+{
+public:
+	GraphicsDevice();
+	~GraphicsDevice();
+
+	void Initialize(const std::string& appName, HINSTANCE hInstance, HWND hWnd, uint32_t width, uint32_t height);
+	void Destroy();
+
+	void SubmitFrame();
+
+	void WaitForGpuIdle();
+
+	Format GetColorFormat() const;
+	Format GetDepthFormat() const;
+
+	ColorBufferPtr GetBackBuffer(uint32_t index) const;
+	uint32_t GetCurrentBuffer() const { return m_currentBuffer; }
+
+	void ReleaseResource(PlatformHandle handle);
+
+	const DeviceHandle& GetDevice();
+
+#if VK
+	uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound);
+	VkFormatProperties GetFormatProperties(Format format);
 #endif
+
+private:
+	// Platform-specific methods
+	void PlatformCreate();
+	void PlatformPresent();
+	void PlatformDestroyData();
+	// TODO - Get rid of this
+	void PlatformDestroy();
+
+private:
+	std::string m_appName;
+
+	HINSTANCE m_hinst{ 0 };
+	HWND m_hwnd{ 0 };
+
+	uint32_t m_width{ 0 };
+	uint32_t m_height{ 0 };
+
+	std::array<ColorBufferPtr, NumSwapChainBuffers> m_swapChainBuffers;
+	uint32_t m_currentBuffer{ 0 };
+
+	uint64_t m_frameNumber{ 0 };
+
+	// Platform-specific implementation
+	struct PlatformData;
+	PlatformData* m_platformData{ nullptr };
+};
+
+const DeviceHandle& GetDevice();
+#if VK
+uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound = nullptr);
+VkFormatProperties GetFormatProperties(Format format);
+#endif
+
+} // namespace Kodiak

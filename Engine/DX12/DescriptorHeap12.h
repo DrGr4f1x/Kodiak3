@@ -125,4 +125,10 @@ private:
 	DescriptorHandle m_nextFreeHandle;
 };
 
+extern DescriptorAllocator g_descriptorAllocator[];
+inline D3D12_CPU_DESCRIPTOR_HANDLE AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE type, UINT count = 1)
+{
+	return g_descriptorAllocator[type].Allocate(count);
+}
+
 } // namespace Kodiak

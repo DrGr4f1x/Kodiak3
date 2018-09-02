@@ -11,7 +11,7 @@
 
 #include "PixelBufferVk.h"
 
-#include "GraphicsDeviceVk.h"
+#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
@@ -46,7 +46,7 @@ void PixelBuffer::Destroy()
 {
 	if (m_image != VK_NULL_HANDLE)
 	{
-		vkDestroyImage(GetDevice(), m_image, nullptr);
+		vkDestroyImage(*GetDevice(), m_image, nullptr);
 		m_image = VK_NULL_HANDLE;
 	}
 
@@ -81,7 +81,7 @@ void PixelBuffer::CreateTextureResource(const std::string& name, const VkImageCr
 	m_height = imageCreateInfo.extent.height;
 	m_arraySize = imageCreateInfo.arrayLayers;
 
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	ThrowIfFailed(vkCreateImage(device, &imageCreateInfo, nullptr, &m_image));
 
@@ -100,6 +100,7 @@ void PixelBuffer::CreateTextureResource(const std::string& name, const VkImageCr
 
 	ThrowIfFailed(vkBindImageMemory(device, m_image, *m_resource, 0));
 
-	SetDebugName(m_image, name + " image");
-	SetDebugName(*m_resource, name + " memory");
+	// TODO
+	//SetDebugName(m_image, name + " image");
+	//SetDebugName(*m_resource, name + " memory");
 }

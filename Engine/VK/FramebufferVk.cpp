@@ -14,7 +14,7 @@
 
 #include "ColorBufferVk.h"
 #include "DepthBufferVk.h"
-#include "GraphicsDeviceVk.h"
+#include "GraphicsDevice.h"
 #include "RenderPassVk.h"
 
 
@@ -23,7 +23,7 @@ using namespace Kodiak;
 
 void FrameBuffer::Destroy()
 {
-	vkDestroyFramebuffer(GetDevice(), m_framebuffer, nullptr);
+	vkDestroyFramebuffer(*GetDevice(), m_framebuffer, nullptr);
 	m_framebuffer = VK_NULL_HANDLE;
 }
 
@@ -131,5 +131,5 @@ void FrameBuffer::Finalize(RenderPass& renderPass)
 	frameBufferCreateInfo.height = height;
 	frameBufferCreateInfo.layers = 1;
 
-	ThrowIfFailed(vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &m_framebuffer));
+	ThrowIfFailed(vkCreateFramebuffer(*GetDevice(), &frameBufferCreateInfo, nullptr, &m_framebuffer));
 }

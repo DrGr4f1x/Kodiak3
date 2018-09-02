@@ -18,7 +18,6 @@
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
 #include "Input.h"
-#include "SwapChain.h"
 
 
 using namespace Kodiak;

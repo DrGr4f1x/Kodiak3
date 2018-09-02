@@ -12,7 +12,7 @@
 
 #include "DescriptorHeapVk.h"
 
-#include "GraphicsDeviceVk.h"
+#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
@@ -33,7 +33,7 @@ VkDescriptorSet DescriptorSetAllocator::Allocate(VkDescriptorSetLayout layout)
 		m_descriptorPool = RequestNewPool();
 	}
 
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	VkDescriptorSet descSet{ VK_NULL_HANDLE };
 
@@ -62,7 +62,7 @@ void DescriptorSetAllocator::DestroyAll()
 {
 	lock_guard<mutex> CS(sm_allocationMutex);
 
-	auto device = GetDevice();
+	VkDevice device = *GetDevice();
 
 	for (auto& pool : sm_descriptorPoolList)
 	{
@@ -104,7 +104,7 @@ VkDescriptorPool DescriptorSetAllocator::RequestNewPool()
 	createInfo.pPoolSizes = typeCounts;
 
 	VkDescriptorPool pool{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateDescriptorPool(GetDevice(), &createInfo, nullptr, &pool));
+	ThrowIfFailed(vkCreateDescriptorPool(*GetDevice(), &createInfo, nullptr, &pool));
 
 	sm_descriptorPoolList.emplace_back(pool);
 

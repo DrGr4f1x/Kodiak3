@@ -18,7 +18,7 @@
 
 #include "CommandContext12.h"
 #include "DDSTextureLoader12.h"
-#include "GraphicsDevice12.h"
+#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;

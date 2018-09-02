@@ -16,7 +16,6 @@
 #include "CommonStates.h"
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
-#include "SwapChain.h"
 
 
 using namespace Kodiak;
@@ -147,12 +146,9 @@ void RadialBlurApp::Render()
 
 void RadialBlurApp::InitRenderPasses()
 {
-	auto swapChain = m_graphicsDevice->GetSwapChain();
-
-	auto colorFormat = swapChain->GetColorFormat();
+	auto colorFormat = Format::R8G8B8A8_UNorm;
 	auto depthFormat = m_graphicsDevice->GetDepthFormat();
-	
-	colorFormat = Format::R8G8B8A8_UNorm;
+		
 	m_offscreenRenderPass.SetColorAttachment(0, colorFormat, ResourceState::Undefined, ResourceState::PixelShaderResource);
 	m_offscreenRenderPass.SetDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
 	m_offscreenRenderPass.Finalize();
