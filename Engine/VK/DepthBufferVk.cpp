@@ -79,7 +79,7 @@ void DepthBuffer::CreateDerivedViews(Format format)
 	imageViewCreateInfo.subresourceRange.levelCount = 1;
 	imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
 	imageViewCreateInfo.subresourceRange.layerCount = 1;
-	imageViewCreateInfo.image = m_image;
+	imageViewCreateInfo.image = m_resource;
 
 	ThrowIfFailed(vkCreateImageView(GetDevice(), &imageViewCreateInfo, nullptr, &m_dsv));
 }

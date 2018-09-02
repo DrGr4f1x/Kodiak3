@@ -46,7 +46,7 @@ namespace Kodiak
 using PlatformHandle = std::shared_ptr<VkBaseHandle>;
 using InstanceHandle = VkHandle<VkInstance>::VkPointer;
 using DeviceHandle = VkHandle<VkDevice>::VkPointer;
-using ResourceHandle = VkHandle<VkDeviceMemory>::VkPointer;
+using ResourceHandle = VkResourceHandle::VkPointer;
 
 static const uint32_t NumSwapChainBuffers = 3;
 

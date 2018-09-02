@@ -409,10 +409,12 @@ void Texture::Create(TextureInitializer& init)
 	{
 		imageCreateInfo.usage |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 	}
-	ThrowIfFailed(vkCreateImage(device, &imageCreateInfo, nullptr, &m_image));
+
+	VkImage image{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkCreateImage(device, &imageCreateInfo, nullptr, &image));
 
 	VkMemoryRequirements memReqs = {};
-	vkGetImageMemoryRequirements(device, m_image, &memReqs);
+	vkGetImageMemoryRequirements(device, image, &memReqs);
 
 	VkMemoryAllocateInfo memAllocInfo = {};
 	memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -421,9 +423,9 @@ void Texture::Create(TextureInitializer& init)
 
 	VkDeviceMemory mem{ VK_NULL_HANDLE };
 	ThrowIfFailed(vkAllocateMemory(device, &memAllocInfo, nullptr, &mem));
-	m_resource = ResourceHandle::Create(mem);
+	m_resource = ResourceHandle::Create(image, mem);
 
-	ThrowIfFailed(vkBindImageMemory(device, m_image, m_resource, 0));
+	ThrowIfFailed(vkBindImageMemory(device, image, m_resource, 0));
 
 	// Setup buffer copy regions for each mip level
 	uint32_t effectiveArraySize = m_type == TextureType::Texture3D ? 1 : m_depthOrArraySize;
@@ -485,7 +487,7 @@ void Texture::Create(TextureInitializer& init)
 	colorImageView.subresourceRange.levelCount = m_numMips;
 	colorImageView.subresourceRange.baseArrayLayer = 0;
 	colorImageView.subresourceRange.layerCount = m_type == TextureType::Texture3D ? 1 : m_depthOrArraySize;
-	colorImageView.image = m_image;
+	colorImageView.image = m_resource;
 	ThrowIfFailed(vkCreateImageView(device, &colorImageView, nullptr, &m_imageView));
 }
 
@@ -499,9 +501,6 @@ void Texture::Destroy()
 
 	vkDestroyImageView(device, m_imageView, nullptr);
 	m_imageView = VK_NULL_HANDLE;
-
-	vkDestroyImage(device, m_image, nullptr);
-	m_image = VK_NULL_HANDLE;
 }
 
 

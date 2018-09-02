@@ -23,9 +23,6 @@ public:
 	virtual ~GpuBuffer() { Destroy(); }
 	void Destroy();
 
-	VkBuffer GetBuffer() { return m_buffer; }
-	const VkBuffer GetBuffer() const { return m_buffer; }
-
 	VkDescriptorBufferInfo& GetDescriptorInfo() { return m_descriptorInfo; }
 	const VkDescriptorBufferInfo& GetDescriptorInfo() const { return m_descriptorInfo; }
 
@@ -41,7 +38,6 @@ protected:
 	size_t		m_elementCount{ 0 };
 	size_t		m_elementSize{ 0 };
 
-	VkBuffer		m_buffer{ VK_NULL_HANDLE };
 	VkDescriptorBufferInfo m_descriptorInfo;
 };
 

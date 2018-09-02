@@ -212,7 +212,7 @@ void CommandContext::InitializeTexture(Texture& dest, size_t numBytes, const voi
 	vkCmdCopyBufferToImage(
 		context.m_commandList,
 		stagingBuffer,
-		dest.m_image,
+		dest.m_resource,
 		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 		numBuffers,
 		bufferCopies);
@@ -264,7 +264,7 @@ void CommandContext::InitializeBuffer(GpuBuffer& dest, const void* initialData, 
 	// Put buffer region copies into command buffer
 	VkBufferCopy copyRegion = {};
 	copyRegion.size = numBytes;
-	vkCmdCopyBuffer(context.m_commandList, stagingBuffer, dest.GetBuffer(), 1, &copyRegion);
+	vkCmdCopyBuffer(context.m_commandList, stagingBuffer, dest.m_resource, 1, &copyRegion);
 
 	context.Finish(true);
 
@@ -294,7 +294,7 @@ void CommandContext::TransitionResource(Texture& texture, ResourceState newState
 		barrierDesc.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 		barrierDesc.pNext = nullptr;
 
-		barrierDesc.image = texture.m_image;
+		barrierDesc.image = texture.m_resource;
 
 		// Setup access flags and layout 
 		barrierDesc.srcAccessMask = texture.m_accessFlags;
@@ -407,7 +407,7 @@ void CommandContext::TransitionResource(ColorBuffer& colorBuffer, ResourceState 
 		barrierDesc.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 		barrierDesc.pNext = nullptr;
 
-		barrierDesc.image = colorBuffer.m_image;
+		barrierDesc.image = colorBuffer.m_resource;
 
 		// Setup access flags and layout 
 		barrierDesc.srcAccessMask = colorBuffer.m_accessFlags;

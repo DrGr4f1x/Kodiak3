@@ -22,9 +22,6 @@ using namespace std;
 
 void GpuBuffer::Destroy()
 {
-	vkDestroyBuffer(GetDevice(), m_buffer, nullptr);
-	m_buffer = VK_NULL_HANDLE;
-	
 	// TODO
 	m_resource = nullptr;
 }
@@ -42,10 +39,12 @@ void GpuBuffer::CreateBuffer(const string& name, size_t numElements, size_t elem
 	vertexbufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	vertexbufferInfo.size = m_bufferSize;
 	vertexbufferInfo.usage = flags | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-	ThrowIfFailed(vkCreateBuffer(device, &vertexbufferInfo, nullptr, &m_buffer));
+
+	VkBuffer buffer{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkCreateBuffer(device, &vertexbufferInfo, nullptr, &buffer));
 
 	VkMemoryRequirements memReqs;
-	vkGetBufferMemoryRequirements(device, m_buffer, &memReqs);
+	vkGetBufferMemoryRequirements(device, buffer, &memReqs);
 
 	VkMemoryPropertyFlags memFlags = bHostMappable ?
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT :
@@ -58,7 +57,7 @@ void GpuBuffer::CreateBuffer(const string& name, size_t numElements, size_t elem
 
 	VkDeviceMemory mem{ VK_NULL_HANDLE };
 	ThrowIfFailed(vkAllocateMemory(device, &memAlloc, nullptr, &mem));
-	m_resource = ResourceHandle::Create(mem);
+	m_resource = ResourceHandle::Create(buffer, mem);
 
 	if (initialData && bHostMappable)
 	{
@@ -68,7 +67,7 @@ void GpuBuffer::CreateBuffer(const string& name, size_t numElements, size_t elem
 		vkUnmapMemory(device, m_resource);
 	}
 
-	ThrowIfFailed(vkBindBufferMemory(device, m_buffer, m_resource, 0));
+	ThrowIfFailed(vkBindBufferMemory(device, buffer, m_resource, 0));
 
 	// TODO
 	//SetDebugName(m_buffer, name);
@@ -80,7 +79,7 @@ void GpuBuffer::CreateBuffer(const string& name, size_t numElements, size_t elem
 		CommandContext::InitializeBuffer(*this, initialData, m_bufferSize);
 	}
 
-	m_descriptorInfo.buffer = m_buffer;
+	m_descriptorInfo.buffer = buffer;
 	m_descriptorInfo.offset = 0;
 	m_descriptorInfo.range = m_bufferSize;
 }

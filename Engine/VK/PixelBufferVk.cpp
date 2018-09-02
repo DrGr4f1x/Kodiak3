@@ -44,12 +44,6 @@ VkSampleCountFlagBits Kodiak::SamplesToFlags(uint32_t numSamples)
 
 void PixelBuffer::Destroy()
 {
-	if (m_image != VK_NULL_HANDLE)
-	{
-		vkDestroyImage(GetDevice(), m_image, nullptr);
-		m_image = VK_NULL_HANDLE;
-	}
-
 	// TODO
 	m_resource = nullptr;
 }
@@ -83,10 +77,11 @@ void PixelBuffer::CreateTextureResource(const std::string& name, const VkImageCr
 
 	VkDevice device = GetDevice();
 
-	ThrowIfFailed(vkCreateImage(device, &imageCreateInfo, nullptr, &m_image));
+	VkImage image{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkCreateImage(device, &imageCreateInfo, nullptr, &image));
 
 	VkMemoryRequirements memReqs = {};
-	vkGetImageMemoryRequirements(device, m_image, &memReqs);
+	vkGetImageMemoryRequirements(device, image, &memReqs);
 
 	VkMemoryAllocateInfo memoryAllocateInfo = {};
 	memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -96,9 +91,9 @@ void PixelBuffer::CreateTextureResource(const std::string& name, const VkImageCr
 
 	VkDeviceMemory mem{ VK_NULL_HANDLE };
 	ThrowIfFailed(vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &mem));
-	m_resource = ResourceHandle::Create(mem);
+	m_resource = ResourceHandle::Create(image, mem);
 
-	ThrowIfFailed(vkBindImageMemory(device, m_image, m_resource, 0));
+	ThrowIfFailed(vkBindImageMemory(device, image, m_resource, 0));
 
 	// TODO
 	//SetDebugName(m_image, name + " image");

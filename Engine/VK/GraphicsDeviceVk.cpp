@@ -261,13 +261,13 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 			presentFences[i] = VK_NULL_HANDLE;
 		}
 
-		FreeDebugCallback(instance);
-
 		vkDestroySurfaceKHR(instance, surface, nullptr);
 		surface = VK_NULL_HANDLE;
 
 		vkDestroySwapchainKHR(device, swapChain, nullptr);
 		swapChain = VK_NULL_HANDLE;
+
+		FreeDebugCallback(instance);
 
 		device = nullptr;
 		instance = nullptr;

@@ -33,7 +33,8 @@ void ColorBuffer::CreateFromSwapChain(const std::string& name, VkImage baseImage
 {
 	m_ownsImage = false;
 
-	m_image = baseImage;
+	m_resource = ResourceHandle::Create(baseImage, VK_NULL_HANDLE, false);
+	
 	// TODO
 	//SetDebugName(m_image, name);
 
@@ -74,7 +75,7 @@ void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t
 	VkImageViewCreateInfo imageViewInfo{ VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
 	imageViewInfo.pNext = nullptr;
 	imageViewInfo.flags = 0;
-	imageViewInfo.image = m_image;
+	imageViewInfo.image = m_resource;
 	imageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 	imageViewInfo.format = static_cast<VkFormat>(format);
 	imageViewInfo.components.r = VK_COMPONENT_SWIZZLE_R;

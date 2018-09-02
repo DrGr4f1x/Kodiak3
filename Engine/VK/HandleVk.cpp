@@ -18,6 +18,35 @@
 namespace Kodiak
 {
 
+VkResourceHandle::~VkResourceHandle()
+{
+	VkDevice device = GetDevice();
+
+	if (m_isImage)
+	{
+		if (m_ownsImage && (m_wrapped.image != VK_NULL_HANDLE))
+		{
+			vkDestroyImage(device, m_wrapped.image, nullptr);
+			m_wrapped.image = VK_NULL_HANDLE;
+		}
+	}
+	else
+	{
+		if (m_wrapped.buffer != VK_NULL_HANDLE)
+		{
+			vkDestroyBuffer(device, m_wrapped.buffer, nullptr);
+			m_wrapped.buffer = VK_NULL_HANDLE;
+		}
+	}
+
+	if (m_wrappedMemory != VK_NULL_HANDLE)
+	{
+		vkFreeMemory(device, m_wrappedMemory, nullptr);
+		m_wrappedMemory = VK_NULL_HANDLE;
+	}
+}
+
+
 template<> VkHandle<VkInstance>::~VkHandle()
 {
 	if (m_wrapped != VK_NULL_HANDLE)
@@ -38,19 +67,8 @@ template<> VkHandle<VkDevice>::~VkHandle()
 }
 
 
-template<> VkHandle<VkDeviceMemory>::~VkHandle()
-{
-	if (m_wrapped != VK_NULL_HANDLE)
-	{
-		vkFreeMemory(GetDevice(), m_wrapped, nullptr);
-		m_wrapped = VK_NULL_HANDLE;
-	}
-}
-
-
 // Instantiate templates to avoid linker issues
 template VkHandle<VkInstance>::~VkHandle();
 template VkHandle<VkDevice>::~VkHandle();
-template VkHandle<VkDeviceMemory>::~VkHandle();
 
 } // namespace Kodiak

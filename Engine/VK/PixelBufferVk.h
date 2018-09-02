@@ -41,7 +41,6 @@ protected:
 	uint32_t m_arraySize{ 0 };
 	Format m_format{ Format::Unknown };
 
-	VkImage			m_image{ VK_NULL_HANDLE };
 	VkImageLayout	m_layout{ VK_IMAGE_LAYOUT_GENERAL };
 	VkAccessFlags	m_accessFlags{ 0 };
 };

@@ -116,7 +116,6 @@ protected:
 
 protected:
 	VkImageView		m_imageView{ VK_NULL_HANDLE };
-	VkImage			m_image{ VK_NULL_HANDLE };
 	VkImageLayout	m_layout{ VK_IMAGE_LAYOUT_GENERAL };
 	VkAccessFlags	m_accessFlags{ 0 };
 

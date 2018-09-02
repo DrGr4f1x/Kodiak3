@@ -370,6 +370,7 @@
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="PixelBuffer.h" />
     <ClInclude Include="RenderPass.h" />
+    <ClInclude Include="ResourceView.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="SamplerState.h" />
     <ClInclude Include="Shader.h" />

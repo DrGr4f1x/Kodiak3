@@ -227,14 +227,14 @@ inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const C
 
 inline void GraphicsContext::SetIndexBuffer(const IndexBuffer& indexBuffer)
 {
-	vkCmdBindIndexBuffer(m_commandList, indexBuffer.GetBuffer(), 0, indexBuffer.GetIndexType());
+	vkCmdBindIndexBuffer(m_commandList, indexBuffer.m_resource, 0, indexBuffer.GetIndexType());
 }
 
 
 inline void GraphicsContext::SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer)
 {
 	VkDeviceSize offsets[1] = { 0 };
-	VkBuffer buffers[1] = { vertexBuffer.GetBuffer() };
+	VkBuffer buffers[1] = { vertexBuffer.m_resource };
 	vkCmdBindVertexBuffers(m_commandList, 0, 1, buffers, offsets);
 }
 
@@ -246,7 +246,7 @@ inline void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count
 	for (uint32_t i = 0; i < count; ++i)
 	{
 		offsets[i] = 0;
-		buffers[i] = vertexBuffers[i].GetBuffer();
+		buffers[i] = vertexBuffers[i].m_resource;
 	}
 	vkCmdBindVertexBuffers(m_commandList, startSlot, count, buffers.data(), offsets.data());
 }

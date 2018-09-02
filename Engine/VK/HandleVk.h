@@ -49,15 +49,67 @@ private:
 	VkType m_wrapped;
 };
 
-template <typename VkType>
-std::shared_ptr<VkHandle<VkType>> CreateHandle(VkType wrapped)
+
+class VkResourceHandle : public VkBaseHandle
 {
-	return VkHandle<VkType>::Create(wrapped);
-}
+public:
+	class VkPointer : public std::shared_ptr<VkResourceHandle>
+	{
+	public:
+		using Super = std::shared_ptr<VkResourceHandle>;
+
+		VkPointer() = default;
+		VkPointer(VkResourceHandle* handle) : Super(handle) {}
+		static VkPointer Create(VkImage image, VkDeviceMemory mem, bool ownsImage = true)
+		{
+			return VkPointer(new VkResourceHandle(image, mem, ownsImage));
+		}
+		static VkPointer Create(VkBuffer buffer, VkDeviceMemory mem, bool ownsImage = true)
+		{
+			return VkPointer(new VkResourceHandle(buffer, mem, ownsImage));
+		}
+		operator VkImage() const { return Get()->m_wrapped.image; }
+		operator VkBuffer() const { return Get()->m_wrapped.buffer; }
+		operator VkDeviceMemory() const { return Get()->m_wrappedMemory; }
+
+	private:
+		VkResourceHandle* Get() const { return Super::get(); }
+	};
+
+	~VkResourceHandle();
+
+private:
+	friend class VkPointer;
+	VkResourceHandle(VkImage image, VkDeviceMemory memory, bool ownsImage) 
+		: m_wrapped(image)
+		, m_wrappedMemory(memory)
+		, m_isImage(true)
+		, m_ownsImage(ownsImage) 
+	{}
+	VkResourceHandle(VkBuffer buffer, VkDeviceMemory memory, bool ownsImage)
+		: m_wrapped(buffer)
+		, m_wrappedMemory(memory)
+		, m_isImage(false)
+		, m_ownsImage(ownsImage)
+	{}
+	
+	union WrappedData
+	{
+		WrappedData(VkImage image) : image(image) {}
+		WrappedData(VkBuffer buffer) : buffer(buffer) {}
+
+		VkImage image;
+		VkBuffer buffer;
+	} m_wrapped;
+	VkDeviceMemory m_wrappedMemory{ VK_NULL_HANDLE };
+
+	const bool m_isImage{ true };
+	const bool m_ownsImage{ true };
+};
+
 
 // Template specializations for destructors
 template<> VkHandle<VkInstance>::~VkHandle();
 template<> VkHandle<VkDevice>::~VkHandle();
-template<> VkHandle<VkDeviceMemory>::~VkHandle();
 
 } // namespace Kodiak
