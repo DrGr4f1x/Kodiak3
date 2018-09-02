@@ -11,12 +11,14 @@
 #pragma once
 
 #include "Color.h"
+#include "GpuBuffer.h"
+
 #include "ColorBufferVk.h"
 #include "DepthBufferVk.h"
 #include "DynamicDescriptorPoolVk.h"
 #include "FramebufferVk.h"
-#include "GpuBufferVk.h"
 #include "TextureVk.h"
+
 
 namespace Kodiak
 {
@@ -197,7 +199,8 @@ inline void GraphicsContext::SetStencilRef(uint32_t stencilRef)
 
 inline void GraphicsContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer)
 {
-	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &constantBuffer.GetCBV());
+	VkDescriptorBufferInfo handle = constantBuffer.GetCBV().GetHandle();
+	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &handle);
 }
 
 
@@ -227,7 +230,8 @@ inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const C
 
 inline void GraphicsContext::SetIndexBuffer(const IndexBuffer& indexBuffer)
 {
-	vkCmdBindIndexBuffer(m_commandList, indexBuffer.m_resource, 0, indexBuffer.GetIndexType());
+	VkIndexType indexType = indexBuffer.IndexSize16Bit() ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32;
+	vkCmdBindIndexBuffer(m_commandList, indexBuffer.m_resource, 0, indexType);
 }
 
 
@@ -284,7 +288,8 @@ inline void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance
 
 inline void ComputeContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer)
 {
-	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &constantBuffer.GetCBV());
+	VkDescriptorBufferInfo handle = constantBuffer.GetCBV().GetHandle();
+	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &handle);
 }
 
 

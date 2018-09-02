@@ -244,15 +244,24 @@ inline bool IsStencilFormat(Format format)
 }
 
 
-enum class TextureType
+enum class ResourceType
 {
+	Unknown,
 	Texture1D,
 	Texture1D_Array,
 	Texture2D,
 	Texture2D_Array,
+	Texture2DMS,
+	Texture2DMS_Array,
 	TextureCube,
 	TextureCube_Array,
-	Texture3D
+	Texture3D,
+	GenericBuffer,
+	IndexBuffer,
+	VertexBuffer,
+	StructuredBuffer,
+	TypedBuffer
 };
+
 
 } // namespace Kodiak

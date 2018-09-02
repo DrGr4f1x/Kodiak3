@@ -53,12 +53,6 @@
     <ClInclude Include="GpuBuffer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="VK\GpuBufferVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\GpuBuffer12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="CommandContext.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -220,6 +214,9 @@
     <ClInclude Include="ResourceView.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="DX12\Util12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -362,6 +359,21 @@
     </ClCompile>
     <ClCompile Include="GraphicsDevice.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12\ResourceView12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12\Util12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="GpuBuffer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceView.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\ResourceViewVk.cpp">
+      <Filter>Graphics\VK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -18,6 +18,7 @@
 #include "GraphicsDevice.h"
 
 #include "DescriptorHeap12.h"
+#include "Util12.h"
 
 
 using namespace Kodiak;

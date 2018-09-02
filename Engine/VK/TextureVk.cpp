@@ -195,20 +195,25 @@ bool QueryBufferFeature(VkFormatProperties properties, VkFormatFeatureFlagBits f
 }
 
 
-VkImageType GetImageType(TextureType type)
+VkImageType GetImageType(ResourceType type)
 {
 	switch (type)
 	{
-	case TextureType::Texture1D:
-	case TextureType::Texture1D_Array:
+	case ResourceType::Texture1D:
+	case ResourceType::Texture1D_Array:
 		return VK_IMAGE_TYPE_1D;
-	case TextureType::Texture2D:
-	case TextureType::Texture2D_Array:
-	case TextureType::TextureCube:
-	case TextureType::TextureCube_Array:
+
+	case ResourceType::Texture2D:
+	case ResourceType::Texture2D_Array:
+	case ResourceType::Texture2DMS:
+	case ResourceType::Texture2DMS_Array:
+	case ResourceType::TextureCube:
+	case ResourceType::TextureCube_Array:
 		return VK_IMAGE_TYPE_2D;
-	case TextureType::Texture3D:
+
+	case ResourceType::Texture3D:
 		return VK_IMAGE_TYPE_3D;
+
 	default:
 		assert(false);
 		return VK_IMAGE_TYPE_2D;
@@ -216,24 +221,33 @@ VkImageType GetImageType(TextureType type)
 }
 
 
-VkImageViewType GetImageViewType(TextureType type)
+VkImageViewType GetImageViewType(ResourceType type)
 {
 	switch (type)
 	{
-	case TextureType::Texture1D:
+	case ResourceType::Texture1D:
 		return VK_IMAGE_VIEW_TYPE_1D;
-	case TextureType::Texture1D_Array:
+
+	case ResourceType::Texture1D_Array:
 		return VK_IMAGE_VIEW_TYPE_1D_ARRAY;
-	case TextureType::Texture2D:
+
+	case ResourceType::Texture2D:
+	case ResourceType::Texture2DMS:
 		return VK_IMAGE_VIEW_TYPE_2D;
-	case TextureType::Texture2D_Array:
+
+	case ResourceType::Texture2D_Array:
+	case ResourceType::Texture2DMS_Array:
 		return VK_IMAGE_VIEW_TYPE_2D_ARRAY;
-	case TextureType::TextureCube:
+
+	case ResourceType::TextureCube:
 		return VK_IMAGE_VIEW_TYPE_CUBE;
-	case TextureType::TextureCube_Array:
+
+	case ResourceType::TextureCube_Array:
 		return VK_IMAGE_VIEW_TYPE_CUBE_ARRAY;
-	case TextureType::Texture3D:
+
+	case ResourceType::Texture3D:
 		return VK_IMAGE_VIEW_TYPE_3D;
+
 	default:
 		assert(false);
 		return VK_IMAGE_VIEW_TYPE_2D;
@@ -241,12 +255,12 @@ VkImageViewType GetImageViewType(TextureType type)
 }
 
 
-VkImageCreateFlagBits GetImageCreateFlags(TextureType type)
+VkImageCreateFlagBits GetImageCreateFlags(ResourceType type)
 {
 	switch (type)
 	{
-	case TextureType::TextureCube:
-	case TextureType::TextureCube_Array:
+	case ResourceType::TextureCube:
+	case ResourceType::TextureCube_Array:
 		return VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
 	default:
 		return static_cast<VkImageCreateFlagBits>(0);
@@ -261,7 +275,7 @@ void TextureInitializer::Initialize()
 	size_t sizeBytes = 0;
 	auto format = static_cast<VkFormat>(m_format);
 
-	if (m_type == TextureType::Texture3D)
+	if (m_type == ResourceType::Texture3D)
 	{
 		uint32_t width = m_width;
 		uint32_t height = m_height;
@@ -343,7 +357,7 @@ void TextureInitializer::SetData(uint32_t slice, uint32_t mipLevel, const void* 
 
 void Texture::Create1D(uint32_t width, Format format, const void* initData)
 {
-	TextureInitializer init(TextureType::Texture1D, format, width, 1, 1, 1);
+	TextureInitializer init(ResourceType::Texture1D, format, width, 1, 1, 1);
 	init.SetData(0, 0, initData);
 
 	Create(init);
@@ -352,7 +366,7 @@ void Texture::Create1D(uint32_t width, Format format, const void* initData)
 
 void Texture::Create2D(uint32_t width, uint32_t height, Format format, const void* initData)
 {
-	TextureInitializer init(TextureType::Texture2D, format, width, height, 1, 1);
+	TextureInitializer init(ResourceType::Texture2D, format, width, height, 1, 1);
 	init.SetData(0, 0, initData);
 
 	Create(init);
@@ -361,7 +375,7 @@ void Texture::Create2D(uint32_t width, uint32_t height, Format format, const voi
 
 void Texture::Create3D(uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData)
 {
-	TextureInitializer init(TextureType::Texture3D, format, width, height, depth, 1);
+	TextureInitializer init(ResourceType::Texture3D, format, width, height, depth, 1);
 	init.SetData(0, 0, initData);
 
 	Create(init);
@@ -397,12 +411,12 @@ void Texture::Create(TextureInitializer& init)
 	imageCreateInfo.imageType = GetImageType(m_type);
 	imageCreateInfo.format = vkFormat;
 	imageCreateInfo.mipLevels = m_numMips;
-	imageCreateInfo.arrayLayers = m_type == TextureType::Texture3D ? 1 : m_depthOrArraySize;
+	imageCreateInfo.arrayLayers = m_type == ResourceType::Texture3D ? 1 : m_depthOrArraySize;
 	imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	imageCreateInfo.extent = { m_width, m_height, (m_type == TextureType::Texture3D ? m_depthOrArraySize : 1) };
+	imageCreateInfo.extent = { m_width, m_height, (m_type == ResourceType::Texture3D ? m_depthOrArraySize : 1) };
 	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | additionalFlags;
 	// Ensure that the TRANSFER_DST bit is set for staging
 	if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
@@ -428,7 +442,7 @@ void Texture::Create(TextureInitializer& init)
 	ThrowIfFailed(vkBindImageMemory(device, image, m_resource, 0));
 
 	// Setup buffer copy regions for each mip level
-	uint32_t effectiveArraySize = m_type == TextureType::Texture3D ? 1 : m_depthOrArraySize;
+	uint32_t effectiveArraySize = m_type == ResourceType::Texture3D ? 1 : m_depthOrArraySize;
 	vector<VkBufferImageCopy> bufferCopyRegions(effectiveArraySize * m_numMips);
 	uint32_t offset = 0;
 
@@ -448,7 +462,7 @@ void Texture::Create(TextureInitializer& init)
 			bufferCopyRegion.imageSubresource.layerCount = 1;
 			bufferCopyRegion.imageExtent.width = width;
 			bufferCopyRegion.imageExtent.height = height;
-			bufferCopyRegion.imageExtent.depth = m_type == TextureType::Texture3D ? depth : 1;
+			bufferCopyRegion.imageExtent.depth = m_type == ResourceType::Texture3D ? depth : 1;
 			bufferCopyRegion.bufferOffset = offset;
 
 			bufferCopyRegions[index] = bufferCopyRegion;
@@ -486,7 +500,7 @@ void Texture::Create(TextureInitializer& init)
 	colorImageView.subresourceRange.baseMipLevel = 0;
 	colorImageView.subresourceRange.levelCount = m_numMips;
 	colorImageView.subresourceRange.baseArrayLayer = 0;
-	colorImageView.subresourceRange.layerCount = m_type == TextureType::Texture3D ? 1 : m_depthOrArraySize;
+	colorImageView.subresourceRange.layerCount = m_type == ResourceType::Texture3D ? 1 : m_depthOrArraySize;
 	colorImageView.image = m_resource;
 	ThrowIfFailed(vkCreateImageView(device, &colorImageView, nullptr, &m_imageView));
 }

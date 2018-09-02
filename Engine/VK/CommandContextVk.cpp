@@ -365,7 +365,7 @@ void CommandContext::TransitionResource(Texture& texture, ResourceState newState
 		barrierDesc.subresourceRange.baseMipLevel = 0;
 		barrierDesc.subresourceRange.levelCount = texture.GetNumMips();
 		barrierDesc.subresourceRange.baseArrayLayer = 0;
-		barrierDesc.subresourceRange.layerCount = texture.GetTextureType() == TextureType::Texture3D ? 1 : texture.GetArraySize();
+		barrierDesc.subresourceRange.layerCount = texture.GetType() == ResourceType::Texture3D ? 1 : texture.GetArraySize();
 
 		texture.m_layout = barrierDesc.newLayout;
 		texture.m_accessFlags = barrierDesc.dstAccessMask;
@@ -610,7 +610,7 @@ void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 
 void GraphicsContext::SetRootConstantBuffer(uint32_t rootIndex, ConstantBuffer& constantBuffer)
 {
-	VkDescriptorBufferInfo bufferInfo = constantBuffer.GetDescriptorInfo();
+	VkDescriptorBufferInfo bufferInfo = constantBuffer.GetCBV().GetHandle();
 	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, 0, 1, &bufferInfo);
 }
 
@@ -632,6 +632,6 @@ void ComputeContext::SetPipelineState(const ComputePSO& pso)
 
 void ComputeContext::SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer)
 {
-	VkDescriptorBufferInfo bufferInfo = constantBuffer.GetDescriptorInfo();
+	VkDescriptorBufferInfo bufferInfo = constantBuffer.GetCBV().GetHandle();
 	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, 0, 1, &bufferInfo);
 }

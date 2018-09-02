@@ -48,6 +48,12 @@ using InstanceHandle = VkHandle<VkInstance>::VkPointer;
 using DeviceHandle = VkHandle<VkDevice>::VkPointer;
 using ResourceHandle = VkResourceHandle::VkPointer;
 
+using SrvHandle = VkDescriptorBufferInfo;
+using UavHandle = VkDescriptorBufferInfo;
+struct IbvHandle {};
+struct VbvHandle {};
+using CbvHandle = VkDescriptorBufferInfo;
+
 static const uint32_t NumSwapChainBuffers = 3;
 
 } // namespace Kodiak

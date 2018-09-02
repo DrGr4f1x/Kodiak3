@@ -20,6 +20,7 @@ GpuResource::GpuResource()
 	: m_resource(nullptr)
 	, m_usageState(ResourceState::Undefined)
 	, m_transitioningState(ResourceState::Undefined)
+	, m_type(ResourceType::Unknown)
 {}
 
 
@@ -27,6 +28,7 @@ GpuResource::GpuResource(const ResourceHandle& resource, ResourceState initialSt
 	: m_resource(resource)
 	, m_usageState(initialState)
 	, m_transitioningState(ResourceState::Undefined)
+	, m_type(ResourceType::Unknown)
 {}
 
 

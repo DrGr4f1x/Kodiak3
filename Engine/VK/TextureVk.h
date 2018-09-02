@@ -24,7 +24,7 @@ class TextureInitializer
 	friend class Texture;
 
 public:
-	TextureInitializer(TextureType type, Format format, uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips)
+	TextureInitializer(ResourceType type, Format format, uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips)
 		: m_type(type)
 		, m_format(format)
 		, m_width(width)
@@ -50,12 +50,12 @@ private:
 	void Initialize();
 
 private:
-	TextureType	m_type;
-	Format m_format;
-	uint32_t m_width;
-	uint32_t m_height;
-	uint32_t m_depthOrArraySize;
-	uint32_t m_numMips;
+	ResourceType	m_type;
+	Format			m_format;
+	uint32_t		m_width;
+	uint32_t		m_height;
+	uint32_t		m_depthOrArraySize;
+	uint32_t		m_numMips;
 
 	std::unique_ptr<byte[]> m_data;
 	std::vector<size_t>		m_faceSize;
@@ -95,7 +95,6 @@ public:
 	uint32_t GetArraySize() const { return m_depthOrArraySize; }
 	uint32_t GetNumMips() const { return m_numMips; }
 	Format GetFormat() const { return m_format; }
-	TextureType GetTextureType() const { return m_type; }
 
 	static std::shared_ptr<Texture> Load(const std::string& filename, bool sRgb = false);
 	static std::shared_ptr<Texture> GetBlackTex2D();
@@ -124,7 +123,6 @@ protected:
 	uint32_t m_depthOrArraySize{ 0 };
 	uint32_t m_numMips{ 1 };
 	Format m_format{ Format::Unknown };
-	TextureType m_type;
 };
 
 using TexturePtr = std::shared_ptr<Texture>;

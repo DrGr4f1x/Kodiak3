@@ -14,11 +14,12 @@
 
 #include "BinaryReader.h"
 #include "Filesystem.h"
+#include "GraphicsDevice.h"
 #include "KTXTextureLoader.h"
 
 #include "CommandContext12.h"
 #include "DDSTextureLoader12.h"
-#include "GraphicsDevice.h"
+#include "Util12.h"
 
 
 using namespace Kodiak;
@@ -182,70 +183,7 @@ void GetSurfaceInfo(size_t width, size_t height, DXGI_FORMAT format, size_t& num
 }
 
 
-D3D12_UAV_DIMENSION GetUAVDimension(TextureType type, bool isArray)
-{
-	switch (type)
-	{
-	case TextureType::Texture1D:
-		return (isArray) ? D3D12_UAV_DIMENSION_TEXTURE1DARRAY : D3D12_UAV_DIMENSION_TEXTURE1D;
-	case TextureType::Texture2D:
-		return (isArray) ? D3D12_UAV_DIMENSION_TEXTURE2DARRAY : D3D12_UAV_DIMENSION_TEXTURE2D;
-	case TextureType::TextureCube:
-		return D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
-	default:
-		assert(false);
-		return D3D12_UAV_DIMENSION_UNKNOWN;
-	}
-}
 
-
-// TODO MSAA support here
-D3D12_SRV_DIMENSION GetSRVDimension(TextureType type)
-{
-	switch (type)
-	{
-	case TextureType::Texture1D:
-		return D3D12_SRV_DIMENSION_TEXTURE1D;
-	case TextureType::Texture1D_Array:
-		return D3D12_SRV_DIMENSION_TEXTURE1DARRAY;
-	case TextureType::Texture2D:
-		return D3D12_SRV_DIMENSION_TEXTURE2D;
-	case TextureType::Texture2D_Array:
-		return D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
-	case TextureType::Texture3D:
-		return D3D12_SRV_DIMENSION_TEXTURE3D;
-	case TextureType::TextureCube:
-		return D3D12_SRV_DIMENSION_TEXTURECUBE;
-	case TextureType::TextureCube_Array:
-		return D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
-	default:
-		assert(false);
-		return D3D12_SRV_DIMENSION_UNKNOWN;
-	}
-}
-
-
-D3D12_RESOURCE_DIMENSION GetResourceDimension(TextureType type)
-{
-	switch (type)
-	{
-	case TextureType::Texture1D:
-	case TextureType::Texture1D_Array:
-		return D3D12_RESOURCE_DIMENSION_TEXTURE1D;
-
-	case TextureType::Texture2D:
-	case TextureType::Texture2D_Array:
-	case TextureType::TextureCube:
-	case TextureType::TextureCube_Array:
-		return D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-
-	case TextureType::Texture3D:
-		return D3D12_RESOURCE_DIMENSION_TEXTURE3D;
-	default:
-		assert(false);
-		return D3D12_RESOURCE_DIMENSION_UNKNOWN;
-	}
-}
 
 } // anonymous namespace
 
@@ -310,7 +248,7 @@ Texture::Texture(D3D12_CPU_DESCRIPTOR_HANDLE handle)
 
 void Texture::Create1D(uint32_t width, Format format, const void* initData)
 {
-	TextureInitializer init(TextureType::Texture1D, format, width, 1, 1, 1);
+	TextureInitializer init(ResourceType::Texture1D, format, width, 1, 1, 1);
 	init.SetData(0, 0, initData);
 
 	Create(init);
@@ -319,7 +257,7 @@ void Texture::Create1D(uint32_t width, Format format, const void* initData)
 
 void Texture::Create2D(uint32_t width, uint32_t height, Format format, const void* initData)
 {
-	TextureInitializer init(TextureType::Texture2D, format, width, height, 1, 1);
+	TextureInitializer init(ResourceType::Texture2D, format, width, height, 1, 1);
 	init.SetData(0, 0, initData);
 
 	Create(init);
@@ -328,7 +266,7 @@ void Texture::Create2D(uint32_t width, uint32_t height, Format format, const voi
 
 void Texture::Create3D(uint32_t width, uint32_t height, uint32_t depth, Format format, const void* initData)
 {
-	TextureInitializer init(TextureType::Texture3D, format, width, height, depth, 1);
+	TextureInitializer init(ResourceType::Texture3D, format, width, height, depth, 1);
 	init.SetData(0, 0, initData);
 
 	Create(init);
@@ -371,7 +309,7 @@ void Texture::Create(TextureInitializer& init)
 
 	m_resource->SetName(L"Texture");
 
-	uint32_t arraySize = (init.m_type == TextureType::Texture3D) ? 1 : m_depthOrArraySize;
+	uint32_t arraySize = (init.m_type == ResourceType::Texture3D) ? 1 : m_depthOrArraySize;
 
 	CommandContext::InitializeTexture(*this, arraySize * m_numMips, init.m_data.data());
 
@@ -386,28 +324,28 @@ void Texture::Create(TextureInitializer& init)
 	SRVDesc.ViewDimension = GetSRVDimension(init.m_type);
 	switch (init.m_type)
 	{
-	case TextureType::Texture1D:
+	case ResourceType::Texture1D:
 		SRVDesc.Texture1D.MipLevels = (UINT)-1;
 		break;
-	case TextureType::Texture1D_Array:
+	case ResourceType::Texture1D_Array:
 		SRVDesc.Texture1DArray.MipLevels = (UINT)-1;
 		SRVDesc.Texture1DArray.ArraySize = m_depthOrArraySize;
 		break;
-	case TextureType::Texture2D:
+	case ResourceType::Texture2D:
 		SRVDesc.Texture2D.MipLevels = (UINT)-1;
 		break;
-	case TextureType::Texture2D_Array:
+	case ResourceType::Texture2D_Array:
 		SRVDesc.Texture2DArray.MipLevels = (UINT)-1;
 		SRVDesc.Texture2DArray.ArraySize = m_depthOrArraySize;
 		break;
-	case TextureType::TextureCube:
+	case ResourceType::TextureCube:
 		SRVDesc.TextureCube.MipLevels = (UINT)-1;
 		break;
-	case TextureType::TextureCube_Array:
+	case ResourceType::TextureCube_Array:
 		SRVDesc.TextureCubeArray.MipLevels = (UINT)-1;
 		SRVDesc.TextureCubeArray.NumCubes = m_depthOrArraySize;
 		break;
-	case TextureType::Texture3D:
+	case ResourceType::Texture3D:
 		SRVDesc.Texture3D.MipLevels = (UINT)-1;
 		break;
 	}

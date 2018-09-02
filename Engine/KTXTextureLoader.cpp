@@ -621,41 +621,41 @@ Format MapKTXFormatToEngine(uint32_t internalFormat, uint32_t format, uint32_t t
 }
 
 
-inline TextureType GetTarget(const KTXHeader10& header)
+inline ResourceType GetTarget(const KTXHeader10& header)
 {
 	if (header.numberOfFaces > 1)
 	{
 		if (header.numberOfArrayElements > 0)
 		{
-			return TextureType::TextureCube_Array;
+			return ResourceType::TextureCube_Array;
 		}
 		else
 		{
-			return TextureType::TextureCube;
+			return ResourceType::TextureCube;
 		}
 	}
 	else if (header.numberOfArrayElements > 0)
 	{
 		if (header.pixelHeight == 0)
 		{
-			return TextureType::Texture1D_Array;
+			return ResourceType::Texture1D_Array;
 		}
 		else
 		{
-			return TextureType::Texture2D_Array;
+			return ResourceType::Texture2D_Array;
 		}
 	}
 	else if (header.pixelHeight == 0)
 	{
-		return TextureType::Texture1D;
+		return ResourceType::Texture1D;
 	}
 	else if (header.pixelDepth > 0)
 	{
-		return TextureType::Texture3D;
+		return ResourceType::Texture3D;
 	}
 	else
 	{
-		return TextureType::Texture2D;
+		return ResourceType::Texture2D;
 	}
 }
 
@@ -708,7 +708,7 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 	}
 
 	auto target = GetTarget(header);
-	const bool isCubeMap = (target == TextureType::TextureCube || target == TextureType::TextureCube_Array);
+	const bool isCubeMap = (target == ResourceType::TextureCube || target == ResourceType::TextureCube_Array);
 
 	// Bound sizes (for security purposes we don't trust KTX file metadata larger than the D3D 11.x hardware requirements)
 	if (numMips > Limits::MaxTextureMipLevels)
@@ -718,8 +718,8 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 
 	switch (target)
 	{
-	case TextureType::Texture1D:
-	case TextureType::Texture1D_Array:
+	case ResourceType::Texture1D:
+	case ResourceType::Texture1D_Array:
 		if ((header.numberOfArrayElements > Limits::MaxTexture1DArrayElements) ||
 			(header.pixelWidth > Limits::MaxTextureDimension1D))
 		{
@@ -727,8 +727,8 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 		}
 		break;
 
-	case TextureType::Texture2D:
-	case TextureType::Texture2D_Array:
+	case ResourceType::Texture2D:
+	case ResourceType::Texture2D_Array:
 		if ((arraySize > Limits::MaxTexture2DArrayElements) ||
 			(header.pixelWidth > Limits::MaxTextureDimension2D) ||
 			(header.pixelHeight > Limits::MaxTextureDimension2D))
@@ -737,8 +737,8 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 		}
 		break;
 
-	case TextureType::TextureCube:
-	case TextureType::TextureCube_Array:
+	case ResourceType::TextureCube:
+	case ResourceType::TextureCube_Array:
 		// This is the right bound because we set arraySize to (NumCubes*6) above
 		if ((arraySize > Limits::MaxTexture2DArrayElements) ||
 			(header.pixelWidth > Limits::MaxTextureDimensionCube) ||
@@ -748,7 +748,7 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 		}
 		break;
 
-	case TextureType::Texture3D:
+	case ResourceType::Texture3D:
 		if ((arraySize > 1) ||
 			(header.pixelWidth > Limits::MaxTextureDimension3D) ||
 			(header.pixelHeight > Limits::MaxTextureDimension3D) ||

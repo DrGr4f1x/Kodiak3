@@ -55,6 +55,12 @@ using ResourceHandle = ID3D12ResourcePtr;
 using DeviceHandle = ID3D12DevicePtr;
 using SwapChainHandle = IDXGISwapChain1Ptr;
 
+using SrvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
+using UavHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
+using VbvHandle = D3D12_VERTEX_BUFFER_VIEW;
+using IbvHandle = D3D12_INDEX_BUFFER_VIEW;
+using CbvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
+
 static const uint32_t NumSwapChainBuffers = 3;
 
 } // namespace Kodiak

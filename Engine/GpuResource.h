@@ -25,10 +25,13 @@ public:
 	GpuResource(const ResourceHandle& resource, ResourceState initialState);
 	virtual ~GpuResource() = 0;
 
+	const ResourceType GetType() const { return m_type; }
+
 protected:
-	ResourceHandle m_resource;
-	ResourceState m_usageState;
-	ResourceState m_transitioningState;
+	ResourceHandle	m_resource;
+	ResourceState	m_usageState;
+	ResourceState	m_transitioningState;
+	ResourceType	m_type;
 };
 
 } // namespace Kodiak

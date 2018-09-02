@@ -11,10 +11,11 @@
 #pragma once
 
 #include "Color.h"
+#include "GpuBuffer.h"
+
 #include "ColorBuffer12.h"
 #include "DepthBuffer12.h"
 #include "DynamicDescriptorHeap12.h"
-#include "GpuBuffer12.h"
 #include "LinearAllocator12.h"
 #include "PipelineState12.h"
 #include "RootSignature12.h"
@@ -298,13 +299,14 @@ inline void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 
 inline void GraphicsContext::SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer)
 {
-	m_commandList->SetGraphicsRootConstantBufferView(rootIndex, constantBuffer.RootConstantBufferView());
+	m_commandList->SetGraphicsRootConstantBufferView(rootIndex, constantBuffer.GetGpuAddress());
 }
 
 
 inline void GraphicsContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer)
 {
-	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &constantBuffer.GetCBV());
+	D3D12_CPU_DESCRIPTOR_HANDLE handles[] = { constantBuffer.GetCBV().GetHandle() };
+	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, handles);
 }
 
 
@@ -328,13 +330,13 @@ inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const D
 
 inline void GraphicsContext::SetIndexBuffer(const IndexBuffer& indexBuffer)
 {
-	m_commandList->IASetIndexBuffer(&indexBuffer.GetIBV());
+	m_commandList->IASetIndexBuffer(&indexBuffer.GetIBV().GetHandle());
 }
 
 
 inline void GraphicsContext::SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer)
 {
-	D3D12_VERTEX_BUFFER_VIEW vbv[1] = { vertexBuffer.GetVBV() };
+	D3D12_VERTEX_BUFFER_VIEW vbv[1] = { vertexBuffer.GetVBV().GetHandle() };
 	m_commandList->IASetVertexBuffers(slot, 1, vbv);
 }
 
@@ -344,7 +346,7 @@ inline void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count
 	std::vector<D3D12_VERTEX_BUFFER_VIEW> vbv(count);
 	for (uint32_t i = 0; i < count; ++i)
 	{
-		vbv[i] = vertexBuffers[i].GetVBV();
+		vbv[i] = vertexBuffers[i].GetVBV().GetHandle();
 	}
 	m_commandList->IASetVertexBuffers(startSlot, 1, vbv.data());
 }
@@ -415,13 +417,14 @@ inline void ComputeContext::SetPipelineState(const ComputePSO& pso)
 
 inline void ComputeContext::SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer)
 {
-	m_commandList->SetComputeRootConstantBufferView(rootIndex, constantBuffer.RootConstantBufferView());
+	m_commandList->SetComputeRootConstantBufferView(rootIndex, constantBuffer.GetGpuAddress());
 }
 
 
 inline void ComputeContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer)
 {
-	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &constantBuffer.GetCBV());
+	D3D12_CPU_DESCRIPTOR_HANDLE handles[] = { constantBuffer.GetCBV().GetHandle() };
+	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, handles);
 }
 
 

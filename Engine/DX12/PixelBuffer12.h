@@ -35,11 +35,6 @@ protected:
 
 	void CreateTextureResource(const std::string& name, const D3D12_RESOURCE_DESC& resourceDesc, D3D12_CLEAR_VALUE clearValue);
 
-	static DXGI_FORMAT GetBaseFormat(DXGI_FORMAT format);
-	static DXGI_FORMAT GetUAVFormat(DXGI_FORMAT format);
-	static DXGI_FORMAT GetDSVFormat(DXGI_FORMAT format);
-	static DXGI_FORMAT GetDepthFormat(DXGI_FORMAT format);
-	static DXGI_FORMAT GetStencilFormat(DXGI_FORMAT format);
 	static size_t BytesPerPixel(DXGI_FORMAT format);
 
 protected:
