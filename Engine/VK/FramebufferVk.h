@@ -11,7 +11,7 @@
 #pragma once
 
 #include "ColorBufferVk.h"
-#include "DepthBufferVk.h"
+#include "DepthBuffer.h"
 
 namespace Kodiak
 {

@@ -375,21 +375,21 @@ void GraphicsContext::ClearColor(ColorBuffer& target)
 void GraphicsContext::ClearDepth(DepthBuffer& target)
 {
 	FlushResourceBarriers();
-	m_commandList->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_DEPTH, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
+	m_commandList->ClearDepthStencilView(target.GetDSV().GetHandle(), D3D12_CLEAR_FLAG_DEPTH, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
 }
 
 
 void GraphicsContext::ClearStencil(DepthBuffer& target)
 {
 	FlushResourceBarriers();
-	m_commandList->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_STENCIL, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
+	m_commandList->ClearDepthStencilView(target.GetDSV().GetHandle(), D3D12_CLEAR_FLAG_STENCIL, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
 }
 
 
 void GraphicsContext::ClearDepthAndStencil(DepthBuffer& target)
 {
 	FlushResourceBarriers();
-	m_commandList->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
+	m_commandList->ClearDepthStencilView(target.GetDSV().GetHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
 }
 
 
@@ -475,7 +475,7 @@ void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer
 		RTVs[i] = m_renderTargets[i]->GetRTV();
 		TransitionResource(*m_renderTargets[i], ResourceState::RenderTarget);
 	}
-	DSV = m_depthTarget->GetDSV();
+	DSV = m_depthTarget->GetDSV().GetHandle();
 	TransitionResource(*m_depthTarget, ResourceState::DepthWrite);
 
 	FlushResourceBarriers();
@@ -566,7 +566,7 @@ void GraphicsContext::SetRenderTarget(const ColorBuffer& colorBuffer)
 void GraphicsContext::SetRenderTarget(const ColorBuffer& colorBuffer, const DepthBuffer& depthBuffer)
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvs[] = { colorBuffer.GetRTV() };
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = depthBuffer.GetDSV();
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = depthBuffer.GetDSV().GetHandle();
 	m_commandList->OMSetRenderTargets(1, rtvs, FALSE, &dsv);
 }
 

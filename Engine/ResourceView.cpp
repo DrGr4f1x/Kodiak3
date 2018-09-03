@@ -44,3 +44,13 @@ ResourceViewDesc Kodiak::DescribeConstantBuffer(size_t bufferSize)
 
 	return resDesc;
 }
+
+
+ResourceViewDesc Kodiak::DescribeDepthStencil(Format format)
+{
+	ResourceViewDesc resDesc = {};
+	resDesc.format = format;
+	resDesc.mipCount = 1;
+
+	return resDesc;
+}

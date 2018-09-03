@@ -61,6 +61,8 @@ using VbvHandle = D3D12_VERTEX_BUFFER_VIEW;
 using IbvHandle = D3D12_INDEX_BUFFER_VIEW;
 using CbvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
 
+using DsvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
+
 static const uint32_t NumSwapChainBuffers = 3;
 
 } // namespace Kodiak

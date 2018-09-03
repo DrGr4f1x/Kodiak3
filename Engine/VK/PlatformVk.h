@@ -54,6 +54,8 @@ struct IbvHandle {};
 struct VbvHandle {};
 using CbvHandle = VkDescriptorBufferInfo;
 
+using DsvHandle = VkHandle<VkImageView>::VkPointer;
+
 static const uint32_t NumSwapChainBuffers = 3;
 
 } // namespace Kodiak

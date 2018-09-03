@@ -31,10 +31,21 @@ ShaderResourceView::ShaderResourceView()
 
 void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType type, const ResourceViewDesc& desc)
 {
+	DXGI_FORMAT dxFormat = static_cast<DXGI_FORMAT>(desc.format);
+
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.ViewDimension = GetSRVDimension(type);
-	srvDesc.Format = static_cast<DXGI_FORMAT>(desc.format);
+	srvDesc.Format = dxFormat;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+	if (desc.isDepth)
+	{
+		srvDesc.Format = GetDepthFormat(srvDesc.Format);
+	}
+	else if (desc.isStencil)
+	{
+		srvDesc.Format = GetStencilFormat(srvDesc.Format);
+	}
 
 	switch (type)
 	{
@@ -47,6 +58,10 @@ void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType typ
 		break;
 	case ResourceType::Texture2D:
 		srvDesc.Texture2D.MipLevels = desc.mipCount;
+		if (desc.isStencil)
+		{	
+			srvDesc.Texture2D.PlaneSlice = (srvDesc.Format == DXGI_FORMAT_X32_TYPELESS_G8X24_UINT) ? 1 : 0;
+		}
 		break;
 	case ResourceType::Texture2D_Array:
 		srvDesc.Texture2DArray.MipLevels = desc.mipCount;
@@ -201,4 +216,46 @@ void ConstantBufferView::Create(const ResourceHandle& resource, const ResourceVi
 
 	m_handle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	GetDevice()->CreateConstantBufferView(&cbvDesc, m_handle);
+}
+
+
+DepthStencilView::DepthStencilView()
+{
+	m_handle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+}
+
+
+void DepthStencilView::Create(const ResourceHandle& resource, const DepthStencilViewDesc& desc)
+{
+	DXGI_FORMAT dxFormat = static_cast<DXGI_FORMAT>(desc.format);
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+	dsvDesc.Format = GetDSVFormat(dxFormat);
+
+	if (resource->GetDesc().SampleDesc.Count == 1)
+	{
+		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+		dsvDesc.Texture2D.MipSlice = 0;
+	}
+	else
+	{
+		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DMS;
+	}
+
+	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+	if (desc.readOnlyDepth && desc.readOnlyStencil)
+	{
+		dsvDesc.Flags = D3D12_DSV_FLAG_READ_ONLY_DEPTH | D3D12_DSV_FLAG_READ_ONLY_STENCIL;
+	}
+	else if (desc.readOnlyDepth)
+	{
+		dsvDesc.Flags = D3D12_DSV_FLAG_READ_ONLY_DEPTH;
+	}
+	else if (desc.readOnlyStencil)
+	{
+		dsvDesc.Flags = D3D12_DSV_FLAG_READ_ONLY_STENCIL;
+	}
+	
+	m_handle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	GetDevice()->CreateDepthStencilView(resource, &dsvDesc, m_handle);
 }

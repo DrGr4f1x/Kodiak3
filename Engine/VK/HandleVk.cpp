@@ -67,8 +67,19 @@ template<> VkHandle<VkDevice>::~VkHandle()
 }
 
 
+template<> VkHandle<VkImageView>::~VkHandle()
+{
+	if (m_wrapped != VK_NULL_HANDLE)
+	{
+		vkDestroyImageView(GetDevice(), m_wrapped, nullptr);
+		m_wrapped = VK_NULL_HANDLE;
+	}
+}
+
+
 // Instantiate templates to avoid linker issues
 template VkHandle<VkInstance>::~VkHandle();
 template VkHandle<VkDevice>::~VkHandle();
+template VkHandle<VkImageView>::~VkHandle();
 
 } // namespace Kodiak

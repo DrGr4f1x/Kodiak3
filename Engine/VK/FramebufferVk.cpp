@@ -13,7 +13,6 @@
 #include "FramebufferVk.h"
 
 #include "ColorBufferVk.h"
-#include "DepthBufferVk.h"
 #include "GraphicsDevice.h"
 #include "RenderPassVk.h"
 
@@ -117,7 +116,7 @@ void FrameBuffer::Finalize(RenderPass& renderPass)
 
 	if (m_depthBuffer)
 	{
-		attachments[curAttachment] = m_depthBuffer->GetDSV();
+		attachments[curAttachment] = m_depthBuffer->GetDSV().GetHandle();
 		++curAttachment;
 	}
 

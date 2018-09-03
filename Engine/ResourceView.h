@@ -23,13 +23,15 @@ struct ResourceViewDesc
 	uint32_t bufferSize;
 	uint32_t elementCount;
 	uint32_t elementSize;
+	bool isDepth;
+	bool isStencil;
 };
 
 
 ResourceViewDesc DescribeIndexBuffer(size_t elementSize, size_t bufferSize);
 ResourceViewDesc DescribeVertexBuffer(size_t elementSize, size_t elementCount, size_t bufferSize);
 ResourceViewDesc DescribeConstantBuffer(size_t bufferSize);
-
+ResourceViewDesc DescribeDepthStencil(Format format);
 
 class ShaderResourceView
 {
@@ -98,6 +100,28 @@ public:
 
 private:
 	CbvHandle m_handle;
+};
+
+
+struct DepthStencilViewDesc
+{
+	Format format;
+	bool readOnlyDepth;
+	bool readOnlyStencil;
+};
+
+
+class DepthStencilView
+{
+public:
+	DepthStencilView();
+
+	void Create(const ResourceHandle& resource, const DepthStencilViewDesc& desc);
+
+	const DsvHandle& GetHandle() const { return m_handle; }
+
+private:
+	DsvHandle m_handle;
 };
 
 } // namespace Kodiak

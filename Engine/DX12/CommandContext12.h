@@ -13,8 +13,9 @@
 #include "Color.h"
 #include "GpuBuffer.h"
 
+#include "DepthBuffer.h"
+
 #include "ColorBuffer12.h"
-#include "DepthBuffer12.h"
 #include "DynamicDescriptorHeap12.h"
 #include "LinearAllocator12.h"
 #include "PipelineState12.h"
@@ -324,7 +325,8 @@ inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const C
 
 inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer)
 {
-	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &depthBuffer.GetDepthSRV());
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = depthBuffer.GetDepthSRV().GetHandle();
+	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &handle);
 }
 
 
@@ -442,7 +444,8 @@ inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Co
 
 inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer)
 {
-	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &depthBuffer.GetDepthSRV());
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = depthBuffer.GetDepthSRV().GetHandle();
+	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &handle);
 }
 
 

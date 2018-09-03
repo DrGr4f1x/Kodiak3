@@ -11,10 +11,10 @@
 #pragma once
 
 #include "Color.h"
+#include "DepthBuffer.h"
 #include "GpuBuffer.h"
 
 #include "ColorBufferVk.h"
-#include "DepthBufferVk.h"
 #include "DynamicDescriptorPoolVk.h"
 #include "FramebufferVk.h"
 #include "TextureVk.h"
