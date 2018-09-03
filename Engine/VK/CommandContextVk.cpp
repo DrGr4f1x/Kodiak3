@@ -410,7 +410,7 @@ void CommandContext::TransitionResource(ColorBuffer& colorBuffer, ResourceState 
 		barrierDesc.image = colorBuffer.m_resource;
 
 		// Setup access flags and layout 
-		barrierDesc.srcAccessMask = colorBuffer.m_accessFlags;
+		barrierDesc.srcAccessMask = colorBuffer.GetAccessFlags();
 		barrierDesc.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
 		switch (barrierDesc.oldLayout)
@@ -476,8 +476,8 @@ void CommandContext::TransitionResource(ColorBuffer& colorBuffer, ResourceState 
 		barrierDesc.subresourceRange.baseArrayLayer = 0;
 		barrierDesc.subresourceRange.layerCount = colorBuffer.GetArraySize();
 
-		colorBuffer.m_layout = barrierDesc.newLayout;
-		colorBuffer.m_accessFlags = barrierDesc.dstAccessMask;
+		colorBuffer.SetLayout(barrierDesc.newLayout);
+		colorBuffer.SetAccessFlags(barrierDesc.dstAccessMask);
 		colorBuffer.m_usageState = newState;
 	}
 	else if (newState == ResourceState::UnorderedAccess)

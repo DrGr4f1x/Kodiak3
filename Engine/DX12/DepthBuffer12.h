@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "PixelBuffer12.h"
+#include "PixelBuffer.h"
 
 namespace Kodiak
 {
@@ -32,6 +32,8 @@ public:
 		m_depthSRV.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 		m_stencilSRV.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	}
+
+	~DepthBuffer();
 
 	void Create(const std::string& name, uint32_t width, uint32_t height, Format format);
 	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numSamples, Format format);

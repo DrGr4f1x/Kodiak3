@@ -14,25 +14,24 @@
 
 #include "GraphicsDevice.h"
 
+#include "UtilVk.h"
+
+
 using namespace Kodiak;
+using namespace std;
 
 
-void ColorBuffer::Destroy()
+ColorBuffer::~ColorBuffer()
 {
 	vkDestroyImageView(GetDevice(), m_imageView, nullptr);
 	m_imageView = VK_NULL_HANDLE;
 	
-	if (m_ownsImage)
-	{
-		PixelBuffer::Destroy();
-	}
+	g_graphicsDevice->ReleaseResource(m_resource);
 }
 
 
-void ColorBuffer::CreateFromSwapChain(const std::string& name, VkImage baseImage, uint32_t width, uint32_t height, Format format)
+void ColorBuffer::CreateFromSwapChain(const string& name, VkImage baseImage, uint32_t width, uint32_t height, Format format)
 {
-	m_ownsImage = false;
-
 	m_resource = ResourceHandle::Create(baseImage, VK_NULL_HANDLE, false);
 	
 	// TODO
@@ -47,11 +46,9 @@ void ColorBuffer::CreateFromSwapChain(const std::string& name, VkImage baseImage
 }
 
 
-void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips, Format format)
+void ColorBuffer::Create(const string& name, uint32_t width, uint32_t height, uint32_t numMips, Format format)
 {
 	numMips = (numMips == 0 ? ComputeNumMips(width, height) : numMips);
-
-	m_ownsImage = true;
 
 	m_width = width;
 	m_height = height;
@@ -63,7 +60,12 @@ void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 	const VkImageUsageFlags flags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
 
 	auto imageCreateInfo = DescribeTex2D(width, height, arraySize, numMips, numSamples, format, flags);
-	CreateTextureResource(name, imageCreateInfo);
+	m_width = imageCreateInfo.extent.width;
+	m_height = imageCreateInfo.extent.height;
+	m_arraySize = imageCreateInfo.arrayLayers;
+
+	m_resource = CreateTextureResource(name, imageCreateInfo);
+
 	CreateDerivedViews(format, 1, numMips);
 }
 

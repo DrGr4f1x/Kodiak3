@@ -1,20 +1,71 @@
+//
 // This code is licensed under the MIT License (MIT).
 // THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
 // IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
 // PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 //
-// Author: David Elder
+// Author:  David Elder
 //
 
 #include "Stdafx.h"
 
-#include "PixelBufferVk.h"
+#include "UtilVk.h"
 
 #include "GraphicsDevice.h"
 
 
-using namespace Kodiak;
+namespace Kodiak
+{
+
+VkImageCreateInfo DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips,
+	uint32_t numSamples, Format format, VkImageUsageFlags usageFlags)
+{
+	VkImageCreateInfo imageCreateInfo = {};
+	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	imageCreateInfo.pNext = nullptr;
+	imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+	imageCreateInfo.format = static_cast<VkFormat>(format);
+	imageCreateInfo.extent = { width, height, 1 };
+	imageCreateInfo.mipLevels = numMips;
+	imageCreateInfo.arrayLayers = depthOrArraySize;
+	imageCreateInfo.samples = SamplesToFlags(numSamples);
+	imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	imageCreateInfo.usage = usageFlags;
+	imageCreateInfo.flags = 0;
+
+	return imageCreateInfo;
+}
+
+
+ResourceHandle CreateTextureResource(const std::string& name, const VkImageCreateInfo& imageCreateInfo)
+{
+	VkDevice device = GetDevice();
+
+	VkImage image{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkCreateImage(device, &imageCreateInfo, nullptr, &image));
+
+	VkMemoryRequirements memReqs = {};
+	vkGetImageMemoryRequirements(device, image, &memReqs);
+
+	VkMemoryAllocateInfo memoryAllocateInfo = {};
+	memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	memoryAllocateInfo.pNext = nullptr;
+	memoryAllocateInfo.allocationSize = memReqs.size;
+	memoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+	VkDeviceMemory mem{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &mem));
+	ResourceHandle handle = ResourceHandle::Create(image, mem);
+
+	ThrowIfFailed(vkBindImageMemory(device, image, handle, 0));
+
+	// TODO
+	//SetDebugName(m_image, name + " image");
+	//SetDebugName(*m_resource, name + " memory");
+
+	return handle;
+}
 
 
 VkSampleCountFlagBits Kodiak::SamplesToFlags(uint32_t numSamples)
@@ -41,61 +92,4 @@ VkSampleCountFlagBits Kodiak::SamplesToFlags(uint32_t numSamples)
 	}
 }
 
-
-void PixelBuffer::Destroy()
-{
-	// TODO
-	m_resource = nullptr;
-}
-
-
-VkImageCreateInfo PixelBuffer::DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips, 
-	uint32_t numSamples, Format format, VkImageUsageFlags usageFlags)
-{
-	VkImageCreateInfo imageCreateInfo = {};
-	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-	imageCreateInfo.pNext = nullptr;
-	imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-	imageCreateInfo.format = static_cast<VkFormat>(format);
-	imageCreateInfo.extent = { width, height, 1 };
-	imageCreateInfo.mipLevels = numMips;
-	imageCreateInfo.arrayLayers = depthOrArraySize;
-	imageCreateInfo.samples = SamplesToFlags(numSamples);
-	imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-	imageCreateInfo.usage = usageFlags;
-	imageCreateInfo.flags = 0;
-
-	return imageCreateInfo;
-}
-
-
-void PixelBuffer::CreateTextureResource(const std::string& name, const VkImageCreateInfo& imageCreateInfo)
-{
-	m_width = imageCreateInfo.extent.width;
-	m_height = imageCreateInfo.extent.height;
-	m_arraySize = imageCreateInfo.arrayLayers;
-
-	VkDevice device = GetDevice();
-
-	VkImage image{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateImage(device, &imageCreateInfo, nullptr, &image));
-
-	VkMemoryRequirements memReqs = {};
-	vkGetImageMemoryRequirements(device, image, &memReqs);
-
-	VkMemoryAllocateInfo memoryAllocateInfo = {};
-	memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	memoryAllocateInfo.pNext = nullptr;
-	memoryAllocateInfo.allocationSize = memReqs.size;
-	memoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-	VkDeviceMemory mem{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &mem));
-	m_resource = ResourceHandle::Create(image, mem);
-
-	ThrowIfFailed(vkBindImageMemory(device, image, m_resource, 0));
-
-	// TODO
-	//SetDebugName(m_image, name + " image");
-	//SetDebugName(*m_resource, name + " memory");
-}
+} // namespace Kodiak

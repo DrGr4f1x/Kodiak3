@@ -15,7 +15,7 @@
 
 #include "Color.h"
 
-#include "PixelBuffer12.h"
+#include "PixelBuffer.h"
 
 namespace Kodiak
 {
@@ -35,8 +35,10 @@ public:
 		std::memset(m_uavHandle, 0xFF, sizeof(m_uavHandle));
 	}
 
+	~ColorBuffer();
+
 	// Create a color buffer from a swap chain buffer.  Unordered access is restricted.
-	void CreateFromSwapChain(const std::string& name, ID3D12Resource* baseResource);
+	void CreateFromSwapChain(const std::string& name, const ResourceHandle& baseResource);
 
 	// Create a color buffer.
 	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips,	Format format);

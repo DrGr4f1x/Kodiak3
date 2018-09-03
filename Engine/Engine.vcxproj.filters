@@ -99,12 +99,6 @@
     <ClInclude Include="PixelBuffer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="DX12\PixelBuffer12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\PixelBufferVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
     <ClInclude Include="DX12\ColorBuffer12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
@@ -217,6 +211,9 @@
     <ClInclude Include="DX12\Util12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
+    <ClInclude Include="VK\UtilVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -278,12 +275,6 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="BinaryReader.cpp" />
-    <ClCompile Include="DX12\PixelBuffer12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\PixelBufferVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
     <ClCompile Include="DX12\ColorBuffer12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
@@ -373,6 +364,9 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="VK\ResourceViewVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\UtilVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
   </ItemGroup>

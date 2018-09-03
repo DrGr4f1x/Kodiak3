@@ -306,7 +306,7 @@ inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Co
 {
 	VkDescriptorImageInfo descriptorInfo = {};
 	descriptorInfo.imageView = colorBuffer.GetSRV();
-	descriptorInfo.imageLayout = colorBuffer.m_layout;
+	descriptorInfo.imageLayout = colorBuffer.GetLayout();
 	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
 }
 

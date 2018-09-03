@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "PixelBufferVk.h"
+#include "PixelBuffer.h"
 
 namespace Kodiak
 {
@@ -23,9 +23,7 @@ public:
 		, m_clearStencil(clearStencil)
 	{}
 
-	~DepthBuffer() { Destroy(); }
-
-	void Destroy();
+	~DepthBuffer();
 
 	void Create(const std::string& name, uint32_t width, uint32_t height, Format format);
 	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numSamples, Format format);

@@ -25,6 +25,12 @@ using namespace Kodiak;
 using namespace std;
 
 
+DepthBuffer::~DepthBuffer()
+{
+	g_graphicsDevice->ReleaseResource(m_resource);
+}
+
+
 void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t height, Format format)
 {
 	const uint32_t arraySize = 1;
@@ -32,12 +38,20 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 	const uint32_t numSamples = 1;
 	auto resourceDesc = DescribeTex2D(width, height, arraySize, numMips, numSamples, format, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
 
+	m_width = width;
+	m_height = height;
+	m_arraySize = 1;
+	m_numSamples = numSamples;
+	m_format = format;
+
 	D3D12_CLEAR_VALUE clearValue = {};
 	clearValue.Format = static_cast<DXGI_FORMAT>(format);
 	clearValue.DepthStencil.Depth = m_clearDepth;
 	clearValue.DepthStencil.Stencil = m_clearStencil;
 
-	CreateTextureResource(name, resourceDesc, clearValue);
+	m_usageState = ResourceState::Common;
+	m_resource = CreateTextureResource(name, resourceDesc, clearValue);
+
 	CreateDerivedViews(format);
 }
 
@@ -48,12 +62,20 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 	const uint32_t numMips = 1;
 	auto resourceDesc = DescribeTex2D(width, height, arraySize, numMips, samples, format, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
 
+	m_width = width;
+	m_height = height;
+	m_arraySize = 1;
+	m_numSamples = samples;
+	m_format = format;
+
 	D3D12_CLEAR_VALUE clearValue = {};
 	clearValue.Format = static_cast<DXGI_FORMAT>(format);
 	clearValue.DepthStencil.Depth = m_clearDepth;
 	clearValue.DepthStencil.Stencil = m_clearStencil;
 
-	CreateTextureResource(name, resourceDesc, clearValue);
+	m_usageState = ResourceState::Common;
+	m_resource = CreateTextureResource(name, resourceDesc, clearValue);
+
 	CreateDerivedViews(format);
 }
 

@@ -10,10 +10,27 @@
 
 #pragma once
 
-#if defined(DX12)
-#include "DX12\PixelBuffer12.h"
-#elif defined(VK)
-#include "VK\PixelBufferVk.h"
-#else
-#error "No graphics API defined"
-#endif
+#include "GpuResource.h"
+
+namespace Kodiak
+{
+
+class PixelBuffer : public GpuResource
+{
+public:
+	uint32_t GetWidth() const { return m_width; }
+	uint32_t GetHeight() const { return m_height; }
+	uint32_t GetDepth() const { return m_arraySize; }
+	uint32_t GetArraySize() const { return m_arraySize; }
+	uint32_t GetNumSamples() const { return m_numSamples; }
+	Format GetFormat() const { return m_format; }
+
+protected:
+	uint32_t m_width{ 0 };
+	uint32_t m_height{ 0 };
+	uint32_t m_arraySize{ 0 };
+	uint32_t m_numSamples{ 1 };
+	Format m_format{ Format::Unknown };
+};
+
+} // namespace Kodiak

@@ -16,9 +16,11 @@
 #include "Shader.h"
 
 #include "GraphicsDevice.h"
-#include "PixelBufferVk.h"
+#include "PixelBuffer.h"
+
 #include "RenderPassVk.h"
 #include "RootSignatureVk.h"
+#include "UtilVk.h"
 
 
 using namespace Kodiak;

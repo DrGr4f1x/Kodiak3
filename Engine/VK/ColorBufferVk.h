@@ -11,7 +11,7 @@
 #pragma once
 
 #include "Color.h"
-#include "PixelBufferVk.h"
+#include "PixelBuffer.h"
 
 namespace Kodiak
 {
@@ -23,9 +23,7 @@ public:
 		: m_clearColor(clearColor), m_numMipMaps(0)
 	{}
 
-	~ColorBuffer() { Destroy(); }
-
-	void Destroy();
+	~ColorBuffer();
 
 	// Create a color buffer from a swap chain buffer.  Unordered access is restricted.
 	void CreateFromSwapChain(const std::string& name, VkImage baseImage, uint32_t width, uint32_t height, Format format);
@@ -42,8 +40,14 @@ public:
 	{
 		assert(numCoverageSamples >= numColorSamples);
 		m_fragmentCount = numColorSamples;
-		m_sampleCount = numCoverageSamples;
+		m_numSamples = numCoverageSamples;
 	}
+
+	void SetLayout(VkImageLayout layout) { m_layout = layout; }
+	VkImageLayout GetLayout() const { return m_layout; }
+
+	void SetAccessFlags(VkAccessFlags flags) { m_accessFlags = flags; }
+	VkAccessFlags GetAccessFlags() const { return m_accessFlags; }
 
 protected:
 	// Compute the number of texture levels needed to reduce to 1x1.  This uses
@@ -62,8 +66,9 @@ protected:
 	VkImageView		m_imageView{ VK_NULL_HANDLE };
 	uint32_t		m_numMipMaps;
 	uint32_t		m_fragmentCount{ 1 };
-	uint32_t		m_sampleCount{ 1 };
-	bool			m_ownsImage{ true };
+
+	VkImageLayout	m_layout{ VK_IMAGE_LAYOUT_GENERAL };
+	VkAccessFlags	m_accessFlags{ 0 };
 
 private:
 	void CreateDerivedViews(Format format, uint32_t arraySize, uint32_t numMips = 1);

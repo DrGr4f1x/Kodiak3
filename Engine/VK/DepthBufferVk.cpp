@@ -14,11 +14,13 @@
 
 #include "GraphicsDevice.h"
 
+#include "UtilVk.h"
+
 
 using namespace Kodiak;
 
 
-void DepthBuffer::Destroy()
+DepthBuffer::~DepthBuffer()
 {
 	if (m_dsv != VK_NULL_HANDLE)
 	{
@@ -26,7 +28,7 @@ void DepthBuffer::Destroy()
 		m_dsv = VK_NULL_HANDLE;
 	}
 
-	PixelBuffer::Destroy();
+	g_graphicsDevice->ReleaseResource(m_resource);
 }
 
 
@@ -38,8 +40,15 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 	const uint32_t numMips = 1;
 	const uint32_t numSamples = 1;
 	const VkImageUsageFlags flags = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+
 	auto imageCreateInfo = DescribeTex2D(width, height, arraySize, numMips, numSamples, format, flags);
-	CreateTextureResource(name, imageCreateInfo);
+
+	m_width = imageCreateInfo.extent.width;
+	m_height = imageCreateInfo.extent.height;
+	m_arraySize = imageCreateInfo.arrayLayers;
+
+	m_resource = CreateTextureResource(name, imageCreateInfo);
+
 	CreateDerivedViews(format);
 }
 
@@ -51,8 +60,15 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 	const uint32_t arraySize = 1;
 	const uint32_t numMips = 1;
 	const VkImageUsageFlags flags = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+
 	auto imageCreateInfo = DescribeTex2D(width, height, arraySize, numMips, numSamples, format, flags);
-	CreateTextureResource(name, imageCreateInfo);
+
+	m_width = imageCreateInfo.extent.width;
+	m_height = imageCreateInfo.extent.height;
+	m_arraySize = imageCreateInfo.arrayLayers;
+
+	m_resource = CreateTextureResource(name, imageCreateInfo);
+
 	CreateDerivedViews(format);
 }
 
