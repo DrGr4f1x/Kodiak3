@@ -13,32 +13,43 @@
 namespace Kodiak
 {
 
-struct ResourceViewDesc
+struct TextureViewDesc
 {
 	Format format;
 	uint32_t arraySize;
 	uint32_t firstArraySlice;
 	uint32_t mipCount;
 	uint32_t mipLevel;
-	uint32_t bufferSize;
-	uint32_t elementCount;
-	uint32_t elementSize;
 	bool isDepth;
 	bool isStencil;
 };
 
 
-ResourceViewDesc DescribeIndexBuffer(size_t elementSize, size_t bufferSize);
-ResourceViewDesc DescribeVertexBuffer(size_t elementSize, size_t elementCount, size_t bufferSize);
-ResourceViewDesc DescribeConstantBuffer(size_t bufferSize);
-ResourceViewDesc DescribeDepthStencil(Format format);
+struct BufferViewDesc
+{
+	Format format;
+	uint32_t bufferSize;
+	uint32_t elementCount;
+	uint32_t elementSize;
+};
+
+
+struct TypedBufferViewDesc
+{
+	Format format;
+	uint32_t bufferSize;
+	uint32_t elementCount;
+	uint32_t elementSize;
+};
+
 
 class ShaderResourceView
 {
 public:
 	ShaderResourceView();
 
-	void Create(const ResourceHandle& resource, ResourceType type, const ResourceViewDesc& desc);
+	void Create(const ResourceHandle& resource, ResourceType type, const TextureViewDesc& desc);
+	void Create(const ResourceHandle& resource, ResourceType type, const BufferViewDesc& desc);
 
 	const SrvHandle& GetHandle() const { return m_handle; }
 
@@ -52,7 +63,9 @@ class UnorderedAccessView
 public:
 	UnorderedAccessView();
 
-	void Create(const ResourceHandle& resource, ResourceType type, const ResourceViewDesc& desc);
+	void Create(const ResourceHandle& resource, ResourceType type, const TextureViewDesc& desc);
+	void Create(const ResourceHandle& resource, ResourceType type, const BufferViewDesc& desc);
+	void Create(const ResourceHandle& resource, ResourceType type, const TypedBufferViewDesc& desc);
 
 	const UavHandle& GetHandle() const { return m_handle; }
 
@@ -66,7 +79,7 @@ class IndexBufferView
 public:
 	IndexBufferView();
 
-	void Create(const ResourceHandle& resource, const ResourceViewDesc& desc);
+	void Create(const ResourceHandle& resource, const BufferViewDesc& desc);
 
 	const IbvHandle& GetHandle() const { return m_handle; }
 
@@ -80,7 +93,7 @@ class VertexBufferView
 public:
 	VertexBufferView();
 
-	void Create(const ResourceHandle& resource, const ResourceViewDesc& desc);
+	void Create(const ResourceHandle& resource, const BufferViewDesc& desc);
 
 	const VbvHandle& GetHandle() const { return m_handle; }
 
@@ -94,7 +107,7 @@ class ConstantBufferView
 public:
 	ConstantBufferView();
 
-	void Create(const ResourceHandle& resource, const ResourceViewDesc& desc);
+	void Create(const ResourceHandle& resource, const BufferViewDesc& desc);
 
 	const CbvHandle& GetHandle() const { return m_handle; }
 
@@ -122,6 +135,30 @@ public:
 
 private:
 	DsvHandle m_handle;
+};
+
+
+struct RenderTargetViewDesc
+{
+	Format format;
+	uint32_t arraySize;
+	uint32_t numMips;
+	uint32_t fragmentCount;
+	bool nullDesc;
+};
+
+
+class RenderTargetView
+{
+public:
+	RenderTargetView();
+
+	void Create(const ResourceHandle& resource, const RenderTargetViewDesc& desc);
+
+	const RtvHandle& GetHandle() const { return m_handle; }
+
+private:
+	RtvHandle m_handle;
 };
 
 } // namespace Kodiak

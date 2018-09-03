@@ -31,7 +31,9 @@ public:
 
 		VkPointer() = default;
 		VkPointer(VkHandle<VkType>* handle) : Super(handle) {}
+
 		static VkPointer Create(VkType wrapped) { return VkPointer(new VkHandle(wrapped)); }
+
 		operator VkType() const { return Get()->m_wrapped; }
 
 	private:
@@ -60,14 +62,17 @@ public:
 
 		VkPointer() = default;
 		VkPointer(VkResourceHandle* handle) : Super(handle) {}
+
 		static VkPointer Create(VkImage image, VkDeviceMemory mem, bool ownsImage = true)
 		{
 			return VkPointer(new VkResourceHandle(image, mem, ownsImage));
 		}
+
 		static VkPointer Create(VkBuffer buffer, VkDeviceMemory mem, bool ownsImage = true)
 		{
 			return VkPointer(new VkResourceHandle(buffer, mem, ownsImage));
 		}
+
 		operator VkImage() const { return Get()->m_wrapped.image; }
 		operator VkBuffer() const { return Get()->m_wrapped.buffer; }
 		operator VkDeviceMemory() const { return Get()->m_wrappedMemory; }
@@ -107,6 +112,102 @@ private:
 	const bool m_ownsImage{ true };
 };
 
+
+class VkDescriptorHandle : public VkBaseHandle
+{
+public:
+	class VkPointer : public std::shared_ptr<VkDescriptorHandle>
+	{
+	public:
+		using Super = std::shared_ptr<VkDescriptorHandle>;
+
+		VkPointer() = default;
+		VkPointer(VkDescriptorHandle* handle) : Super(handle) {}
+
+		static VkPointer Create(VkImageView imageView)
+		{
+			return VkPointer(new VkDescriptorHandle(imageView));
+		}
+
+		static VkPointer Create(VkBufferView bufferView)
+		{
+			return VkPointer(new VkDescriptorHandle(bufferView));
+		}
+
+		static VkPointer Create(VkBuffer buffer, uint32_t offset, uint32_t size)
+		{
+			return VkPointer(new VkDescriptorHandle(buffer, offset, size));
+		}
+
+		operator VkImageView() const { return Get()->m_wrapped.imageView; }
+		operator VkBufferView() const { return Get()->m_wrapped.bufferView; }
+		operator VkBuffer() const { return Get()->m_wrapped.buffer; }
+
+		operator VkDescriptorImageInfo() const { return Get()->m_wrappedDescriptor.imageInfo; }
+		operator VkDescriptorBufferInfo() const { return Get()->m_wrappedDescriptor.bufferInfo; }
+
+	private:
+		VkDescriptorHandle* Get() const { return Super::get(); }
+	};
+
+	~VkDescriptorHandle();
+
+private:
+	friend class VkPointer;
+
+	VkDescriptorHandle(VkImageView imageView)
+		: m_wrapped(imageView)
+		, m_wrappedDescriptor(imageView)
+		, m_isImageView(true)
+		, m_isBufferView(false)
+	{}
+
+	VkDescriptorHandle(VkBufferView bufferView)
+		: m_wrapped(bufferView)
+		, m_wrappedDescriptor()
+		, m_isImageView(false)
+		, m_isBufferView(true)
+	{}
+
+	VkDescriptorHandle(VkBuffer buffer, uint32_t offset, uint32_t size)
+		: m_wrapped(buffer)
+		, m_wrappedDescriptor(buffer, offset, size)
+		, m_isImageView(false)
+		, m_isBufferView(false)
+	{}
+
+	union WrappedData
+	{
+		WrappedData(VkImageView imageView) : imageView(imageView) {}
+		WrappedData(VkBufferView bufferView) : bufferView(bufferView) {}
+		WrappedData(VkBuffer buffer) : buffer(buffer) {}
+
+		VkImageView imageView;
+		VkBufferView bufferView;
+		VkBuffer buffer;
+	} m_wrapped;
+
+	union WrappedDescriptor
+	{
+		WrappedDescriptor() = default;
+		WrappedDescriptor(VkImageView imageView)
+		{
+			imageInfo.imageView = imageView;
+		}
+		WrappedDescriptor(VkBuffer buffer, uint32_t offset, uint32_t size)
+		{
+			bufferInfo.buffer = buffer;
+			bufferInfo.offset = offset;
+			bufferInfo.range = size;
+		}
+
+		VkDescriptorImageInfo imageInfo;
+		VkDescriptorBufferInfo bufferInfo;
+	} m_wrappedDescriptor;
+
+	const bool m_isImageView{ true };
+	const bool m_isBufferView{ false };
+};
 
 // Template specializations for destructors
 template<> VkHandle<VkInstance>::~VkHandle();

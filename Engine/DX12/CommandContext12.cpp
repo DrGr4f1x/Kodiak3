@@ -368,7 +368,7 @@ void CommandContext::Reset()
 void GraphicsContext::ClearColor(ColorBuffer& target)
 {
 	FlushResourceBarriers();
-	m_commandList->ClearRenderTargetView(target.GetRTV(), target.GetClearColor().GetPtr(), 0, nullptr);
+	m_commandList->ClearRenderTargetView(target.GetRTV().GetHandle(), target.GetClearColor().GetPtr(), 0, nullptr);
 }
 
 
@@ -416,7 +416,7 @@ void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer
 	// Transition resources to initial states
 	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
 	{
-		RTVs[i] = m_renderTargets[i]->GetRTV();
+		RTVs[i] = m_renderTargets[i]->GetRTV().GetHandle();
 		TransitionResource(*m_renderTargets[i], ResourceState::RenderTarget);
 	}
 
@@ -472,7 +472,7 @@ void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer
 	// Transition resources to initial states
 	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
 	{
-		RTVs[i] = m_renderTargets[i]->GetRTV();
+		RTVs[i] = m_renderTargets[i]->GetRTV().GetHandle();
 		TransitionResource(*m_renderTargets[i], ResourceState::RenderTarget);
 	}
 	DSV = m_depthTarget->GetDSV().GetHandle();
@@ -558,14 +558,14 @@ void GraphicsContext::EndRenderPass()
 
 void GraphicsContext::SetRenderTarget(const ColorBuffer& colorBuffer)
 {
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvs[] = { colorBuffer.GetRTV() };
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvs[] = { colorBuffer.GetRTV().GetHandle() };
 	m_commandList->OMSetRenderTargets(1, rtvs, FALSE, nullptr);
 }
 
 
 void GraphicsContext::SetRenderTarget(const ColorBuffer& colorBuffer, const DepthBuffer& depthBuffer)
 {
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvs[] = { colorBuffer.GetRTV() };
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvs[] = { colorBuffer.GetRTV().GetHandle() };
 	D3D12_CPU_DESCRIPTOR_HANDLE dsv = depthBuffer.GetDSV().GetHandle();
 	m_commandList->OMSetRenderTargets(1, rtvs, FALSE, &dsv);
 }

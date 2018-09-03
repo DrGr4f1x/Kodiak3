@@ -26,7 +26,11 @@ GpuBuffer::~GpuBuffer()
 
 void IndexBuffer::CreateDerivedViews()
 {
-	auto resDesc = DescribeIndexBuffer(m_elementSize, m_bufferSize);
+	BufferViewDesc resDesc = {};
+	resDesc.format = Format::Unknown;
+	resDesc.bufferSize = (uint32_t)m_bufferSize;
+	resDesc.elementCount = (uint32_t)m_elementCount;
+	resDesc.elementSize = (uint32_t)m_elementSize;
 
 	m_srv.Create(m_resource, ResourceType::IndexBuffer, resDesc);
 	m_uav.Create(m_resource, ResourceType::IndexBuffer, resDesc);
@@ -38,7 +42,11 @@ void IndexBuffer::CreateDerivedViews()
 
 void VertexBuffer::CreateDerivedViews()
 {
-	auto resDesc = DescribeVertexBuffer(m_elementSize, m_elementCount, m_bufferSize);
+	BufferViewDesc resDesc = {};
+	resDesc.format = Format::Unknown;
+	resDesc.bufferSize = (uint32_t)m_bufferSize;
+	resDesc.elementCount = (uint32_t)m_elementCount;
+	resDesc.elementSize = (uint32_t)m_elementSize;
 
 	m_srv.Create(m_resource, ResourceType::VertexBuffer, resDesc);
 	m_uav.Create(m_resource, ResourceType::VertexBuffer, resDesc);
@@ -48,7 +56,11 @@ void VertexBuffer::CreateDerivedViews()
 
 void ConstantBuffer::CreateDerivedViews()
 {
-	auto resDesc = DescribeConstantBuffer(m_bufferSize);
+	BufferViewDesc resDesc = {};
+	resDesc.format = Format::Unknown;
+	resDesc.bufferSize = (uint32_t)m_bufferSize;
+	resDesc.elementCount = (uint32_t)m_elementCount;
+	resDesc.elementSize = (uint32_t)m_elementSize;
 
 	m_cbv.Create(m_resource, resDesc);
 }

@@ -19,5 +19,8 @@ VkImageCreateInfo DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthO
 ResourceHandle CreateTextureResource(const std::string& name, const VkImageCreateInfo& imageCreateInfo);
 
 VkSampleCountFlagBits SamplesToFlags(uint32_t numSamples);
+VkImageType GetImageType(ResourceType type);
+VkImageViewType GetImageViewType(ResourceType type);
+VkImageCreateFlagBits GetImageCreateFlags(ResourceType type);
 
 } // namespace Kodiak

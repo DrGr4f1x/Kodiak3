@@ -62,6 +62,7 @@ using IbvHandle = D3D12_INDEX_BUFFER_VIEW;
 using CbvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
 
 using DsvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
+using RtvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
 
 static const uint32_t NumSwapChainBuffers = 3;
 

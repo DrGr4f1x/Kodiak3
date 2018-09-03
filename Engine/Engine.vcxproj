@@ -259,11 +259,6 @@
     <ClInclude Include="dds.h" />
     <ClInclude Include="DepthBuffer.h" />
     <ClInclude Include="DescriptorHeap.h" />
-    <ClInclude Include="DX12\ColorBuffer12.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="DX12\CommandAllocatorPool12.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
@@ -372,11 +367,6 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="VectorMath.h" />
-    <ClInclude Include="VK\ColorBufferVk.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="VK\CommandBufferPoolVk.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
@@ -455,6 +445,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="ColorBuffer.cpp" />
     <ClCompile Include="CommonStates.cpp" />
     <ClCompile Include="DepthBuffer.cpp" />
     <ClCompile Include="DX12\ColorBuffer12.cpp">
@@ -561,7 +552,6 @@
     <ClCompile Include="KTXTextureLoader.cpp" />
     <ClCompile Include="Math\Frustum.cpp" />
     <ClCompile Include="Model.cpp" />
-    <ClCompile Include="ResourceView.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Create</PrecompiledHeader>

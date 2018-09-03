@@ -12,8 +12,8 @@
 
 #include "FramebufferVk.h"
 
-#include "ColorBufferVk.h"
 #include "GraphicsDevice.h"
+
 #include "RenderPassVk.h"
 
 
@@ -107,7 +107,7 @@ void FrameBuffer::Finalize(RenderPass& renderPass)
 	{
 		if (m_colorBuffers[i])
 		{
-			attachments[curAttachment] = m_colorBuffers[i]->GetRTV();
+			attachments[curAttachment] = m_colorBuffers[i]->GetRTV().GetHandle();
 			++curAttachment;
 			width = m_colorBuffers[i]->GetWidth();
 			height = m_colorBuffers[i]->GetHeight();

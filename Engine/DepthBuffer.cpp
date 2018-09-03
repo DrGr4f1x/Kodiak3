@@ -60,7 +60,9 @@ void DepthBuffer::CreateDerivedViews()
 		m_dsv[3] = m_dsv[1];
 	}
 
-	ResourceViewDesc srvDesc = DescribeDepthStencil(m_format);
+	TextureViewDesc srvDesc = {};
+	srvDesc.format = m_format;
+	srvDesc.mipCount = 1;
 	srvDesc.isDepth = true;
 
 	if (m_numSamples == 1)

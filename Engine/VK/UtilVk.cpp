@@ -92,4 +92,76 @@ VkSampleCountFlagBits Kodiak::SamplesToFlags(uint32_t numSamples)
 	}
 }
 
+VkImageType GetImageType(ResourceType type)
+{
+	switch (type)
+	{
+	case ResourceType::Texture1D:
+	case ResourceType::Texture1D_Array:
+		return VK_IMAGE_TYPE_1D;
+
+	case ResourceType::Texture2D:
+	case ResourceType::Texture2D_Array:
+	case ResourceType::Texture2DMS:
+	case ResourceType::Texture2DMS_Array:
+	case ResourceType::TextureCube:
+	case ResourceType::TextureCube_Array:
+		return VK_IMAGE_TYPE_2D;
+
+	case ResourceType::Texture3D:
+		return VK_IMAGE_TYPE_3D;
+
+	default:
+		assert(false);
+		return VK_IMAGE_TYPE_2D;
+	}
+}
+
+
+VkImageViewType GetImageViewType(ResourceType type)
+{
+	switch (type)
+	{
+	case ResourceType::Texture1D:
+		return VK_IMAGE_VIEW_TYPE_1D;
+
+	case ResourceType::Texture1D_Array:
+		return VK_IMAGE_VIEW_TYPE_1D_ARRAY;
+
+	case ResourceType::Texture2D:
+	case ResourceType::Texture2DMS:
+		return VK_IMAGE_VIEW_TYPE_2D;
+
+	case ResourceType::Texture2D_Array:
+	case ResourceType::Texture2DMS_Array:
+		return VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+
+	case ResourceType::TextureCube:
+		return VK_IMAGE_VIEW_TYPE_CUBE;
+
+	case ResourceType::TextureCube_Array:
+		return VK_IMAGE_VIEW_TYPE_CUBE_ARRAY;
+
+	case ResourceType::Texture3D:
+		return VK_IMAGE_VIEW_TYPE_3D;
+
+	default:
+		assert(false);
+		return VK_IMAGE_VIEW_TYPE_2D;
+	}
+}
+
+
+VkImageCreateFlagBits GetImageCreateFlags(ResourceType type)
+{
+	switch (type)
+	{
+	case ResourceType::TextureCube:
+	case ResourceType::TextureCube_Array:
+		return VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+	default:
+		return static_cast<VkImageCreateFlagBits>(0);
+	}
+}
+
 } // namespace Kodiak

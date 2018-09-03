@@ -47,6 +47,27 @@ VkResourceHandle::~VkResourceHandle()
 }
 
 
+VkDescriptorHandle::~VkDescriptorHandle()
+{
+	auto device = GetDevice();
+
+	if (m_isImageView && (m_wrapped.imageView != VK_NULL_HANDLE))
+	{
+		vkDestroyImageView(device, m_wrapped.imageView, nullptr);
+		m_wrapped.imageView = VK_NULL_HANDLE;
+	}
+	else if (m_isBufferView && (m_wrapped.bufferView != VK_NULL_HANDLE))
+	{
+		vkDestroyBufferView(device, m_wrapped.bufferView, nullptr);
+		m_wrapped.bufferView = VK_NULL_HANDLE;
+	}
+	else
+	{
+		m_wrapped.buffer = VK_NULL_HANDLE;
+	}
+}
+
+
 template<> VkHandle<VkInstance>::~VkHandle()
 {
 	if (m_wrapped != VK_NULL_HANDLE)

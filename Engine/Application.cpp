@@ -122,7 +122,7 @@ const string& Application::GetDefaultShaderPath()
 void Application::Initialize()
 {
 #if ENABLE_VULKAN_VALIDATION || (defined(DX12) && _DEBUG)
-	CreateConsole("Validation output");
+	//CreateConsole("Validation output");
 #endif
 
 	Configure();

@@ -48,13 +48,14 @@ using InstanceHandle = VkHandle<VkInstance>::VkPointer;
 using DeviceHandle = VkHandle<VkDevice>::VkPointer;
 using ResourceHandle = VkResourceHandle::VkPointer;
 
-using SrvHandle = VkDescriptorBufferInfo;
-using UavHandle = VkDescriptorBufferInfo;
+using SrvHandle = VkDescriptorHandle::VkPointer;
+using UavHandle = VkDescriptorHandle::VkPointer;
 struct IbvHandle {};
 struct VbvHandle {};
-using CbvHandle = VkDescriptorBufferInfo;
+using CbvHandle = VkDescriptorHandle::VkPointer;
 
 using DsvHandle = VkHandle<VkImageView>::VkPointer;
+using RtvHandle = VkHandle<VkImageView>::VkPointer;
 
 static const uint32_t NumSwapChainBuffers = 3;
 

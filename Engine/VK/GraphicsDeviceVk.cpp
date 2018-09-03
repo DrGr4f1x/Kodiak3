@@ -91,7 +91,7 @@ VkBool32 messageCallback(
 		cout << debugMessage.str() << "\n";
 	}
 
-	fflush(stdout);
+	fflush(stderr);
 
 	// The return value of this callback controls whether the Vulkan call that caused
 	// the validation message will be aborted or not
@@ -914,7 +914,8 @@ void GraphicsDevice::PlatformCreate()
 	for (uint32_t i = 0; i < NumSwapChainBuffers; ++i)
 	{
 		m_swapChainBuffers[i] = make_shared<ColorBuffer>();
-		m_swapChainBuffers[i]->CreateFromSwapChain("Primary SwapChain Buffer", m_platformData->images[i], m_width, m_height, BackBufferColorFormat);
+		auto handle = ResourceHandle::Create(m_platformData->images[i], VK_NULL_HANDLE, false);
+		m_swapChainBuffers[i]->CreateFromSwapChain("Primary SwapChain Buffer", handle, m_width, m_height, BackBufferColorFormat);
 	}
 
 	g_commandManager.Create(
@@ -943,6 +944,8 @@ void GraphicsDevice::PlatformPresent()
 	vkResetFences(device, 1, &fence);
 
 	vkAcquireNextImageKHR(device, m_platformData->swapChain, UINT64_MAX, nullptr, fence, &m_currentBuffer);
+
+	g_commandManager.DestroyRetiredFences();
 }
 
 
@@ -954,7 +957,9 @@ void GraphicsDevice::PlatformDestroyData()
 
 
 void GraphicsDevice::PlatformDestroy()
-{}
+{
+	g_commandManager.Destroy();
+}
 
 
 VkFormatProperties GraphicsDevice::GetFormatProperties(Format format)

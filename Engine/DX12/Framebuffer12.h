@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "DepthBuffer.h"
 
-#include "ColorBuffer12.h"
+#include "ColorBuffer.h"
+#include "DepthBuffer.h"
 
 
 namespace Kodiak

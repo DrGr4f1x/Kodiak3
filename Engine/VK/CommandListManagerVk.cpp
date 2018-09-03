@@ -164,7 +164,8 @@ CommandListManager::CommandListManager()
 
 CommandListManager::~CommandListManager()
 {
-	Destroy();
+	// TODO
+	//Destroy();
 }
 
 

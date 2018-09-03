@@ -11,10 +11,10 @@
 #pragma once
 
 #include "Color.h"
+#include "ColorBuffer.h"
 #include "DepthBuffer.h"
 #include "GpuBuffer.h"
 
-#include "ColorBufferVk.h"
 #include "DynamicDescriptorPoolVk.h"
 #include "FramebufferVk.h"
 #include "TextureVk.h"
@@ -215,8 +215,7 @@ inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const T
 
 inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
 {
-	VkDescriptorImageInfo descriptorInfo = {};
-	descriptorInfo.imageView = colorBuffer.GetSRV();
+	VkDescriptorImageInfo descriptorInfo = colorBuffer.GetSRV().GetHandle();
 	descriptorInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
 }
@@ -304,8 +303,7 @@ inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Te
 
 inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
 {
-	VkDescriptorImageInfo descriptorInfo = {};
-	descriptorInfo.imageView = colorBuffer.GetSRV();
+	VkDescriptorImageInfo descriptorInfo = colorBuffer.GetSRV().GetHandle();
 	descriptorInfo.imageLayout = colorBuffer.GetLayout();
 	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
 }
@@ -320,8 +318,7 @@ inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Co
 
 inline void ComputeContext::SetUAV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
 {
-	VkDescriptorImageInfo descriptorInfo = {};
-	descriptorInfo.imageView = colorBuffer.GetSRV();
+	VkDescriptorImageInfo descriptorInfo = colorBuffer.GetSRV().GetHandle();
 	descriptorInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
 }

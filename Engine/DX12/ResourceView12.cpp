@@ -29,9 +29,11 @@ ShaderResourceView::ShaderResourceView()
 }
 
 
-void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType type, const ResourceViewDesc& desc)
+void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType type, const TextureViewDesc& desc)
 {
-	DXGI_FORMAT dxFormat = static_cast<DXGI_FORMAT>(desc.format);
+	// TODO - Validate that ResourceType is compatible with a texture SRV
+
+	auto dxFormat = static_cast<DXGI_FORMAT>(desc.format);
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.ViewDimension = GetSRVDimension(type);
@@ -77,6 +79,33 @@ void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType typ
 	case ResourceType::Texture3D:
 		srvDesc.Texture3D.MipLevels = desc.mipCount;
 		break;
+	
+	default:
+		assert(false);
+		return;
+	}
+
+	if (m_handle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_handle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+	GetDevice()->CreateShaderResourceView(resource, &srvDesc, m_handle);
+}
+
+
+void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType type, const BufferViewDesc& desc)
+{
+	// TODO - Validate that ResourceType is compatible with a buffer SRV
+
+	auto dxFormat = static_cast<DXGI_FORMAT>(desc.format);
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.ViewDimension = GetSRVDimension(type);
+	srvDesc.Format = dxFormat;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+	switch (type)
+	{
 	case ResourceType::GenericBuffer:
 	case ResourceType::IndexBuffer:
 		srvDesc.Format = DXGI_FORMAT_R32_TYPELESS;
@@ -97,6 +126,10 @@ void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType typ
 	case ResourceType::TypedBuffer:
 		srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 		srvDesc.Buffer.NumElements = desc.elementCount;
+
+	default:
+		assert(false);
+		return;
 	}
 
 	if (m_handle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
@@ -113,9 +146,11 @@ UnorderedAccessView::UnorderedAccessView()
 }
 
 
-void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType type, const ResourceViewDesc& desc)
+void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType type, const TextureViewDesc& desc)
 {
-	DXGI_FORMAT dxFormat = static_cast<DXGI_FORMAT>(desc.format);
+	// TODO - Validate that ResourceType is compatible with a texture UAV
+
+	auto dxFormat = static_cast<DXGI_FORMAT>(desc.format);
 
 	const bool isCube = type == ResourceType::TextureCube || type == ResourceType::TextureCube_Array;
 	const uint32_t arrayMultiplier = isCube ? 6 : 1;
@@ -147,6 +182,32 @@ void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType ty
 	case ResourceType::Texture3D:
 		uavDesc.Texture3D.MipSlice = desc.mipLevel;
 		break;
+	
+	default:
+		assert(false);
+		return;
+	}
+
+	if (m_handle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_handle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+	GetDevice()->CreateUnorderedAccessView(resource, nullptr, &uavDesc, m_handle);
+}
+
+
+void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType type, const BufferViewDesc& desc)
+{
+	// TODO - Validate that ResourceType is compatible with a buffer UAV
+
+	auto dxFormat = static_cast<DXGI_FORMAT>(desc.format);
+
+	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+	uavDesc.ViewDimension = GetUAVDimension(type);
+	uavDesc.Format = GetUAVFormat(dxFormat);
+
+	switch (type)
+	{
 	case ResourceType::GenericBuffer:
 	case ResourceType::IndexBuffer:
 		uavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
@@ -168,6 +229,10 @@ void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType ty
 		uavDesc.Format = dxFormat;
 		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
 		uavDesc.Buffer.NumElements = desc.elementCount;
+
+	default:
+		assert(false);
+		return;
 	}
 
 	if (m_handle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
@@ -178,10 +243,17 @@ void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType ty
 }
 
 
+void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType type, const TypedBufferViewDesc& desc)
+{
+	BufferViewDesc bufferDesc{ desc.format, desc.bufferSize, desc.elementCount, desc.elementSize };
+	Create(resource, type, bufferDesc);
+}
+
+
 IndexBufferView::IndexBufferView() = default;
 
 
-void IndexBufferView::Create(const ResourceHandle& handle, const ResourceViewDesc& desc)
+void IndexBufferView::Create(const ResourceHandle& handle, const BufferViewDesc& desc)
 {
 	m_handle.BufferLocation = handle->GetGPUVirtualAddress();
 	m_handle.Format = desc.elementSize == sizeof(uint32_t) ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R16_UINT;
@@ -192,7 +264,7 @@ void IndexBufferView::Create(const ResourceHandle& handle, const ResourceViewDes
 VertexBufferView::VertexBufferView() = default;
 
 
-void VertexBufferView::Create(const ResourceHandle& handle, const ResourceViewDesc& desc)
+void VertexBufferView::Create(const ResourceHandle& handle, const BufferViewDesc& desc)
 {
 	m_handle.BufferLocation = handle->GetGPUVirtualAddress();
 	m_handle.SizeInBytes = desc.bufferSize;
@@ -206,7 +278,7 @@ ConstantBufferView::ConstantBufferView()
 }
 
 
-void ConstantBufferView::Create(const ResourceHandle& resource, const ResourceViewDesc& desc)
+void ConstantBufferView::Create(const ResourceHandle& resource, const BufferViewDesc& desc)
 {
 	UINT size = static_cast<UINT>(Math::AlignUp(desc.bufferSize, 16));
 
@@ -227,7 +299,7 @@ DepthStencilView::DepthStencilView()
 
 void DepthStencilView::Create(const ResourceHandle& resource, const DepthStencilViewDesc& desc)
 {
-	DXGI_FORMAT dxFormat = static_cast<DXGI_FORMAT>(desc.format);
+	auto dxFormat = static_cast<DXGI_FORMAT>(desc.format);
 
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
 	dsvDesc.Format = GetDSVFormat(dxFormat);
@@ -258,4 +330,44 @@ void DepthStencilView::Create(const ResourceHandle& resource, const DepthStencil
 	
 	m_handle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	GetDevice()->CreateDepthStencilView(resource, &dsvDesc, m_handle);
+}
+
+
+RenderTargetView::RenderTargetView()
+{
+	m_handle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+}
+
+
+void RenderTargetView::Create(const ResourceHandle& resource, const RenderTargetViewDesc& desc)
+{
+	auto dxFormat = static_cast<DXGI_FORMAT>(desc.format);
+
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+	rtvDesc.Format = dxFormat;
+	
+	if (desc.arraySize > 1)
+	{
+		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
+		rtvDesc.Texture2DArray.MipSlice = 0;
+		rtvDesc.Texture2DArray.FirstArraySlice = 0;
+		rtvDesc.Texture2DArray.ArraySize = desc.arraySize;
+	}
+	else if (desc.fragmentCount > 1)
+	{
+		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMS;
+	}
+	else
+	{
+		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+		rtvDesc.Texture2D.MipSlice = 0;
+	}
+
+	if (m_handle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_handle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	}
+
+	// Create the render target view
+	GetDevice()->CreateRenderTargetView(resource, desc.nullDesc ? nullptr : &rtvDesc, m_handle);
 }

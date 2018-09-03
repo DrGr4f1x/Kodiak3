@@ -14,6 +14,7 @@
 
 #include "GraphicsDevice.h"
 
+#include "UtilVk.h"
 
 using namespace Kodiak;
 
@@ -21,29 +22,98 @@ using namespace Kodiak;
 ShaderResourceView::ShaderResourceView() = default;
 
 
-void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType type, const ResourceViewDesc& desc)
+void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType type, const TextureViewDesc& desc)
 {
-	m_handle.buffer = resource;
-	m_handle.offset = 0;
-	m_handle.range = desc.bufferSize;
+	// TODO - Validate that ResourceType is compatible with a texture SRV
+
+	VkImageViewCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	createInfo.pNext = nullptr;
+	createInfo.flags = 0;
+	createInfo.viewType = GetImageViewType(type);
+	createInfo.format = static_cast<VkFormat>(desc.format);
+	createInfo.subresourceRange = {};
+	createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	createInfo.subresourceRange.baseMipLevel = 0;
+	createInfo.subresourceRange.levelCount = desc.mipCount;
+	createInfo.subresourceRange.baseArrayLayer = 0;
+	createInfo.subresourceRange.layerCount = type == ResourceType::Texture3D ? 1 : desc.arraySize;
+	createInfo.image = resource;
+
+	VkImageView imageView{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkCreateImageView(GetDevice(), &createInfo, nullptr, &imageView));
+
+	m_handle = SrvHandle::Create(imageView);
+}
+
+
+void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType type, const BufferViewDesc& desc)
+{
+	// TODO - Validate that ResourceType is compatible with a buffer SRV
+
+	m_handle = SrvHandle::Create(resource, 0, desc.bufferSize);
 }
 
 
 UnorderedAccessView::UnorderedAccessView() = default;
 
 
-void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType type, const ResourceViewDesc& desc)
+void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType type, const TextureViewDesc& desc)
 {
-	m_handle.buffer = resource;
-	m_handle.offset = 0;
-	m_handle.range = desc.bufferSize;
+	// TODO - Validate that ResourceType is compatible with a texture UAV
+	
+	VkImageViewCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	createInfo.pNext = nullptr;
+	createInfo.flags = 0;
+	createInfo.viewType = GetImageViewType(type);
+	createInfo.format = static_cast<VkFormat>(desc.format);
+	createInfo.subresourceRange = {};
+	createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	createInfo.subresourceRange.baseMipLevel = 0;
+	createInfo.subresourceRange.levelCount = desc.mipCount;
+	createInfo.subresourceRange.baseArrayLayer = 0;
+	createInfo.subresourceRange.layerCount = type == ResourceType::Texture3D ? 1 : desc.arraySize;
+	createInfo.image = resource;
+
+	VkImageView imageView{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkCreateImageView(GetDevice(), &createInfo, nullptr, &imageView));
+
+	m_handle = UavHandle::Create(imageView);
 }
 
+
+void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType type, const BufferViewDesc& desc)
+{
+	// TODO - Validate that ResourceType is compatible with a buffer UAV
+
+	m_handle = UavHandle::Create(resource, 0, desc.bufferSize);
+}
+
+
+void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType type, const TypedBufferViewDesc& desc)
+{
+	// TODO - Validate that ResourceType is compatible with a typed-buffer UAV
+
+	VkBufferViewCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
+	createInfo.pNext = nullptr;
+	createInfo.flags = 0;
+	createInfo.buffer = resource;
+	createInfo.offset = 0;
+	createInfo.range = desc.bufferSize;
+	createInfo.format = static_cast<VkFormat>(desc.format);
+
+	VkBufferView bufferView{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkCreateBufferView(GetDevice(), &createInfo, nullptr, &bufferView));
+
+	m_handle = UavHandle::Create(bufferView);
+}
 
 IndexBufferView::IndexBufferView() = default;
 
 
-void IndexBufferView::Create(const ResourceHandle& handle, const ResourceViewDesc& desc)
+void IndexBufferView::Create(const ResourceHandle& handle, const BufferViewDesc& desc)
 {
 	// Nothing to do for Vulkan
 }
@@ -52,7 +122,7 @@ void IndexBufferView::Create(const ResourceHandle& handle, const ResourceViewDes
 VertexBufferView::VertexBufferView() = default;
 
 
-void VertexBufferView::Create(const ResourceHandle& handle, const ResourceViewDesc& desc)
+void VertexBufferView::Create(const ResourceHandle& handle, const BufferViewDesc& desc)
 {
 	// Nothing to do for Vulkan
 }
@@ -61,11 +131,9 @@ void VertexBufferView::Create(const ResourceHandle& handle, const ResourceViewDe
 ConstantBufferView::ConstantBufferView() = default;
 
 
-void ConstantBufferView::Create(const ResourceHandle& resource, const ResourceViewDesc& desc)
+void ConstantBufferView::Create(const ResourceHandle& resource, const BufferViewDesc& desc)
 {
-	m_handle.buffer = resource;
-	m_handle.offset = 0;
-	m_handle.range = desc.bufferSize;
+	m_handle = CbvHandle::Create(resource, 0, desc.bufferSize);
 }
 
 
@@ -99,4 +167,31 @@ void DepthStencilView::Create(const ResourceHandle& resource, const DepthStencil
 	VkImageView dsv{ VK_NULL_HANDLE };
 	ThrowIfFailed(vkCreateImageView(GetDevice(), &imageViewCreateInfo, nullptr, &dsv));
 	m_handle = DsvHandle::Create(dsv);
+}
+
+
+RenderTargetView::RenderTargetView() = default;
+
+
+void RenderTargetView::Create(const ResourceHandle& resource, const RenderTargetViewDesc& desc)
+{
+	VkImageViewCreateInfo imageViewInfo{ VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
+	imageViewInfo.pNext = nullptr;
+	imageViewInfo.flags = 0;
+	imageViewInfo.image = resource;
+	imageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	imageViewInfo.format = static_cast<VkFormat>(desc.format);
+	imageViewInfo.components.r = VK_COMPONENT_SWIZZLE_R;
+	imageViewInfo.components.g = VK_COMPONENT_SWIZZLE_G;
+	imageViewInfo.components.b = VK_COMPONENT_SWIZZLE_B;
+	imageViewInfo.components.a = VK_COMPONENT_SWIZZLE_A;
+	imageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	imageViewInfo.subresourceRange.baseMipLevel = 0;
+	imageViewInfo.subresourceRange.levelCount = desc.numMips;
+	imageViewInfo.subresourceRange.baseArrayLayer = 0;
+	imageViewInfo.subresourceRange.layerCount = desc.arraySize;
+
+	VkImageView rtv{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkCreateImageView(GetDevice(), &imageViewInfo, nullptr, &rtv));
+	m_handle = RtvHandle::Create(rtv);
 }
