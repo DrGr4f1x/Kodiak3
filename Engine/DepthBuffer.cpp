@@ -65,19 +65,12 @@ void DepthBuffer::CreateDerivedViews()
 	srvDesc.mipCount = 1;
 	srvDesc.isDepth = true;
 
-	if (m_numSamples == 1)
-	{
-		m_depthSRV.Create(m_resource, ResourceType::Texture2D, srvDesc);
-	}
-	else
-	{
-		m_depthSRV.Create(m_resource, ResourceType::Texture2DMS, srvDesc);
-	}
-
+	m_depthSRV.Create(m_resource, m_type, srvDesc);
+	
 	if (hasStencil)
 	{
 		srvDesc.isDepth = false;
 		srvDesc.isStencil = true;
-		m_stencilSRV.Create(m_resource, ResourceType::Texture2D, srvDesc);
+		m_stencilSRV.Create(m_resource, m_type, srvDesc);
 	}
 }

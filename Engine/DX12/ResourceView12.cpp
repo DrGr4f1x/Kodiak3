@@ -59,6 +59,7 @@ void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType typ
 		srvDesc.Texture1DArray.ArraySize = desc.arraySize;
 		break;
 	case ResourceType::Texture2D:
+	case ResourceType::Texture2DMS:
 		srvDesc.Texture2D.MipLevels = desc.mipCount;
 		if (desc.isStencil)
 		{	
@@ -66,6 +67,7 @@ void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType typ
 		}
 		break;
 	case ResourceType::Texture2D_Array:
+	case ResourceType::Texture2DMS_Array:
 		srvDesc.Texture2DArray.MipLevels = desc.mipCount;
 		srvDesc.Texture2DArray.ArraySize = desc.arraySize;
 		break;

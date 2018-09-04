@@ -74,7 +74,7 @@ void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 {
 	numMips = (numMips == 0 ? ComputeNumMips(width, height) : numMips);
 	const uint32_t numSamples = 1;
-	auto flags = CombineResourceFlags(numSamples);
+	auto flags = CombineResourceFlags(m_fragmentCount);
 	auto resourceDesc = DescribeTex2D(width, height, 1, numMips, numSamples, format, flags);
 
 	m_width = width;

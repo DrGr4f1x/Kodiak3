@@ -118,11 +118,11 @@ void MultisamplingApp::InitRenderTargets()
 	m_renderPass.SetDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
 	m_renderPass.Finalize();
 
-	m_colorTarget = make_shared<ColorBuffer>();
+	m_colorTarget = make_shared<ColorBuffer>(DirectX::Colors::White);
 	m_colorTarget->SetMsaaMode(m_numSamples, m_numSamples);
 	m_colorTarget->Create("Color target", m_displayWidth, m_displayHeight, 1, colorFormat);
 
-	m_depthTarget = make_shared<DepthBuffer>();
+	m_depthTarget = make_shared<DepthBuffer>(1.0f, 0);
 	m_depthTarget->Create("Depth target", m_displayWidth, m_displayHeight, m_numSamples, depthFormat);
 
 	for (int i = 0; i < 3; ++i)
@@ -160,6 +160,7 @@ void MultisamplingApp::InitPSO()
 	m_pso.SetPixelShader("MeshPS");
 
 	m_pso.SetRenderPass(m_defaultRenderPass);
+	m_pso.SetMsaaState(m_numSamples);
 
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 

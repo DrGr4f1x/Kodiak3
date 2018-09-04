@@ -37,6 +37,7 @@ void DepthBuffer::Create(const string& name, uint32_t width, uint32_t height, Fo
 	m_arraySize = 1;
 	m_numSamples = numSamples;
 	m_format = format;
+	m_type = ResourceType::Texture2D;
 
 	D3D12_CLEAR_VALUE clearValue = {};
 	clearValue.Format = static_cast<DXGI_FORMAT>(format);
@@ -61,6 +62,7 @@ void DepthBuffer::Create(const string& name, uint32_t width, uint32_t height, ui
 	m_arraySize = 1;
 	m_numSamples = samples;
 	m_format = format;
+	m_type = (m_numSamples == 1) ? ResourceType::Texture2D : ResourceType::Texture2DMS;
 
 	D3D12_CLEAR_VALUE clearValue = {};
 	clearValue.Format = static_cast<DXGI_FORMAT>(format);

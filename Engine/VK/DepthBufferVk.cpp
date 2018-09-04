@@ -34,6 +34,8 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 	m_width = imageCreateInfo.extent.width;
 	m_height = imageCreateInfo.extent.height;
 	m_arraySize = imageCreateInfo.arrayLayers;
+	m_numSamples = 1;
+	m_type = ResourceType::Texture2D;
 
 	m_resource = CreateTextureResource(name, imageCreateInfo);
 
@@ -54,6 +56,8 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 	m_width = imageCreateInfo.extent.width;
 	m_height = imageCreateInfo.extent.height;
 	m_arraySize = imageCreateInfo.arrayLayers;
+	m_numSamples = numSamples;
+	m_type = (m_numSamples == 1) ? ResourceType::Texture2D : ResourceType::Texture2DMS;
 
 	m_resource = CreateTextureResource(name, imageCreateInfo);
 
