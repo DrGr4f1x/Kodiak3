@@ -61,10 +61,9 @@ private:
 
 	Kodiak::ColorBufferPtr		m_colorTarget;
 	Kodiak::DepthBufferPtr		m_depthTarget;
-	const uint32_t				m_numSamples{ 2 };
+	const uint32_t				m_numSamples{ 8 };
 
-	Kodiak::RenderPass			m_renderPass;
-	Kodiak::FrameBufferPtr		m_frameBuffer[3];
+	Kodiak::FrameBufferPtr		m_frameBuffer;
 
 	Constants					m_constants;
 	Kodiak::ConstantBuffer		m_constantBuffer;

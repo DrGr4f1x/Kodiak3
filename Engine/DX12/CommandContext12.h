@@ -184,6 +184,8 @@ public:
 		uint32_t startVertexLocation = 0, uint32_t startInstanceLocation = 0);
 	void DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation,
 		int32_t baseVertexLocation, uint32_t startInstanceLocation);
+
+	void Resolve(GpuResource& src, GpuResource& dest, Format format);
 };
 
 
@@ -378,6 +380,14 @@ inline void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance
 	m_dynamicViewDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
 	m_dynamicSamplerDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
 	m_commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
+}
+
+
+inline void GraphicsContext::Resolve(GpuResource& src, GpuResource& dest, Format format)
+{
+	FlushResourceBarriers();
+	auto dxFormat = static_cast<DXGI_FORMAT>(format);
+	m_commandList->ResolveSubresource(dest.m_resource, 0, src.m_resource, 0, dxFormat);
 }
 
 

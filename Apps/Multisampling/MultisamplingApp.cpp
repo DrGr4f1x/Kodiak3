@@ -82,10 +82,13 @@ void MultisamplingApp::Render()
 {
 	auto& context = GraphicsContext::Begin("Render frame");
 
-	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
-
 	Color clearColor{ DirectX::Colors::White };
-	context.BeginRenderPass(m_renderPass, *m_frameBuffer[curFrame], clearColor, 1.0f, 0);
+	context.BeginRenderPass(*m_frameBuffer);
+
+	context.TransitionResource(*m_frameBuffer->GetColorBuffer(0), ResourceState::RenderTarget);
+	context.TransitionResource(*m_frameBuffer->GetDepthBuffer(), ResourceState::DepthWrite);
+	context.ClearColor(*m_frameBuffer->GetColorBuffer(0), clearColor);
+	context.ClearDepth(*m_frameBuffer->GetDepthBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -104,35 +107,30 @@ void MultisamplingApp::Render()
 
 	context.EndRenderPass();
 
+	context.TransitionResource(*m_frameBuffer->GetColorBuffer(0), ResourceState::ResolveSource);
+	context.TransitionResource(GetColorBuffer(), ResourceState::ResolveDest);
+
+	context.Resolve(*m_frameBuffer->GetColorBuffer(0), GetColorBuffer(), GetColorFormat());
+
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
+
 	context.Finish();
 }
 
 
 void MultisamplingApp::InitRenderTargets()
 {
-	auto colorFormat = m_graphicsDevice->GetColorFormat();
-	auto depthFormat = m_graphicsDevice->GetDepthFormat();
-
-	m_renderPass.SetColorAttachment(0, colorFormat, ResourceState::RenderTarget, ResourceState::CopySource);
-	m_renderPass.SetResolveAttachment(0, colorFormat, ResourceState::CopyDest, ResourceState::Present);
-	m_renderPass.SetDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
-	m_renderPass.Finalize();
-
 	m_colorTarget = make_shared<ColorBuffer>(DirectX::Colors::White);
 	m_colorTarget->SetMsaaMode(m_numSamples, m_numSamples);
-	m_colorTarget->Create("Color target", m_displayWidth, m_displayHeight, 1, colorFormat);
+	m_colorTarget->Create("Color target", m_displayWidth, m_displayHeight, 1, GetColorFormat());
 
 	m_depthTarget = make_shared<DepthBuffer>(1.0f, 0);
-	m_depthTarget->Create("Depth target", m_displayWidth, m_displayHeight, m_numSamples, depthFormat);
+	m_depthTarget->Create("Depth target", m_displayWidth, m_displayHeight, m_numSamples, GetDepthFormat());
 
-	for (int i = 0; i < 3; ++i)
-	{
-		m_frameBuffer[i] = make_shared<FrameBuffer>();
-		m_frameBuffer[i]->SetColorBuffer(0, m_colorTarget);
-		m_frameBuffer[i]->SetResolveBuffer(0, m_defaultFramebuffers[i]->GetColorBuffer(0));
-		m_frameBuffer[i]->SetDepthBuffer(m_depthTarget);
-		m_frameBuffer[i]->Finalize(m_renderPass);
-	}
+	m_frameBuffer = make_shared<FrameBuffer>();
+	m_frameBuffer->SetColorBuffer(0, m_colorTarget);
+	m_frameBuffer->SetDepthBuffer(m_depthTarget);
+	m_frameBuffer->Finalize();
 }
 
 
@@ -159,8 +157,7 @@ void MultisamplingApp::InitPSO()
 	m_pso.SetVertexShader("MeshVS");
 	m_pso.SetPixelShader("MeshPS");
 
-	m_pso.SetRenderPass(m_defaultRenderPass);
-	m_pso.SetMsaaState(m_numSamples);
+	m_pso.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat(), m_numSamples);
 
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
