@@ -22,7 +22,6 @@ void FrameBuffer::Destroy()
 	for (uint32_t i = 0; i < 8; ++i)
 	{
 		m_colorBuffers[i].reset();
-		m_resolveBuffers[i].reset();
 	}
 
 	m_depthBuffer.reset();
@@ -43,19 +42,17 @@ void FrameBuffer::SetDepthBuffer(DepthBufferPtr buffer)
 }
 
 
-void FrameBuffer::SetResolveBuffer(uint32_t index, ColorBufferPtr buffer)
-{
-	assert(index < 8);
-
-	m_resolveBuffers[index] = buffer;
-}
-
-
 ColorBufferPtr FrameBuffer::GetColorBuffer(uint32_t index) const
 {
 	assert(index < 8);
 
 	return m_colorBuffers[index];
+}
+
+
+DepthBufferPtr FrameBuffer::GetDepthBuffer() const
+{
+	return m_depthBuffer;
 }
 
 
@@ -66,19 +63,6 @@ uint32_t FrameBuffer::GetNumColorBuffers() const
 	for (uint32_t i = 0; i < 8; ++i)
 	{
 		count += m_colorBuffers[i] != nullptr ? 1 : 0;
-	}
-
-	return count;
-}
-
-
-uint32_t FrameBuffer::GetNumResolveBuffers() const
-{
-	uint32_t count = 0;
-
-	for (uint32_t i = 0; i < 8; ++i)
-	{
-		count += m_resolveBuffers[i] != nullptr ? 1 : 0;
 	}
 
 	return count;

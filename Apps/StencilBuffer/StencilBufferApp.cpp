@@ -85,8 +85,12 @@ void StencilBufferApp::Render()
 
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
-	Color clearColor{ DirectX::Colors::Black };
-	context.BeginRenderPass(m_defaultRenderPass, *m_defaultFramebuffers[curFrame], clearColor, 1.0f, 0);
+	context.BeginRenderPass(GetBackBuffer());
+
+	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
+	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
+	context.ClearColor(GetColorBuffer());
+	context.ClearDepthAndStencil(GetDepthBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -112,6 +116,7 @@ void StencilBufferApp::Render()
 	}
 
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -147,7 +152,7 @@ void StencilBufferApp::InitPSOs()
 		m_toonPSO.SetVertexShader("ToonVS");
 		m_toonPSO.SetPixelShader("ToonPS");
 
-		m_toonPSO.SetRenderPass(m_defaultRenderPass);
+		m_toonPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 
 		m_toonPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
@@ -185,7 +190,7 @@ void StencilBufferApp::InitPSOs()
 		m_outlinePSO.SetVertexShader("OutlineVS");
 		m_outlinePSO.SetPixelShader("OutlinePS");
 
-		m_outlinePSO.SetRenderPass(m_defaultRenderPass);
+		m_outlinePSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 
 		m_outlinePSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 

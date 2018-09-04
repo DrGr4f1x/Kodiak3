@@ -101,8 +101,12 @@ void TextureArrayApp::Render()
 
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
-	Color clearColor{ DirectX::Colors::Black };
-	context.BeginRenderPass(m_defaultRenderPass, *m_defaultFramebuffers[curFrame], clearColor, 1.0f, 0);
+	context.BeginRenderPass(GetBackBuffer());
+
+	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
+	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
+	context.ClearColor(GetColorBuffer());
+	context.ClearDepth(GetDepthBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -118,6 +122,7 @@ void TextureArrayApp::Render()
 	context.DrawIndexedInstanced((uint32_t)m_indexBuffer.GetElementCount(), m_layerCount, 0, 0, 0);
 
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -146,7 +151,7 @@ void TextureArrayApp::InitPSO()
 	m_pso.SetVertexShader("InstancingVS");
 	m_pso.SetPixelShader("InstancingPS");
 
-	m_pso.SetRenderPass(m_defaultRenderPass);
+	m_pso.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 

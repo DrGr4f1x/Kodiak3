@@ -38,7 +38,6 @@ void RadialBlurApp::Startup()
 {
 	m_timerSpeed = 0.125f;
 
-	InitRenderPasses();
 	InitRootSigs();
 	InitPSOs();
 	InitFramebuffers();
@@ -52,8 +51,6 @@ void RadialBlurApp::Shutdown()
 {
 	m_model.reset();
 	m_gradientTex.reset();
-
-	m_offscreenRenderPass.Destroy();
 
 	m_offscreenFramebuffer.reset();
 
@@ -82,7 +79,12 @@ void RadialBlurApp::Render()
 		auto& context = GraphicsContext::Begin("Offscreen");
 
 		Color clearColor{ DirectX::Colors::Black };
-		context.BeginRenderPass(m_offscreenRenderPass, *m_offscreenFramebuffer, clearColor, 1.0f, 0);
+		context.BeginRenderPass(*m_offscreenFramebuffer);
+
+		context.TransitionResource(*m_offscreenFramebuffer->GetColorBuffer(0), ResourceState::RenderTarget);
+		context.TransitionResource(*m_offscreenFramebuffer->GetDepthBuffer(), ResourceState::DepthWrite);
+		context.ClearColor(*m_offscreenFramebuffer->GetColorBuffer(0));
+		context.ClearDepth(*m_offscreenFramebuffer->GetDepthBuffer());
 
 		context.SetViewportAndScissor(0u, 0u, s_offscreenSize, s_offscreenSize);
 
@@ -108,8 +110,12 @@ void RadialBlurApp::Render()
 
 		uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
-		Color clearColor{ DirectX::Colors::Black };
-		context.BeginRenderPass(m_defaultRenderPass, *m_defaultFramebuffers[curFrame], clearColor, 1.0f, 0);
+		context.BeginRenderPass(GetBackBuffer());
+
+		context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
+		context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
+		context.ClearColor(GetColorBuffer());
+		context.ClearDepth(GetDepthBuffer());
 
 		context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -126,6 +132,8 @@ void RadialBlurApp::Render()
 
 		if (m_blur)
 		{
+			context.TransitionResource(*m_offscreenFramebuffer->GetColorBuffer(0), ResourceState::PixelShaderImage);
+
 			context.SetRootSignature(m_radialBlurRootSig);
 			context.SetPipelineState(m_radialBlurPSO);
 			
@@ -136,20 +144,10 @@ void RadialBlurApp::Render()
 		}
 
 		context.EndRenderPass();
+		context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 		context.Finish();
 	}
-}
-
-
-void RadialBlurApp::InitRenderPasses()
-{
-	auto colorFormat = Format::R8G8B8A8_UNorm;
-	auto depthFormat = m_graphicsDevice->GetDepthFormat();
-		
-	m_offscreenRenderPass.SetColorAttachment(0, colorFormat, ResourceState::Undefined, ResourceState::PixelShaderResource);
-	m_offscreenRenderPass.SetDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
-	m_offscreenRenderPass.Finalize();
 }
 
 
@@ -175,7 +173,7 @@ void RadialBlurApp::InitRootSigs()
 void RadialBlurApp::InitPSOs()
 {
 	m_radialBlurPSO.SetRootSignature(m_radialBlurRootSig);
-	m_radialBlurPSO.SetRenderPass(m_defaultRenderPass);
+	m_radialBlurPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 	m_radialBlurPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 	m_radialBlurPSO.SetBlendState(CommonStates::BlendAdditive());
 	m_radialBlurPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
@@ -183,10 +181,9 @@ void RadialBlurApp::InitPSOs()
 	m_radialBlurPSO.SetVertexShader("RadialBlurVS");
 	m_radialBlurPSO.SetPixelShader("RadialBlurPS");
 
-	m_offscreenDisplayPSO = m_radialBlurPSO;
-	m_offscreenDisplayPSO.SetBlendState(CommonStates::BlendDisable());
-
-	m_phongPassPSO = m_offscreenDisplayPSO;
+	m_phongPassPSO = m_radialBlurPSO;
+	m_phongPassPSO.SetBlendState(CommonStates::BlendDisable());
+	m_phongPassPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 	m_phongPassPSO.SetRootSignature(m_sceneRootSig);
 	m_phongPassPSO.SetVertexShader("PhongPassVS");
 	m_phongPassPSO.SetPixelShader("PhongPassPS");
@@ -202,12 +199,11 @@ void RadialBlurApp::InitPSOs()
 	m_phongPassPSO.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
 
 	m_colorPassPSO = m_phongPassPSO;
-	m_colorPassPSO.SetRenderPass(m_offscreenRenderPass);
+	m_colorPassPSO.SetRenderTargetFormat(Format::R8G8B8A8_UNorm, GetDepthFormat());
 	m_colorPassPSO.SetVertexShader("ColorPassVS");
 	m_colorPassPSO.SetPixelShader("ColorPassPS");
 
 	m_radialBlurPSO.Finalize();
-	m_offscreenDisplayPSO.Finalize();
 	m_phongPassPSO.Finalize();
 	m_colorPassPSO.Finalize();
 }
@@ -221,12 +217,12 @@ void RadialBlurApp::InitFramebuffers()
 		colorBuffer->Create("Offscreen Color Buffer", s_offscreenSize, s_offscreenSize, 1, Format::R8G8B8A8_UNorm);
 
 		auto depthBuffer = make_shared<DepthBuffer>(1.0f);
-		depthBuffer->Create("Offscreen Depth Buffer", s_offscreenSize, s_offscreenSize, m_graphicsDevice->GetDepthFormat());
+		depthBuffer->Create("Offscreen Depth Buffer", s_offscreenSize, s_offscreenSize, GetDepthFormat());
 
 		m_offscreenFramebuffer = make_shared<FrameBuffer>();
 		m_offscreenFramebuffer->SetColorBuffer(0, colorBuffer);
 		m_offscreenFramebuffer->SetDepthBuffer(depthBuffer);
-		m_offscreenFramebuffer->Finalize(m_offscreenRenderPass);
+		m_offscreenFramebuffer->Finalize();
 	}
 }
 

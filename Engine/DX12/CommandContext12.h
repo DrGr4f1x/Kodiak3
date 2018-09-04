@@ -33,7 +33,6 @@ class ComputeContext;
 class DepthBuffer;
 class FrameBuffer;
 class GraphicsContext;
-class RenderPass;
 
 
 class ContextManager
@@ -127,14 +126,7 @@ protected:
 
 	// Current render targets
 	std::array<ColorBuffer*, 8>		m_renderTargets;
-	std::array<ResourceState, 8>	m_renderTargetStates;
-	std::array<ColorBuffer*, 8>		m_resolveTargets;
-	std::array<ResourceState, 8>	m_resolveTargetStates;
 	DepthBuffer* m_depthTarget;
-	ResourceState m_depthTargetState;
-	bool m_depthTargetValid{ false };
-	uint32_t m_numRenderTargets{ 0 };
-	uint32_t m_numResolveTargets{ 0 };
 
 	std::string m_id;
 
@@ -157,12 +149,12 @@ public:
 	}
 
 	void ClearColor(ColorBuffer& target);
+	void ClearColor(ColorBuffer& target, Color clearColor);
 	void ClearDepth(DepthBuffer& target);
 	void ClearStencil(DepthBuffer& target);
 	void ClearDepthAndStencil(DepthBuffer& target);
 
-	void BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor);
-	void BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor, float clearDepth, uint32_t clearStencil);
+	void BeginRenderPass(FrameBuffer& framebuffer);
 	void EndRenderPass();
 
 	void SetRootSignature(const RootSignature& rootSig);

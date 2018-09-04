@@ -15,7 +15,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="Shaders\Texture3dPS.hlsl" />
-    <CustomBuild Include="Shaders\Texture3dVS.hlsl" />
+    <CustomBuild Include="Shaders\Texture3dPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Texture3dVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

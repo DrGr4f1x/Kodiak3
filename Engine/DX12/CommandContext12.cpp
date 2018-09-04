@@ -372,6 +372,13 @@ void GraphicsContext::ClearColor(ColorBuffer& target)
 }
 
 
+void GraphicsContext::ClearColor(ColorBuffer& target, Color clearColor)
+{
+	FlushResourceBarriers();
+	m_commandList->ClearRenderTargetView(target.GetRTV().GetHandle(), clearColor.GetPtr(), 0, nullptr);
+}
+
+
 void GraphicsContext::ClearDepth(DepthBuffer& target)
 {
 	FlushResourceBarriers();
@@ -393,166 +400,42 @@ void GraphicsContext::ClearDepthAndStencil(DepthBuffer& target)
 }
 
 
-void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor)
+void GraphicsContext::BeginRenderPass(FrameBuffer& framebuffer)
 {
-	// Verify the renderpass and framebuffer are compatible
-	assert(pass.GetNumColorAttachments() == framebuffer.GetNumColorBuffers());
-
-	assert(!pass.m_depthAttachment.isValid);
-	assert(!framebuffer.HasDepthBuffer());
-
 	array<D3D12_CPU_DESCRIPTOR_HANDLE, 8> RTVs;
-
-	m_numRenderTargets = (uint32_t)pass.GetNumColorAttachments();
 
 	// Gather render targets for EndRenderPass
-	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
+	uint32_t highWaterMark = 0;
+	for (uint32_t i = 0; i < 8; ++i)
 	{
 		m_renderTargets[i] = framebuffer.m_colorBuffers[i].get();
-		m_renderTargetStates[i] = pass.m_colorAttachments[i].finalState;
-	}
-	m_depthTargetValid = false;
-
-	// Transition resources to initial states
-	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
-	{
-		RTVs[i] = m_renderTargets[i]->GetRTV().GetHandle();
-		TransitionResource(*m_renderTargets[i], ResourceState::RenderTarget);
+		if (m_renderTargets[i])
+		{
+			RTVs[i] = m_renderTargets[i]->GetRTV().GetHandle();
+			highWaterMark = i + 1;
+		}
 	}
 
-	FlushResourceBarriers();
-
-	// Gather resolve targets for EndRenderPass
-	for (uint32_t i = 0; i < m_numResolveTargets; ++i)
-	{
-		m_resolveTargets[i] = framebuffer.m_resolveBuffers[i].get();
-		m_resolveTargetStates[i] = pass.m_resolveAttachments[i].finalState;
-	}
-
-	// Set the render targets
-	m_commandList->OMSetRenderTargets(m_numRenderTargets, &RTVs[0], FALSE, nullptr);
-
-	// Clear render targets
-	float rgba[4];
-	rgba[0] = clearColor.R();
-	rgba[1] = clearColor.G();
-	rgba[2] = clearColor.B();
-	rgba[3] = clearColor.A();
-	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
-	{
-		m_commandList->ClearRenderTargetView(RTVs[i], rgba, 0, nullptr);
-	}
-}
-
-
-void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor, float clearDepth, uint32_t clearStencil)
-{
-	// Verify the renderpass and framebuffer are compatible
-	assert(pass.GetNumColorAttachments() == framebuffer.GetNumColorBuffers());
-
-	assert(pass.m_depthAttachment.isValid);
-	assert(framebuffer.HasDepthBuffer());
-
-	array<D3D12_CPU_DESCRIPTOR_HANDLE, 8> RTVs;
 	D3D12_CPU_DESCRIPTOR_HANDLE DSV;
-
-	m_numRenderTargets = pass.GetNumColorAttachments();
-	m_numResolveTargets = pass.GetNumResolveAttachments();
-
-	// Gather render targets for EndRenderPass
-	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
+	m_depthTarget = framebuffer.GetDepthBuffer().get();
+	if (m_depthTarget)
 	{
-		m_renderTargets[i] = framebuffer.m_colorBuffers[i].get();
-		m_renderTargetStates[i] = pass.m_colorAttachments[i].finalState;
-	}
-	m_depthTarget = framebuffer.m_depthBuffer.get();
-	m_depthTargetState = pass.m_depthAttachment.finalState;
-	m_depthTargetValid = true;
-
-	// Transition resources to initial states
-	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
-	{
-		RTVs[i] = m_renderTargets[i]->GetRTV().GetHandle();
-		TransitionResource(*m_renderTargets[i], ResourceState::RenderTarget);
-	}
-	DSV = m_depthTarget->GetDSV().GetHandle();
-	TransitionResource(*m_depthTarget, ResourceState::DepthWrite);
-
-	FlushResourceBarriers();
-
-	// Gather resolve targets for EndRenderPass
-	for (uint32_t i = 0; i < m_numResolveTargets; ++i)
-	{
-		m_resolveTargets[i] = framebuffer.m_resolveBuffers[i].get();
-		m_resolveTargetStates[i] = pass.m_resolveAttachments[i].finalState;
+		DSV = m_depthTarget->GetDSV().GetHandle();
 	}
 
 	// Set the render targets
-	m_commandList->OMSetRenderTargets(m_numRenderTargets, &RTVs[0], FALSE, &DSV);
-
-	// Clear render targets
-	float rgba[4];
-	rgba[0] = clearColor.R();
-	rgba[1] = clearColor.G();
-	rgba[2] = clearColor.B();
-	rgba[3] = clearColor.A();
-	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
-	{
-		m_commandList->ClearRenderTargetView(RTVs[i], rgba, 0, nullptr);
-	}
-	m_commandList->ClearDepthStencilView(DSV, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, clearDepth, (UINT8)clearStencil, 0, nullptr);
+	m_commandList->OMSetRenderTargets(highWaterMark, RTVs.data(), FALSE, m_depthTarget ? &DSV : nullptr);
 }
 
 
 void GraphicsContext::EndRenderPass()
 {
-	// Transition resolve sources/targets to initial states
-	for (uint32_t i = 0; i < m_numResolveTargets; ++i)
-	{
-		TransitionResource(*m_renderTargets[i], ResourceState::ResolveSource);
-		TransitionResource(*m_resolveTargets[i], ResourceState::ResolveDest);
-	}
-
-	FlushResourceBarriers();
-
-	// Resolve
-	for (uint32_t i = 0; i < m_numResolveTargets; ++i)
-	{
-		auto dxgiFormat = static_cast<DXGI_FORMAT>(m_renderTargets[i]->GetFormat());
-		m_commandList->ResolveSubresource(m_resolveTargets[i]->m_resource, 0, m_renderTargets[i]->m_resource, 0, dxgiFormat);
-	}
-
-	// Transition render targets to final states
-	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
-	{
-		TransitionResource(*m_renderTargets[i], m_renderTargetStates[i]);
-	}
-	if (m_depthTargetValid)
-	{
-		TransitionResource(*m_depthTarget, m_depthTargetState);
-	}
-
-	FlushResourceBarriers();
-
-	// Transition resolve targets to final states
-	for (uint32_t i = 0; i < m_numResolveTargets; ++i)
-	{
-		TransitionResource(*m_resolveTargets[i], m_resolveTargetStates[i]);
-	}
-	FlushResourceBarriers();
-
 	// Clear cached render targets
-	for (uint32_t i = 0; i < m_numRenderTargets; ++i)
+	for (uint32_t i = 0; i < 8; ++i)
 	{
 		m_renderTargets[i] = nullptr;
-		m_resolveTargets[i] = nullptr;
 	}
-	if (m_depthTargetValid)
-	{
-		m_depthTarget = nullptr;
-	}
-	m_numRenderTargets = 0;
-	m_depthTargetValid = false;
+	m_depthTarget = nullptr;
 }
 
 

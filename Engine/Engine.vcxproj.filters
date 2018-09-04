@@ -115,9 +115,6 @@
     <ClInclude Include="RenderPass.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="DX12\RenderPass12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="VK\RenderPassVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
@@ -275,9 +272,6 @@
     </ClCompile>
     <ClCompile Include="VK\FramebufferVk.cpp">
       <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\RenderPass12.cpp">
-      <Filter>Graphics\DX12</Filter>
     </ClCompile>
     <ClCompile Include="VK\RenderPassVk.cpp">
       <Filter>Graphics\VK</Filter>

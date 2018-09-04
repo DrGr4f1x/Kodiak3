@@ -139,7 +139,12 @@ void ComputeShaderApp::Render()
 	context.TransitionResource(*m_texture, ResourceState::PixelShaderResource, true);
 
 	Color clearColor{ DirectX::Colors::Black };
-	context.BeginRenderPass(m_defaultRenderPass, *m_defaultFramebuffers[curFrame], clearColor, 1.0f, 0);
+	context.BeginRenderPass(GetBackBuffer());
+
+	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
+	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
+	context.ClearColor(GetColorBuffer());
+	context.ClearDepth(GetDepthBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth / 2, m_displayHeight);
 
@@ -160,6 +165,7 @@ void ComputeShaderApp::Render()
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -193,7 +199,7 @@ void ComputeShaderApp::InitPSOs()
 	m_pso.SetVertexShader("TextureVS");
 	m_pso.SetPixelShader("TexturePS");
 
-	m_pso.SetRenderPass(m_defaultRenderPass);
+	m_pso.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 

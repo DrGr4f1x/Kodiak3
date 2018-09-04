@@ -83,10 +83,12 @@ void DisplacementApp::Render()
 {
 	auto& context = GraphicsContext::Begin("Render frame");
 
-	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
+	context.BeginRenderPass(GetBackBuffer());
 
-	Color clearColor{ DirectX::Colors::Black };
-	context.BeginRenderPass(m_defaultRenderPass, *m_defaultFramebuffers[curFrame], clearColor, 1.0f, 0);
+	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
+	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
+	context.ClearColor(GetColorBuffer());
+	context.ClearDepth(GetDepthBuffer());
 
 	context.SetViewport(0.0f, 0.0f, (float)m_displayWidth, (float)m_displayHeight);
 
@@ -112,6 +114,7 @@ void DisplacementApp::Render()
 	context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
 
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -144,7 +147,7 @@ void DisplacementApp::InitPSOs()
 	m_pso.SetHullShader("DisplacementHS");
 	m_pso.SetDomainShader("DisplacementDS");
 
-	m_pso.SetRenderPass(m_defaultRenderPass);
+	m_pso.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::Patch_3_ControlPoint);
 

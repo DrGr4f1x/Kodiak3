@@ -221,12 +221,6 @@ void GraphicsPSO::SetSampleMask(uint32_t sampleMask)
 }
 
 
-void GraphicsPSO::SetMsaaState(uint32_t numSamples)
-{
-	m_psoDesc.SampleDesc.Count = numSamples;
-}
-
-
 void GraphicsPSO::SetPrimitiveTopology(PrimitiveTopology topology)
 {
 	m_psoDesc.PrimitiveTopologyType = MapPrimitiveTopologyToD3DType(topology);
@@ -240,19 +234,27 @@ void GraphicsPSO::SetPrimitiveRestart(IndexBufferStripCutValue ibProps)
 }
 
 
-void GraphicsPSO::SetRenderPass(const RenderPass& renderpass)
+void GraphicsPSO::SetRenderTargetFormat(Format rtvFormat, Format dsvFormat, uint32_t msaaCount, uint32_t msaaQuality)
 {
-	uint32_t numRTVs = static_cast<uint32_t>(renderpass.GetNumColorAttachments());
-	for (uint32_t i = 0; i < numRTVs; ++i)
+	SetRenderTargetFormats(1, &rtvFormat, dsvFormat, msaaCount, msaaQuality);
+}
+
+
+void GraphicsPSO::SetRenderTargetFormats(uint32_t numRtvs, const Format* rtvFormats, Format dsvFormat, uint32_t msaaCount, uint32_t msaaQuality)
+{
+	assert_msg(numRtvs == 0 || rtvFormats != nullptr, "Null format array conflicts with non-zero length");
+	for (uint32_t i = 0; i < numRtvs; ++i)
 	{
-		m_psoDesc.RTVFormats[i] = static_cast<DXGI_FORMAT>(renderpass.m_colorAttachments[i].format);
+		m_psoDesc.RTVFormats[i] = static_cast<DXGI_FORMAT>(rtvFormats[i]);
 	}
-	for (uint32_t i = numRTVs; i < m_psoDesc.NumRenderTargets; ++i)
+	for (uint32_t i = numRtvs; i < m_psoDesc.NumRenderTargets; ++i)
 	{
 		m_psoDesc.RTVFormats[i] = DXGI_FORMAT_UNKNOWN;
 	}
-	m_psoDesc.NumRenderTargets = numRTVs;
-	m_psoDesc.DSVFormat = static_cast<DXGI_FORMAT>(renderpass.m_depthAttachment.format);
+	m_psoDesc.NumRenderTargets = numRtvs;
+	m_psoDesc.DSVFormat = static_cast<DXGI_FORMAT>(dsvFormat);
+	m_psoDesc.SampleDesc.Count = msaaCount;
+	m_psoDesc.SampleDesc.Quality = msaaQuality;
 }
 
 

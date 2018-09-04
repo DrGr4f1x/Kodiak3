@@ -14,7 +14,6 @@
 #include "GpuBuffer.h"
 #include "Model.h"
 #include "PipelineState.h"
-#include "RenderPass.h"
 #include "RootSignature.h"
 #include "Texture.h"
 
@@ -31,7 +30,6 @@ public:
 	void Render() final;
 
 private:
-	void InitRenderPasses();
 	void InitRootSigs();
 	void InitPSOs();
 	void InitFramebuffers();
@@ -67,8 +65,6 @@ private:
 
 	static const uint32_t	s_offscreenSize{ 512 };
 
-	Kodiak::RenderPass		m_offscreenRenderPass;
-
 	Kodiak::FrameBufferPtr	m_offscreenFramebuffer;
 
 	Kodiak::RootSignature	m_radialBlurRootSig;
@@ -77,7 +73,6 @@ private:
 	Kodiak::GraphicsPSO		m_radialBlurPSO;
 	Kodiak::GraphicsPSO		m_colorPassPSO;
 	Kodiak::GraphicsPSO		m_phongPassPSO;
-	Kodiak::GraphicsPSO		m_offscreenDisplayPSO;
 
 	// Constant buffers
 	SceneConstants			m_sceneConstants;

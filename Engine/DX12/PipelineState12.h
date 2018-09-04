@@ -19,7 +19,6 @@ namespace Kodiak
 {
 
 // Forward declarations
-class RenderPass;
 class RootSignature;
 
 
@@ -134,9 +133,9 @@ public:
 	void SetRasterizerState(const RasterizerStateDesc& rasterizerDesc);
 	void SetDepthStencilState(const DepthStencilStateDesc& depthStencilDesc);
 	void SetSampleMask(uint32_t sampleMask);
-	void SetMsaaState(uint32_t numSamples);
 	void SetPrimitiveTopology(PrimitiveTopology topology);
-	void SetRenderPass(const RenderPass& renderpass);
+	void SetRenderTargetFormat(Format rtvFormat, Format dsvFormat, uint32_t msaaCount = 1, uint32_t msaaQuality = 0);
+	void SetRenderTargetFormats(uint32_t numRtvs, const Format* rtvFormats, Format dsvFormat, uint32_t msaaCount = 1, uint32_t msaaQuality = 0);
 	void SetInputLayout(uint32_t numStreams, const VertexStreamDesc* vertexStreams, uint32_t numElements, const VertexElementDesc* inputElementDescs);
 	void SetPrimitiveRestart(IndexBufferStripCutValue ibProps);
 

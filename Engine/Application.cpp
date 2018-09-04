@@ -113,6 +113,39 @@ void Application::Run()
 }
 
 
+FrameBuffer& Application::GetBackBuffer() const
+{
+	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
+	return *m_defaultFramebuffers[curFrame];
+}
+
+
+ColorBuffer& Application::GetColorBuffer() const
+{
+	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
+	return *m_defaultFramebuffers[curFrame]->GetColorBuffer(0);
+}
+
+
+DepthBuffer& Application::GetDepthBuffer() const
+{
+	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
+	return *m_defaultFramebuffers[curFrame]->GetDepthBuffer();
+}
+
+
+Format Application::GetColorFormat() const
+{
+	return g_graphicsDevice->GetColorFormat();
+}
+
+
+Format Application::GetDepthFormat() const
+{
+	return g_graphicsDevice->GetDepthFormat();
+}
+
+
 const string& Application::GetDefaultShaderPath()
 {
 	return s_defaultShaderPath;
@@ -150,7 +183,6 @@ void Application::Finalize()
 	}
 
 	m_defaultDepthBuffer.reset();
-	m_defaultRenderPass.Destroy();
 
 	m_graphicsDevice->Destroy();
 	m_graphicsDevice.reset();
@@ -205,12 +237,6 @@ bool Application::Tick()
 
 void Application::InitFramebuffer()
 {
-	auto colorFormat = m_graphicsDevice->GetColorFormat();
-	auto depthFormat = m_graphicsDevice->GetDepthFormat();
-	m_defaultRenderPass.SetColorAttachment(0, colorFormat, ResourceState::Undefined, ResourceState::Present);
-	m_defaultRenderPass.SetDepthAttachment(depthFormat, ResourceState::Undefined, ResourceState::DepthWrite);
-	m_defaultRenderPass.Finalize();
-
 	// Depth stencil buffer for swap chain
 	m_defaultDepthBuffer = make_shared<DepthBuffer>(1.0f);
 	m_defaultDepthBuffer->Create("Depth Buffer", m_displayWidth, m_displayHeight, m_graphicsDevice->GetDepthFormat());
@@ -222,7 +248,7 @@ void Application::InitFramebuffer()
 		
 		m_defaultFramebuffers[i]->SetColorBuffer(0, m_graphicsDevice->GetBackBuffer(i));
 		m_defaultFramebuffers[i]->SetDepthBuffer(m_defaultDepthBuffer);
-		m_defaultFramebuffers[i]->Finalize(m_defaultRenderPass);
+		m_defaultFramebuffers[i]->Finalize();
 	}
 }
 

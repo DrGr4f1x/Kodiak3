@@ -18,9 +18,6 @@
 namespace Kodiak
 {
 
-// Forward declarations
-class RenderPass;
-
 class FrameBuffer
 {
 	friend class GraphicsContext;
@@ -32,20 +29,18 @@ public:
 
 	void SetColorBuffer(uint32_t index, ColorBufferPtr buffer);
 	void SetDepthBuffer(DepthBufferPtr buffer);
-	void SetResolveBuffer(uint32_t index, ColorBufferPtr buffer);
 
 	ColorBufferPtr GetColorBuffer(uint32_t index) const;
+	DepthBufferPtr GetDepthBuffer() const;
 
 	uint32_t GetNumColorBuffers() const;
-	uint32_t GetNumResolveBuffers() const;
 
 	bool HasDepthBuffer() const { return m_depthBuffer != nullptr; }
 
-	void Finalize(RenderPass& renderpass) {}
+	void Finalize() {}
 
 private:
 	std::array<ColorBufferPtr, 8> m_colorBuffers;
-	std::array<ColorBufferPtr, 8> m_resolveBuffers;
 	DepthBufferPtr m_depthBuffer;
 };
 

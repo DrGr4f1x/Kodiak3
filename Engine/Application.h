@@ -13,7 +13,6 @@
 #include "Camera.h"
 #include "DepthBuffer.h"
 #include "Framebuffer.h"
-#include "RenderPass.h"
 
 
 namespace Kodiak
@@ -54,6 +53,13 @@ public:
 
 	const std::string& GetDefaultShaderPath();
 
+	// Utility methods to get the default color and depth buffers
+	FrameBuffer& GetBackBuffer() const;
+	ColorBuffer& GetColorBuffer() const;
+	DepthBuffer& GetDepthBuffer() const;
+	Format GetColorFormat() const;
+	Format GetDepthFormat() const;
+
 protected:
 	const std::string m_name;
 
@@ -77,7 +83,6 @@ protected:
 	std::array<Kodiak::FrameBufferPtr, NumSwapChainBuffers>
 											m_defaultFramebuffers;
 	Kodiak::DepthBufferPtr					m_defaultDepthBuffer;
-	Kodiak::RenderPass						m_defaultRenderPass;
 
 private:
 	void Initialize();

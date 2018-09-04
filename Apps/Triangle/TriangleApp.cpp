@@ -98,7 +98,12 @@ void TriangleApp::Render()
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 	
 	Color clearColor{ DirectX::Colors::CornflowerBlue };
-	context.BeginRenderPass(m_defaultRenderPass, *m_defaultFramebuffers[curFrame], clearColor, 1.0f, 0);
+	context.BeginRenderPass(GetBackBuffer());
+
+	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
+	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
+	context.ClearColor(GetColorBuffer(), clearColor);
+	context.ClearDepth(GetDepthBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -113,6 +118,7 @@ void TriangleApp::Render()
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -147,7 +153,7 @@ void TriangleApp::InitPSO()
 	m_pso.SetVertexShader("TriangleVS");
 	m_pso.SetPixelShader("TrianglePS");
 
-	m_pso.SetRenderPass(m_defaultRenderPass);
+	m_pso.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
