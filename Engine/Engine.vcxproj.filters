@@ -155,9 +155,6 @@
     <ClInclude Include="Texture.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="DX12\Texture12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="VK\TextureVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
@@ -358,6 +355,9 @@
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
     <ClCompile Include="ColorBuffer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>

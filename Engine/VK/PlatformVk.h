@@ -56,6 +56,7 @@ using CbvHandle = VkDescriptorHandle::VkPointer;
 
 using DsvHandle = VkHandle<VkImageView>::VkPointer;
 using RtvHandle = VkHandle<VkImageView>::VkPointer;
+using FboHandle = VkFramebufferHandle::VkPointer;
 
 static const uint32_t NumSwapChainBuffers = 3;
 

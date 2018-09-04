@@ -12,13 +12,13 @@
 
 #include "GraphicsDevice.h"
 
+#include "Texture.h"
 #include "Utility.h"
 
 #include "CommandContextVk.h"
 #include "CommandListManagerVk.h"
 #include "PipelineStateVk.h"
 #include "RootSignatureVk.h"
-#include "TextureVk.h"
 
 #include <iostream>
 #include <sstream>

@@ -49,14 +49,6 @@ public:
 		m_numSamples = numCoverageSamples;
 	}
 
-#if VK
-	void SetLayout(VkImageLayout layout) { m_layout = layout; }
-	VkImageLayout GetLayout() const { return m_layout; }
-
-	void SetAccessFlags(VkAccessFlags flags) { m_accessFlags = flags; }
-	VkAccessFlags GetAccessFlags() const { return m_accessFlags; }
-#endif
-
 protected:
 	// Compute the number of texture levels needed to reduce to 1x1.  This uses
 	// _BitScanReverse to find the highest set bit.  Each dimension reduces by
@@ -78,12 +70,6 @@ protected:
 	UnorderedAccessView m_uavHandle;
 	uint32_t m_numMipMaps{ 0 }; // number of texture sublevels
 	uint32_t m_fragmentCount{ 1 };
-
-	// TODO - Wrap this up?
-#if VK
-	VkImageLayout	m_layout{ VK_IMAGE_LAYOUT_GENERAL };
-	VkAccessFlags	m_accessFlags{ 0 };
-#endif
 };
 
 using ColorBufferPtr = std::shared_ptr<ColorBuffer>;

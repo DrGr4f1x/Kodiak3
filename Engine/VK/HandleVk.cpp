@@ -68,6 +68,24 @@ VkDescriptorHandle::~VkDescriptorHandle()
 }
 
 
+VkFramebufferHandle::~VkFramebufferHandle()
+{
+	auto device = GetDevice();
+
+	if (m_renderPass != VK_NULL_HANDLE)
+	{
+		vkDestroyRenderPass(device, m_renderPass, nullptr);
+		m_renderPass = VK_NULL_HANDLE;
+	}
+
+	if (m_framebuffer != VK_NULL_HANDLE)
+	{
+		vkDestroyFramebuffer(device, m_framebuffer, nullptr);
+		m_framebuffer = VK_NULL_HANDLE;
+	}
+}
+
+
 template<> VkHandle<VkInstance>::~VkHandle()
 {
 	if (m_wrapped != VK_NULL_HANDLE)

@@ -209,6 +209,44 @@ private:
 	const bool m_isBufferView{ false };
 };
 
+
+class VkFramebufferHandle : public VkBaseHandle
+{
+public:
+	class VkPointer : std::shared_ptr<VkFramebufferHandle>
+	{
+	public:
+		using Super = std::shared_ptr<VkFramebufferHandle>;
+
+		VkPointer() = default;
+		VkPointer(VkFramebufferHandle* handle) : Super(handle) {}
+
+		static VkPointer Create(VkFramebuffer framebuffer, VkRenderPass renderPass)
+		{
+			return VkPointer(new VkFramebufferHandle(framebuffer, renderPass));
+		}
+
+		operator VkFramebuffer() const { return Get()->m_framebuffer; }
+		operator VkRenderPass() const { return Get()->m_renderPass; }
+
+	private:
+		VkFramebufferHandle* Get() const { return Super::get(); }
+	};
+
+	~VkFramebufferHandle();
+
+private:
+	friend class VkPointer;
+
+	VkFramebufferHandle(VkFramebuffer framebuffer, VkRenderPass renderPass)
+		: m_framebuffer(framebuffer)
+		, m_renderPass(renderPass)
+	{}
+
+	VkFramebuffer	m_framebuffer{ VK_NULL_HANDLE };
+	VkRenderPass	m_renderPass{ VK_NULL_HANDLE };
+};
+
 // Template specializations for destructors
 template<> VkHandle<VkInstance>::~VkHandle();
 template<> VkHandle<VkDevice>::~VkHandle();

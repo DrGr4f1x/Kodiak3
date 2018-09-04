@@ -10,7 +10,7 @@
 
 #include "Stdafx.h"
 
-#include "Texture12.h"
+#include "Texture.h"
 
 #include "BinaryReader.h"
 #include "Filesystem.h"
@@ -28,48 +28,6 @@ using namespace std;
 
 namespace
 {
-
-map<string, shared_ptr<ManagedTexture>> s_textureCache;
-
-
-pair<shared_ptr<ManagedTexture>, bool> FindOrLoadTexture(const string& filename)
-{
-	static mutex s_mutex;
-	lock_guard<mutex> CS(s_mutex);
-
-	auto iter = s_textureCache.find(filename);
-
-	// If it's found, it has already been loaded or the load process has begun
-	if (iter != s_textureCache.end())
-	{
-		return make_pair(iter->second, false);
-	}
-
-	auto newTexture = make_shared<ManagedTexture>(filename);
-	s_textureCache[filename] = newTexture;
-
-	// This was the first time it was requested, so indicate that the caller must read the file
-	return make_pair(newTexture, true);
-}
-
-
-template <typename F>
-shared_ptr<Texture> MakeTexture(const string& filename, F fn)
-{
-	auto managedTex = FindOrLoadTexture(filename);
-
-	auto manTex = managedTex.first;
-	const bool requestsLoad = managedTex.second;
-
-	if (!requestsLoad)
-	{
-		manTex->WaitForLoad();
-		return manTex;
-	}
-
-	fn(manTex.get(), filename);
-	return manTex;
-}
 
 void GetSurfaceInfo(size_t width, size_t height, DXGI_FORMAT format, size_t& numBytes, size_t& rowBytes, size_t& numRows)
 {
@@ -182,14 +140,34 @@ void GetSurfaceInfo(size_t width, size_t height, DXGI_FORMAT format, size_t& num
 	}
 }
 
-
-
-
 } // anonymous namespace
 
 
-void TextureInitializer::Initialize()
+namespace Kodiak
 {
+
+struct TextureInitializer::PlatformData
+{
+	PlatformData(uint32_t size)
+		: data(size)
+	{}
+
+	std::vector<D3D12_SUBRESOURCE_DATA> data;
+};
+
+} // namespace Kodiak
+
+
+TextureInitializer::~TextureInitializer()
+{
+	delete m_platformData;
+}
+
+
+void TextureInitializer::PlatformCreate()
+{
+	m_platformData = new PlatformData(m_numMips * m_depthOrArraySize);
+
 	DXGI_FORMAT format = static_cast<DXGI_FORMAT>(m_format);
 
 	size_t index = 0;
@@ -211,9 +189,9 @@ void TextureInitializer::Initialize()
 				m_faceSize[j] = numBytes;
 			}
 
-			m_data[index].pData = nullptr;
-			m_data[index].RowPitch = static_cast<UINT>(rowBytes);
-			m_data[index].SlicePitch = static_cast<UINT>(numBytes);
+			m_platformData->data[index].pData = nullptr;
+			m_platformData->data[index].RowPitch = static_cast<UINT>(rowBytes);
+			m_platformData->data[index].SlicePitch = static_cast<UINT>(numBytes);
 			++index;
 
 			width = width >> 1;
@@ -231,19 +209,8 @@ void TextureInitializer::Initialize()
 void TextureInitializer::SetData(uint32_t slice, uint32_t mipLevel, const void* data)
 {
 	int index = slice * m_numMips + mipLevel;
-	m_data[index].pData = data;
+	m_platformData->data[index].pData = data;
 }
-
-
-Texture::Texture()
-{
-	m_cpuDescriptorHandle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
-}
-
-
-Texture::Texture(D3D12_CPU_DESCRIPTOR_HANDLE handle)
-	: m_cpuDescriptorHandle(handle)
-{}
 
 
 void Texture::Create1D(uint32_t width, Format format, const void* initData)
@@ -277,9 +244,10 @@ void Texture::Create(TextureInitializer& init)
 {
 	m_width = init.m_width;
 	m_height = init.m_height;
-	m_depthOrArraySize = init.m_depthOrArraySize;
+	m_arraySize = init.m_depthOrArraySize;
 	m_format = init.m_format;
 	m_numMips = init.m_numMips;
+	m_type = init.m_type;
 
 	m_usageState = ResourceState::CopyDest;
 
@@ -287,7 +255,7 @@ void Texture::Create(TextureInitializer& init)
 	texDesc.Dimension = GetResourceDimension(init.m_type);
 	texDesc.Width = m_width;
 	texDesc.Height = m_height;
-	texDesc.DepthOrArraySize = static_cast<UINT16>(m_depthOrArraySize);
+	texDesc.DepthOrArraySize = static_cast<UINT16>(m_arraySize);
 	texDesc.MipLevels = m_numMips;
 	texDesc.Format = static_cast<DXGI_FORMAT>(m_format);
 	texDesc.SampleDesc.Count = 1;
@@ -309,114 +277,11 @@ void Texture::Create(TextureInitializer& init)
 
 	m_resource->SetName(L"Texture");
 
-	uint32_t arraySize = (init.m_type == ResourceType::Texture3D) ? 1 : m_depthOrArraySize;
+	uint32_t arraySize = (init.m_type == ResourceType::Texture3D) ? 1 : m_arraySize;
 
-	CommandContext::InitializeTexture(*this, arraySize * m_numMips, init.m_data.data());
+	CommandContext::InitializeTexture(*this, arraySize * m_numMips, init.m_platformData->data.data());
 
-	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
-	{
-		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	}
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
-	SRVDesc.Format = texDesc.Format;
-	SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	SRVDesc.ViewDimension = GetSRVDimension(init.m_type);
-	switch (init.m_type)
-	{
-	case ResourceType::Texture1D:
-		SRVDesc.Texture1D.MipLevels = (UINT)-1;
-		break;
-	case ResourceType::Texture1D_Array:
-		SRVDesc.Texture1DArray.MipLevels = (UINT)-1;
-		SRVDesc.Texture1DArray.ArraySize = m_depthOrArraySize;
-		break;
-	case ResourceType::Texture2D:
-		SRVDesc.Texture2D.MipLevels = (UINT)-1;
-		break;
-	case ResourceType::Texture2D_Array:
-		SRVDesc.Texture2DArray.MipLevels = (UINT)-1;
-		SRVDesc.Texture2DArray.ArraySize = m_depthOrArraySize;
-		break;
-	case ResourceType::TextureCube:
-		SRVDesc.TextureCube.MipLevels = (UINT)-1;
-		break;
-	case ResourceType::TextureCube_Array:
-		SRVDesc.TextureCubeArray.MipLevels = (UINT)-1;
-		SRVDesc.TextureCubeArray.NumCubes = m_depthOrArraySize;
-		break;
-	case ResourceType::Texture3D:
-		SRVDesc.Texture3D.MipLevels = (UINT)-1;
-		break;
-	}
-	device->CreateShaderResourceView(m_resource, &SRVDesc, m_cpuDescriptorHandle);
-}
-
-
-shared_ptr<Texture> Texture::Load(const string& filename, bool sRgb)
-{
-	auto& filesystem = Filesystem::GetInstance();
-	string fullpath = filesystem.GetFullPath(filename);
-
-	assert_msg(!fullpath.empty(), "Could not find texture file %s", filename.c_str());
-
-	string extension = filesystem.GetFileExtension(filename);
-
-	if (extension == ".dds")
-	{
-		return MakeTexture(fullpath, [sRgb](Texture* texture, const string& filename) { texture->LoadDDS(filename, sRgb); });
-	}
-	else if (extension == ".ktx")
-	{
-		return MakeTexture(fullpath, [sRgb](Texture* texture, const string& filename) { texture->LoadKTX(filename, sRgb); });
-	}
-	else
-	{
-		assert_msg(false, "Unknown file extension %s", extension.c_str());
-		return nullptr;
-	}
-}
-
-
-shared_ptr<Texture> Texture::GetBlackTex2D()
-{
-	auto makeBlackTex = [](Texture* texture, const string& filename)
-	{
-		uint32_t blackPixel = 0u;
-		texture->Create2D(1, 1, Format::R8G8B8A8_UNorm, &blackPixel);
-	};
-
-	return MakeTexture("DefaultWhiteTexture", makeBlackTex);
-}
-
-
-shared_ptr<Texture> Texture::GetWhiteTex2D()
-{
-	auto makeWhiteTex = [](Texture* texture, const string& filename)
-	{
-		uint32_t whitePixel = 0xFFFFFFFFul;
-		texture->Create2D(1, 1, Format::R8G8B8A8_UNorm, &whitePixel);
-	};
-
-	return MakeTexture("DefaultWhiteTexture", makeWhiteTex);
-}
-
-
-shared_ptr<Texture> Texture::GetMagentaTex2D()
-{
-	auto makeMagentaTex = [](Texture* texture, const string& filename)
-	{
-		uint32_t magentaPixel = 0x00FF00FF;
-		texture->Create2D(1, 1, Format::R8G8B8A8_UNorm, &magentaPixel);
-	};
-
-	return MakeTexture("DefaultMagentaTexture", makeMagentaTex);
-}
-
-
-void Texture::DestroyAll()
-{
-	s_textureCache.clear();
+	CreateDerivedViews();
 }
 
 
@@ -425,16 +290,19 @@ void Texture::LoadDDS(const string& fullpath, bool sRgb)
 	unique_ptr<byte[]> data;
 	size_t dataSize;
 
-	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	// TODO this is janky
+	auto& descriptorHandle = m_srv.GetHandle();
+
+	if (descriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
 	{
-		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		descriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
 	ThrowIfFailed(BinaryReader::ReadEntireFile(fullpath, data, &dataSize));
 
 	auto device = GetDevice();
 
-	ThrowIfFailed(CreateDDSTextureFromMemory(device, data.get(), dataSize, 0, sRgb, &m_resource, m_cpuDescriptorHandle));
+	ThrowIfFailed(CreateDDSTextureFromMemory(device, data.get(), dataSize, 0, sRgb, &m_resource, descriptorHandle));
 }
 
 
@@ -442,15 +310,16 @@ void Texture::LoadKTX(const string& fullpath, bool sRgb)
 {
 	unique_ptr<byte[]> data;
 	size_t dataSize;
+	
+	// TODO this is janky
+	auto& descriptorHandle = m_srv.GetHandle();
 
-	if (m_cpuDescriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	if (descriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
 	{
-		m_cpuDescriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		descriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
 	ThrowIfFailed(BinaryReader::ReadEntireFile(fullpath, data, &dataSize));
-
-	auto device = GetDevice();
 
 	ThrowIfFailed(CreateKTXTextureFromMemory(data.get(), dataSize, 0, sRgb, this));
 }
@@ -458,23 +327,10 @@ void Texture::LoadKTX(const string& fullpath, bool sRgb)
 
 void ManagedTexture::WaitForLoad() const
 {
-	volatile D3D12_CPU_DESCRIPTOR_HANDLE& volHandle = (volatile D3D12_CPU_DESCRIPTOR_HANDLE&)m_cpuDescriptorHandle;
+	volatile D3D12_CPU_DESCRIPTOR_HANDLE& volHandle = (volatile D3D12_CPU_DESCRIPTOR_HANDLE&)m_srv.GetHandle();
 	volatile bool& volValid = (volatile bool&)m_isValid;
 	while (volHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN && volValid)
 	{
 		this_thread::yield();
 	}
-}
-
-
-void ManagedTexture::SetToInvalidTexture()
-{
-	m_cpuDescriptorHandle = Texture::GetMagentaTex2D()->GetSRV();
-	m_isValid = false;
-}
-
-
-uint32_t Kodiak::BytesPerPixel(Format format)
-{
-	return BitsPerPixel(format) / 8;
 }

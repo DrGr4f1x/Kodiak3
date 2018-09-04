@@ -14,10 +14,10 @@
 #include "ColorBuffer.h"
 #include "DepthBuffer.h"
 #include "GpuBuffer.h"
+#include "Texture.h"
 
 #include "DynamicDescriptorPoolVk.h"
 #include "FramebufferVk.h"
-#include "TextureVk.h"
 
 
 namespace Kodiak
@@ -207,7 +207,7 @@ inline void GraphicsContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offs
 inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture)
 {
 	VkDescriptorImageInfo descriptorInfo = {};
-	descriptorInfo.imageView = texture.GetSRV();
+	descriptorInfo.imageView = texture.GetSRV().GetHandle();
 	descriptorInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
 }
@@ -295,8 +295,8 @@ inline void ComputeContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offse
 inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture)
 {
 	VkDescriptorImageInfo descriptorInfo = {};
-	descriptorInfo.imageView = texture.GetSRV();
-	descriptorInfo.imageLayout = texture.m_layout;
+	descriptorInfo.imageView = texture.GetSRV().GetHandle();
+	descriptorInfo.imageLayout = texture.GetLayout();
 	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
 }
 

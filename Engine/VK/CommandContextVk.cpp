@@ -297,7 +297,7 @@ void CommandContext::TransitionResource(Texture& texture, ResourceState newState
 		barrierDesc.image = texture.m_resource;
 
 		// Setup access flags and layout 
-		barrierDesc.srcAccessMask = texture.m_accessFlags;
+		barrierDesc.srcAccessMask = texture.GetAccessFlags();
 		barrierDesc.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
 		switch (barrierDesc.oldLayout)
@@ -367,8 +367,8 @@ void CommandContext::TransitionResource(Texture& texture, ResourceState newState
 		barrierDesc.subresourceRange.baseArrayLayer = 0;
 		barrierDesc.subresourceRange.layerCount = texture.GetType() == ResourceType::Texture3D ? 1 : texture.GetArraySize();
 
-		texture.m_layout = barrierDesc.newLayout;
-		texture.m_accessFlags = barrierDesc.dstAccessMask;
+		texture.SetLayout(barrierDesc.newLayout);
+		texture.SetAccessFlags(barrierDesc.dstAccessMask);
 		texture.m_usageState = newState;
 	}
 	else if (newState == ResourceState::UnorderedAccess)

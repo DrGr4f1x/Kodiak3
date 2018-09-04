@@ -10,7 +10,7 @@
 
 #include "Stdafx.h"
 
-#include "TextureVk.h"
+#include "Texture.h"
 
 #include "BinaryReader.h"
 #include "Filesystem.h"
@@ -27,55 +27,6 @@ using namespace std;
 
 namespace
 {
-
-uint32_t BytesPerPixel(Format format)
-{
-	return BitsPerPixel(format) / 8;
-}
-
-
-map<string, shared_ptr<ManagedTexture>> s_textureCache;
-
-
-pair<shared_ptr<ManagedTexture>, bool> FindOrLoadTexture(const string& filename)
-{
-	static mutex s_mutex;
-	lock_guard<mutex> CS(s_mutex);
-
-	auto iter = s_textureCache.find(filename);
-
-	// If it's found, it has already been loaded or the load process has begun
-	if (iter != s_textureCache.end())
-	{
-		return make_pair(iter->second, false);
-	}
-
-	auto newTexture = make_shared<ManagedTexture>(filename);
-	s_textureCache[filename] = newTexture;
-
-	// This was the first time it was requested, so indicate that the caller must read the file
-	return make_pair(newTexture, true);
-}
-
-
-template <typename F>
-shared_ptr<Texture> MakeTexture(const string& filename, F fn)
-{
-	auto managedTex = FindOrLoadTexture(filename);
-
-	auto manTex = managedTex.first;
-	const bool requestsLoad = managedTex.second;
-
-	if (!requestsLoad)
-	{
-		manTex->WaitForLoad();
-		return manTex;
-	}
-
-	fn(manTex.get(), filename);
-	return manTex;
-}
-
 
 void GetSurfaceInfo(size_t width, size_t height, VkFormat format, size_t& numBytes, size_t& rowBytes, size_t& numRows)
 {
@@ -198,8 +149,32 @@ bool QueryBufferFeature(VkFormatProperties properties, VkFormatFeatureFlagBits f
 } // anonymous namespace
 
 
-void TextureInitializer::Initialize()
+namespace Kodiak
 {
+
+struct TextureInitializer::PlatformData
+{
+	PlatformData(uint32_t numMips) : faceOffsets(numMips) {}
+
+	std::unique_ptr<byte[]> data;
+	std::vector<size_t>		faceOffsets;
+	size_t					arraySliceSize;
+	size_t					totalSize;
+};
+
+} // namespace Kodiak
+
+
+TextureInitializer::~TextureInitializer()
+{
+	delete m_platformData;
+}
+
+
+void TextureInitializer::PlatformCreate()
+{
+	m_platformData = new PlatformData(m_numMips);
+
 	size_t sizeBytes = 0;
 	auto format = static_cast<VkFormat>(m_format);
 
@@ -221,7 +196,7 @@ void TextureInitializer::Initialize()
 
 			m_faceSize[j] = numBytes;
 
-			m_faceOffsets[j] = (j == 0) ? 0 : m_faceOffsets[j - 1] + m_faceSize[j - 1];
+			m_platformData->faceOffsets[j] = (j == 0) ? 0 : m_platformData->faceOffsets[j - 1] + m_faceSize[j - 1];
 
 			width = width >> 1;
 			height = height >> 1;
@@ -251,10 +226,10 @@ void TextureInitializer::Initialize()
 
 				if (i == 0)
 				{
-					m_arraySliceSize += numBytes;
+					m_platformData->arraySliceSize += numBytes;
 					m_faceSize[j] = numBytes;
 
-					m_faceOffsets[j] = (j == 0) ? 0 : m_faceOffsets[j - 1] + m_faceSize[j - 1];
+					m_platformData->faceOffsets[j] = (j == 0) ? 0 : m_platformData->faceOffsets[j - 1] + m_faceSize[j - 1];
 				}
 
 				width = width >> 1;
@@ -268,8 +243,8 @@ void TextureInitializer::Initialize()
 		}
 	}
 
-	m_data.reset(new byte[sizeBytes]);
-	m_totalSize = sizeBytes;
+	m_platformData->data.reset(new byte[sizeBytes]);
+	m_platformData->totalSize = sizeBytes;
 }
 
 
@@ -277,9 +252,9 @@ void TextureInitializer::SetData(uint32_t slice, uint32_t mipLevel, const void* 
 {
 	size_t srcSize = GetFaceSize(mipLevel);
 
-	size_t offset = slice * m_arraySliceSize + m_faceOffsets[mipLevel];
+	size_t offset = slice * m_platformData->arraySliceSize + m_platformData->faceOffsets[mipLevel];
 	
-	memcpy(m_data.get() + offset, data, srcSize);
+	memcpy(m_platformData->data.get() + offset, data, srcSize);
 }
 
 
@@ -314,7 +289,7 @@ void Texture::Create(TextureInitializer& init)
 {
 	m_width = init.m_width;
 	m_height = init.m_height;
-	m_depthOrArraySize = init.m_depthOrArraySize;
+	m_arraySize = init.m_depthOrArraySize;
 	m_format = init.m_format;
 	m_numMips = init.m_numMips;
 	m_type = init.m_type;
@@ -339,12 +314,12 @@ void Texture::Create(TextureInitializer& init)
 	imageCreateInfo.imageType = GetImageType(m_type);
 	imageCreateInfo.format = vkFormat;
 	imageCreateInfo.mipLevels = m_numMips;
-	imageCreateInfo.arrayLayers = m_type == ResourceType::Texture3D ? 1 : m_depthOrArraySize;
+	imageCreateInfo.arrayLayers = m_type == ResourceType::Texture3D ? 1 : m_arraySize;
 	imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	imageCreateInfo.extent = { m_width, m_height, (m_type == ResourceType::Texture3D ? m_depthOrArraySize : 1) };
+	imageCreateInfo.extent = { m_width, m_height, (m_type == ResourceType::Texture3D ? m_arraySize : 1) };
 	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | additionalFlags;
 	// Ensure that the TRANSFER_DST bit is set for staging
 	if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
@@ -370,7 +345,7 @@ void Texture::Create(TextureInitializer& init)
 	ThrowIfFailed(vkBindImageMemory(device, image, m_resource, 0));
 
 	// Setup buffer copy regions for each mip level
-	uint32_t effectiveArraySize = m_type == ResourceType::Texture3D ? 1 : m_depthOrArraySize;
+	uint32_t effectiveArraySize = m_type == ResourceType::Texture3D ? 1 : m_arraySize;
 	vector<VkBufferImageCopy> bufferCopyRegions(effectiveArraySize * m_numMips);
 	uint32_t offset = 0;
 
@@ -380,7 +355,7 @@ void Texture::Create(TextureInitializer& init)
 	{
 		uint32_t width = m_width;
 		uint32_t height = m_height;
-		uint32_t depth = m_depthOrArraySize;
+		uint32_t depth = m_arraySize;
 		for (uint32_t j = 0; j < m_numMips; ++j)
 		{
 			VkBufferImageCopy bufferCopyRegion = {};
@@ -414,102 +389,9 @@ void Texture::Create(TextureInitializer& init)
 	}
 
 	// Upload to GPU
-	CommandContext::InitializeTexture(*this, init.m_totalSize, init.m_data.get(), effectiveArraySize * m_numMips, bufferCopyRegions.data());
+	CommandContext::InitializeTexture(*this, init.m_platformData->totalSize, init.m_platformData->data.get(), effectiveArraySize * m_numMips, bufferCopyRegions.data());
 
-	// Create the image view (SRV)
-	VkImageViewCreateInfo colorImageView = {};
-	colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-	colorImageView.pNext = nullptr;
-	colorImageView.flags = 0;
-	colorImageView.viewType = GetImageViewType(m_type);
-	colorImageView.format = vkFormat;
-	colorImageView.subresourceRange = {};
-	colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	colorImageView.subresourceRange.baseMipLevel = 0;
-	colorImageView.subresourceRange.levelCount = m_numMips;
-	colorImageView.subresourceRange.baseArrayLayer = 0;
-	colorImageView.subresourceRange.layerCount = m_type == ResourceType::Texture3D ? 1 : m_depthOrArraySize;
-	colorImageView.image = m_resource;
-	ThrowIfFailed(vkCreateImageView(device, &colorImageView, nullptr, &m_imageView));
-}
-
-
-void Texture::Destroy()
-{
-	// TODO
-	m_resource = nullptr;
-
-	VkDevice device = GetDevice();
-
-	vkDestroyImageView(device, m_imageView, nullptr);
-	m_imageView = VK_NULL_HANDLE;
-}
-
-
-void Texture::DestroyAll()
-{
-	s_textureCache.clear();
-}
-
-
-shared_ptr<Texture> Texture::Load(const string& filename, bool sRgb)
-{
-	auto& filesystem = Filesystem::GetInstance();
-	string fullpath = filesystem.GetFullPath(filename);
-
-	assert_msg(!fullpath.empty(), "Could not find texture file %s", filename.c_str());
-
-	string extension = filesystem.GetFileExtension(filename);
-
-	if (extension == ".dds")
-	{
-		return MakeTexture(fullpath, [sRgb](Texture* texture, const string& filename) { texture->LoadDDS(filename, sRgb); });
-	}
-	else if (extension == ".ktx")
-	{
-		return MakeTexture(fullpath, [sRgb](Texture* texture, const string& filename) { texture->LoadKTX(filename, sRgb); });
-	}
-	else
-	{
-		assert_msg(false, "Unknown file extension %s", extension.c_str());
-		return nullptr;
-	}
-}
-
-
-shared_ptr<Texture> Texture::GetBlackTex2D()
-{
-	auto makeBlackTex = [](Texture* texture, const string& filename)
-	{
-		uint32_t blackPixel = 0u;
-		texture->Create2D(1, 1, Format::R8G8B8A8_UNorm, &blackPixel);
-	};
-
-	return MakeTexture("DefaultWhiteTexture", makeBlackTex);
-}
-
-
-shared_ptr<Texture> Texture::GetWhiteTex2D()
-{
-	auto makeWhiteTex = [](Texture* texture, const string& filename)
-	{
-		uint32_t whitePixel = 0xFFFFFFFFul;
-		texture->Create2D(1, 1, Format::R8G8B8A8_UNorm, &whitePixel);
-	};
-
-	return MakeTexture("DefaultWhiteTexture", makeWhiteTex);
-}
-
-
-shared_ptr<Texture> Texture::GetMagentaTex2D()
-{
-	auto makeMagentaTex = [](Texture* texture, const string& filename)
-	{
-		uint32_t magentaPixel = 0x00FF00FF;
-		texture->Create2D(1, 1, Format::R8G8B8A8_UNorm, &magentaPixel);
-	};
-
-	return MakeTexture("DefaultMagentaTexture", makeMagentaTex);
+	CreateDerivedViews();
 }
 
 
@@ -542,17 +424,10 @@ void Texture::LoadKTX(const string& fullpath, bool sRgb)
 
 void ManagedTexture::WaitForLoad() const
 {
-	volatile VkImageView& volHandle = (volatile VkImageView&)m_imageView;
+	volatile VkImageView& volHandle = (volatile VkImageView&)m_srv.GetHandle();
 	volatile bool& volValid = (volatile bool&)m_isValid;
 	while (volHandle == VK_NULL_HANDLE && volValid)
 	{
 		this_thread::yield();
 	}
-}
-
-
-void ManagedTexture::SetToInvalidTexture()
-{
-	m_imageView = Texture::GetMagentaTex2D()->GetSRV();
-	m_isValid = false;
 }

@@ -15,12 +15,13 @@
 
 #include "ColorBuffer.h"
 #include "DepthBuffer.h"
+#include "Texture.h"
 
 #include "DynamicDescriptorHeap12.h"
 #include "LinearAllocator12.h"
 #include "PipelineState12.h"
 #include "RootSignature12.h"
-#include "Texture12.h"
+
 
 namespace Kodiak
 {
@@ -313,7 +314,8 @@ inline void GraphicsContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offs
 
 inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture)
 {
-	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &texture.GetSRV());
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = texture.GetSRV().GetHandle();
+	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &handle);
 }
 
 
@@ -433,7 +435,8 @@ inline void ComputeContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offse
 
 inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture)
 {
-	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &texture.GetSRV());
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = texture.GetSRV().GetHandle();
+	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &handle);
 }
 
 

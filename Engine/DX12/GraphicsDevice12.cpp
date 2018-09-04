@@ -13,12 +13,12 @@
 #include "GraphicsDevice.h"
 
 #include "Shader.h"
+#include "Texture.h"
 
 #include "CommandContext12.h"
 #include "CommandListManager12.h"
 #include "PipelineState12.h"
 #include "RootSignature12.h"
-#include "Texture12.h"
 
 
 using namespace Kodiak;
@@ -220,18 +220,11 @@ void GraphicsDevice::PlatformCreate()
 			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
 				continue;
 
-			try
+			if (desc.DedicatedVideoMemory > maxSize && SUCCEEDED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&pDevice))))
 			{
-				if (desc.DedicatedVideoMemory > maxSize && SUCCEEDED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&pDevice))))
-				{
-					pAdapter->GetDesc1(&desc);
-					Utility::Printf(L"D3D12-capable hardware found:  %s (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
-					maxSize = desc.DedicatedVideoMemory;
-				}
-			}
-			catch (_com_error& e)
-			{
-				assert(false);
+				pAdapter->GetDesc1(&desc);
+				Utility::Printf(L"D3D12-capable hardware found:  %s (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
+				maxSize = desc.DedicatedVideoMemory;
 			}
 		}
 

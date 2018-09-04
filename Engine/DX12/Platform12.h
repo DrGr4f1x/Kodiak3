@@ -63,6 +63,7 @@ using CbvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
 
 using DsvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
 using RtvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
+using FboHandle = void*;
 
 static const uint32_t NumSwapChainBuffers = 3;
 

@@ -51,6 +51,7 @@ public:
 	void Create(const ResourceHandle& resource, ResourceType type, const TextureViewDesc& desc);
 	void Create(const ResourceHandle& resource, ResourceType type, const BufferViewDesc& desc);
 
+	SrvHandle& GetHandle() { return m_handle; }
 	const SrvHandle& GetHandle() const { return m_handle; }
 
 private:
@@ -67,6 +68,7 @@ public:
 	void Create(const ResourceHandle& resource, ResourceType type, const BufferViewDesc& desc);
 	void Create(const ResourceHandle& resource, ResourceType type, const TypedBufferViewDesc& desc);
 
+	UavHandle& GetHandle() { return m_handle; }
 	const UavHandle& GetHandle() const { return m_handle; }
 
 private:
@@ -81,6 +83,7 @@ public:
 
 	void Create(const ResourceHandle& resource, const BufferViewDesc& desc);
 
+	IbvHandle& GetHandle() { return m_handle; }
 	const IbvHandle& GetHandle() const { return m_handle; }
 
 private:
@@ -95,6 +98,7 @@ public:
 
 	void Create(const ResourceHandle& resource, const BufferViewDesc& desc);
 
+	VbvHandle& GetHandle() { return m_handle; }
 	const VbvHandle& GetHandle() const { return m_handle; }
 
 private:
@@ -109,6 +113,7 @@ public:
 
 	void Create(const ResourceHandle& resource, const BufferViewDesc& desc);
 
+	CbvHandle& GetHandle() { return m_handle; }
 	const CbvHandle& GetHandle() const { return m_handle; }
 
 private:
@@ -131,6 +136,7 @@ public:
 
 	void Create(const ResourceHandle& resource, const DepthStencilViewDesc& desc);
 
+	DsvHandle& GetHandle() { return m_handle; }
 	const DsvHandle& GetHandle() const { return m_handle; }
 
 private:
@@ -155,6 +161,7 @@ public:
 
 	void Create(const ResourceHandle& resource, const RenderTargetViewDesc& desc);
 
+	RtvHandle& GetHandle() { return m_handle; }
 	const RtvHandle& GetHandle() const { return m_handle; }
 
 private:
