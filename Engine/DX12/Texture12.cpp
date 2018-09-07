@@ -273,7 +273,7 @@ void Texture::Create(TextureInitializer& init)
 	auto device = GetDevice();
 
 	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
-		static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, IID_PPV_ARGS(&m_resource)));
+		GetResourceState(m_usageState), nullptr, IID_PPV_ARGS(&m_resource)));
 
 	m_resource->SetName(L"Texture");
 
@@ -302,7 +302,7 @@ void Texture::LoadDDS(const string& fullpath, bool sRgb)
 
 	auto device = GetDevice();
 
-	ThrowIfFailed(CreateDDSTextureFromMemory(device, data.get(), dataSize, 0, sRgb, &m_resource, descriptorHandle));
+	ThrowIfFailed(CreateDDSTextureFromMemory(device.Get(), data.get(), dataSize, 0, sRgb, &m_resource, descriptorHandle));
 }
 
 

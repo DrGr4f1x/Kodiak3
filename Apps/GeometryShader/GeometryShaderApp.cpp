@@ -81,12 +81,12 @@ void GeometryShaderApp::Render()
 
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
-	context.BeginRenderPass(GetBackBuffer());
-
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
 	context.ClearColor(GetColorBuffer());
 	context.ClearDepth(GetDepthBuffer());
+
+	context.BeginRenderPass(GetBackBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -142,15 +142,15 @@ void GeometryShaderApp::InitPSOs()
 	m_meshPSO.SetVertexShader("MeshVS");
 	m_meshPSO.SetPixelShader("MeshPS");
 
-	VertexStreamDesc vertexStreamDesc{ 0, sizeof(Vertex), InputClassification::PerVertexData };
-	VertexElementDesc vertexElements[] =
+	VertexStreamDesc vertexStream{ 0, sizeof(Vertex), InputClassification::PerVertexData };
+	vector<VertexElementDesc> vertexElements =
 	{
 		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
 		{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 },
 		{ "COLOR", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 },
 		
 	};
-	m_meshPSO.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
+	m_meshPSO.SetInputLayout(vertexStream, vertexElements);
 	m_meshPSO.Finalize();
 
 	
@@ -167,7 +167,7 @@ void GeometryShaderApp::InitPSOs()
 	m_geomPSO.SetGeometryShader("BaseGS");
 	m_geomPSO.SetPixelShader("BasePS");
 
-	m_geomPSO.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
+	m_geomPSO.SetInputLayout(vertexStream, vertexElements);
 	m_geomPSO.Finalize();
 }
 

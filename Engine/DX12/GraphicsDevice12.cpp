@@ -17,7 +17,6 @@
 
 #include "CommandContext12.h"
 #include "CommandListManager12.h"
-#include "PipelineState12.h"
 #include "RootSignature12.h"
 
 
@@ -28,7 +27,7 @@ using namespace std;
 namespace
 {
 
-ID3D12DevicePtr g_device;
+Microsoft::WRL::ComPtr<ID3D12Device> g_device;
 
 const Format BackBufferColorFormat = Format::R10G10B10A2_UNorm;
 const Format DepthFormat = Format::D32_Float_S8_UInt;
@@ -85,9 +84,9 @@ void ConfigureInfoQueue(ID3D12Device* device)
 }
 
 
-IDXGISwapChain1Ptr CreateSwapChain(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height)
+Microsoft::WRL::ComPtr<IDXGISwapChain1> CreateSwapChain(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height)
 {
-	IDXGISwapChain1Ptr swapChain;
+	Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain;
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 	swapChainDesc.Width = width;
@@ -138,8 +137,8 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		device = nullptr;
 	}
 
-	ID3D12DevicePtr device;
-	IDXGISwapChain1Ptr swapChain;
+	Microsoft::WRL::ComPtr<ID3D12Device> device;
+	Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain;
 };
 
 
@@ -185,7 +184,7 @@ void GraphicsDevice::PlatformCreate()
 	m_platformData = new PlatformData;
 
 #if _DEBUG
-	ID3D12DebugPtr debugInterface;
+	Microsoft::WRL::ComPtr<ID3D12Debug> debugInterface;
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface))))
 	{
 		debugInterface->EnableDebugLayer();
@@ -199,7 +198,7 @@ void GraphicsDevice::PlatformCreate()
 	ThrowIfFailed(D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModels, nullptr, nullptr));
 
 	// Obtain the DXGI factory
-	IDXGIFactory4Ptr dxgiFactory;
+	Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
 	assert_succeeded(CreateDXGIFactory2(0, IID_PPV_ARGS(&dxgiFactory)));
 
 	// Create the D3D graphics device
@@ -207,7 +206,7 @@ void GraphicsDevice::PlatformCreate()
 
 	static const bool bUseWarpDriver = false;
 
-	ID3D12DevicePtr pDevice;
+	Microsoft::WRL::ComPtr<ID3D12Device> pDevice;
 
 	if (!bUseWarpDriver)
 	{
@@ -280,15 +279,15 @@ void GraphicsDevice::PlatformCreate()
 
 	g_device = m_platformData->device;
 
-	ConfigureInfoQueue(m_platformData->device);
+	ConfigureInfoQueue(m_platformData->device.Get());
 
-	g_commandManager.Create(m_platformData->device);
+	g_commandManager.Create(m_platformData->device.Get());
 
-	m_platformData->swapChain = CreateSwapChain(dxgiFactory, m_hwnd, m_width, m_height);
+	m_platformData->swapChain = CreateSwapChain(dxgiFactory.Get(), m_hwnd, m_width, m_height);
 
 	for (int i = 0; i < NumSwapChainBuffers; ++i)
 	{
-		ID3D12ResourcePtr displayPlane;
+		Microsoft::WRL::ComPtr<ID3D12Resource> displayPlane;
 		assert_succeeded(m_platformData->swapChain->GetBuffer(i, IID_PPV_ARGS(&displayPlane)));
 
 		ColorBufferPtr buffer = make_shared<ColorBuffer>();
@@ -302,6 +301,8 @@ void GraphicsDevice::PlatformCreate()
 void GraphicsDevice::PlatformPresent()
 {
 	UINT presentInterval = 0;
+
+	m_currentBuffer = (m_currentBuffer + 1) % NumSwapChainBuffers;
 
 	m_platformData->swapChain->Present(presentInterval, 0);
 }

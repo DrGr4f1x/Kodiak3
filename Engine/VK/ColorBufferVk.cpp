@@ -34,7 +34,7 @@ void ColorBuffer::CreateFromSwapChain(const string& name, const ResourceHandle& 
 	m_format = format;
 	m_numMipMaps = 1;
 	m_numSamples = 1;
-	m_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+	m_type = ResourceType::Texture2D;
 
 	CreateDerivedViews(format, 1, m_numMipMaps);
 }
@@ -46,14 +46,20 @@ void ColorBuffer::Create(const string& name, uint32_t width, uint32_t height, ui
 
 	m_width = width;
 	m_height = height;
+	m_arraySize = 1;
 	m_format = format;
-	m_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+	m_numMips = numMips;
+	m_type = ResourceType::Texture2D;
 
 	const uint32_t arraySize = 1;
-	const uint32_t numSamples = 1;
-	const VkImageUsageFlags flags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
+	const VkImageUsageFlags flags = 
+		VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | 
+		VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+		VK_IMAGE_USAGE_TRANSFER_SRC_BIT | 
+		VK_IMAGE_USAGE_SAMPLED_BIT | 
+		VK_IMAGE_USAGE_STORAGE_BIT;
 
-	auto imageCreateInfo = DescribeTex2D(width, height, arraySize, numMips, numSamples, format, flags);
+	auto imageCreateInfo = DescribeTex2D(width, height, m_arraySize, numMips, m_numSamples, format, flags);
 	m_width = imageCreateInfo.extent.width;
 	m_height = imageCreateInfo.extent.height;
 	m_arraySize = imageCreateInfo.arrayLayers;

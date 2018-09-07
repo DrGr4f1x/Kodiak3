@@ -12,8 +12,10 @@
 
 #include "GpuBuffer.h"
 
-#include "CommandContext12.h"
 #include "GraphicsDevice.h"
+
+#include "CommandContext12.h"
+#include "Util12.h"
 
 
 using namespace Kodiak;
@@ -54,7 +56,7 @@ void GpuBuffer::Create(const std::string& name, size_t numElements, size_t eleme
 
 	assert_succeeded(
 		GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
-			&desc, static_cast<D3D12_RESOURCE_STATES>(m_usageState), nullptr, IID_PPV_ARGS(&m_resource)) );
+			&desc, GetResourceState(m_usageState), nullptr, IID_PPV_ARGS(&m_resource)) );
 
 	if (initialData)
 	{

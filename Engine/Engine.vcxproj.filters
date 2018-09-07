@@ -83,15 +83,6 @@
     <ClInclude Include="VK\RootSignatureVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
-    <ClInclude Include="PipelineState.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\PipelineState12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\PipelineStateVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
     <ClInclude Include="Shader.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -105,18 +96,6 @@
     </ClInclude>
     <ClInclude Include="Framebuffer.h">
       <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\Framebuffer12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\FramebufferVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderPass.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\RenderPassVk.h">
-      <Filter>Graphics\VK</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsEnums.h">
       <Filter>Graphics</Filter>
@@ -151,9 +130,6 @@
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\TextureVk.h">
-      <Filter>Graphics\VK</Filter>
     </ClInclude>
     <ClInclude Include="DX12\DDSTextureLoader12.h">
       <Filter>Graphics\DX12</Filter>
@@ -195,6 +171,9 @@
     </ClInclude>
     <ClInclude Include="VK\UtilVk.h">
       <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineState.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -273,9 +252,6 @@
     <ClCompile Include="VK\FramebufferVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
-    <ClCompile Include="VK\RenderPassVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
     <ClCompile Include="VK\GraphicsEnumsVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
@@ -352,6 +328,12 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Framebuffer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineState.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>

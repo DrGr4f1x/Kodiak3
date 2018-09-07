@@ -83,12 +83,12 @@ void MultisamplingApp::Render()
 	auto& context = GraphicsContext::Begin("Render frame");
 
 	Color clearColor{ DirectX::Colors::White };
-	context.BeginRenderPass(*m_frameBuffer);
-
 	context.TransitionResource(*m_frameBuffer->GetColorBuffer(0), ResourceState::RenderTarget);
 	context.TransitionResource(*m_frameBuffer->GetDepthBuffer(), ResourceState::DepthWrite);
 	context.ClearColor(*m_frameBuffer->GetColorBuffer(0), clearColor);
 	context.ClearDepth(*m_frameBuffer->GetDepthBuffer());
+
+	context.BeginRenderPass(*m_frameBuffer);
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -162,15 +162,15 @@ void MultisamplingApp::InitPSO()
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
 	// Vertex inputs
-	VertexStreamDesc vertexStreamDesc{ 0, sizeof(Vertex), InputClassification::PerVertexData };
-	VertexElementDesc vertexElements[] =
+	VertexStreamDesc vertexStream{ 0, sizeof(Vertex), InputClassification::PerVertexData };
+	vector<VertexElementDesc> vertexElements =
 	{
 		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
 		{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 },
 		{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 },
 		{ "COLOR", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0}
 	};
-	m_pso.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
+	m_pso.SetInputLayout(vertexStream, vertexElements);
 
 	m_pso.Finalize();
 }

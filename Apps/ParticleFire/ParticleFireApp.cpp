@@ -85,12 +85,12 @@ void ParticleFireApp::Render()
 
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
-	context.BeginRenderPass(GetBackBuffer());
-
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
 	context.ClearColor(GetColorBuffer());
 	context.ClearDepth(GetDepthBuffer());
+
+	context.BeginRenderPass(GetBackBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -143,8 +143,8 @@ void ParticleFireApp::InitPSOs()
 		m_modelPSO.SetVertexShader("NormalMapVS");
 		m_modelPSO.SetPixelShader("NormalMapPS");
 
-		VertexStreamDesc vertexStreamDesc{ 0, sizeof(ModelVertex), InputClassification::PerVertexData };
-		VertexElementDesc vertexElements[] =
+		VertexStreamDesc vertexStream{ 0, sizeof(ModelVertex), InputClassification::PerVertexData };
+		vector<VertexElementDesc> vertexElements =
 		{
 			{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(ModelVertex, pos), InputClassification::PerVertexData, 0 },
 			{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(ModelVertex, uv), InputClassification::PerVertexData, 0 },
@@ -153,7 +153,7 @@ void ParticleFireApp::InitPSOs()
 			{ "BITANGENT", 0, Format::R32G32B32_Float, 0, offsetof(ModelVertex, bitangent), InputClassification::PerVertexData, 0},
 		};
 
-		m_modelPSO.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
+		m_modelPSO.SetInputLayout(vertexStream, vertexElements);
 		m_modelPSO.Finalize();
 	}
 }

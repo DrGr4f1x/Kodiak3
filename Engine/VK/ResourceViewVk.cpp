@@ -33,7 +33,7 @@ void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType typ
 	createInfo.viewType = GetImageViewType(type);
 	createInfo.format = static_cast<VkFormat>(desc.format);
 	createInfo.subresourceRange = {};
-	createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	createInfo.subresourceRange.aspectMask = GetAspectFlagsFromFormat(desc.format);
 	createInfo.subresourceRange.baseMipLevel = 0;
 	createInfo.subresourceRange.levelCount = desc.mipCount;
 	createInfo.subresourceRange.baseArrayLayer = 0;

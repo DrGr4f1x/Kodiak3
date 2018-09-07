@@ -85,12 +85,12 @@ void StencilBufferApp::Render()
 
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
-	context.BeginRenderPass(GetBackBuffer());
-
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
 	context.ClearColor(GetColorBuffer());
 	context.ClearDepthAndStencil(GetDepthBuffer());
+
+	context.BeginRenderPass(GetBackBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -157,14 +157,14 @@ void StencilBufferApp::InitPSOs()
 		m_toonPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
 		// Vertex inputs
-		VertexStreamDesc vertexStreamDesc{ 0, 9 * sizeof(float), InputClassification::PerVertexData };
-		VertexElementDesc vertexElements[] =
+		VertexStreamDesc vertexStream{ 0, 9 * sizeof(float), InputClassification::PerVertexData };
+		vector<VertexElementDesc> vertexElements =
 		{
 			{ "POSITION", 0, Format::R32G32B32_Float, 0, 0, InputClassification::PerVertexData, 0 },
 			{ "COLOR", 0, Format::R32G32B32_Float, 0, 3 * sizeof(float), InputClassification::PerVertexData, 0 },
 			{ "NORMAL", 0, Format::R32G32B32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 }
 		};
-		m_toonPSO.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
+		m_toonPSO.SetInputLayout(vertexStream, vertexElements);
 
 		m_toonPSO.Finalize();
 	}
@@ -195,14 +195,14 @@ void StencilBufferApp::InitPSOs()
 		m_outlinePSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
 		// Vertex inputs
-		VertexStreamDesc vertexStreamDesc{ 0, 9 * sizeof(float), InputClassification::PerVertexData };
-		VertexElementDesc vertexElements[] =
+		VertexStreamDesc vertexStream{ 0, 9 * sizeof(float), InputClassification::PerVertexData };
+		vector<VertexElementDesc> vertexElements =
 		{
 			{ "POSITION", 0, Format::R32G32B32_Float, 0, 0, InputClassification::PerVertexData, 0 },
 			{ "COLOR", 0, Format::R32G32B32_Float, 0, 3 * sizeof(float), InputClassification::PerVertexData, 0 },
 			{ "NORMAL", 0, Format::R32G32B32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 }
 		};
-		m_outlinePSO.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
+		m_outlinePSO.SetInputLayout(vertexStream, vertexElements);
 
 		m_outlinePSO.Finalize();
 	}

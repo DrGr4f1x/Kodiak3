@@ -15,9 +15,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="Shaders\ReflectPS.hlsl" />
-    <CustomBuild Include="Shaders\ReflectVS.hlsl" />
-    <CustomBuild Include="Shaders\SkyboxPS.hlsl" />
-    <CustomBuild Include="Shaders\SkyboxVS.hlsl" />
+    <CustomBuild Include="Shaders\ReflectPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ReflectVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\SkyboxPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\SkyboxVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

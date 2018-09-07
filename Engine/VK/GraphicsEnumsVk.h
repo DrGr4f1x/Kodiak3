@@ -13,36 +13,6 @@
 namespace Kodiak
 {
 
-enum class ResourceState
-{
-	Undefined = -1,
-	Common,
-	VertexBuffer,
-	IndexBuffer,
-	ConstantBuffer,
-	Clear,
-	RenderTarget,
-	UnorderedAccess,
-	DepthWrite,
-	DepthRead,
-	NonPixelShaderResource,
-	PixelShaderResource,
-	StreamOut,
-	IndirectArgument,
-	CopyDest,
-	CopySource,
-	ResolveDest,
-	ResolveSource,
-	GenericRead,
-	Present,
-	Predication,
-	NonPixelShaderImage,
-	PixelShaderImage
-};
-
-template <> struct EnableBitmaskOperators<ResourceState> { static const bool enable = true; };
-
-
 enum class Blend
 {
 	Zero =				VK_BLEND_FACTOR_ZERO,
