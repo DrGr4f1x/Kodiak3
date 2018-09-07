@@ -12,7 +12,6 @@
 
 #include <d3d12.h>
 #include <d3dcompiler.h>
-#include <comdef.h>
 #include <dxgi1_4.h>
 #include <dxgiformat.h>
 #include <pix.h>
@@ -22,8 +21,6 @@
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
-
-#define DECLARE_COM_PTR(type) _COM_SMARTPTR_TYPEDEF(type, __uuidof(type))
 
 #define D3D12_GPU_VIRTUAL_ADDRESS_NULL      ((D3D12_GPU_VIRTUAL_ADDRESS)0)
 #define D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN   ((D3D12_GPU_VIRTUAL_ADDRESS)-1)
@@ -35,25 +32,11 @@ const std::string s_defaultShaderPath = "Shaders\\DXIL";
 namespace Kodiak
 {
 
-// COM types
-DECLARE_COM_PTR(IUnknown);
-
-// DXGI types
-DECLARE_COM_PTR(IDXGIFactory4);
-DECLARE_COM_PTR(IDXGISwapChain1);
-
-// DirectX 12 types
-DECLARE_COM_PTR(ID3D12Device);
-DECLARE_COM_PTR(ID3D12Resource);
-
-#if _DEBUG
-DECLARE_COM_PTR(ID3D12Debug);
-#endif
-
-using PlatformHandle = IUnknownPtr;
-using ResourceHandle = ID3D12ResourcePtr;
-using DeviceHandle = ID3D12DevicePtr;
-using SwapChainHandle = IDXGISwapChain1Ptr;
+using PlatformHandle = Microsoft::WRL::ComPtr<IUnknown>;
+using ResourceHandle = Microsoft::WRL::ComPtr<ID3D12Resource>;
+using DeviceHandle = Microsoft::WRL::ComPtr<ID3D12Device>;
+using SwapChainHandle = Microsoft::WRL::ComPtr<IDXGISwapChain1>;
+using PsoHandle = ID3D12PipelineState*;
 
 using SrvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
 using UavHandle = D3D12_CPU_DESCRIPTOR_HANDLE;

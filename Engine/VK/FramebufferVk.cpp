@@ -10,125 +10,151 @@
 
 #include "Stdafx.h"
 
-#include "FramebufferVk.h"
+#include "Framebuffer.h"
 
 #include "GraphicsDevice.h"
 
-#include "RenderPassVk.h"
+#include "UtilVk.h"
 
 
 using namespace Kodiak;
+using namespace std;
 
 
-void FrameBuffer::Destroy()
+void FrameBuffer::Finalize()
 {
-	vkDestroyFramebuffer(GetDevice(), m_framebuffer, nullptr);
-	m_framebuffer = VK_NULL_HANDLE;
-}
+	VkRenderPass renderpass{ VK_NULL_HANDLE };
+	VkFramebuffer framebuffer{ VK_NULL_HANDLE };
 
+	uint32_t rtCount = 0;
+	const uint32_t numColorBuffers = GetNumColorBuffers();
 
-void FrameBuffer::SetColorBuffer(uint32_t index, ColorBufferPtr buffer)
-{
-	assert(index < 8);
-
-	m_colorBuffers[index] = buffer;
-}
-
-
-void FrameBuffer::SetDepthBuffer(DepthBufferPtr buffer)
-{
-	m_depthBuffer = buffer;
-}
-
-
-void FrameBuffer::SetResolveBuffer(uint32_t index, ColorBufferPtr buffer)
-{
-	assert(index < 8);
-
-	m_resolveBuffers[index] = buffer;
-}
-
-
-uint32_t FrameBuffer::GetWidth() const
-{
-	return m_colorBuffers[0]->GetWidth();
-}
-
-
-uint32_t FrameBuffer::GetHeight() const
-{
-	return m_colorBuffers[0]->GetHeight();
-}
-
-
-ColorBufferPtr FrameBuffer::GetColorBuffer(uint32_t index) const
-{
-	assert(index < 8);
-
-	return m_colorBuffers[index];
-}
-
-
-uint32_t FrameBuffer::GetNumColorBuffers() const
-{
-	uint32_t count = 0;
-
-	for (uint32_t i = 0; i < 8; ++i)
+	// Create renderpass
 	{
-		count += m_colorBuffers[i] != nullptr ? 1 : 0;
-	}
+		VkRenderPassCreateInfo rpInfo = {};
+		rpInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		rpInfo.pNext = 0;
+		rpInfo.flags = 0;
 
-	return count;
-}
+		vector<VkAttachmentDescription> attachments(numColorBuffers + 1);
+		vector<uint32_t> regToAttachmentIndex(attachments.size(), VK_ATTACHMENT_UNUSED);
 
-
-uint32_t FrameBuffer::GetNumResolveBuffers() const
-{
-	uint32_t count = 0;
-
-	for (uint32_t i = 0; i < 8; ++i)
-	{
-		count += m_resolveBuffers[i] != nullptr ? 1 : 0;
-	}
-
-	return count;
-}
-
-
-void FrameBuffer::Finalize(RenderPass& renderPass)
-{
-	std::array<VkImageView, 9> attachments;
-	int curAttachment = 0;
-
-	uint32_t width = 0;
-	uint32_t height = 0;
-
-	for (int i = 0; i < 8; ++i)
-	{
-		if (m_colorBuffers[i])
+		// Process color targets
+		for (uint32_t i = 0; i < numColorBuffers; ++i)
 		{
-			attachments[curAttachment] = m_colorBuffers[i]->GetRTV().GetHandle();
-			++curAttachment;
-			width = m_colorBuffers[i]->GetWidth();
-			height = m_colorBuffers[i]->GetHeight();
+			auto format = m_colorBuffers[i]->GetFormat();
+			if (format != Format::Unknown)
+			{
+				auto& desc = attachments[rtCount];
+				regToAttachmentIndex[i] = rtCount;
+				++rtCount;
+
+				desc.flags = 0;
+				desc.format = static_cast<VkFormat>(format);
+				desc.samples = SamplesToFlags(m_numSamples);
+				desc.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+				desc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+				desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE; // This is a color attachment
+				desc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE; // This is a color attachment
+				desc.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+				desc.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			}
 		}
+
+		bool hasColor = rtCount > 0;
+		bool hasDepth = false;
+
+		// Process depth target
+		if (m_depthBuffer && m_depthBuffer->GetFormat() != Format::Unknown)
+		{
+			auto& depthDesc = attachments[rtCount];
+			regToAttachmentIndex.back() = rtCount;
+			rtCount++;
+
+			depthDesc.flags = 0;
+			depthDesc.format = static_cast<VkFormat>(m_depthBuffer->GetFormat());
+			depthDesc.samples = SamplesToFlags(m_numSamples);
+			depthDesc.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+			depthDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+			depthDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+			depthDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
+			depthDesc.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			depthDesc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+			hasDepth = true;
+		}
+
+		// Init subpass
+		VkSubpassDescription subpassDesc = {};
+		subpassDesc.flags = 0;
+
+		vector<VkAttachmentReference> attachmentRefs(attachments.size());
+
+		if (hasDepth)
+		{
+			auto& depthRef = attachmentRefs.back();
+			depthRef.attachment = regToAttachmentIndex.back();
+			depthRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			subpassDesc.pDepthStencilAttachment = &attachmentRefs.back();
+		}
+
+		if (hasColor)
+		{
+			for (uint32_t i = 0; i < numColorBuffers; ++i)
+			{
+				auto& ref = attachmentRefs[i];
+				ref.attachment = regToAttachmentIndex[i];
+				ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			}
+
+			subpassDesc.colorAttachmentCount = numColorBuffers;
+			subpassDesc.pColorAttachments = attachmentRefs.data();
+		}
+
+		// Build renderpass
+		VkRenderPassCreateInfo createInfo = {};
+		createInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		createInfo.pNext = nullptr;
+		createInfo.flags = 0;
+		createInfo.attachmentCount = rtCount;
+		createInfo.pAttachments = attachments.data();
+		createInfo.subpassCount = 1;
+		createInfo.pSubpasses = &subpassDesc;
+		createInfo.dependencyCount = 0;
+		createInfo.pDependencies = nullptr;
+
+		ThrowIfFailed(vkCreateRenderPass(GetDevice(), &createInfo, nullptr, &renderpass));
 	}
 
-	if (m_depthBuffer)
+	// Create framebuffer
 	{
-		attachments[curAttachment] = m_depthBuffer->GetDSV().GetHandle();
-		++curAttachment;
+		vector<VkImageView> attachments(rtCount);
+
+		uint32_t attachmentCount = 0;
+		for (uint32_t i = 0; i < numColorBuffers; ++i)
+		{
+			attachments[i] = m_colorBuffers[i]->GetRTV().GetHandle();
+			++attachmentCount;
+		}
+
+		if (m_depthBuffer)
+		{
+			attachments[attachmentCount] = m_depthBuffer->GetDSV().GetHandle();
+			++attachmentCount;
+		}
+
+		VkFramebufferCreateInfo frameBufferCreateInfo = {};
+		frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		frameBufferCreateInfo.pNext = nullptr;
+		frameBufferCreateInfo.renderPass = renderpass;
+		frameBufferCreateInfo.attachmentCount = attachmentCount;
+		frameBufferCreateInfo.pAttachments = attachments.data();
+		frameBufferCreateInfo.width = m_width;
+		frameBufferCreateInfo.height = m_height;
+		frameBufferCreateInfo.layers = 1;
+
+		ThrowIfFailed(vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &framebuffer));
 	}
 
-	VkFramebufferCreateInfo frameBufferCreateInfo = {};
-	frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-	frameBufferCreateInfo.pNext = nullptr;
-	frameBufferCreateInfo.renderPass = renderPass.GetRenderPass();
-	frameBufferCreateInfo.attachmentCount = curAttachment;
-	frameBufferCreateInfo.pAttachments = &attachments[0];
-	frameBufferCreateInfo.width = width;
-	frameBufferCreateInfo.height = height;
-	frameBufferCreateInfo.layers = 1;
-
-	ThrowIfFailed(vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &m_framebuffer));
+	m_handle = FboHandle::Create(framebuffer, renderpass);
 }

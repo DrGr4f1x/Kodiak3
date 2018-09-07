@@ -78,13 +78,12 @@ void RadialBlurApp::Render()
 	{
 		auto& context = GraphicsContext::Begin("Offscreen");
 
-		Color clearColor{ DirectX::Colors::Black };
-		context.BeginRenderPass(*m_offscreenFramebuffer);
-
 		context.TransitionResource(*m_offscreenFramebuffer->GetColorBuffer(0), ResourceState::RenderTarget);
 		context.TransitionResource(*m_offscreenFramebuffer->GetDepthBuffer(), ResourceState::DepthWrite);
 		context.ClearColor(*m_offscreenFramebuffer->GetColorBuffer(0));
 		context.ClearDepth(*m_offscreenFramebuffer->GetDepthBuffer());
+
+		context.BeginRenderPass(*m_offscreenFramebuffer);
 
 		context.SetViewportAndScissor(0u, 0u, s_offscreenSize, s_offscreenSize);
 
@@ -110,12 +109,13 @@ void RadialBlurApp::Render()
 
 		uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
-		context.BeginRenderPass(GetBackBuffer());
-
 		context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 		context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
 		context.ClearColor(GetColorBuffer());
 		context.ClearDepth(GetDepthBuffer());
+		context.TransitionResource(*m_offscreenFramebuffer->GetColorBuffer(0), ResourceState::PixelShaderResource);
+
+		context.BeginRenderPass(GetBackBuffer());
 
 		context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -132,8 +132,6 @@ void RadialBlurApp::Render()
 
 		if (m_blur)
 		{
-			context.TransitionResource(*m_offscreenFramebuffer->GetColorBuffer(0), ResourceState::PixelShaderImage);
-
 			context.SetRootSignature(m_radialBlurRootSig);
 			context.SetPipelineState(m_radialBlurPSO);
 			
@@ -188,15 +186,15 @@ void RadialBlurApp::InitPSOs()
 	m_phongPassPSO.SetVertexShader("PhongPassVS");
 	m_phongPassPSO.SetPixelShader("PhongPassPS");
 
-	VertexStreamDesc vertexStreamDesc{ 0, sizeof(Vertex), InputClassification::PerVertexData };
-	VertexElementDesc vertexElements[] =
+	VertexStreamDesc vertexStream = { 0, sizeof(Vertex), InputClassification::PerVertexData };
+	vector<VertexElementDesc> vertexElements =
 	{
 		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
 		{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 },
 		{ "COLOR", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 },
 		{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 }
 	};
-	m_phongPassPSO.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
+	m_phongPassPSO.SetInputLayout(vertexStream, vertexElements);
 
 	m_colorPassPSO = m_phongPassPSO;
 	m_colorPassPSO.SetRenderTargetFormat(Format::R8G8B8A8_UNorm, GetDepthFormat());

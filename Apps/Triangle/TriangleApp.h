@@ -14,7 +14,6 @@
 #include "CameraController.h"
 #include "GpuBuffer.h"
 #include "PipelineState.h"
-#include "RenderPass.h"
 #include "RootSignature.h"
 
 

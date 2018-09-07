@@ -15,7 +15,6 @@
 #include "GpuBuffer.h"
 #include "Model.h"
 #include "PipelineState.h"
-#include "RenderPass.h"
 #include "RootSignature.h"
 #include "Texture.h"
 

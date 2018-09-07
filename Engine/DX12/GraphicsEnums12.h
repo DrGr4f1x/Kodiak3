@@ -13,34 +13,7 @@
 namespace Kodiak
 {
 
-enum class ResourceState
-{
-	Undefined =					-1,
-	Common =					D3D12_RESOURCE_STATE_COMMON,
-	VertexBuffer =				D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,
-	IndexBuffer =				D3D12_RESOURCE_STATE_INDEX_BUFFER,
-	ConstantBuffer =			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,
-	Clear =						D3D12_RESOURCE_STATE_RENDER_TARGET,
-	RenderTarget =				D3D12_RESOURCE_STATE_RENDER_TARGET,
-	UnorderedAccess =			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-	DepthWrite =				D3D12_RESOURCE_STATE_DEPTH_WRITE,
-	DepthRead =					D3D12_RESOURCE_STATE_DEPTH_READ,
-	NonPixelShaderResource =	D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
-	PixelShaderResource =		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-	StreamOut =					D3D12_RESOURCE_STATE_STREAM_OUT,
-	IndirectArgument =			D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT,
-	CopyDest =					D3D12_RESOURCE_STATE_COPY_DEST,
-	CopySource =				D3D12_RESOURCE_STATE_COPY_SOURCE,
-	ResolveDest =				D3D12_RESOURCE_STATE_RESOLVE_DEST,
-	ResolveSource =				D3D12_RESOURCE_STATE_RESOLVE_SOURCE,
-	GenericRead =				D3D12_RESOURCE_STATE_GENERIC_READ,
-	Present =					D3D12_RESOURCE_STATE_PRESENT,
-	Predication =				D3D12_RESOURCE_STATE_PREDICATION,
-	NonPixelShaderImage,
-	PixelShaderImage
-};
 
-template <> struct EnableBitmaskOperators<ResourceState> { static const bool enable = true; };
 
 
 enum class Blend

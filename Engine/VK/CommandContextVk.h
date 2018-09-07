@@ -13,11 +13,12 @@
 #include "Color.h"
 #include "ColorBuffer.h"
 #include "DepthBuffer.h"
+#include "Framebuffer.h"
 #include "GpuBuffer.h"
 #include "Texture.h"
 
 #include "DynamicDescriptorPoolVk.h"
-#include "FramebufferVk.h"
+#include "UtilVk.h"
 
 
 namespace Kodiak
@@ -79,17 +80,14 @@ public:
 	static void InitializeTexture(Texture& dest, size_t numBytes, const void* initData, uint32_t numBuffers, VkBufferImageCopy bufferCopies[]);
 	static void InitializeBuffer(GpuBuffer& dest, const void* initialData, size_t numBytes, bool useOffset = false, size_t offset = 0);
 
-	void TransitionResource(Texture& texture, ResourceState newState, bool flushImmediate = false);
-	void TransitionResource(ColorBuffer& colorBuffer, ResourceState newState, bool flushImmediate = false);
-	inline void FlushImageBarriers();
+	void TransitionResource(GpuResource& resource, ResourceState newState, bool flushImmediate = false);
+	inline void FlushResourceBarriers() { /* TODO - see if we can cache and flush multiple barriers at once */ }
 
 protected:
 	CommandListType m_type;
 	VkCommandBuffer m_commandList{ VK_NULL_HANDLE };
 
-	// Image barriers
-	VkImageMemoryBarrier m_pendingImageBarriers[16];
-	uint8_t m_numImageBarriersToFlush{ 0 };
+	bool m_isRenderPassActive{ false };
 
 	// Current pipeline layouts
 	VkPipelineLayout m_curGraphicsPipelineLayout{ VK_NULL_HANDLE };
@@ -116,8 +114,13 @@ public:
 		return CommandContext::Begin(id).GetGraphicsContext();
 	}
 
-	void BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor);
-	void BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor, float clearDepth, uint32_t clearStencil);
+	void ClearColor(ColorBuffer& target);
+	void ClearColor(ColorBuffer& target, Color clearColor);
+	void ClearDepth(DepthBuffer& target);
+	void ClearStencil(DepthBuffer& target);
+	void ClearDepthAndStencil(DepthBuffer& target);
+
+	void BeginRenderPass(FrameBuffer& framebuffer);
 	void EndRenderPass();
 
 	void SetRootSignature(const RootSignature& rootSig);
@@ -144,6 +147,8 @@ public:
 		uint32_t startVertexLocation = 0, uint32_t startInstanceLocation = 0);
 	void DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation,
 		int32_t baseVertexLocation, uint32_t startInstanceLocation);
+
+	void Resolve(ColorBuffer& src, ColorBuffer& dest, Format format);
 };
 
 
@@ -167,27 +172,134 @@ public:
 };
 
 
-inline void CommandContext::FlushImageBarriers()
+inline void GraphicsContext::ClearColor(ColorBuffer& target)
 {
-	if (m_numImageBarriersToFlush > 0)
-	{
-		vkCmdPipelineBarrier(
-			m_commandList,
-			VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-			VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-			0,
-			0, nullptr,
-			0, nullptr,
-			m_numImageBarriersToFlush, m_pendingImageBarriers);
+	ResourceState oldState = target.m_usageState;
 
-		m_numImageBarriersToFlush = 0;
-	}
+	TransitionResource(target, ResourceState::CopyDest);
+
+	VkClearColorValue colVal;
+	Color clearColor = target.GetClearColor();
+	colVal.float32[0] = clearColor.R();
+	colVal.float32[1] = clearColor.G();
+	colVal.float32[2] = clearColor.B();
+	colVal.float32[3] = clearColor.A();
+
+	VkImageSubresourceRange range;
+	range.baseArrayLayer = 0;
+	range.baseMipLevel = 0;
+	range.layerCount = target.GetArraySize();
+	range.levelCount = target.GetNumMips();
+	range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+
+	FlushResourceBarriers();
+	vkCmdClearColorImage(m_commandList, target.m_resource, GetImageLayout(target.m_usageState), &colVal, 1, &range);
+
+	TransitionResource(target, oldState);
+}
+
+
+inline void GraphicsContext::ClearColor(ColorBuffer& target, Color clearColor)
+{
+	ResourceState oldState = target.m_usageState;
+
+	TransitionResource(target, ResourceState::CopyDest);
+
+	VkClearColorValue colVal;
+	colVal.float32[0] = clearColor.R();
+	colVal.float32[1] = clearColor.G();
+	colVal.float32[2] = clearColor.B();
+	colVal.float32[3] = clearColor.A();
+
+	VkImageSubresourceRange range;
+	range.baseArrayLayer = 0;
+	range.baseMipLevel = 0;
+	range.layerCount = target.GetArraySize();
+	range.levelCount = target.GetNumMips();
+	range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+
+	FlushResourceBarriers();
+	vkCmdClearColorImage(m_commandList, target.m_resource, GetImageLayout(target.m_usageState), &colVal, 1, &range);
+
+	TransitionResource(target, oldState);
+}
+
+
+inline void GraphicsContext::ClearDepth(DepthBuffer& target)
+{
+	ResourceState oldState = target.m_usageState;
+
+	TransitionResource(target, ResourceState::CopyDest);
+
+	VkClearDepthStencilValue depthVal;
+	depthVal.depth = target.GetClearDepth();
+	depthVal.stencil = target.GetClearStencil();
+
+	VkImageSubresourceRange range;
+	range.baseArrayLayer = 0;
+	range.baseMipLevel = 0;
+	range.layerCount = target.GetArraySize();
+	range.levelCount = target.GetNumMips();
+	range.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+	FlushResourceBarriers();
+	vkCmdClearDepthStencilImage(m_commandList, target.m_resource, GetImageLayout(target.m_usageState), &depthVal, 1, &range);
+
+	TransitionResource(target, oldState);
+}
+
+
+inline void GraphicsContext::ClearStencil(DepthBuffer& target)
+{
+	ResourceState oldState = target.m_usageState;
+
+	TransitionResource(target, ResourceState::CopyDest);
+
+	VkClearDepthStencilValue depthVal;
+	depthVal.depth = target.GetClearDepth();
+	depthVal.stencil = target.GetClearStencil();
+
+	VkImageSubresourceRange range;
+	range.baseArrayLayer = 0;
+	range.baseMipLevel = 0;
+	range.layerCount = target.GetArraySize();
+	range.levelCount = target.GetNumMips();
+	range.aspectMask = VK_IMAGE_ASPECT_STENCIL_BIT;
+
+	FlushResourceBarriers();
+	vkCmdClearDepthStencilImage(m_commandList, target.m_resource, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &depthVal, 1, &range);
+
+	TransitionResource(target, oldState);
+}
+
+
+inline void GraphicsContext::ClearDepthAndStencil(DepthBuffer& target)
+{
+	ResourceState oldState = target.m_usageState;
+
+	TransitionResource(target, ResourceState::CopyDest);
+
+	VkClearDepthStencilValue depthVal;
+	depthVal.depth = target.GetClearDepth();
+	depthVal.stencil = target.GetClearStencil();
+
+	VkImageSubresourceRange range;
+	range.baseArrayLayer = 0;
+	range.baseMipLevel = 0;
+	range.layerCount = target.GetArraySize();
+	range.levelCount = target.GetNumMips();
+	range.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+
+	FlushResourceBarriers();
+	vkCmdClearDepthStencilImage(m_commandList, target.m_resource, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &depthVal, 1, &range);
+	TransitionResource(target, oldState);
 }
 
 
 inline void GraphicsContext::EndRenderPass()
 {
 	vkCmdEndRenderPass(m_commandList);
+	m_isRenderPassActive = false;
 }
 
 
@@ -270,7 +382,7 @@ inline void GraphicsContext::DrawIndexed(uint32_t indexCount, uint32_t startInde
 inline void GraphicsContext::DrawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount,
 	uint32_t startVertexLocation, uint32_t startInstanceLocation)
 {
-	FlushImageBarriers();
+	FlushResourceBarriers();
 	m_dynamicDescriptorPool.CommitGraphicsRootDescriptorSets(m_commandList);
 	vkCmdDraw(m_commandList, vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 }
@@ -279,9 +391,43 @@ inline void GraphicsContext::DrawInstanced(uint32_t vertexCountPerInstance, uint
 inline void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation,
 	int32_t baseVertexLocation, uint32_t startInstanceLocation)
 {
-	FlushImageBarriers();
+	FlushResourceBarriers();
 	m_dynamicDescriptorPool.CommitGraphicsRootDescriptorSets(m_commandList);
 	vkCmdDrawIndexed(m_commandList, indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
+}
+
+
+inline void GraphicsContext::Resolve(ColorBuffer& src, ColorBuffer& dest, Format format)
+{
+	FlushResourceBarriers();
+
+	VkImageResolve resolve = {};
+	resolve.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	resolve.srcSubresource.baseArrayLayer = 0;
+	resolve.srcSubresource.layerCount = src.GetArraySize();
+	resolve.srcSubresource.mipLevel = 0;
+	resolve.srcOffset.x = 0;
+	resolve.srcOffset.y = 0;
+	resolve.srcOffset.z = 0;
+	resolve.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	resolve.dstSubresource.baseArrayLayer = 0;
+	resolve.dstSubresource.layerCount = dest.GetArraySize();
+	resolve.dstSubresource.mipLevel = 0;
+	resolve.dstOffset.x = 0;
+	resolve.dstOffset.y = 0;
+	resolve.dstOffset.z = 0;
+	resolve.extent.width = dest.GetWidth();
+	resolve.extent.height = dest.GetHeight();;
+	resolve.extent.depth = 1;
+
+	vkCmdResolveImage(
+		m_commandList, 
+		src.m_resource, 
+		VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 
+		dest.m_resource, 
+		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+		1, 
+		&resolve);
 }
 
 
@@ -296,7 +442,7 @@ inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Te
 {
 	VkDescriptorImageInfo descriptorInfo = {};
 	descriptorInfo.imageView = texture.GetSRV().GetHandle();
-	descriptorInfo.imageLayout = texture.GetLayout();
+	descriptorInfo.imageLayout = GetImageLayout(texture.m_usageState);
 	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
 }
 
@@ -304,7 +450,7 @@ inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Te
 inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
 {
 	VkDescriptorImageInfo descriptorInfo = colorBuffer.GetSRV().GetHandle();
-	descriptorInfo.imageLayout = colorBuffer.GetLayout();
+	descriptorInfo.imageLayout = GetImageLayout(colorBuffer.m_usageState);
 	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
 }
 
@@ -319,14 +465,14 @@ inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Co
 inline void ComputeContext::SetUAV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
 {
 	VkDescriptorImageInfo descriptorInfo = colorBuffer.GetSRV().GetHandle();
-	descriptorInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+	descriptorInfo.imageLayout = GetImageLayout(colorBuffer.m_usageState);
 	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
 }
 
 
 inline void ComputeContext::Dispatch(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ)
 {
-	FlushImageBarriers();
+	FlushResourceBarriers();
 	m_dynamicDescriptorPool.CommitComputeRootDescriptorSets(m_commandList);
 	vkCmdDispatch(m_commandList, groupCountX, groupCountY, groupCountZ);
 }

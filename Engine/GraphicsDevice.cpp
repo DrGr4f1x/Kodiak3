@@ -91,8 +91,6 @@ void GraphicsDevice::SubmitFrame()
 	context.TransitionResource(*m_swapChainBuffers[m_currentBuffer], ResourceState::Present);
 	context.Finish();
 
-	m_currentBuffer = (m_currentBuffer + 1) % NumSwapChainBuffers;
-
 	PlatformPresent();
 
 	ReleaseDeferredResources(m_currentBuffer);

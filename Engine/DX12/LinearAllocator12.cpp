@@ -16,8 +16,10 @@
 
 #include "LinearAllocator12.h"
 
-#include "CommandListManager12.h"
 #include "GraphicsDevice.h"
+
+#include "CommandListManager12.h"
+#include "Util12.h"
 
 
 using namespace Kodiak;
@@ -132,7 +134,7 @@ LinearAllocationPage* LinearAllocatorPageManager::CreateNewPage(size_t pageSize)
 
 	ID3D12Resource* buffer = nullptr;
 	assert_succeeded(GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
-		&resourceDesc, static_cast<D3D12_RESOURCE_STATES>(defaultUsage), nullptr, IID_PPV_ARGS(&buffer)));
+		&resourceDesc, GetResourceState(defaultUsage), nullptr, IID_PPV_ARGS(&buffer)));
 
 	buffer->SetName(L"LinearAllocator Page");
 

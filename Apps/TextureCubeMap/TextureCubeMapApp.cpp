@@ -91,12 +91,12 @@ void TextureCubeMapApp::Render()
 
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
-	context.BeginRenderPass(GetBackBuffer());
-
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
 	context.ClearColor(GetColorBuffer());
 	context.ClearDepth(GetDepthBuffer());
+
+	context.BeginRenderPass(GetBackBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -171,15 +171,15 @@ void TextureCubeMapApp::InitPSOs()
 	m_skyboxPSO.SetVertexShader("SkyboxVS");
 	m_skyboxPSO.SetPixelShader("SkyboxPS");
 
-	VertexStreamDesc vertexStreamDesc{ 0, sizeof(Vertex), InputClassification::PerVertexData };
-	VertexElementDesc vertexElements[] =
+	VertexStreamDesc vertexStream{ 0, sizeof(Vertex), InputClassification::PerVertexData };
+	vector<VertexElementDesc> vertexElements =
 	{
 		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
 		{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 },
 		{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 },
 	};
 
-	m_skyboxPSO.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
+	m_skyboxPSO.SetInputLayout(vertexStream, vertexElements);
 	m_skyboxPSO.Finalize();
 
 	// Model
@@ -195,7 +195,7 @@ void TextureCubeMapApp::InitPSOs()
 	m_modelPSO.SetVertexShader("ReflectVS");
 	m_modelPSO.SetPixelShader("ReflectPS");
 
-	m_modelPSO.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
+	m_modelPSO.SetInputLayout(vertexStream, vertexElements);
 	m_modelPSO.Finalize();
 }
 

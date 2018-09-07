@@ -158,8 +158,8 @@ struct TextureInitializer::PlatformData
 
 	std::unique_ptr<byte[]> data;
 	std::vector<size_t>		faceOffsets;
-	size_t					arraySliceSize;
-	size_t					totalSize;
+	size_t					arraySliceSize{ 0 };
+	size_t					totalSize{ 0 };
 };
 
 } // namespace Kodiak
@@ -320,7 +320,7 @@ void Texture::Create(TextureInitializer& init)
 	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	imageCreateInfo.extent = { m_width, m_height, (m_type == ResourceType::Texture3D ? m_arraySize : 1) };
-	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | additionalFlags;
+	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | additionalFlags;
 	// Ensure that the TRANSFER_DST bit is set for staging
 	if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
 	{

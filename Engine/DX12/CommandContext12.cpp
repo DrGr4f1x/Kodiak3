@@ -12,9 +12,10 @@
 
 #include "CommandContext12.h"
 
+#include "Framebuffer.h"
+
 #include "CommandListManager12.h"
-#include "Framebuffer12.h"
-#include "RenderPass12.h"
+#include "Util12.h"
 
 
 using namespace Kodiak;
@@ -26,8 +27,21 @@ namespace
 
 ContextManager g_contextManager;
 
-const ResourceState VALID_COMPUTE_QUEUE_RESOURCE_STATES =
-	ResourceState::NonPixelShaderResource | ResourceState::UnorderedAccess | ResourceState::CopyDest | ResourceState::CopySource;
+static bool IsValidComputeResourceState(ResourceState state)
+{
+	// TODO: Also ResourceState::ShaderResource?
+	switch (state)
+	{
+	case ResourceState::NonPixelShaderResource:
+	case ResourceState::UnorderedAccess:
+	case ResourceState::CopyDest:
+	case ResourceState::CopySource:
+		return true;
+
+	default:
+		return false;
+	}
+}
 
 } // anonymous namespace
 
@@ -155,13 +169,13 @@ void CommandContext::Initialize()
 
 void CommandContext::InitializeTexture(GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA subData[])
 {
-	uint64_t uploadBufferSize = GetRequiredIntermediateSize(dest.m_resource, 0, numSubresources);
+	uint64_t uploadBufferSize = GetRequiredIntermediateSize(dest.m_resource.Get(), 0, numSubresources);
 
 	CommandContext& initContext = CommandContext::Begin();
 
 	// copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
 	DynAlloc mem = initContext.ReserveUploadMemory(uploadBufferSize);
-	UpdateSubresources(initContext.m_commandList, dest.m_resource, mem.buffer.m_resource, 0, 0, numSubresources, subData);
+	UpdateSubresources(initContext.m_commandList, dest.m_resource.Get(), mem.buffer.m_resource.Get(), 0, 0, numSubresources, subData);
 	initContext.TransitionResource(dest, ResourceState::GenericRead);
 
 	// Execute the command list and wait for it to finish so we can release the upload buffer
@@ -178,7 +192,7 @@ void CommandContext::InitializeBuffer(GpuResource& dest, const void* bufferData,
 
 	// copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
 	initContext.TransitionResource(dest, ResourceState::CopyDest, true);
-	initContext.m_commandList->CopyBufferRegion(dest.m_resource, offset, mem.buffer.m_resource, 0, numBytes);
+	initContext.m_commandList->CopyBufferRegion(dest.m_resource.Get(), offset, mem.buffer.m_resource.Get(), 0, numBytes);
 	initContext.TransitionResource(dest, ResourceState::GenericRead, true);
 
 	// Execute the command list and wait for it to finish so we can release the upload buffer
@@ -190,13 +204,10 @@ void CommandContext::TransitionResource(GpuResource& resource, ResourceState new
 {
 	ResourceState oldState = resource.m_usageState;
 
-	if (newState == ResourceState::NonPixelShaderImage) newState = ResourceState::NonPixelShaderResource;
-	if (newState == ResourceState::PixelShaderImage) newState = ResourceState::PixelShaderResource;
-
 	if (m_type == CommandListType::Compute)
 	{
-		assert((oldState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == oldState);
-		assert((newState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == newState);
+		assert(IsValidComputeResourceState(oldState));
+		assert(IsValidComputeResourceState(newState));
 	}
 
 	if (oldState != newState)
@@ -205,10 +216,10 @@ void CommandContext::TransitionResource(GpuResource& resource, ResourceState new
 		D3D12_RESOURCE_BARRIER& barrierDesc = m_resourceBarrierBuffer[m_numBarriersToFlush++];
 
 		barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrierDesc.Transition.pResource = resource.m_resource;
+		barrierDesc.Transition.pResource = resource.m_resource.Get();
 		barrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		barrierDesc.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(oldState);
-		barrierDesc.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(newState);
+		barrierDesc.Transition.StateBefore = GetResourceState(oldState);
+		barrierDesc.Transition.StateAfter = GetResourceState(newState);
 
 		// Check to see if we already started the transition
 		if (newState == resource.m_transitioningState)
@@ -223,45 +234,9 @@ void CommandContext::TransitionResource(GpuResource& resource, ResourceState new
 
 		resource.m_usageState = newState;
 	}
-	else if (newState == D3D12_RESOURCE_STATE_UNORDERED_ACCESS)
+	else if (newState == ResourceState::UnorderedAccess)
 	{
 		InsertUAVBarrier(resource, flushImmediate);
-	}
-
-	if (flushImmediate || m_numBarriersToFlush == 16)
-	{
-		FlushResourceBarriers();
-	}
-}
-
-
-void CommandContext::BeginResourceTransition(GpuResource& resource, ResourceState newState, bool flushImmediate)
-{
-	if (newState == ResourceState::NonPixelShaderImage) newState = ResourceState::NonPixelShaderResource;
-	if (newState == ResourceState::PixelShaderImage) newState = ResourceState::PixelShaderResource;
-
-	// If it's already transitioning, finish that transition
-	if (resource.m_transitioningState != (D3D12_RESOURCE_STATES)-1)
-	{
-		TransitionResource(resource, resource.m_transitioningState);
-	}
-
-	ResourceState oldState = resource.m_usageState;
-
-	if (oldState != newState)
-	{
-		assert_msg(m_numBarriersToFlush < 16, "Exceeded arbitrary limit on buffered barriers");
-		D3D12_RESOURCE_BARRIER& barrierDesc = m_resourceBarrierBuffer[m_numBarriersToFlush++];
-
-		barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrierDesc.Transition.pResource = resource.m_resource;
-		barrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		barrierDesc.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(oldState);
-		barrierDesc.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(newState);
-
-		barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_BEGIN_ONLY;
-
-		resource.m_transitioningState = newState;
 	}
 
 	if (flushImmediate || m_numBarriersToFlush == 16)
@@ -278,7 +253,7 @@ void CommandContext::InsertUAVBarrier(GpuResource& resource, bool flushImmediate
 
 	barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
 	barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrierDesc.UAV.pResource = resource.m_resource;
+	barrierDesc.UAV.pResource = resource.m_resource.Get();
 
 	if (flushImmediate)
 	{
@@ -294,8 +269,8 @@ void CommandContext::InsertAliasBarrier(GpuResource& before, GpuResource& after,
 
 	barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_ALIASING;
 	barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrierDesc.Aliasing.pResourceBefore = before.m_resource;
-	barrierDesc.Aliasing.pResourceAfter = after.m_resource;
+	barrierDesc.Aliasing.pResourceBefore = before.m_resource.Get();
+	barrierDesc.Aliasing.pResourceAfter = after.m_resource.Get();
 
 	if (flushImmediate)
 	{
@@ -405,14 +380,14 @@ void GraphicsContext::BeginRenderPass(FrameBuffer& framebuffer)
 	array<D3D12_CPU_DESCRIPTOR_HANDLE, 8> RTVs;
 
 	// Gather render targets for EndRenderPass
-	uint32_t highWaterMark = 0;
+	int highWaterMark = -1;
 	for (uint32_t i = 0; i < 8; ++i)
 	{
 		m_renderTargets[i] = framebuffer.m_colorBuffers[i].get();
 		if (m_renderTargets[i])
 		{
 			RTVs[i] = m_renderTargets[i]->GetRTV().GetHandle();
-			highWaterMark = i + 1;
+			highWaterMark = i;
 		}
 	}
 
@@ -424,7 +399,7 @@ void GraphicsContext::BeginRenderPass(FrameBuffer& framebuffer)
 	}
 
 	// Set the render targets
-	m_commandList->OMSetRenderTargets(highWaterMark, RTVs.data(), FALSE, m_depthTarget ? &DSV : nullptr);
+	m_commandList->OMSetRenderTargets(highWaterMark + 1, RTVs.data(), FALSE, m_depthTarget ? &DSV : nullptr);
 }
 
 

@@ -23,4 +23,9 @@ VkImageType GetImageType(ResourceType type);
 VkImageViewType GetImageViewType(ResourceType type);
 VkImageCreateFlagBits GetImageCreateFlags(ResourceType type);
 
+VkImageLayout GetImageLayout(ResourceState state);
+VkAccessFlagBits GetAccessMask(ResourceState state);
+VkPipelineStageFlags GetShaderStageMask(ResourceState state, bool isSrc);
+VkImageAspectFlags GetAspectFlagsFromFormat(Format format, bool ignoreStencil = false);
+
 } // namespace Kodiak

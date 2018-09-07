@@ -91,7 +91,7 @@ void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType typ
 	{
 		m_handle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
-	GetDevice()->CreateShaderResourceView(resource, &srvDesc, m_handle);
+	GetDevice()->CreateShaderResourceView(resource.Get(), &srvDesc, m_handle);
 }
 
 
@@ -138,7 +138,7 @@ void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType typ
 	{
 		m_handle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
-	GetDevice()->CreateShaderResourceView(resource, &srvDesc, m_handle);
+	GetDevice()->CreateShaderResourceView(resource.Get(), &srvDesc, m_handle);
 }
 
 
@@ -194,7 +194,7 @@ void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType ty
 	{
 		m_handle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
-	GetDevice()->CreateUnorderedAccessView(resource, nullptr, &uavDesc, m_handle);
+	GetDevice()->CreateUnorderedAccessView(resource.Get(), nullptr, &uavDesc, m_handle);
 }
 
 
@@ -241,7 +241,7 @@ void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType ty
 	{
 		m_handle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
-	GetDevice()->CreateUnorderedAccessView(resource, nullptr, &uavDesc, m_handle);
+	GetDevice()->CreateUnorderedAccessView(resource.Get(), nullptr, &uavDesc, m_handle);
 }
 
 
@@ -331,7 +331,7 @@ void DepthStencilView::Create(const ResourceHandle& resource, const DepthStencil
 	}
 	
 	m_handle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	GetDevice()->CreateDepthStencilView(resource, &dsvDesc, m_handle);
+	GetDevice()->CreateDepthStencilView(resource.Get(), &dsvDesc, m_handle);
 }
 
 
@@ -371,5 +371,5 @@ void RenderTargetView::Create(const ResourceHandle& resource, const RenderTarget
 	}
 
 	// Create the render target view
-	GetDevice()->CreateRenderTargetView(resource, desc.nullDesc ? nullptr : &rtvDesc, m_handle);
+	GetDevice()->CreateRenderTargetView(resource.Get(), desc.nullDesc ? nullptr : &rtvDesc, m_handle);
 }

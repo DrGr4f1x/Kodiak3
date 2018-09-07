@@ -44,6 +44,33 @@ struct Limits
 };
 
 
+enum class ResourceState
+{
+	Undefined,
+	Common,
+	VertexBuffer,
+	IndexBuffer,
+	ConstantBuffer,
+	RenderTarget,
+	UnorderedAccess,
+	DepthWrite,
+	DepthRead,
+	NonPixelShaderResource,
+	PixelShaderResource,
+	ShaderResource,
+	StreamOut,
+	IndirectArgument,
+	CopyDest,
+	CopySource,
+	ResolveDest,
+	ResolveSource,
+	GenericRead,
+	Present,
+	Predication,
+	PreInitialized,
+};
+
+
 inline uint32_t BitsPerPixel(Format format)
 {
 	switch (format)
@@ -238,9 +265,25 @@ inline Format MakeSRGB(Format format)
 }
 
 
+inline bool IsDepthFormat(Format format)
+{
+	return 
+		format == Format::D32_Float_S8_UInt ||
+		format == Format::D32_Float ||
+		format == Format::D24S8 ||
+		format == Format::D16_UNorm;
+}
+
+
 inline bool IsStencilFormat(Format format)
 {
 	return format == Format::D24S8 || format == Format::D32_Float_S8_UInt;
+}
+
+
+inline bool IsDepthStencilFormat(Format format)
+{
+	return IsDepthFormat(format) || IsStencilFormat(format);
 }
 
 
@@ -263,5 +306,16 @@ enum class ResourceType
 	TypedBuffer
 };
 
+
+inline bool IsTextureResource(ResourceType type)
+{
+	return (type >= ResourceType::Texture1D) && (type <= ResourceType::Texture3D);
+}
+
+
+inline bool IsBufferResource(ResourceType type)
+{
+	return (type > ResourceType::Texture3D);
+}
 
 } // namespace Kodiak

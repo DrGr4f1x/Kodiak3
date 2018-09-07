@@ -49,7 +49,7 @@ void ColorBuffer::CreateFromSwapChain(const std::string& name, const ResourceHan
 	assert(resource != nullptr);
 	D3D12_RESOURCE_DESC resourceDesc = resource->GetDesc();
 
-	m_resource.Attach(resource);
+	m_resource.Attach(resource.Get());
 	m_usageState = ResourceState::Present;
 
 	m_width = (uint32_t)resourceDesc.Width;		// We don't care about large virtual textures yet
@@ -57,6 +57,7 @@ void ColorBuffer::CreateFromSwapChain(const std::string& name, const ResourceHan
 	m_arraySize = resourceDesc.DepthOrArraySize;
 	m_numSamples = resourceDesc.SampleDesc.Count;
 	m_format = MapDXGIFormatToEngine(resourceDesc.Format);
+	m_type = ResourceType::Texture2D;
 
 #ifndef _RELEASE
 	m_resource->SetName(MakeWStr(name).c_str());
@@ -82,6 +83,7 @@ void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 	m_arraySize = 1;
 	m_numSamples = numSamples;
 	m_format = format;
+	m_type = ResourceType::Texture2D;
 
 	resourceDesc.SampleDesc.Count = m_fragmentCount;
 	resourceDesc.SampleDesc.Quality = 0;
@@ -114,6 +116,7 @@ void ColorBuffer::CreateArray(const std::string& name, uint32_t width, uint32_t 
 	m_fragmentCount = numSamples;
 	m_numSamples = numSamples;
 	m_format = format;
+	m_type = ResourceType::Texture2D_Array;
 
 	D3D12_CLEAR_VALUE clearValue = {};
 	clearValue.Format = static_cast<DXGI_FORMAT>(format);

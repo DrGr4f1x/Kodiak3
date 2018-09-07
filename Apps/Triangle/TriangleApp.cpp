@@ -97,14 +97,14 @@ void TriangleApp::Render()
 
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 	
-	Color clearColor{ DirectX::Colors::CornflowerBlue };
-	context.BeginRenderPass(GetBackBuffer());
-
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
+	Color clearColor{ DirectX::Colors::CornflowerBlue };
 	context.ClearColor(GetColorBuffer(), clearColor);
 	context.ClearDepth(GetDepthBuffer());
 
+	context.BeginRenderPass(GetBackBuffer());
+	
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
 	context.SetRootSignature(m_rootSig);
@@ -118,6 +118,7 @@ void TriangleApp::Render()
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 
 	context.EndRenderPass();
+
 	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
@@ -158,13 +159,13 @@ void TriangleApp::InitPSO()
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
 	// Vertex inputs
-	VertexStreamDesc vertexStreamDesc{ 0, sizeof(Vertex), InputClassification::PerVertexData };
-	VertexElementDesc vertexElements[] =
+	VertexStreamDesc vertexStream = { 0, sizeof(Vertex), InputClassification::PerVertexData };
+	vector<VertexElementDesc> vertexElements =
 	{
 		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
 		{ "COLOR", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 }
 	};
-	m_pso.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
+	m_pso.SetInputLayout(vertexStream, vertexElements);
 
 	m_pso.Finalize();
 }

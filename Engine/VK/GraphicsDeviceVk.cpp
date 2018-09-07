@@ -12,12 +12,13 @@
 
 #include "GraphicsDevice.h"
 
+#include "PipelineState.h"
 #include "Texture.h"
 #include "Utility.h"
 
 #include "CommandContextVk.h"
 #include "CommandListManagerVk.h"
-#include "PipelineStateVk.h"
+
 #include "RootSignatureVk.h"
 
 #include <iostream>
@@ -91,6 +92,9 @@ VkBool32 messageCallback(
 		cout << debugMessage.str() << "\n";
 	}
 
+	OutputDebugString(debugMessage.str().c_str());
+	assert(false);
+
 	fflush(stderr);
 
 	// The return value of this callback controls whether the Vulkan call that caused
@@ -142,7 +146,7 @@ InstanceHandle CreateInstance(const string& appName)
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.pApplicationName = appName.c_str();
 	appInfo.pEngineName = "Kodiak";
-	appInfo.apiVersion = VK_API_VERSION_1_0;
+	appInfo.apiVersion = VK_API_VERSION_1_1;
 
 	vector<const char*> instanceExtensions = { VK_KHR_SURFACE_EXTENSION_NAME };
 	instanceExtensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
@@ -255,15 +259,16 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		for (int i = 0; i < NumSwapChainBuffers; ++i)
 		{
+			vkWaitForFences(device, 1, &presentFences[i], TRUE, UINT64_MAX);
 			vkDestroyFence(device, presentFences[i], nullptr);
 			presentFences[i] = VK_NULL_HANDLE;
 		}
 
-		vkDestroySurfaceKHR(instance, surface, nullptr);
-		surface = VK_NULL_HANDLE;
-
 		vkDestroySwapchainKHR(device, swapChain, nullptr);
 		swapChain = VK_NULL_HANDLE;
+
+		vkDestroySurfaceKHR(instance, surface, nullptr);
+		surface = VK_NULL_HANDLE;
 
 		FreeDebugCallback(instance);
 
@@ -744,7 +749,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		swapchainCI.imageFormat = vkFormat;
 		swapchainCI.imageColorSpace = colorSpace;
 		swapchainCI.imageExtent = { swapchainExtent.width, swapchainExtent.height };
-		swapchainCI.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+		swapchainCI.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 		swapchainCI.preTransform = (VkSurfaceTransformFlagBitsKHR)preTransform;
 		swapchainCI.imageArrayLayers = 1;
 		swapchainCI.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -922,6 +927,11 @@ void GraphicsDevice::PlatformCreate()
 		m_platformData->queueFamilyIndices.graphics, m_platformData->graphicsQueue,
 		m_platformData->queueFamilyIndices.compute, m_platformData->graphicsQueue,
 		m_platformData->queueFamilyIndices.transfer, m_platformData->graphicsQueue);
+
+	VkFence fence = m_platformData->presentFences[m_currentBuffer];
+	vkResetFences(m_platformData->device, 1, &fence);
+
+	vkAcquireNextImageKHR(m_platformData->device, m_platformData->swapChain, UINT64_MAX, nullptr, fence, &m_currentBuffer);
 }
 
 

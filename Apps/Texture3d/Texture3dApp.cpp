@@ -199,13 +199,12 @@ void Texture3dApp::Render()
 
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
-	Color clearColor{ DirectX::Colors::Black };
-	context.BeginRenderPass(GetBackBuffer());
-
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
 	context.ClearColor(GetColorBuffer());
 	context.ClearDepth(GetDepthBuffer());
+
+	context.BeginRenderPass(GetBackBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
@@ -254,14 +253,14 @@ void Texture3dApp::InitPSO()
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
 	// Vertex inputs
-	VertexStreamDesc vertexStreamDesc{ 0, sizeof(Vertex), InputClassification::PerVertexData };
-	VertexElementDesc vertexElements[] =
+	VertexStreamDesc vertexStream{ 0, sizeof(Vertex), InputClassification::PerVertexData };
+	vector<VertexElementDesc> vertexElements =
 	{
 		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
 		{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 },
 		{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 }
 	};
-	m_pso.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
+	m_pso.SetInputLayout(vertexStream, vertexElements);
 
 	m_pso.Finalize();
 }

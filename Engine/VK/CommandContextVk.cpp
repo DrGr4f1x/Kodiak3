@@ -14,9 +14,10 @@
 
 #include "CommandListManagerVk.h"
 #include "GraphicsDevice.h"
-#include "PipelineStateVk.h"
-#include "RenderPassVk.h"
+#include "PipelineState.h"
+
 #include "RootSignatureVk.h"
+#include "UtilVk.h"
 
 
 using namespace Kodiak;
@@ -25,8 +26,21 @@ using namespace std;
 
 ContextManager g_contextManager;
 
-static const ResourceState VALID_COMPUTE_QUEUE_RESOURCE_STATES =
-ResourceState::NonPixelShaderResource | ResourceState::UnorderedAccess | ResourceState::CopyDest | ResourceState::CopySource;
+static bool IsValidComputeResourceState(ResourceState state)
+{
+	// TODO: Also ResourceState::ShaderResource?
+	switch (state)
+	{
+	case ResourceState::NonPixelShaderResource:
+	case ResourceState::UnorderedAccess:
+	case ResourceState::CopyDest:
+	case ResourceState::CopySource:
+		return true;
+
+	default:
+		return false;
+	}
+}
 
 
 CommandContext* ContextManager::AllocateContext(CommandListType type)
@@ -130,8 +144,7 @@ void CommandContext::Finish(bool waitForCompletion)
 {
 	assert(m_type == CommandListType::Direct || m_type == CommandListType::Compute);
 
-	FlushImageBarriers();
-	//FlushBufferBarriers();
+	FlushResourceBarriers();
 
 	// TODO
 #if 0
@@ -274,224 +287,92 @@ void CommandContext::InitializeBuffer(GpuBuffer& dest, const void* initialData, 
 }
 
 
-void CommandContext::TransitionResource(Texture& texture, ResourceState newState, bool flushImmediate)
+void CommandContext::TransitionResource(GpuResource& resource, ResourceState newState, bool flushImmediate)
 {
 	assert_msg(newState != ResourceState::Undefined, "Can\'t transition to Undefined resource state");
+	assert(!m_isRenderPassActive);
 
-	ResourceState oldState = texture.m_usageState;
+	ResourceState oldState = resource.m_usageState;
 
 	if (m_type == CommandListType::Compute)
 	{
-		assert((oldState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == oldState);
-		assert((newState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == newState);
+		assert(IsValidComputeResourceState(oldState));
+		assert(IsValidComputeResourceState(newState));
 	}
 
 	if (oldState != newState)
 	{
-		assert_msg(m_numImageBarriersToFlush < 16, "Exceeded arbitrary limit on buffered image barriers");
-		VkImageMemoryBarrier& barrierDesc = m_pendingImageBarriers[m_numImageBarriersToFlush++];
-
-		barrierDesc.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-		barrierDesc.pNext = nullptr;
-
-		barrierDesc.image = texture.m_resource;
-
-		// Setup access flags and layout 
-		barrierDesc.srcAccessMask = texture.GetAccessFlags();
-		barrierDesc.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-
-		switch (barrierDesc.oldLayout)
+		if (IsTextureResource(resource.m_type))
 		{
-		case VK_IMAGE_LAYOUT_UNDEFINED:
-			// Only valid as initial layout, memory contents are not preserved
-			// Can be accessed directly, no source dependency required
-			barrierDesc.srcAccessMask = 0;
-			break;
-		case VK_IMAGE_LAYOUT_PREINITIALIZED:
-			// Only valid as initial layout for linear images, preserves memory contents
-			// Make sure host writes to the image have been finished
-			barrierDesc.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
-			break;
-		case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
-			// Old layout is transfer destination
-			// Make sure any writes to the image have been finished
-			barrierDesc.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			break;
+			PixelBuffer& texture = dynamic_cast<PixelBuffer&>(resource);
+
+			VkImageMemoryBarrier barrierDesc = {};
+
+			barrierDesc.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			barrierDesc.pNext = nullptr;
+			barrierDesc.image = resource.m_resource;
+			barrierDesc.oldLayout = GetImageLayout(oldState);
+			barrierDesc.newLayout = GetImageLayout(newState);
+			barrierDesc.subresourceRange.aspectMask = GetAspectFlagsFromFormat(texture.GetFormat());
+			barrierDesc.subresourceRange.baseArrayLayer = 0;
+			barrierDesc.subresourceRange.baseMipLevel = 0;
+			barrierDesc.subresourceRange.layerCount = resource.m_type == ResourceType::Texture3D ? 1 : texture.GetArraySize();
+			barrierDesc.subresourceRange.levelCount = texture.GetNumMips();
+			barrierDesc.srcAccessMask = GetAccessMask(oldState);
+			barrierDesc.dstAccessMask = GetAccessMask(newState);
+
+			auto srcStageMask = GetShaderStageMask(oldState, true);
+			auto dstStageMask = GetShaderStageMask(newState, false);
+
+			vkCmdPipelineBarrier(
+				m_commandList,
+				srcStageMask,
+				dstStageMask,
+				0,
+				0,
+				nullptr,
+				0,
+				nullptr,
+				1,
+				&barrierDesc);
+
+			resource.m_usageState = newState;
 		}
-
-		switch (newState)
+		else if (IsBufferResource(resource.m_type))
 		{
-		case ResourceState::Clear:
-			barrierDesc.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			barrierDesc.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-			break;
-		case ResourceState::RenderTarget:
-			barrierDesc.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-			barrierDesc.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			break;
-		case ResourceState::PixelShaderResource:
-		case ResourceState::NonPixelShaderResource:
-		case ResourceState::GenericRead:
-			// Shader read (sampler, input attachment)
-			barrierDesc.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-			barrierDesc.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			break;
-		case ResourceState::NonPixelShaderImage:
-			barrierDesc.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-			barrierDesc.newLayout = VK_IMAGE_LAYOUT_GENERAL;
-			break;
-		case ResourceState::UnorderedAccess:
-			barrierDesc.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
-			barrierDesc.newLayout = VK_IMAGE_LAYOUT_GENERAL;
-			break;
-		case ResourceState::Present:
-			barrierDesc.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-			barrierDesc.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-			break;
-		case ResourceState::CopyDest:
-			barrierDesc.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			barrierDesc.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-			break;
-		default:
+			GpuBuffer& buffer = dynamic_cast<GpuBuffer&>(resource);
+
+			VkBufferMemoryBarrier barrierDesc = {};
+
+			barrierDesc.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+			barrierDesc.pNext = nullptr;
+			barrierDesc.buffer = resource.m_resource;
+			barrierDesc.srcAccessMask = GetAccessMask(oldState);
+			barrierDesc.dstAccessMask = GetAccessMask(newState);
+			barrierDesc.offset = 0;
+			barrierDesc.size = buffer.GetSize();
+
+			auto srcStageMask = GetShaderStageMask(oldState, true);
+			auto dstStageMask = GetShaderStageMask(newState, false);
+
+			vkCmdPipelineBarrier(
+				m_commandList,
+				srcStageMask,
+				dstStageMask,
+				0,
+				0,
+				nullptr,
+				1,
+				&barrierDesc,
+				0,
+				nullptr);
+
+			resource.m_usageState = newState;
+		}
+		else
+		{
 			assert(false);
-			break;
 		}
-
-		barrierDesc.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		barrierDesc.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-
-		// TODO this likely isn't correct
-		barrierDesc.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		barrierDesc.subresourceRange.baseMipLevel = 0;
-		barrierDesc.subresourceRange.levelCount = texture.GetNumMips();
-		barrierDesc.subresourceRange.baseArrayLayer = 0;
-		barrierDesc.subresourceRange.layerCount = texture.GetType() == ResourceType::Texture3D ? 1 : texture.GetArraySize();
-
-		texture.SetLayout(barrierDesc.newLayout);
-		texture.SetAccessFlags(barrierDesc.dstAccessMask);
-		texture.m_usageState = newState;
-	}
-	else if (newState == ResourceState::UnorderedAccess)
-	{
-		// TODO
-		assert(false);
-#if 0
-		InsertUAVBarrier(Resource, FlushImmediate);
-#endif
-	}
-
-	if (flushImmediate || m_numImageBarriersToFlush == 16)
-	{
-		FlushImageBarriers();
-	}
-}
-
-
-void CommandContext::TransitionResource(ColorBuffer& colorBuffer, ResourceState newState, bool flushImmediate)
-{
-	assert_msg(newState != ResourceState::Undefined, "Can\'t transition to Undefined resource state");
-
-	ResourceState oldState = colorBuffer.m_usageState;
-
-	if (m_type == CommandListType::Compute)
-	{
-		assert((oldState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == oldState);
-		assert((newState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == newState);
-	}
-
-	if (oldState != newState)
-	{
-		assert_msg(m_numImageBarriersToFlush < 16, "Exceeded arbitrary limit on buffered image barriers");
-		VkImageMemoryBarrier& barrierDesc = m_pendingImageBarriers[m_numImageBarriersToFlush++];
-
-		barrierDesc.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-		barrierDesc.pNext = nullptr;
-
-		barrierDesc.image = colorBuffer.m_resource;
-
-		// Setup access flags and layout 
-		barrierDesc.srcAccessMask = colorBuffer.GetAccessFlags();
-		barrierDesc.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-
-		switch (barrierDesc.oldLayout)
-		{
-		case VK_IMAGE_LAYOUT_UNDEFINED:
-			// Only valid as initial layout, memory contents are not preserved
-			// Can be accessed directly, no source dependency required
-			barrierDesc.srcAccessMask = 0;
-			break;
-		case VK_IMAGE_LAYOUT_PREINITIALIZED:
-			// Only valid as initial layout for linear images, preserves memory contents
-			// Make sure host writes to the image have been finished
-			barrierDesc.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
-			break;
-		case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
-			// Old layout is transfer destination
-			// Make sure any writes to the image have been finished
-			barrierDesc.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			break;
-		}
-
-		switch (newState)
-		{
-		case ResourceState::Clear:
-			barrierDesc.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			barrierDesc.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-			break;
-		case ResourceState::RenderTarget:
-			barrierDesc.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-			barrierDesc.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			break;
-		case ResourceState::PixelShaderResource:
-		case ResourceState::NonPixelShaderResource:
-		case ResourceState::GenericRead:
-			// Shader read (sampler, input attachment)
-			barrierDesc.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-			barrierDesc.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			break;
-		case ResourceState::Present:
-			barrierDesc.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-			barrierDesc.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-			break;
-		case ResourceState::CopyDest:
-			barrierDesc.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			barrierDesc.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-			break;
-		case ResourceState::UnorderedAccess:
-			barrierDesc.dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
-			barrierDesc.newLayout = VK_IMAGE_LAYOUT_GENERAL;
-			break;
-		default:
-			assert(false);
-			break;
-		}
-
-		barrierDesc.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		barrierDesc.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-
-		// TODO this likely isn't correct
-		barrierDesc.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		barrierDesc.subresourceRange.baseMipLevel = 0;
-		barrierDesc.subresourceRange.levelCount = 1;
-		barrierDesc.subresourceRange.baseArrayLayer = 0;
-		barrierDesc.subresourceRange.layerCount = colorBuffer.GetArraySize();
-
-		colorBuffer.SetLayout(barrierDesc.newLayout);
-		colorBuffer.SetAccessFlags(barrierDesc.dstAccessMask);
-		colorBuffer.m_usageState = newState;
-	}
-	else if (newState == ResourceState::UnorderedAccess)
-	{
-		// TODO
-		assert(false);
-#if 0
-		InsertUAVBarrier(Resource, FlushImmediate);
-#endif
-	}
-
-	if (flushImmediate || m_numImageBarriersToFlush == 16)
-	{
-		FlushImageBarriers();
 	}
 }
 
@@ -507,52 +388,25 @@ void CommandContext::Reset()
 }
 
 
-void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor)
+void GraphicsContext::BeginRenderPass(FrameBuffer& framebuffer)
 {
-	VkClearValue clearValue;
-	clearValue.color = { clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A() };
-
 	VkRenderPassBeginInfo renderPassBeginInfo = {};
 	renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassBeginInfo.pNext = nullptr;
-	renderPassBeginInfo.renderPass = pass.GetRenderPass();
+	renderPassBeginInfo.renderPass = framebuffer.GetFboHandle();
 
-	// TODO: Pass the renderArea rectangle in as a parameter?
 	renderPassBeginInfo.renderArea.offset.x = 0;
 	renderPassBeginInfo.renderArea.offset.y = 0;
 	renderPassBeginInfo.renderArea.extent.width = framebuffer.GetWidth();
 	renderPassBeginInfo.renderArea.extent.height = framebuffer.GetHeight();
 
-	renderPassBeginInfo.clearValueCount = 1;
-	renderPassBeginInfo.pClearValues = &clearValue;
-	renderPassBeginInfo.framebuffer = framebuffer.GetFramebuffer();
+	renderPassBeginInfo.clearValueCount = 0;
+	renderPassBeginInfo.pClearValues = nullptr;
+	renderPassBeginInfo.framebuffer = framebuffer.GetFboHandle();
 
 	vkCmdBeginRenderPass(m_commandList, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-}
 
-
-void GraphicsContext::BeginRenderPass(RenderPass& pass, FrameBuffer& framebuffer, Color& clearColor, float clearDepth, uint32_t clearStencil)
-{
-	VkClearValue clearValues[2];
-	clearValues[0].color = { clearColor.R(), clearColor.G(), clearColor.B(), clearColor.A() };
-	clearValues[1].depthStencil = { clearDepth, clearStencil };
-
-	VkRenderPassBeginInfo renderPassBeginInfo = {};
-	renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassBeginInfo.pNext = nullptr;
-	renderPassBeginInfo.renderPass = pass.GetRenderPass();
-
-	// TODO: Pass the renderArea rectangle in as a parameter?
-	renderPassBeginInfo.renderArea.offset.x = 0;
-	renderPassBeginInfo.renderArea.offset.y = 0;
-	renderPassBeginInfo.renderArea.extent.width = framebuffer.GetWidth();
-	renderPassBeginInfo.renderArea.extent.height = framebuffer.GetHeight();
-
-	renderPassBeginInfo.clearValueCount = 2;
-	renderPassBeginInfo.pClearValues = clearValues;
-	renderPassBeginInfo.framebuffer = framebuffer.GetFramebuffer();
-
-	vkCmdBeginRenderPass(m_commandList, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+	m_isRenderPassActive = true;
 }
 
 
@@ -604,7 +458,7 @@ void GraphicsContext::SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, 
 
 void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 {
-	vkCmdBindPipeline(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, pso.GetPipelineStateObject());
+	vkCmdBindPipeline(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, pso.GetHandle());
 }
 
 
@@ -626,7 +480,7 @@ void ComputeContext::SetRootSignature(const RootSignature& rootSig)
 
 void ComputeContext::SetPipelineState(const ComputePSO& pso)
 {
-	vkCmdBindPipeline(m_commandList, VK_PIPELINE_BIND_POINT_COMPUTE, pso.GetPipelineStateObject());
+	vkCmdBindPipeline(m_commandList, VK_PIPELINE_BIND_POINT_COMPUTE, pso.GetHandle());
 }
 
 

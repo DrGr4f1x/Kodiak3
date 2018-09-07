@@ -109,7 +109,7 @@ void ComputeShaderApp::Render()
 		auto& computeContext = context.GetComputeContext();
 
 		computeContext.TransitionResource(m_computeScratch, ResourceState::UnorderedAccess);
-		computeContext.TransitionResource(*m_texture, ResourceState::NonPixelShaderImage);
+		computeContext.TransitionResource(*m_texture, ResourceState::NonPixelShaderResource);
 
 		computeContext.SetRootSignature(m_computeRootSig);
 		if (m_curComputeTechnique == 0)
@@ -137,14 +137,12 @@ void ComputeShaderApp::Render()
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
 	context.TransitionResource(*m_texture, ResourceState::PixelShaderResource, true);
-
-	Color clearColor{ DirectX::Colors::Black };
-	context.BeginRenderPass(GetBackBuffer());
-
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
 	context.ClearColor(GetColorBuffer());
 	context.ClearDepth(GetDepthBuffer());
+
+	context.BeginRenderPass(GetBackBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth / 2, m_displayHeight);
 
@@ -181,7 +179,7 @@ void ComputeShaderApp::InitRootSigs()
 
 	m_computeRootSig.Reset(1);
 	m_computeRootSig[0].InitAsDescriptorTable(2, ShaderVisibility::Compute);
-	m_computeRootSig[0].SetTableRange(0, DescriptorType::ImageSRV, 0, 1);
+	m_computeRootSig[0].SetTableRange(0, DescriptorType::TextureSRV, 0, 1);
 	m_computeRootSig[0].SetTableRange(1, DescriptorType::ImageUAV, 0, 1);
 	m_computeRootSig.Finalize("Compute Root Sig");
 }
@@ -204,13 +202,13 @@ void ComputeShaderApp::InitPSOs()
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
 	// Vertex inputs
-	VertexStreamDesc vertexStreamDesc{ 0, sizeof(Vertex), InputClassification::PerVertexData };
-	VertexElementDesc vertexElements[] =
+	VertexStreamDesc vertexStream{ 0, sizeof(Vertex), InputClassification::PerVertexData };
+	vector<VertexElementDesc> vertexElements =
 	{
 		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
 		{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 }
 	};
-	m_pso.SetInputLayout(1, &vertexStreamDesc, _countof(vertexElements), vertexElements);
+	m_pso.SetInputLayout(vertexStream, vertexElements);
 
 	m_pso.Finalize();
 

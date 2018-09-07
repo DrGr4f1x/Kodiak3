@@ -15,11 +15,12 @@
 
 #include "ColorBuffer.h"
 #include "DepthBuffer.h"
+#include "PipelineState.h"
 #include "Texture.h"
 
 #include "DynamicDescriptorHeap12.h"
 #include "LinearAllocator12.h"
-#include "PipelineState12.h"
+
 #include "RootSignature12.h"
 
 
@@ -88,7 +89,6 @@ public:
 	static void InitializeBuffer(GpuResource& dest, const void* data, size_t numBytes, size_t offset = 0);
 
 	void TransitionResource(GpuResource& resource, ResourceState newState, bool flushImmediate = false);
-	void BeginResourceTransition(GpuResource& resource, ResourceState newState, bool flushImmediate = false);
 	void InsertUAVBarrier(GpuResource& resource, bool flushImmediate = false);
 	void InsertAliasBarrier(GpuResource& before, GpuResource& after, bool flushImmediate = false);
 	inline void FlushResourceBarriers();
@@ -185,7 +185,7 @@ public:
 	void DrawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation,
 		int32_t baseVertexLocation, uint32_t startInstanceLocation);
 
-	void Resolve(GpuResource& src, GpuResource& dest, Format format);
+	void Resolve(ColorBuffer& src, ColorBuffer& dest, Format format);
 };
 
 
@@ -277,14 +277,14 @@ inline void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 {
 	m_curComputePipelineState = nullptr;
 
-	auto pipelineState = pso.GetPipelineStateObject();
+	auto pipelineState = pso.GetHandle();
 	if (pipelineState != m_curGraphicsPipelineState)
 	{
 		m_commandList->SetPipelineState(pipelineState);
 		m_curGraphicsPipelineState = pipelineState;
 	}
 
-	auto topology = pso.GetTopology();
+	auto topology = static_cast<D3D12_PRIMITIVE_TOPOLOGY>(pso.GetTopology());
 	if (topology != m_curPrimitiveTopology)
 	{
 		m_commandList->IASetPrimitiveTopology(topology);
@@ -383,11 +383,11 @@ inline void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance
 }
 
 
-inline void GraphicsContext::Resolve(GpuResource& src, GpuResource& dest, Format format)
+inline void GraphicsContext::Resolve(ColorBuffer& src, ColorBuffer& dest, Format format)
 {
 	FlushResourceBarriers();
 	auto dxFormat = static_cast<DXGI_FORMAT>(format);
-	m_commandList->ResolveSubresource(dest.m_resource, 0, src.m_resource, 0, dxFormat);
+	m_commandList->ResolveSubresource(dest.m_resource.Get(), 0, src.m_resource.Get(), 0, dxFormat);
 }
 
 
@@ -413,7 +413,7 @@ inline void ComputeContext::SetPipelineState(const ComputePSO& pso)
 {
 	m_curGraphicsPipelineState = nullptr;
 
-	auto pipelineState = pso.GetPipelineStateObject();
+	auto pipelineState = pso.GetHandle();
 	if (pipelineState != m_curComputePipelineState)
 	{
 		m_commandList->SetPipelineState(pipelineState);
