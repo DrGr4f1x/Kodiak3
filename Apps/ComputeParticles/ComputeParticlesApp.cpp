@@ -20,6 +20,7 @@
 
 
 using namespace Kodiak;
+using namespace Math;
 using namespace std;
 
 
@@ -36,17 +37,39 @@ void ComputeParticlesApp::Configure()
 
 void ComputeParticlesApp::Startup()
 {
+	InitRootSigs();
+	InitPSOs();
+	InitConstantBuffers();
+	InitParticles();
 
 	LoadAssets();
 }
 
 
 void ComputeParticlesApp::Shutdown()
-{}
+{
+	m_computeRootSig.Destroy();
+	m_graphicsRootSig.Destroy();
+}
 
 
 bool ComputeParticlesApp::Update()
 {
+	if (m_animStart > 0.0f)
+	{
+		m_animStart -= m_frameTimer * 5.0f;
+	}
+	else if (m_animStart <= 0.0f)
+	{
+		m_localTimer += m_frameTimer * 0.04f;
+		if (m_localTimer > 1.0f)
+		{
+			m_localTimer = 0.f;
+		}
+	}
+
+	UpdateConstantBuffers();
+
 	return true;
 }
 
@@ -57,7 +80,20 @@ void ComputeParticlesApp::Render()
 
 	// Simulate particles on compute
 	{
+		auto& computeContext = context.GetComputeContext();
 
+		computeContext.TransitionResource(m_particleBuffer, ResourceState::UnorderedAccess);
+		computeContext.InsertUAVBarrier(m_particleBuffer);
+
+		computeContext.SetRootSignature(m_computeRootSig);
+		computeContext.SetPipelineState(m_computePSO);
+
+		computeContext.SetUAV(0, 0, m_particleBuffer);
+		computeContext.SetConstantBuffer(0, 1, m_csConstantBuffer);
+
+		computeContext.Dispatch1D(m_particleCount, 256);
+
+		computeContext.TransitionResource(m_particleBuffer, ResourceState::NonPixelShaderResource);
 	}
 
 	// Render particles
@@ -68,10 +104,28 @@ void ComputeParticlesApp::Render()
 
 	context.BeginRenderPass(GetBackBuffer());
 
+	context.SetRootSignature(m_graphicsRootSig);
+	context.SetPipelineState(m_graphicsPSO);
+
+	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
+
+	context.SetSRV(0, 0, m_particleBuffer);
+	context.SetConstantBuffer(0, 1, m_vsConstantBuffer);
+	context.SetSRV(1, 0, *m_colorTexture);
+	context.SetSRV(1, 1, *m_gradientTexture);
+
+	context.Draw(6 * m_particleCount);
+
 	context.EndRenderPass();
 	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
+	// TODO - DX12 is crashing here due to bad synchro involving the UAV.  Waiting on submit to finish
+	// is a workaround until I can solve the resource barrier problem.
+#if DX12
+	context.Finish(true);
+#else
 	context.Finish();
+#endif
 }
 
 
@@ -83,27 +137,93 @@ void ComputeParticlesApp::InitRootSigs()
 	m_computeRootSig[0].SetTableRange(1, DescriptorType::CBV, 0, 1);
 	m_computeRootSig.Finalize("Compute Root Sig");
 
-#if 0
-	m_graphicsRootSig.Reset(2);
+	m_graphicsRootSig.Reset(2, 1);
 	m_graphicsRootSig[0].InitAsDescriptorTable(2, ShaderVisibility::Vertex);
-	m_graphicsRootSig[0].SetTableRange(0, DescriptorType::BufferSRV, 0, 1);
+	m_graphicsRootSig[0].SetTableRange(0, DescriptorType::StructuredBufferSRV, 0, 1);
 	m_graphicsRootSig[0].SetTableRange(1, DescriptorType::CBV, 0, 1);
-	m_graphicsRootSig[1].InitAsDescriptorRange(DescriptorType::TextureSRV, 0, 2, ShaderVisibility::Pixel);
+	m_graphicsRootSig[1].InitAsDescriptorTable(2, ShaderVisibility::Pixel);
+	m_graphicsRootSig[1].SetTableRange(0, DescriptorType::TextureSRV, 0, 1);
+	m_graphicsRootSig[1].SetTableRange(1, DescriptorType::TextureSRV, 1, 1);
+	m_graphicsRootSig.InitStaticSampler(0, CommonStates::SamplerLinearWrap(), ShaderVisibility::Pixel);
 	m_graphicsRootSig.Finalize("Graphics Root Sig");
-#endif
 }
 
 
 void ComputeParticlesApp::InitPSOs()
 {
 	m_computePSO.SetRootSignature(m_computeRootSig);
-	m_computePSO.SetComputeShader("ParticlesCS");
+	m_computePSO.SetComputeShader("ParticleCS");
 	m_computePSO.Finalize();
+
+	m_graphicsPSO.SetRootSignature(m_graphicsRootSig);
+
+	BlendStateDesc blendDesc{};
+	blendDesc.renderTargetBlend[0].blendEnable = TRUE;
+	blendDesc.renderTargetBlend[0].blendOp = BlendOp::Add;
+	blendDesc.renderTargetBlend[0].srcBlend = Blend::One;
+	blendDesc.renderTargetBlend[0].dstBlend = Blend::One;
+	blendDesc.renderTargetBlend[0].blendOpAlpha = BlendOp::Add;
+	blendDesc.renderTargetBlend[0].srcBlendAlpha = Blend::One;
+	blendDesc.renderTargetBlend[0].dstBlendAlpha = Blend::One;
+	blendDesc.renderTargetBlend[0].writeMask = ColorWrite::All;
+
+	m_graphicsPSO.SetBlendState(blendDesc);
+	m_graphicsPSO.SetDepthStencilState(CommonStates::DepthStateDisabled());
+	m_graphicsPSO.SetRasterizerState(CommonStates::RasterizerDefault());
+
+	m_graphicsPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
+
+	m_graphicsPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
+
+	m_graphicsPSO.SetVertexShader("ParticleVS");
+	m_graphicsPSO.SetPixelShader("ParticlePS");
+
+	m_graphicsPSO.Finalize();
 }
 
 
 void ComputeParticlesApp::InitConstantBuffers()
-{}
+{
+	m_csConstantBuffer.Create("CS Constant Buffer", 1, sizeof(CSConstants));
+	m_vsConstantBuffer.Create("VS Constant Buffer", 1, sizeof(VSConstants));
+
+	UpdateConstantBuffers();
+}
+
+
+void ComputeParticlesApp::InitParticles()
+{
+	vector<Particle> particles(m_particleCount);
+	RandomNumberGenerator rng;
+
+	for (auto& particle : particles)
+	{
+		particle.pos[0] = rng.NextFloat(-1.0f, 1.0f);
+		particle.pos[1] = rng.NextFloat(-1.0f, 1.0f);
+		particle.vel[0] = 0.0f;
+		particle.vel[1] = 0.0f;
+		particle.gradientPos = Vector4(0.5f * particle.pos[0], 0.0f, 0.0f, 0.0f);
+	}
+
+	m_particleBuffer.Create("Particle SB", m_particleCount, sizeof(Particle), particles.data());
+}
+
+
+void ComputeParticlesApp::UpdateConstantBuffers()
+{
+	m_csConstants.deltaT = m_frameTimer * 2.5f;
+	m_csConstants.destX = sinf(DirectX::XMConvertToRadians(m_localTimer * 360.0f)) * 0.75f;;
+	m_csConstants.destY = 0.0f;
+	m_csConstants.particleCount = m_particleCount;
+
+	m_csConstantBuffer.Update(sizeof(CSConstants), &m_csConstants);
+
+	m_vsConstants.invTargetSize[0] = 1.0f / GetColorBuffer().GetWidth();
+	m_vsConstants.invTargetSize[1] = 1.0f / GetColorBuffer().GetHeight();
+	m_vsConstants.pointSize = 8;
+
+	m_vsConstantBuffer.Update(sizeof(VSConstants), &m_vsConstants);
+}
 
 
 void ComputeParticlesApp::LoadAssets()

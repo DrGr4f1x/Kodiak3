@@ -10,11 +10,17 @@
 
 #pragma once
 
+
 #include "GpuResource.h"
 #include "ResourceView.h"
 
+
 namespace Kodiak
 {
+
+// Forward declarations
+class CommandContext;
+
 
 class GpuBuffer : public GpuResource
 {
@@ -114,6 +120,55 @@ protected:
 
 private:
 	ConstantBufferView m_cbv;
+};
+
+
+class ByteAddressBuffer : public GpuBuffer
+{
+protected:
+	void CreateDerivedViews() override;
+};
+
+
+class IndirectArgsBuffer : public ByteAddressBuffer
+{};
+
+
+class StructuredBuffer : public GpuBuffer
+{
+public:
+	StructuredBuffer()
+	{
+		m_type = ResourceType::StructuredBuffer;
+	}
+
+	ByteAddressBuffer& GetCounterBuffer() { return m_counterBuffer; }
+
+	const ShaderResourceView& GetCounterSRV(CommandContext& context);
+	const UnorderedAccessView& GetCounterUAV(CommandContext& context);
+
+protected:
+	void CreateDerivedViews();
+
+private:
+	ByteAddressBuffer m_counterBuffer;
+};
+
+
+class TypedBuffer : public GpuBuffer
+{
+public:
+	TypedBuffer(Format format)
+		: m_dataFormat(format)
+	{
+		m_type = ResourceType::TypedBuffer;
+	}
+
+protected:
+	void CreateDerivedViews() override;
+
+private:
+	Format m_dataFormat;
 };
 
 } // namespace Kodiak

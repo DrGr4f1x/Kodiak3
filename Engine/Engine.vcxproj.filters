@@ -175,6 +175,9 @@
     <ClInclude Include="PipelineState.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Math\Random.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -335,6 +338,9 @@
     </ClCompile>
     <ClCompile Include="PipelineState.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Random.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

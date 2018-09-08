@@ -318,6 +318,11 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		{
 			physicalDeviceEnabledFeatures.fillModeNonSolid = VK_TRUE;
 		}
+
+		if (physicalDeviceSupportedFeatures.vertexPipelineStoresAndAtomics == VK_TRUE)
+		{
+			physicalDeviceEnabledFeatures.vertexPipelineStoresAndAtomics = VK_TRUE;
+		}
 	}
 
 	void InitializeDebugMarkup()

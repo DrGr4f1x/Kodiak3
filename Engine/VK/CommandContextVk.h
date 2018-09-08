@@ -136,6 +136,8 @@ public:
 	void SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture);
 	void SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
 	//void SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer);
+	
 
 	void SetIndexBuffer(const IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer);
@@ -163,7 +165,9 @@ public:
 	void SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture);
 	void SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
 	//void SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer);
 	void SetUAV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
+	void SetUAV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer);
 
 	void Dispatch(uint32_t groupCountX = 1, uint32_t groupCountY = 1, uint32_t groupCountZ = 1);
 	void Dispatch1D(uint32_t threadCountX, uint32_t groupSizeX = 64);
@@ -325,6 +329,24 @@ inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const T
 }
 
 
+inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer)
+{
+	if (buffer.m_type == ResourceType::TypedBuffer)
+	{
+		VkBufferView bufferView = buffer.GetSRV().GetHandle();
+		m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &bufferView);
+	}
+	else
+	{
+		VkDescriptorBufferInfo descriptorInfo = {};
+		descriptorInfo.buffer = buffer.GetSRV().GetHandle();
+		descriptorInfo.offset = 0;
+		descriptorInfo.range = buffer.GetSize();
+		m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
+	}
+}
+
+
 inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
 {
 	VkDescriptorImageInfo descriptorInfo = colorBuffer.GetSRV().GetHandle();
@@ -462,11 +484,47 @@ inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Co
 //}
 
 
+inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer)
+{
+	if (buffer.m_type == ResourceType::TypedBuffer)
+	{
+		VkBufferView bufferView = buffer.GetSRV().GetHandle();
+		m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &bufferView);
+	}
+	else
+	{
+		VkDescriptorBufferInfo descriptorInfo = {};
+		descriptorInfo.buffer = buffer.GetSRV().GetHandle();
+		descriptorInfo.offset = 0;
+		descriptorInfo.range = buffer.GetSize();
+		m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
+	}
+}
+
+
 inline void ComputeContext::SetUAV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
 {
 	VkDescriptorImageInfo descriptorInfo = colorBuffer.GetSRV().GetHandle();
 	descriptorInfo.imageLayout = GetImageLayout(colorBuffer.m_usageState);
 	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
+}
+
+
+inline void ComputeContext::SetUAV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer)
+{
+	if (buffer.m_type == ResourceType::TypedBuffer)
+	{
+		VkBufferView bufferView = buffer.GetUAV().GetHandle();
+		m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &bufferView);
+	}
+	else
+	{
+		VkDescriptorBufferInfo descriptorInfo = {};
+		descriptorInfo.buffer = buffer.GetUAV().GetHandle();
+		descriptorInfo.offset = 0;
+		descriptorInfo.range = buffer.GetSize();
+		m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
+	}
 }
 
 

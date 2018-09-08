@@ -33,10 +33,47 @@ private:
 	void InitRootSigs();
 	void InitPSOs();
 	void InitConstantBuffers();
+	void InitParticles();
+
+	void UpdateConstantBuffers();
 
 	void LoadAssets();
 
 private:
+	struct Particle
+	{
+		float pos[2];
+		float vel[2];
+		Math::Vector4 gradientPos;
+	};
+#if DX12
+	const uint32_t m_particleCount{ 256 * 1024 };
+#elif VK
+	const uint32_t m_particleCount{ 256 * 1024 };
+#endif
+
+	Kodiak::StructuredBuffer m_particleBuffer;
+
+	struct CSConstants
+	{
+		float deltaT;
+		float destX;
+		float destY;
+		int particleCount;
+	};
+
+	CSConstants m_csConstants;
+	Kodiak::ConstantBuffer m_csConstantBuffer;
+
+	struct VSConstants
+	{
+		float invTargetSize[2];
+		float pointSize;
+	};
+
+	VSConstants m_vsConstants;
+	Kodiak::ConstantBuffer m_vsConstantBuffer;
+
 	Kodiak::RootSignature	m_graphicsRootSig;
 	Kodiak::RootSignature	m_computeRootSig;
 
@@ -45,4 +82,7 @@ private:
 
 	Kodiak::TexturePtr		m_colorTexture;
 	Kodiak::TexturePtr		m_gradientTexture;
+
+	float m_animStart{ 20.0f };
+	float m_localTimer{ 0.0f };
 };

@@ -33,6 +33,9 @@ void GpuBuffer::Create(const std::string& name, size_t numElements, size_t eleme
 	VkBufferUsageFlags flags = 0;
 	flags |= (m_type == ResourceType::IndexBuffer) ? VK_BUFFER_USAGE_INDEX_BUFFER_BIT : 0;
 	flags |= (m_type == ResourceType::VertexBuffer) ? VK_BUFFER_USAGE_VERTEX_BUFFER_BIT : 0;
+	flags |= (m_type == ResourceType::TypedBuffer) ? (VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT) : 0;
+	flags |= (m_type == ResourceType::GenericBuffer) ? VK_BUFFER_USAGE_STORAGE_BUFFER_BIT : 0;
+	flags |= (m_type == ResourceType::StructuredBuffer) ? VK_BUFFER_USAGE_STORAGE_BUFFER_BIT : 0;
 	flags |= m_isConstantBuffer ? VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT : 0;
 
 	VkBufferCreateInfo bufferInfo = {};

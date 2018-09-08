@@ -1,9 +1,9 @@
-[[vk::binding(0, 0)]]
-Texture2D colorTex : register(t0);
-[[vk::binding(1, 0)]]
-Texture2D gradientTex : register(t1);
-
 [[vk::binding(0, 1)]]
+Texture2D colorTex : register(t0);
+[[vk::binding(1, 1)]]
+Texture1D gradientTex : register(t1);
+
+[[vk::binding(0, 2)]]
 SamplerState linearSampler : register(s0);
 
 

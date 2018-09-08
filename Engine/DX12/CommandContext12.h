@@ -173,6 +173,7 @@ public:
 	void SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture);
 	void SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
 	void SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer);
 
 	void SetIndexBuffer(const IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer);
@@ -200,7 +201,9 @@ public:
 	void SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture);
 	void SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
 	void SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer);
+	void SetSRV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer);
 	void SetUAV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
+	void SetUAV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer);
 
 	void Dispatch(uint32_t groupCountX = 1, uint32_t groupCountY = 1, uint32_t groupCountZ = 1);
 	void Dispatch1D(uint32_t threadCountX, uint32_t groupSizeX = 64);
@@ -323,6 +326,13 @@ inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const C
 inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer)
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = depthBuffer.GetDepthSRV().GetHandle();
+	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &handle);
+}
+
+
+inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = buffer.GetSRV().GetHandle();
 	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &handle);
 }
 
@@ -456,9 +466,23 @@ inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const De
 }
 
 
+inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = buffer.GetSRV().GetHandle();
+	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &handle);
+}
+
+
 inline void ComputeContext::SetUAV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = colorBuffer.GetUAV().GetHandle();
+	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &handle);
+}
+
+
+inline void ComputeContext::SetUAV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = buffer.GetUAV().GetHandle();
 	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &handle);
 }
 

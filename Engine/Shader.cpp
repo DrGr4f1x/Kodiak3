@@ -94,7 +94,7 @@ Shader* Shader::Load(const string& shaderPath)
 		shader->WaitForLoad();
 		return shader;
 	}
-
+	
 	// Kick off the load
 	auto& filesystem = Filesystem::GetInstance();
 	string fullpath = filesystem.GetFullPath(shaderPathWithExtension);

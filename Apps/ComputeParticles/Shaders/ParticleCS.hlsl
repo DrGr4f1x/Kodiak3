@@ -8,7 +8,7 @@ struct Particle
 [[vk::binding(0, 0)]]
 RWStructuredBuffer<Particle> particles : register(u0);
 
-[[vk::binding(0, 1)]]
+[[vk::binding(1, 0)]]
 cbuffer CSConstants : register(b0)
 {
 	float deltaT;
@@ -41,7 +41,7 @@ float2 Repulsion(float2 pos, float2 attractorPos)
 void main(uint3 DTid : SV_DispatchThreadId)
 {
 	uint index = DTid.x;
-	if (index > particleCount)
+	if (index >= particleCount)
 		return;
 
 	float2 vel = particles[index].vel;
@@ -61,7 +61,7 @@ void main(uint3 DTid : SV_DispatchThreadId)
 		particles[index].pos.xy = pos;
 
 	particles[index].vel = vel;
-	particles[index].gradientPos.x += 0.2 * deltaT;
+	particles[index].gradientPos.x += 0.02 * deltaT;
 	if (particles[index].gradientPos.x > 1.0)
 		particles[index].gradientPos.x -= 1.0;
 }

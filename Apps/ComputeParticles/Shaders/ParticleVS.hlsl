@@ -8,7 +8,7 @@ struct Particle
 [[vk::binding(0, 0)]]
 StructuredBuffer<Particle> particles:register(t0);
 
-[[vk::binding(0, 1)]]
+[[vk::binding(1, 0)]]
 cbuffer VSConstants : register(b0)
 {
 	float2 invTargetSize;
@@ -32,24 +32,26 @@ VSOutput main(uint vertId : SV_VertexId)
 	Particle particle = particles[particleId];
 	float2 pos = particle.pos;
 
+	float scale = pointSize;
+
 	if (index == 0)
 	{
-		output.pos = float4(pos + 0.5 * invTargetSize * float2(-1.0, 1.0), 0.0, 1.0);
+		output.pos = float4(pos + scale * invTargetSize * float2(-1.0, 1.0), 0.0, 1.0);
 		output.uv = float2(0.0, 0.0);
 	}
 	else if (index == 1 || index == 5)
 	{
-		output.pos = float4(pos + 0.5 * invTargetSize * float2(-1.0, -1.0), 0.0, 1.0);
+		output.pos = float4(pos + scale * invTargetSize * float2(-1.0, -1.0), 0.0, 1.0);
 		output.uv = float2(0.0, 1.0);
 	}
 	else if (index == 2 || index == 4)
 	{
-		output.pos = float4(pos + 0.5 * invTargetSize * float2(1.0, 1.0), 0.0, 1.0);
+		output.pos = float4(pos + scale * invTargetSize * float2(1.0, 1.0), 0.0, 1.0);
 		output.uv = float2(1.0, 0.0);
 	}
 	else
 	{
-		output.pos = float4(pos + 0.5 * invTargetSize * float2(1.0, -1.0), 0.0, 1.0);
+		output.pos = float4(pos + scale * invTargetSize * float2(1.0, -1.0), 0.0, 1.0);
 		output.uv = float2(1.0, 1.0);
 	}
 
