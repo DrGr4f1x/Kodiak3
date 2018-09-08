@@ -87,10 +87,6 @@ void GraphicsDevice::Destroy()
 
 void GraphicsDevice::SubmitFrame()
 {
-	auto& context = GraphicsContext::Begin("Present");
-	context.TransitionResource(*m_swapChainBuffers[m_currentBuffer], ResourceState::Present);
-	context.Finish();
-
 	PlatformPresent();
 
 	ReleaseDeferredResources(m_currentBuffer);

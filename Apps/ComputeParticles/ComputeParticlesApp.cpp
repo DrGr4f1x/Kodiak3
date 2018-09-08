@@ -83,7 +83,6 @@ void ComputeParticlesApp::Render()
 		auto& computeContext = context.GetComputeContext();
 
 		computeContext.TransitionResource(m_particleBuffer, ResourceState::UnorderedAccess);
-		computeContext.InsertUAVBarrier(m_particleBuffer);
 
 		computeContext.SetRootSignature(m_computeRootSig);
 		computeContext.SetPipelineState(m_computePSO);
