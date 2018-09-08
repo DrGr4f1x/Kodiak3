@@ -34,6 +34,8 @@ public:
 	ColorBufferPtr GetBackBuffer(uint32_t index) const;
 	uint32_t GetCurrentBuffer() const { return m_currentBuffer; }
 
+	uint64_t GetFrameNumber() const { return m_frameNumber; }
+
 	void ReleaseResource(PlatformHandle handle);
 
 	const DeviceHandle& GetDevice();

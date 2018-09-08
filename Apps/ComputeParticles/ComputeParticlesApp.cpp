@@ -96,6 +96,7 @@ void ComputeParticlesApp::Render()
 	}
 
 	// Render particles
+	context.TransitionResource(m_particleBuffer, ResourceState::UnorderedAccess);
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
 	context.ClearColor(GetColorBuffer());
@@ -118,13 +119,7 @@ void ComputeParticlesApp::Render()
 	context.EndRenderPass();
 	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
-	// TODO - DX12 is crashing here due to bad synchro involving the UAV.  Waiting on submit to finish
-	// is a workaround until I can solve the resource barrier problem.
-#if DX12
-	context.Finish(true);
-#else
 	context.Finish();
-#endif
 }
 
 
