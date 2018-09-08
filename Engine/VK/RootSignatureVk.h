@@ -38,7 +38,7 @@ public:
 		assert(m_type == RootParameterType::Invalid);
 		assert(m_bindings.empty());
 
-		m_type = RootParameterType::CBV;
+		m_type = RootParameterType::RootCBV;
 		m_visibility = visibility;
 
 		VkDescriptorSetLayoutBinding binding;

@@ -75,9 +75,8 @@ void GpuBuffer::Create(const std::string& name, size_t numElements, size_t eleme
 
 	ThrowIfFailed(vkBindBufferMemory(device, buffer, m_resource, 0));
 
-	// TODO
-	//SetDebugName(m_buffer, name);
-	//SetDebugName(*m_resource, name + " memory");
+	SetDebugName(buffer, name);
+	SetDebugName(mem, name + " memory");
 
 	// Upload to GPU
 	if (initialData && !bHostMappable)

@@ -18,7 +18,7 @@
 
 #include "CommandContextVk.h"
 #include "CommandListManagerVk.h"
-
+#include "DescriptorHeapVk.h"
 #include "RootSignatureVk.h"
 
 #include <iostream>
@@ -968,6 +968,7 @@ void GraphicsDevice::PlatformDestroyData()
 
 void GraphicsDevice::PlatformDestroy()
 {
+	g_descriptorSetAllocator.DestroyAll();
 	g_commandManager.Destroy();
 }
 
@@ -1007,228 +1008,205 @@ uint32_t Kodiak::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags pro
 }
 
 
-// TODO
-#if 0
-void Kodiak::SetDebugName(VkInstance obj, const std::string& name)
-{
 #if ENABLE_VULKAN_DEBUG_MARKUP
+void Kodiak::SetDebugName(VkInstance obj, const string& name)
+{
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_INSTANCE_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkPhysicalDevice obj, const std::string& name)
+void Kodiak::SetDebugName(VkPhysicalDevice obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_PHYSICAL_DEVICE_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkDevice obj, const std::string& name)
+void Kodiak::SetDebugName(VkDevice obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DEVICE_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkQueue obj, const std::string& name)
+void Kodiak::SetDebugName(VkQueue obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_QUEUE_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkSemaphore obj, const std::string& name)
+void Kodiak::SetDebugName(VkSemaphore obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SEMAPHORE_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkCommandBuffer obj, const std::string& name)
+void Kodiak::SetDebugName(VkCommandBuffer obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkFence obj, const std::string& name)
+void Kodiak::SetDebugName(VkFence obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_FENCE_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkDeviceMemory obj, const std::string& name)
+void Kodiak::SetDebugName(VkDeviceMemory obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DEVICE_MEMORY_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkBuffer obj, const std::string& name)
+void Kodiak::SetDebugName(VkBuffer obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkImage obj, const std::string& name)
+void Kodiak::SetDebugName(VkImage obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkEvent obj, const std::string& name)
+void Kodiak::SetDebugName(VkEvent obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_EVENT_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkQueryPool obj, const std::string& name)
+void Kodiak::SetDebugName(VkQueryPool obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_QUERY_POOL_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkBufferView obj, const std::string& name)
+void Kodiak::SetDebugName(VkBufferView obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkImageView obj, const std::string& name)
+void Kodiak::SetDebugName(VkImageView obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkShaderModule obj, const std::string& name)
+void Kodiak::SetDebugName(VkShaderModule obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkPipelineCache obj, const std::string& name)
+void Kodiak::SetDebugName(VkPipelineCache obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_CACHE_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkPipelineLayout obj, const std::string& name)
+void Kodiak::SetDebugName(VkPipelineLayout obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_LAYOUT_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkRenderPass obj, const std::string& name)
+void Kodiak::SetDebugName(VkRenderPass obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_RENDER_PASS_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkPipeline obj, const std::string& name)
+void Kodiak::SetDebugName(VkPipeline obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkDescriptorSetLayout obj, const std::string& name)
+void Kodiak::SetDebugName(VkDescriptorSetLayout obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkSampler obj, const std::string& name)
+void Kodiak::SetDebugName(VkSampler obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkDescriptorPool obj, const std::string& name)
+void Kodiak::SetDebugName(VkDescriptorPool obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_POOL_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkDescriptorSet obj, const std::string& name)
+void Kodiak::SetDebugName(VkDescriptorSet obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkFramebuffer obj, const std::string& name)
+void Kodiak::SetDebugName(VkFramebuffer obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_FRAMEBUFFER_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkCommandPool obj, const std::string& name)
+void Kodiak::SetDebugName(VkCommandPool obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_POOL_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkSurfaceKHR obj, const std::string& name)
+void Kodiak::SetDebugName(VkSurfaceKHR obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SURFACE_KHR_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkSwapchainKHR obj, const std::string& name)
+void Kodiak::SetDebugName(VkSwapchainKHR obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SWAPCHAIN_KHR_EXT, name.c_str());
-#endif
 }
 
 
-void Kodiak::SetDebugName(VkDebugReportCallbackEXT obj, const std::string& name)
+void Kodiak::SetDebugName(VkDebugReportCallbackEXT obj, const string& name)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
 	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DEBUG_REPORT_EXT, name.c_str());
-#endif
 }
+
+
+#else
+
+
+void Kodiak::SetDebugName(VkInstance obj, const string& name) {}
+void Kodiak::SetDebugName(VkPhysicalDevice obj, const string& name) {}
+void Kodiak::SetDebugName(VkDevice obj, const string& name) {}
+void Kodiak::SetDebugName(VkQueue obj, const string& name) {}
+void Kodiak::SetDebugName(VkSemaphore obj, const string& name) {}
+void Kodiak::SetDebugName(VkCommandBuffer obj, const string& name) {}
+void Kodiak::SetDebugName(VkFence obj, const string& name) {}
+void Kodiak::SetDebugName(VkDeviceMemory obj, const string& name) {}
+void Kodiak::SetDebugName(VkBuffer obj, const string& name) {}
+void Kodiak::SetDebugName(VkImage obj, const string& name) {}
+void Kodiak::SetDebugName(VkEvent obj, const string& name) {}
+void Kodiak::SetDebugName(VkQueryPool obj, const string& name) {}
+void Kodiak::SetDebugName(VkBufferView obj, const string& name) {}
+void Kodiak::SetDebugName(VkImageView obj, const string& name) {}
+void Kodiak::SetDebugName(VkShaderModule obj, const string& name) {}
+void Kodiak::SetDebugName(VkPipelineCache obj, const string& name) {}
+void Kodiak::SetDebugName(VkPipelineLayout obj, const string& name) {}
+void Kodiak::SetDebugName(VkRenderPass obj, const string& name) {}
+void Kodiak::SetDebugName(VkPipeline obj, const string& name) {}
+void Kodiak::SetDebugName(VkDescriptorSetLayout obj, const string& name) {}
+void Kodiak::SetDebugName(VkSampler obj, const string& name) {}
+void Kodiak::SetDebugName(VkDescriptorPool obj, const string& name) {}
+void Kodiak::SetDebugName(VkDescriptorSet obj, const string& name) {}
+void Kodiak::SetDebugName(VkFramebuffer obj, const string& name) {}
+void Kodiak::SetDebugName(VkCommandPool obj, const string& name) {}
+void Kodiak::SetDebugName(VkSurfaceKHR obj, const string& name) {}
+void Kodiak::SetDebugName(VkSwapchainKHR obj, const string& name) {}
+void Kodiak::SetDebugName(VkDebugReportCallbackEXT obj, const string& name) {}
+
 #endif

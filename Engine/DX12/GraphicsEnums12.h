@@ -203,10 +203,11 @@ enum class DescriptorType
 	CBV,
 	Sampler,
 	TextureSRV,
-	ImageSRV,
-	ImageSampler,
-	BufferUAV,
-	ImageUAV
+	TypedBufferSRV,
+	StructuredBufferSRV,
+	TextureUAV,
+	TypedBufferUAV,
+	StructuredBufferUAV
 };
 
 
@@ -216,25 +217,24 @@ inline D3D12_DESCRIPTOR_RANGE_TYPE DescriptorTypeToDX12(DescriptorType type)
 	{
 	case DescriptorType::CBV:
 		return D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-		break;
+
 	case DescriptorType::Sampler:
 		return D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
-		break;
-	case DescriptorType::ImageSRV:
+
 	case DescriptorType::TextureSRV:
+	case DescriptorType::TypedBufferSRV:
+	case DescriptorType::StructuredBufferSRV:
 		return D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-		break;
-	case DescriptorType::ImageSampler:
-		return D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-		break;
-	case DescriptorType::BufferUAV:
-	case DescriptorType::ImageUAV:
+
+	case DescriptorType::TextureUAV:
+	case DescriptorType::TypedBufferUAV:
+	case DescriptorType::StructuredBufferUAV:
 		return D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
-		break;
+
+	default:
+		assert(false);
+		return D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	}
-	// Should never reach this assert
-	assert(false);
-	return D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 }
 
 

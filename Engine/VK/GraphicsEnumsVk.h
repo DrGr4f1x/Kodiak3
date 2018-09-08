@@ -208,10 +208,13 @@ enum class DescriptorType
 	CBV,
 	Sampler,
 	TextureSRV,
-	ImageSRV,
-	BufferUAV,
-	ImageUAV
+	TypedBufferSRV,
+	StructuredBufferSRV,
+	TextureUAV,
+	TypedBufferUAV,
+	StructuredBufferUAV
 };
+
 
 inline VkDescriptorType DescriptorTypeToVulkan(DescriptorType type)
 {
@@ -219,38 +222,38 @@ inline VkDescriptorType DescriptorTypeToVulkan(DescriptorType type)
 	{
 	case DescriptorType::CBV:
 		return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		break;
+
 	case DescriptorType::Sampler:
 		return VK_DESCRIPTOR_TYPE_SAMPLER;
-		break;
+
 	case DescriptorType::TextureSRV:
 		return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-		break;
-	case DescriptorType::ImageSRV:
-		return VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-		break;
-	case DescriptorType::BufferUAV:
+
+	case DescriptorType::StructuredBufferSRV:
+	case DescriptorType::StructuredBufferUAV:
 		return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		break;
-	case DescriptorType::ImageUAV:
+
+	case DescriptorType::TextureUAV:
 		return VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-		break;
+
+	case DescriptorType::TypedBufferSRV:
+		return VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+
+	case DescriptorType::TypedBufferUAV:
+		return VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
+
+	default:
+		assert(false);
+		return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	}
-	// Should never reach this assert
-	assert(false);
-	return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 }
 
 
 enum class RootParameterType
 {
 	Invalid,
-	Constants32Bit,
 	DescriptorTable,
-	CBV,
-	UAV,
-	ImageSRV,
-	TextureSRV
+	RootCBV
 };
 
 

@@ -49,7 +49,7 @@ private:
 	uint32_t m_height{ 0 };
 	uint32_t m_numSamples{ 0 };
 
-	FboHandle m_handle;
+	FboHandle m_handle{};
 };
 
 using FrameBufferPtr = std::shared_ptr<FrameBuffer>;

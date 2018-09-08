@@ -43,7 +43,7 @@ VkImageCreateInfo DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthO
 }
 
 
-ResourceHandle CreateTextureResource(const std::string& name, const VkImageCreateInfo& imageCreateInfo)
+ResourceHandle CreateTextureResource(const string& name, const VkImageCreateInfo& imageCreateInfo)
 {
 	VkDevice device = GetDevice();
 
@@ -65,9 +65,8 @@ ResourceHandle CreateTextureResource(const std::string& name, const VkImageCreat
 
 	ThrowIfFailed(vkBindImageMemory(device, image, handle, 0));
 
-	// TODO
-	//SetDebugName(m_image, name + " image");
-	//SetDebugName(*m_resource, name + " memory");
+	SetDebugName(image, name + " image");
+	SetDebugName(mem, name + " memory");
 
 	return handle;
 }

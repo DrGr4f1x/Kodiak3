@@ -75,7 +75,7 @@ private:
 	{
 		std::string localPath;
 		std::string fullPath;
-		PathDesc* next;
+		PathDesc* next{ nullptr };
 	};
 	PathDesc* m_searchPaths{ nullptr };
 

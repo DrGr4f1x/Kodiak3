@@ -235,16 +235,29 @@ void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& 
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 					writeDescriptorSet.pBufferInfo = rangeDesc.bufferHandleStart + rangeDesc.offset;
 					break;
+
 				case DescriptorType::TextureSRV:
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 					writeDescriptorSet.pImageInfo = rangeDesc.imageHandleStart + rangeDesc.offset;
 					break;
-				case DescriptorType::ImageSRV:
-				case DescriptorType::ImageUAV:
+
+				case DescriptorType::TextureUAV:
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
 					writeDescriptorSet.pImageInfo = rangeDesc.imageHandleStart + rangeDesc.offset;
 					break;
-				case DescriptorType::BufferUAV:
+
+				case DescriptorType::StructuredBufferSRV:
+				case DescriptorType::StructuredBufferUAV:
+					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+					writeDescriptorSet.pBufferInfo = rangeDesc.bufferHandleStart + rangeDesc.offset;
+					break;
+
+				case DescriptorType::TypedBufferSRV:
+					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+					writeDescriptorSet.pTexelBufferView = rangeDesc.texelBufferHandleStart + rangeDesc.offset;
+					break;
+
+				case DescriptorType::TypedBufferUAV:
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
 					writeDescriptorSet.pTexelBufferView = rangeDesc.texelBufferHandleStart + rangeDesc.offset;
 					break;
@@ -307,6 +320,29 @@ void DynamicDescriptorPool::DescriptorHandleCache::ClearCache()
 }
 
 
+namespace
+{
+
+inline bool IsTextureDescriptor(const DescriptorType type)
+{
+	return (type == DescriptorType::TextureSRV || type == DescriptorType::TextureUAV);
+}
+
+
+inline bool IsBufferDescriptor(const DescriptorType type)
+{
+	return (type == DescriptorType::CBV || type == DescriptorType::StructuredBufferSRV || type == DescriptorType::StructuredBufferUAV);
+}
+
+
+inline bool IsTypedBufferDescriptor(const DescriptorType type)
+{
+	return (type == DescriptorType::TypedBufferSRV || type == DescriptorType::TypedBufferUAV);
+}
+
+} // anonymous namespace
+
+
 void DynamicDescriptorPool::DescriptorHandleCache::StageDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkDescriptorImageInfo handles[])
 {
 	DescriptorSetCache& descriptorSet = m_descriptorSetCache[rootIndex];
@@ -314,7 +350,7 @@ void DynamicDescriptorPool::DescriptorHandleCache::StageDescriptorHandles(uint32
 	{
 		auto& rangeDesc = descriptorSet.ranges[rangeIndex];
 
-		if (rangeDesc.type != DescriptorType::TextureSRV && rangeDesc.type != DescriptorType::ImageUAV && rangeDesc.type != DescriptorType::ImageSRV) continue;
+		if (!IsTextureDescriptor(rangeDesc.type)) continue;
 
 		if (offset >= rangeDesc.offset && offset < (rangeDesc.offset + rangeDesc.rangeSize))
 		{
@@ -340,7 +376,7 @@ void DynamicDescriptorPool::DescriptorHandleCache::StageDescriptorHandles(uint32
 	{
 		auto& rangeDesc = descriptorSet.ranges[rangeIndex];
 
-		if (rangeDesc.type != DescriptorType::CBV) continue;
+		if (!IsBufferDescriptor(rangeDesc.type)) continue;
 
 		if (offset >= rangeDesc.offset && offset < (rangeDesc.offset + rangeDesc.rangeSize))
 		{
@@ -366,7 +402,7 @@ void DynamicDescriptorPool::DescriptorHandleCache::StageDescriptorHandles(uint32
 	{
 		auto& rangeDesc = descriptorSet.ranges[rangeIndex];
 
-		if (rangeDesc.type != DescriptorType::BufferUAV) continue;
+		if (!IsTypedBufferDescriptor(rangeDesc.type)) continue;
 
 		if (offset >= rangeDesc.offset && offset < (rangeDesc.offset + rangeDesc.rangeSize))
 		{
@@ -400,9 +436,7 @@ void DynamicDescriptorPool::DescriptorHandleCache::ParseRootSignature(const Root
 	{
 		const RootParameter& param = rootSig[rootIndex];
 
-		// Skip push-constants
 		auto type = param.GetType();
-		if (type == RootParameterType::Constants32Bit) continue;
 
 		// Mark this descriptor set as assigned
 		m_assignedDescriptorSetBitMap |= (1 << rootIndex);
@@ -417,40 +451,13 @@ void DynamicDescriptorPool::DescriptorHandleCache::ParseRootSignature(const Root
 
 		switch (type)
 		{
-		case RootParameterType::CBV:
+		case RootParameterType::RootCBV:
 			descriptorSet.rangeCount = 1;
 			descriptorSet.ranges[0].type = DescriptorType::CBV;
 			descriptorSet.ranges[0].rangeSize = 1;
 			descriptorSet.ranges[0].offset = 0;
 			descriptorSet.ranges[0].bufferHandleStart = &m_bufferDescriptors[0] + currentBufferOffset;
 			currentBufferOffset++;
-			break;
-
-		case RootParameterType::TextureSRV:
-			descriptorSet.rangeCount = 1;
-			descriptorSet.ranges[0].type = DescriptorType::TextureSRV;
-			descriptorSet.ranges[0].rangeSize = 1;
-			descriptorSet.ranges[0].offset = 0;
-			descriptorSet.ranges[0].imageHandleStart = &m_imageDescriptors[0] + currentImageOffset;
-			currentImageOffset++;
-			break;
-
-		case RootParameterType::ImageSRV:
-			descriptorSet.rangeCount = 1;
-			descriptorSet.ranges[0].type = DescriptorType::TextureSRV;
-			descriptorSet.ranges[0].rangeSize = 1;
-			descriptorSet.ranges[0].offset = 0;
-			descriptorSet.ranges[0].imageHandleStart = &m_imageDescriptors[0] + currentImageOffset;
-			currentImageOffset++;
-			break;
-
-		case RootParameterType::UAV:
-			descriptorSet.rangeCount = 1;
-			descriptorSet.ranges[0].type = DescriptorType::BufferUAV;
-			descriptorSet.ranges[0].rangeSize = 1;
-			descriptorSet.ranges[0].offset = 0;
-			descriptorSet.ranges[0].texelBufferHandleStart = &m_texelBufferDescriptors[0] + currentTexelBufferOffset;
-			currentTexelBufferOffset++;
 			break;
 
 		case RootParameterType::DescriptorTable:
@@ -460,33 +467,28 @@ void DynamicDescriptorPool::DescriptorHandleCache::ParseRootSignature(const Root
 			for (uint32_t rangeIndex = 0; rangeIndex < numRanges; ++rangeIndex)
 			{
 				const auto& rangeDesc = param.GetRangeDesc(rangeIndex);
+				descriptorSet.ranges[rangeIndex].type = rangeDesc.type;
 				descriptorSet.ranges[rangeIndex].rangeSize = rangeDesc.numDescriptors;
 				descriptorSet.ranges[rangeIndex].offset = currentOffset;
 				currentOffset += rangeDesc.numDescriptors;
+				
 				switch (rangeDesc.type)
 				{
 				case DescriptorType::CBV:
-					descriptorSet.ranges[rangeIndex].type = DescriptorType::CBV;
+				case DescriptorType::StructuredBufferSRV:
+				case DescriptorType::StructuredBufferUAV:
 					descriptorSet.ranges[rangeIndex].bufferHandleStart = &m_bufferDescriptors[0] + currentBufferOffset;
 					currentBufferOffset += rangeDesc.numDescriptors;
 					break;
+
 				case DescriptorType::TextureSRV:
-					descriptorSet.ranges[rangeIndex].type = DescriptorType::TextureSRV;
+				case DescriptorType::TextureUAV:
 					descriptorSet.ranges[rangeIndex].imageHandleStart = &m_imageDescriptors[0] + currentImageOffset;
 					currentImageOffset += rangeDesc.numDescriptors;
 					break;
-				case DescriptorType::ImageSRV:
-					descriptorSet.ranges[rangeIndex].type = DescriptorType::ImageSRV;
-					descriptorSet.ranges[rangeIndex].imageHandleStart = &m_imageDescriptors[0] + currentImageOffset;
-					currentImageOffset += rangeDesc.numDescriptors;
-					break;
-				case DescriptorType::ImageUAV:
-					descriptorSet.ranges[rangeIndex].type = DescriptorType::ImageUAV;
-					descriptorSet.ranges[rangeIndex].imageHandleStart = &m_imageDescriptors[0] + currentImageOffset;
-					currentImageOffset += rangeDesc.numDescriptors;
-					break;
-				case DescriptorType::BufferUAV:
-					descriptorSet.ranges[rangeIndex].type = DescriptorType::BufferUAV;
+
+				case DescriptorType::TypedBufferSRV:
+				case DescriptorType::TypedBufferUAV:
 					descriptorSet.ranges[rangeIndex].texelBufferHandleStart = &m_texelBufferDescriptors[0] + currentTexelBufferOffset;
 					currentTexelBufferOffset += rangeDesc.numDescriptors;
 					break;

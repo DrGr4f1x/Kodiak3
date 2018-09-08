@@ -180,7 +180,7 @@ void ComputeShaderApp::InitRootSigs()
 	m_computeRootSig.Reset(1);
 	m_computeRootSig[0].InitAsDescriptorTable(2, ShaderVisibility::Compute);
 	m_computeRootSig[0].SetTableRange(0, DescriptorType::TextureSRV, 0, 1);
-	m_computeRootSig[0].SetTableRange(1, DescriptorType::ImageUAV, 0, 1);
+	m_computeRootSig[0].SetTableRange(1, DescriptorType::TextureUAV, 0, 1);
 	m_computeRootSig.Finalize("Compute Root Sig");
 }
 

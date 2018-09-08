@@ -28,6 +28,16 @@
 
 #pragma comment(lib, "shlwapi.lib")
 
+#define USE_XINPUT
+#include <XInput.h>
+#pragma comment(lib, "xinput9_1_0.lib")
+
+#define USE_KEYBOARD_MOUSE
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "dxguid.lib")
+
 inline void ThrowIfFailed(HRESULT hr)
 {
 	if (FAILED(hr))
@@ -48,33 +58,9 @@ inline void ThrowIfFailed(HRESULT hr)
 
 // Graphics APIs
 #if defined(DX12)
-#include <d3d12.h>
-#include <d3d11on12.h>
-#include <pix.h>
-#include "d3dx12.h"
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
-#define D3D12_GPU_VIRTUAL_ADDRESS_NULL      ((D3D12_GPU_VIRTUAL_ADDRESS)0)
-#define D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN   ((D3D12_GPU_VIRTUAL_ADDRESS)-1)
-
+#include "DX12\Platform12.h"
 #elif defined(VK)
-
-#define FORCE_VULKAN_VALIDATION 0
-#define ENABLE_VULKAN_VALIDATION (_DEBUG || FORCE_VULKAN_VALIDATION)
-
-#define FORCE_VULKAN_DEBUG_MARKUP 0
-#define ENABLE_VULKAN_DEBUG_MARKUP (_DEBUG || _PROFILE || FORCE_VULKAN_DEBUG_MARKUP)
-
-#define VK_USE_PLATFORM_WIN32_KHR
-#include <vulkan.h>
-#pragma comment(lib, "vulkan-1.lib")
-inline void ThrowIfFailed(VkResult res)
-{
-	if (res != VK_SUCCESS)
-	{
-		throw;
-	}
-}
+#include "VK\PlatformVk.h"
 #else
 #error No graphics API defined!
 #endif

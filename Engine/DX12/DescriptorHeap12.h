@@ -34,9 +34,9 @@ protected:
 
 	D3D12_DESCRIPTOR_HEAP_TYPE m_type;
 	ID3D12DescriptorHeap* m_currentHeap{ nullptr };
-	D3D12_CPU_DESCRIPTOR_HANDLE m_currentHandle;
-	uint32_t m_descriptorSize;
-	uint32_t m_remainingFreeHandles;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_currentHandle{ D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN };
+	uint32_t m_descriptorSize{ 0 };
+	uint32_t m_remainingFreeHandles{ 0 };
 };
 
 

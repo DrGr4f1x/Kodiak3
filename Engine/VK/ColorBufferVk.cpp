@@ -25,8 +25,7 @@ void ColorBuffer::CreateFromSwapChain(const string& name, const ResourceHandle& 
 {
 	m_resource = resource;
 	
-	// TODO
-	//SetDebugName(m_image, name);
+	SetDebugName((VkImage)resource, name);
 
 	m_width = width;
 	m_height = height;
