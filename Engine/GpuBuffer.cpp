@@ -25,14 +25,21 @@ GpuBuffer::~GpuBuffer()
 }
 
 
-void IndexBuffer::CreateDerivedViews()
+BufferViewDesc GpuBuffer::GetDesc() const
 {
 	BufferViewDesc resDesc = {};
 	resDesc.format = Format::Unknown;
 	resDesc.bufferSize = (uint32_t)m_bufferSize;
 	resDesc.elementCount = (uint32_t)m_elementCount;
 	resDesc.elementSize = (uint32_t)m_elementSize;
+	return resDesc;
+}
 
+
+void IndexBuffer::CreateDerivedViews()
+{
+	BufferViewDesc resDesc = GetDesc();
+	
 	m_srv.Create(m_resource, m_type, resDesc);
 	m_uav.Create(m_resource, m_type, resDesc);
 	m_ibv.Create(m_resource, resDesc);
@@ -43,11 +50,7 @@ void IndexBuffer::CreateDerivedViews()
 
 void VertexBuffer::CreateDerivedViews()
 {
-	BufferViewDesc resDesc = {};
-	resDesc.format = Format::Unknown;
-	resDesc.bufferSize = (uint32_t)m_bufferSize;
-	resDesc.elementCount = (uint32_t)m_elementCount;
-	resDesc.elementSize = (uint32_t)m_elementSize;
+	BufferViewDesc resDesc = GetDesc();
 
 	m_srv.Create(m_resource, m_type, resDesc);
 	m_uav.Create(m_resource, m_type, resDesc);
@@ -57,11 +60,7 @@ void VertexBuffer::CreateDerivedViews()
 
 void ConstantBuffer::CreateDerivedViews()
 {
-	BufferViewDesc resDesc = {};
-	resDesc.format = Format::Unknown;
-	resDesc.bufferSize = (uint32_t)m_bufferSize;
-	resDesc.elementCount = (uint32_t)m_elementCount;
-	resDesc.elementSize = (uint32_t)m_elementSize;
+	BufferViewDesc resDesc = GetDesc();
 
 	m_cbv.Create(m_resource, resDesc);
 }
@@ -69,11 +68,7 @@ void ConstantBuffer::CreateDerivedViews()
 
 void ByteAddressBuffer::CreateDerivedViews()
 {
-	BufferViewDesc resDesc = {};
-	resDesc.format = Format::Unknown;
-	resDesc.bufferSize = (uint32_t)m_bufferSize;
-	resDesc.elementCount = (uint32_t)m_elementCount;
-	resDesc.elementSize = (uint32_t)m_elementSize;
+	BufferViewDesc resDesc = GetDesc();
 
 	m_srv.Create(m_resource, m_type, resDesc);
 	m_uav.Create(m_resource, m_type, resDesc);
@@ -82,11 +77,7 @@ void ByteAddressBuffer::CreateDerivedViews()
 
 void StructuredBuffer::CreateDerivedViews()
 {
-	BufferViewDesc resDesc = {};
-	resDesc.format = Format::Unknown;
-	resDesc.bufferSize = (uint32_t)m_bufferSize;
-	resDesc.elementCount = (uint32_t)m_elementCount;
-	resDesc.elementSize = (uint32_t)m_elementSize;
+	BufferViewDesc resDesc = GetDesc();
 
 	m_srv.Create(m_resource, m_type, resDesc);
 	m_uav.Create(m_resource, m_type, resDesc);
@@ -111,11 +102,8 @@ const UnorderedAccessView& StructuredBuffer::GetCounterUAV(CommandContext& conte
 
 void TypedBuffer::CreateDerivedViews()
 {
-	BufferViewDesc resDesc = {};
+	BufferViewDesc resDesc = GetDesc();
 	resDesc.format = m_dataFormat;
-	resDesc.bufferSize = (uint32_t)m_bufferSize;
-	resDesc.elementCount = (uint32_t)m_elementCount;
-	resDesc.elementSize = (uint32_t)m_elementSize;
 
 	m_srv.Create(m_resource, m_type, resDesc);
 	m_uav.Create(m_resource, m_type, resDesc);

@@ -40,12 +40,13 @@ public:
 	uint64_t GetGpuAddress() const { return m_gpuAddress; }
 
 protected:
-	GpuBuffer()
+	GpuBuffer(ResourceType type)
 	{
 		m_usageState = ResourceState::Common;
-		m_type = ResourceType::GenericBuffer;
+		m_type = type;
 	}
 	virtual void CreateDerivedViews() = 0;
+	BufferViewDesc GetDesc() const;
 
 protected:
 	size_t m_bufferSize{ 0 };
@@ -65,10 +66,7 @@ protected:
 class IndexBuffer : public GpuBuffer
 {
 public:
-	IndexBuffer() : GpuBuffer()
-	{
-		m_type = ResourceType::IndexBuffer;
-	}
+	IndexBuffer() : GpuBuffer(ResourceType::IndexBuffer) {}
 
 	const IndexBufferView& GetIBV() const { return m_ibv; }
 
@@ -86,10 +84,7 @@ private:
 class VertexBuffer : public GpuBuffer
 {
 public:
-	VertexBuffer() : GpuBuffer()
-	{
-		m_type = ResourceType::VertexBuffer;
-	}
+	VertexBuffer() : GpuBuffer(ResourceType::VertexBuffer) {}
 
 	const VertexBufferView& GetVBV() const { return m_vbv; }
 
@@ -104,7 +99,7 @@ private:
 class ConstantBuffer : public GpuBuffer
 {
 public:
-	ConstantBuffer() : GpuBuffer()
+	ConstantBuffer() : GpuBuffer(ResourceType::GenericBuffer)
 	{
 		m_isConstantBuffer = true;
 		m_usageState = ResourceState::GenericRead;
@@ -125,6 +120,9 @@ private:
 
 class ByteAddressBuffer : public GpuBuffer
 {
+public:
+	ByteAddressBuffer() : GpuBuffer(ResourceType::GenericBuffer) {}
+
 protected:
 	void CreateDerivedViews() override;
 };
@@ -137,10 +135,7 @@ class IndirectArgsBuffer : public ByteAddressBuffer
 class StructuredBuffer : public GpuBuffer
 {
 public:
-	StructuredBuffer()
-	{
-		m_type = ResourceType::StructuredBuffer;
-	}
+	StructuredBuffer() : GpuBuffer(ResourceType::StructuredBuffer) {}
 
 	ByteAddressBuffer& GetCounterBuffer() { return m_counterBuffer; }
 
@@ -158,11 +153,10 @@ private:
 class TypedBuffer : public GpuBuffer
 {
 public:
-	TypedBuffer(Format format)
-		: m_dataFormat(format)
-	{
-		m_type = ResourceType::TypedBuffer;
-	}
+	TypedBuffer(Format format) 
+		: GpuBuffer(ResourceType::TypedBuffer)
+		, m_dataFormat(format)
+	{}
 
 protected:
 	void CreateDerivedViews() override;
