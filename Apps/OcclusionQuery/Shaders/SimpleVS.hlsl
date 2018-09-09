@@ -3,6 +3,8 @@ cbuffer VSConstants : register(b0)
 {
 	float4x4 projectionMatrix;
 	float4x4 modelViewMatrix;
+	float4 lightPos;
+	float visible;
 }
 
 

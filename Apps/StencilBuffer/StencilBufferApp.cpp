@@ -51,7 +51,7 @@ void StencilBufferApp::Startup()
 
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);
-	m_controller.SetOrbitTarget(Math::Vector3(0.0f, 3.5f, 0.0f), Math::Length(m_camera.GetPosition()), 0.25f);
+	m_controller.SetOrbitTarget(Vector3(0.0f, 3.5f, 0.0f), Length(m_camera.GetPosition()), 0.25f);
 
 	InitRootSig();
 	InitPSOs();
@@ -82,8 +82,6 @@ bool StencilBufferApp::Update()
 void StencilBufferApp::Render()
 {
 	auto& context = GraphicsContext::Begin("Render frame");
-
-	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);

@@ -248,6 +248,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="OcclusionQueryApp.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Create</PrecompiledHeader>
@@ -258,10 +259,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="OcclusionQueryApp.h" />
     <ClInclude Include="Stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-      <CustomBuild Include="Shaders\SimplePS.hlsl">
+    <CustomBuild Include="Shaders\SimplePS.hlsl">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>

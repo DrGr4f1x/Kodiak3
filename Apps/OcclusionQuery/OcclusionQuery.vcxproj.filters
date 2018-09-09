@@ -3,9 +3,11 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Stdafx.cpp" />
+    <ClCompile Include="OcclusionQueryApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="OcclusionQueryApp.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
