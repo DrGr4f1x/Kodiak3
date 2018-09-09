@@ -84,9 +84,10 @@ void ConfigureInfoQueue(ID3D12Device* device)
 }
 
 
-Microsoft::WRL::ComPtr<IDXGISwapChain1> CreateSwapChain(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height)
+Microsoft::WRL::ComPtr<IDXGISwapChain3> CreateSwapChain(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height)
 {
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain;
+	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain3;
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 	swapChainDesc.Width = width;
@@ -106,7 +107,8 @@ Microsoft::WRL::ComPtr<IDXGISwapChain1> CreateSwapChain(IDXGIFactory4* dxgiFacto
 	assert_succeeded(dxgiFactory->CreateSwapChainForCoreWindow(g_commandManager.GetCommandQueue(), (IUnknown*)GameCore::g_window.Get(), &swapChainDesc, nullptr, &m_swapChain));
 #endif
 
-	return swapChain;
+	ThrowIfFailed(swapChain.As(&swapChain3));
+	return swapChain3;
 }
 
 } // anonymous namespace
@@ -138,7 +140,8 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	}
 
 	Microsoft::WRL::ComPtr<ID3D12Device> device;
-	Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain;
+	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain;
+	uint64_t fenceValues[NumSwapChainBuffers]{ 0, 0, 0 };
 };
 
 
@@ -284,6 +287,7 @@ void GraphicsDevice::PlatformCreate()
 	g_commandManager.Create(m_platformData->device.Get());
 
 	m_platformData->swapChain = CreateSwapChain(dxgiFactory.Get(), m_hwnd, m_width, m_height);
+	m_currentBuffer = m_platformData->swapChain->GetCurrentBackBufferIndex();
 
 	for (int i = 0; i < NumSwapChainBuffers; ++i)
 	{
@@ -295,16 +299,21 @@ void GraphicsDevice::PlatformCreate()
 
 		m_swapChainBuffers[i] = buffer;
 	}
+
+	// Setup fence
+	m_platformData->fenceValues[0] = g_commandManager.GetGraphicsQueue().GetNextFenceValue();
 }
 
 
 void GraphicsDevice::PlatformPresent()
 {
 	UINT presentInterval = 0;
-
-	m_currentBuffer = (m_currentBuffer + 1) % NumSwapChainBuffers;
-
 	m_platformData->swapChain->Present(presentInterval, 0);
+
+	m_currentBuffer = m_platformData->swapChain->GetCurrentBackBufferIndex();
+
+	g_commandManager.WaitForFence(m_platformData->fenceValues[m_currentBuffer]);
+	m_platformData->fenceValues[m_currentBuffer] = g_commandManager.GetGraphicsQueue().GetNextFenceValue();
 }
 
 

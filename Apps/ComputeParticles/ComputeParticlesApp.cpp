@@ -32,6 +32,8 @@ void ComputeParticlesApp::Configure()
 	filesystem.SetDefaultRootDir();
 	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
 	filesystem.AddSearchPath("Data\\Textures");
+
+	g_input.SetCaptureMouse(false);
 }
 
 
