@@ -74,9 +74,6 @@ void TriangleApp::Startup()
 
 void TriangleApp::Shutdown()
 {
-	//m_vertexBuffer.Destroy();
-	//m_indexBuffer.Destroy();
-	//m_constantBuffer.Destroy();
 	m_rootSig.Destroy();
 }
 
@@ -95,8 +92,6 @@ void TriangleApp::Render()
 {
 	auto& context = GraphicsContext::Begin("Render frame");
 
-	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
-	
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
 	Color clearColor{ DirectX::Colors::CornflowerBlue };

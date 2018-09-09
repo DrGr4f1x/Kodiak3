@@ -48,7 +48,7 @@ void DisplacementApp::Startup()
 
 	m_controller.SetSpeedScale(0.0025f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);
-	m_controller.SetOrbitTarget(Math::Vector3(0.0f, 0.0f, 0.0f), Math::Length(m_camera.GetPosition()), 0.25f);
+	m_controller.SetOrbitTarget(Vector3(0.0f, 0.0f, 0.0f), Length(m_camera.GetPosition()), 0.25f);
 
 	InitRootSig();
 	InitPSOs();

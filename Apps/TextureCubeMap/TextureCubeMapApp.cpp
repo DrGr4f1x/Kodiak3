@@ -36,25 +36,25 @@ void TextureCubeMapApp::Configure()
 
 void TextureCubeMapApp::Startup()
 {
-	InitRootSigs();
-	InitPSOs();
-	InitConstantBuffers();
+	using namespace Math;
 
 	m_camera.SetPerspectiveMatrix(
 		XMConvertToRadians(60.0f),
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.001f,
 		256.0f);
-	m_camera.SetPosition(Math::Vector3(0.0f, 0.0f, 4.0f));
+	m_camera.SetPosition(Vector3(0.0f, 0.0f, 4.0f));
 
 	m_camera.Update();
 
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.RefreshFromCamera();
 	m_controller.SetCameraMode(CameraMode::ArcBall);
-	m_controller.SetOrbitTarget(Math::Vector3(0.0f, 0.0f, 0.0f), 4.0f, 2.0f);
+	m_controller.SetOrbitTarget(Vector3(0.0f, 0.0f, 0.0f), 4.0f, 2.0f);
 
-	UpdateConstantBuffers();
+	InitRootSigs();
+	InitPSOs();
+	InitConstantBuffers();
 
 	LoadAssets();
 }
@@ -75,10 +75,6 @@ bool TextureCubeMapApp::Update()
 {
 	m_controller.Update(m_frameTimer);
 
-	Math::Vector3 right = m_camera.GetRightVec();
-	Math::Vector3 up = m_camera.GetUpVec();
-	Math::Vector3 forward = m_camera.GetForwardVec();
-
 	UpdateConstantBuffers();
 
 	return true;
@@ -88,8 +84,6 @@ bool TextureCubeMapApp::Update()
 void TextureCubeMapApp::Render()
 {
 	auto& context = GraphicsContext::Begin("Render frame");
-
-	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
@@ -205,6 +199,8 @@ void TextureCubeMapApp::InitConstantBuffers()
 	m_vsSkyboxConstantBuffer.Create("VS Constant Buffer", 1, sizeof(VSConstants));
 	m_vsModelConstantBuffer.Create("VS Constant Buffer", 1, sizeof(VSConstants));
 	m_psConstantBuffer.Create("PS Constant Buffer", 1, sizeof(PSConstants));
+
+	UpdateConstantBuffers();
 }
 
 
@@ -218,7 +214,7 @@ void TextureCubeMapApp::UpdateConstantBuffers()
 	
 	m_vsSkyboxConstants.viewProjectionMatrix = m_camera.GetProjMatrix() * Invert(viewMatrix);
 	m_vsSkyboxConstants.modelMatrix = modelMatrix;
-	m_vsSkyboxConstants.eyePos = Math::Vector3(0.0f, 0.0f, 0.0f);
+	m_vsSkyboxConstants.eyePos = Vector3(0.0f, 0.0f, 0.0f);
 	m_vsSkyboxConstantBuffer.Update(sizeof(m_vsSkyboxConstants), &m_vsSkyboxConstants);
 
 	m_vsModelConstants.viewProjectionMatrix = m_camera.GetViewProjMatrix();

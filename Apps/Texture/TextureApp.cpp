@@ -88,8 +88,6 @@ void TextureApp::Render()
 {
 	auto& context = GraphicsContext::Begin("Render frame");
 
-	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
-
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
 	context.ClearColor(GetColorBuffer());

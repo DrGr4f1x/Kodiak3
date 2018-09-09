@@ -35,9 +35,7 @@ void GeometryShaderApp::Configure()
 
 void GeometryShaderApp::Startup()
 {
-	InitRootSigs();
-	InitPSOs();
-	InitConstantBuffer();
+	using namespace Math;
 
 	m_camera.SetPerspectiveMatrix(
 		XMConvertToRadians(60.0f),
@@ -48,9 +46,11 @@ void GeometryShaderApp::Startup()
 
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);
-	m_controller.SetOrbitTarget(Math::Vector3(0.0f, 0.0f, 0.0f), Math::Length(m_camera.GetPosition()), 4.0f);
+	m_controller.SetOrbitTarget(Vector3(0.0f, 0.0f, 0.0f), Length(m_camera.GetPosition()), 4.0f);
 
-	UpdateConstantBuffer();
+	InitRootSigs();
+	InitPSOs();
+	InitConstantBuffer();
 
 	LoadAssets();
 }
@@ -58,8 +58,6 @@ void GeometryShaderApp::Startup()
 
 void GeometryShaderApp::Shutdown()
 {
-	m_model.reset();
-
 	m_meshRootSig.Destroy();
 	m_geomRootSig.Destroy();
 }
@@ -78,8 +76,6 @@ bool GeometryShaderApp::Update()
 void GeometryShaderApp::Render()
 {
 	auto& context = GraphicsContext::Begin("Render frame");
-
-	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
@@ -175,6 +171,8 @@ void GeometryShaderApp::InitPSOs()
 void GeometryShaderApp::InitConstantBuffer()
 {
 	m_constantBuffer.Create("Constant Buffer", 1, sizeof(Constants));
+
+	UpdateConstantBuffer();
 }
 
 

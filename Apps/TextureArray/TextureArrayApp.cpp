@@ -49,9 +49,6 @@ void TextureArrayApp::Startup()
 	vector<uint32_t> indexData = { 0,1,2, 2,3,0 };
 	m_indexBuffer.Create("Index Buffer", indexData.size(), sizeof(uint32_t), indexData.data());
 
-	InitRootSig();
-	InitPSO();
-
 	// Setup camera
 	{
 		using namespace Math;
@@ -69,6 +66,9 @@ void TextureArrayApp::Startup()
 		m_controller.RefreshFromCamera();
 	}
 
+	InitRootSig();
+	InitPSO();
+
 	// We have to load the texture first, so we know how many array slices there are
 	LoadAssets();
 	InitConstantBuffer();
@@ -78,8 +78,6 @@ void TextureArrayApp::Startup()
 void TextureArrayApp::Shutdown()
 {
 	m_rootSig.Destroy();
-
-	m_texture.reset();
 
 	delete[] m_constants.instance;
 }

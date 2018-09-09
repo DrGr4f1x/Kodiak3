@@ -134,7 +134,6 @@ void ComputeShaderApp::Render()
 	}
 
 	// Graphics
-	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
 	context.TransitionResource(*m_texture, ResourceState::PixelShaderResource, true);
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
