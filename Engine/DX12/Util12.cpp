@@ -499,4 +499,40 @@ D3D12_RESOURCE_STATES GetResourceState(ResourceState state)
 	}
 }
 
+
+D3D12_QUERY_HEAP_TYPE GetQueryHeapType(QueryHeapType type)
+{
+	switch (type)
+	{
+	case QueryHeapType::Occlusion:
+		return D3D12_QUERY_HEAP_TYPE_OCCLUSION;
+	case QueryHeapType::Timestamp:
+		return D3D12_QUERY_HEAP_TYPE_TIMESTAMP;
+	case QueryHeapType::PipelineStats:
+		return D3D12_QUERY_HEAP_TYPE_PIPELINE_STATISTICS;
+
+	default:
+		assert(false);
+		return D3D12_QUERY_HEAP_TYPE_OCCLUSION;
+	}
+}
+
+
+D3D12_QUERY_TYPE GetQueryType(QueryType type)
+{
+	switch (type)
+	{
+	case QueryType::Occlusion:
+		return D3D12_QUERY_TYPE_OCCLUSION;
+	case QueryType::Timestamp:
+		return D3D12_QUERY_TYPE_TIMESTAMP;
+	case QueryType::PipelineStats:
+		return D3D12_QUERY_TYPE_PIPELINE_STATISTICS;
+
+	default:
+		assert(false);
+		return D3D12_QUERY_TYPE_OCCLUSION;
+	}
+}
+
 } // namespace Kodiak

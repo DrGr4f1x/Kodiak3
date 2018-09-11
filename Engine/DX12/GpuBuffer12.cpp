@@ -19,9 +19,10 @@
 
 
 using namespace Kodiak;
+using namespace std;
 
 
-void GpuBuffer::Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData)
+void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSize, const void* initialData)
 {
 	m_resource = nullptr;
 
@@ -104,4 +105,59 @@ void ConstantBuffer::Update(size_t sizeInBytes, size_t offset, const void* data)
 	// Unmap after data has been copied
 	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
 	m_resource->Unmap(0, nullptr);
+}
+
+
+void ReadbackBuffer::Create(const string& name, uint32_t numElements, uint32_t elementSize)
+{
+	m_resource = nullptr;
+
+	m_elementCount = numElements;
+	m_elementSize = elementSize;
+	m_bufferSize = numElements * elementSize;
+	m_usageState = ResourceState::CopyDest;
+
+	// Create a readback buffer large enough to hold all texel data
+	D3D12_HEAP_PROPERTIES heapProps = {};
+	heapProps.Type = D3D12_HEAP_TYPE_READBACK;
+	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProps.CreationNodeMask = 1;
+	heapProps.VisibleNodeMask = 1;
+
+	// Readback buffers must be 1-dimensional, i.e. "buffer" not "texture2d"
+	D3D12_RESOURCE_DESC resourceDesc = {};
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Width = m_bufferSize;
+	resourceDesc.Height = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.SampleDesc.Quality = 0;
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	assert_succeeded(GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc,
+		D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_resource)));
+
+#ifdef RELEASE
+	(name);
+#else
+	m_resource->SetName(MakeWStr(name).c_str());
+#endif
+}
+
+
+void* ReadbackBuffer::Map()
+{
+	void* mem;
+	m_resource->Map(0, &CD3DX12_RANGE(0, m_bufferSize), &mem);
+	return mem;
+}
+
+
+void ReadbackBuffer::Unmap()
+{
+	m_resource->Unmap(0, &CD3DX12_RANGE(0, 0));
 }

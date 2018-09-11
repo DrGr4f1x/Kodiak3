@@ -29,6 +29,7 @@ class ComputeContext;
 class ComputePSO;
 class GraphicsContext;
 class GraphicsPSO;
+class OcclusionQueryHeap;
 class RenderPass;
 class RootSignature;
 
@@ -122,6 +123,10 @@ public:
 
 	void BeginRenderPass(FrameBuffer& framebuffer);
 	void EndRenderPass();
+
+	void BeginOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex);
+	void EndOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex);
+	void ResolveOcclusionQueries(OcclusionQueryHeap& queryHeap, uint32_t startIndex, uint32_t numQueries, GpuResource& destBuffer, uint64_t destBufferOffset);
 
 	void SetRootSignature(const RootSignature& rootSig);
 

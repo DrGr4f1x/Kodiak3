@@ -165,4 +165,19 @@ private:
 	Format m_dataFormat;
 };
 
+
+class ReadbackBuffer : public GpuBuffer
+{
+public:
+	ReadbackBuffer() : GpuBuffer(ResourceType::GenericBuffer) {}
+
+	void Create(const std::string& name, uint32_t numElements, uint32_t elementSize);
+
+	void* Map();
+	void Unmap();
+
+protected:
+	void CreateDerivedViews() override {}
+};
+
 } // namespace Kodiak

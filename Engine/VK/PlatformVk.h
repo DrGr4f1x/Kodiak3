@@ -48,6 +48,7 @@ using InstanceHandle = VkHandle<VkInstance>::VkPointer;
 using DeviceHandle = VkHandle<VkDevice>::VkPointer;
 using ResourceHandle = VkResourceHandle::VkPointer;
 using PsoHandle = VkPipeline;
+using QueryHeapHandle = VkHandle<VkQueryPool>::VkPointer;
 
 using SrvHandle = VkDescriptorHandle::VkPointer;
 using UavHandle = VkDescriptorHandle::VkPointer;

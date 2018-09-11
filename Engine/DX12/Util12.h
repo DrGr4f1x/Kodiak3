@@ -31,5 +31,7 @@ D3D12_RESOURCE_DESC DescribeTex2D(uint32_t width, uint32_t height, uint32_t dept
 ResourceHandle CreateTextureResource(const std::string& name, const D3D12_RESOURCE_DESC& resourceDesc, D3D12_CLEAR_VALUE clearValue);
 
 D3D12_RESOURCE_STATES GetResourceState(ResourceState state);
+D3D12_QUERY_HEAP_TYPE GetQueryHeapType(QueryHeapType type);
+D3D12_QUERY_TYPE GetQueryType(QueryType type);
 
 } // namespace Kodiak

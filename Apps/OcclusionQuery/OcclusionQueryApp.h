@@ -15,6 +15,7 @@
 #include "GpuBuffer.h"
 #include "Model.h"
 #include "PipelineState.h"
+#include "QueryHeap.h"
 #include "RootSignature.h"
 
 
@@ -37,6 +38,7 @@ private:
 	void InitRootSig();
 	void InitPSOs();
 	void InitConstantBuffers();
+	void InitQueryHeap();
 
 	void UpdateConstantBuffers();
 
@@ -68,6 +70,9 @@ private:
 	Kodiak::ModelPtr m_occluderModel;
 	Kodiak::ModelPtr m_teapotModel;
 	Kodiak::ModelPtr m_sphereModel;
+
+	Kodiak::OcclusionQueryHeap m_queryHeap;
+	Kodiak::ReadbackBuffer m_readbackBuffer;
 
 	Kodiak::CameraController m_controller;
 	float m_zoom{ -35.0f };

@@ -15,6 +15,7 @@
 #include "CommandContext.h"
 #include "CommonStates.h"
 #include "Filesystem.h"
+#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
@@ -53,6 +54,7 @@ void OcclusionQueryApp::Startup()
 	InitRootSig();
 	InitPSOs();
 	InitConstantBuffers();
+	InitQueryHeap();
 
 	LoadAssets();
 }
@@ -83,17 +85,58 @@ void OcclusionQueryApp::Render()
 	context.ClearColor(GetColorBuffer());
 	context.ClearDepthAndStencil(GetDepthBuffer());
 
+	// Occlusion pass
+
 	context.BeginRenderPass(GetBackBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 	context.SetRootSignature(m_rootSignature);
 
-	// Occlusion pass
-	{
+	auto curFrame = g_graphicsDevice->GetCurrentBuffer();
 
+	{
+		context.SetPipelineState(m_simplePSO);
+
+		// Occluder plane
+		context.SetRootConstantBuffer(0, m_occluderCB);
+		context.SetVertexBuffer(0, m_occluderModel->GetVertexBuffer());
+		context.SetIndexBuffer(m_occluderModel->GetIndexBuffer());
+		context.DrawIndexed((uint32_t)m_occluderModel->GetIndexBuffer().GetElementCount());
+
+		// Teapot
+		context.BeginOcclusionQuery(m_queryHeap, 2 * curFrame);
+
+		context.SetRootConstantBuffer(0, m_teapotCB);
+		context.SetVertexBuffer(0, m_teapotModel->GetVertexBuffer());
+		context.SetIndexBuffer(m_teapotModel->GetIndexBuffer());
+		context.DrawIndexed((uint32_t)m_teapotModel->GetIndexBuffer().GetElementCount());
+
+		context.EndOcclusionQuery(m_queryHeap, 2 * curFrame);
+
+		// Sphere
+		context.BeginOcclusionQuery(m_queryHeap, 2 * curFrame + 1);
+
+		context.SetRootConstantBuffer(0, m_sphereCB);
+		context.SetVertexBuffer(0, m_sphereModel->GetVertexBuffer());
+		context.SetIndexBuffer(m_sphereModel->GetIndexBuffer());
+		context.DrawIndexed((uint32_t)m_sphereModel->GetIndexBuffer().GetElementCount());
+
+		context.EndOcclusionQuery(m_queryHeap, 2 * curFrame + 1);
 	}
+	context.EndRenderPass();
+
+	// Copy query results to buffer
+	context.ResolveOcclusionQueries(m_queryHeap, 2 * curFrame, 2, m_readbackBuffer, 2 * curFrame * sizeof(uint64_t));
+
+	context.ClearColor(GetColorBuffer());
+	context.ClearDepthAndStencil(GetDepthBuffer());
 
 	// Visible pass
+
+	context.BeginRenderPass(GetBackBuffer());
+
+	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
+	context.SetRootSignature(m_rootSignature);
 	{
 		// Teapot
 		context.SetPipelineState(m_solidPSO);
@@ -184,6 +227,13 @@ void OcclusionQueryApp::InitConstantBuffers()
 }
 
 
+void OcclusionQueryApp::InitQueryHeap()
+{
+	m_queryHeap.Create(2 * NumSwapChainBuffers);
+	m_readbackBuffer.Create("Readback Buffer", 2 * NumSwapChainBuffers, sizeof(uint64_t));
+}
+
+
 void OcclusionQueryApp::UpdateConstantBuffers()
 {
 	using namespace Math;
@@ -198,14 +248,30 @@ void OcclusionQueryApp::UpdateConstantBuffers()
 	m_occluderConstants.modelViewMatrix = viewMatrix * rotationMatrix;
 	m_occluderCB.Update(sizeof(m_occluderConstants), &m_occluderConstants);
 
+	uint64_t teapotQueryResult = 1;
+	uint64_t sphereQueryResult = 1;
+
+	uint32_t resultFrame = (g_graphicsDevice->GetCurrentBuffer() + 1) % NumSwapChainBuffers;
+	bool getResults = g_graphicsDevice->GetFrameNumber() >= NumSwapChainBuffers;
+
+	if (getResults)
+	{
+		uint64_t* data = (uint64_t*)m_readbackBuffer.Map();
+
+		teapotQueryResult = data[2 * resultFrame];
+		sphereQueryResult = data[2 * resultFrame + 1];
+
+		m_readbackBuffer.Unmap();
+	}
+
 	m_teapotConstants.projectionMatrix = projectionMatrix;
 	m_teapotConstants.modelViewMatrix = viewMatrix * rotationMatrix * Matrix4(AffineTransform::MakeTranslation(Vector3(0.0f, 0.0f, -10.0f)));
-	m_teapotConstants.visible = 1.0f;
+	m_teapotConstants.visible = teapotQueryResult > 0 ? 1.0f : 0.0f;
 	m_teapotCB.Update(sizeof(m_teapotConstants), &m_teapotConstants);
 
 	m_sphereConstants.projectionMatrix = projectionMatrix;
 	m_sphereConstants.modelViewMatrix = viewMatrix * rotationMatrix * Matrix4(AffineTransform::MakeTranslation(Vector3(0.0f, 0.0f, 10.0f)));
-	m_sphereConstants.visible = 1.0f;
+	m_sphereConstants.visible = sphereQueryResult > 0 ? 1.0f : 0.0f;
 	m_sphereCB.Update(sizeof(m_sphereConstants), &m_sphereConstants);
 }
 

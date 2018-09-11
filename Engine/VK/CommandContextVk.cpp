@@ -12,10 +12,11 @@
 
 #include "CommandContextVk.h"
 
-#include "CommandListManagerVk.h"
 #include "GraphicsDevice.h"
 #include "PipelineState.h"
+#include "QueryHeap.h"
 
+#include "CommandListManagerVk.h"
 #include "RootSignatureVk.h"
 #include "UtilVk.h"
 
@@ -407,6 +408,34 @@ void GraphicsContext::BeginRenderPass(FrameBuffer& framebuffer)
 	vkCmdBeginRenderPass(m_commandList, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 	m_isRenderPassActive = true;
+}
+
+
+void GraphicsContext::BeginOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex)
+{
+	vkCmdBeginQuery(m_commandList, queryHeap.GetHandle(), heapIndex, VK_FLAGS_NONE);
+}
+
+
+void GraphicsContext::EndOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex)
+{
+	vkCmdEndQuery(m_commandList, queryHeap.GetHandle(), heapIndex);
+}
+
+
+void GraphicsContext::ResolveOcclusionQueries(OcclusionQueryHeap& queryHeap, uint32_t startIndex, uint32_t numQueries, GpuResource& destBuffer, uint64_t destBufferOffset)
+{
+	assert(!m_isRenderPassActive);
+
+	vkCmdCopyQueryPoolResults(
+		m_commandList,
+		queryHeap.GetHandle(),
+		startIndex,
+		numQueries,
+		destBuffer.GetHandle(),
+		destBufferOffset,
+		sizeof(uint64_t), // TODO - don't hardcode this
+		VK_QUERY_RESULT_64_BIT);
 }
 
 

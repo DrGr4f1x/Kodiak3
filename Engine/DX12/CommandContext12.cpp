@@ -13,6 +13,7 @@
 #include "CommandContext12.h"
 
 #include "Framebuffer.h"
+#include "QueryHeap.h"
 
 #include "CommandListManager12.h"
 #include "Util12.h"
@@ -411,6 +412,29 @@ void GraphicsContext::EndRenderPass()
 		m_renderTargets[i] = nullptr;
 	}
 	m_depthTarget = nullptr;
+}
+
+
+void GraphicsContext::BeginOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex)
+{
+	m_commandList->BeginQuery(queryHeap.GetHandle().Get(), D3D12_QUERY_TYPE_OCCLUSION, heapIndex);
+}
+
+
+void GraphicsContext::EndOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex)
+{
+	m_commandList->EndQuery(queryHeap.GetHandle().Get(), D3D12_QUERY_TYPE_OCCLUSION, heapIndex);
+}
+
+void GraphicsContext::ResolveOcclusionQueries(OcclusionQueryHeap& queryHeap, uint32_t startIndex, uint32_t numQueries, GpuResource& destBuffer, uint64_t destBufferOffset)
+{
+	m_commandList->ResolveQueryData(
+		queryHeap.GetHandle().Get(),
+		D3D12_QUERY_TYPE_OCCLUSION,
+		startIndex,
+		numQueries,
+		destBuffer.GetHandle().Get(),
+		destBufferOffset);
 }
 
 

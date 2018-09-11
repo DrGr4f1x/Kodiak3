@@ -26,6 +26,7 @@ public:
 	virtual ~GpuResource() = 0;
 
 	const ResourceType GetType() const { return m_type; }
+	const ResourceHandle& GetHandle() const { return m_resource; }
 
 protected:
 	ResourceHandle	m_resource;

@@ -71,6 +71,22 @@ enum class ResourceState
 };
 
 
+enum class QueryHeapType
+{
+	Occlusion,
+	Timestamp,
+	PipelineStats
+};
+
+
+enum class QueryType
+{
+	Occlusion,
+	Timestamp,
+	PipelineStats
+};
+
+
 inline uint32_t BitsPerPixel(Format format)
 {
 	switch (format)

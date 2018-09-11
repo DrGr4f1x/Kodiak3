@@ -121,3 +121,60 @@ void ConstantBuffer::Update(size_t sizeInBytes, size_t offset, const void* data)
 	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
 	vkUnmapMemory(device, m_resource);
 }
+
+
+void ReadbackBuffer::Create(const string& name, uint32_t numElements, uint32_t elementSize)
+{
+	VkDevice device = GetDevice();
+
+	m_elementCount = numElements;
+	m_elementSize = elementSize;
+	m_bufferSize = numElements * elementSize;
+
+	VkBufferCreateInfo bufferInfo = {};
+	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.size = m_bufferSize;
+	bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	VkBuffer buffer{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkCreateBuffer(device, &bufferInfo, nullptr, &buffer));
+
+	VkMemoryRequirements memReqs;
+	vkGetBufferMemoryRequirements(device, buffer, &memReqs);
+
+	const bool bHostMappable = m_isConstantBuffer;
+	VkMemoryPropertyFlags memFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+
+	VkBufferCreateInfo vertexbufferInfo = {};
+	vertexbufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	vertexbufferInfo.size = m_bufferSize;
+	vertexbufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	VkMemoryAllocateInfo memAlloc = {};
+	memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	memAlloc.allocationSize = memReqs.size;
+	memAlloc.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, memFlags);
+
+	VkDeviceMemory mem{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkAllocateMemory(device, &memAlloc, nullptr, &mem));
+	m_resource = ResourceHandle::Create(buffer, mem);
+
+	ThrowIfFailed(vkBindBufferMemory(device, buffer, m_resource, 0));
+
+	SetDebugName(buffer, name);
+	SetDebugName(mem, name + " memory");
+}
+
+
+void* ReadbackBuffer::Map()
+{
+	void* mem = nullptr;
+	ThrowIfFailed(vkMapMemory(GetDevice(), m_resource, 0, m_bufferSize, 0, &mem));
+	return mem;
+}
+
+
+void ReadbackBuffer::Unmap()
+{
+	vkUnmapMemory(GetDevice(), m_resource);
+}
