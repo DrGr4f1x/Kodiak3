@@ -59,6 +59,8 @@ public:
 	DepthBuffer& GetDepthBuffer() const;
 	Format GetColorFormat() const;
 	Format GetDepthFormat() const;
+	uint32_t GetCurrentFrame() const;
+	uint32_t GetFrameNumber() const;
 
 protected:
 	const std::string m_name;

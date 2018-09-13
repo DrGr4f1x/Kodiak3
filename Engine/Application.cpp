@@ -146,6 +146,18 @@ Format Application::GetDepthFormat() const
 }
 
 
+uint32_t Application::GetCurrentFrame() const
+{
+	return g_graphicsDevice->GetCurrentBuffer();
+}
+
+
+uint32_t Application::GetFrameNumber() const
+{
+	return g_graphicsDevice->GetFrameNumber();
+}
+
+
 const string& Application::GetDefaultShaderPath()
 {
 	return s_defaultShaderPath;

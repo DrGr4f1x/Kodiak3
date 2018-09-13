@@ -377,7 +377,7 @@ inline void GraphicsContext::SetVertexBuffer(uint32_t slot, const VertexBuffer& 
 {
 	VkDeviceSize offsets[1] = { 0 };
 	VkBuffer buffers[1] = { vertexBuffer.m_resource };
-	vkCmdBindVertexBuffers(m_commandList, 0, 1, buffers, offsets);
+	vkCmdBindVertexBuffers(m_commandList, slot, 1, buffers, offsets);
 }
 
 

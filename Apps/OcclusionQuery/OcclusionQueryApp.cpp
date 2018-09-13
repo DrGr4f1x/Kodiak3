@@ -15,7 +15,6 @@
 #include "CommandContext.h"
 #include "CommonStates.h"
 #include "Filesystem.h"
-#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
@@ -92,7 +91,7 @@ void OcclusionQueryApp::Render()
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 	context.SetRootSignature(m_rootSignature);
 
-	auto curFrame = g_graphicsDevice->GetCurrentBuffer();
+	auto curFrame = GetCurrentFrame();
 
 	{
 		context.SetPipelineState(m_simplePSO);
@@ -251,8 +250,8 @@ void OcclusionQueryApp::UpdateConstantBuffers()
 	uint64_t teapotQueryResult = 1;
 	uint64_t sphereQueryResult = 1;
 
-	uint32_t resultFrame = (g_graphicsDevice->GetCurrentBuffer() + 1) % NumSwapChainBuffers;
-	bool getResults = g_graphicsDevice->GetFrameNumber() >= NumSwapChainBuffers;
+	uint32_t resultFrame = (GetCurrentFrame() + 1) % NumSwapChainBuffers;
+	bool getResults = GetFrameNumber() >= NumSwapChainBuffers;
 
 	if (getResults)
 	{

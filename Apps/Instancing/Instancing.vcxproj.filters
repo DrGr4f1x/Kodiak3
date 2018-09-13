@@ -3,8 +3,23 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Stdafx.cpp" />
+    <ClCompile Include="InstancingApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="InstancingApp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{1ec16b26-b40d-4c5d-a133-269d43c23214}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Shaders\InstancingVS.hlsl" />
+    <CustomBuild Include="Shaders\InstancingPS.hlsl" />
+    <CustomBuild Include="Shaders\PlanetVS.hlsl" />
+    <CustomBuild Include="Shaders\PlanetPS.hlsl" />
+    <CustomBuild Include="Shaders\StarfieldVS.hlsl" />
+    <CustomBuild Include="Shaders\StarfieldPS.hlsl" />
   </ItemGroup>
 </Project>
