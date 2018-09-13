@@ -137,9 +137,7 @@ void ComputeParticlesApp::InitRootSigs()
 	m_graphicsRootSig[0].InitAsDescriptorTable(2, ShaderVisibility::Vertex);
 	m_graphicsRootSig[0].SetTableRange(0, DescriptorType::StructuredBufferSRV, 0, 1);
 	m_graphicsRootSig[0].SetTableRange(1, DescriptorType::CBV, 0, 1);
-	m_graphicsRootSig[1].InitAsDescriptorTable(2, ShaderVisibility::Pixel);
-	m_graphicsRootSig[1].SetTableRange(0, DescriptorType::TextureSRV, 0, 1);
-	m_graphicsRootSig[1].SetTableRange(1, DescriptorType::TextureSRV, 1, 1);
+	m_graphicsRootSig[1].InitAsDescriptorRange(DescriptorType::TextureSRV, 0, 2, ShaderVisibility::Pixel);
 	m_graphicsRootSig.InitStaticSampler(0, CommonStates::SamplerLinearWrap(), ShaderVisibility::Pixel);
 	m_graphicsRootSig.Finalize("Graphics Root Sig");
 }

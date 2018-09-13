@@ -62,22 +62,6 @@ public:
 		m_rootParam.Descriptor.RegisterSpace = 0;
 	}
 
-	void InitAsBufferSRV(uint32_t _register, ShaderVisibility visibility = ShaderVisibility::All)
-	{
-		m_rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
-		m_rootParam.ShaderVisibility = static_cast<D3D12_SHADER_VISIBILITY>(visibility);
-		m_rootParam.Descriptor.ShaderRegister = _register;
-		m_rootParam.Descriptor.RegisterSpace = 0;
-	}
-
-	void InitAsBufferUAV(uint32_t _register, ShaderVisibility visibility = ShaderVisibility::All)
-	{
-		m_rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV;
-		m_rootParam.ShaderVisibility = static_cast<D3D12_SHADER_VISIBILITY>(visibility);
-		m_rootParam.Descriptor.ShaderRegister = _register;
-		m_rootParam.Descriptor.RegisterSpace = 0;
-	}
-
 	void InitAsDescriptorRange(DescriptorType type, uint32_t _register, uint32_t count, ShaderVisibility visibility = ShaderVisibility::All)
 	{
 		InitAsDescriptorTable(1, visibility);
@@ -102,7 +86,7 @@ public:
 		range->OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 	}
 
-	const D3D12_ROOT_PARAMETER& operator()() const { return m_rootParam; }
+	//const D3D12_ROOT_PARAMETER& operator()() const { return m_rootParam; }
 
 protected:
 	D3D12_ROOT_PARAMETER m_rootParam;

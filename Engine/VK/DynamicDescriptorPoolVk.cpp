@@ -233,33 +233,33 @@ void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& 
 				{
 				case DescriptorType::CBV:
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-					writeDescriptorSet.pBufferInfo = rangeDesc.bufferHandleStart + rangeDesc.offset;
+					writeDescriptorSet.pBufferInfo = rangeDesc.bufferHandleStart + rangeDesc.offset + rangeIndex;
 					break;
 
 				case DescriptorType::TextureSRV:
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-					writeDescriptorSet.pImageInfo = rangeDesc.imageHandleStart + rangeDesc.offset;
+					writeDescriptorSet.pImageInfo = rangeDesc.imageHandleStart + rangeDesc.offset + rangeIndex;
 					break;
 
 				case DescriptorType::TextureUAV:
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-					writeDescriptorSet.pImageInfo = rangeDesc.imageHandleStart + rangeDesc.offset;
+					writeDescriptorSet.pImageInfo = rangeDesc.imageHandleStart + rangeDesc.offset + rangeIndex;
 					break;
 
 				case DescriptorType::StructuredBufferSRV:
 				case DescriptorType::StructuredBufferUAV:
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-					writeDescriptorSet.pBufferInfo = rangeDesc.bufferHandleStart + rangeDesc.offset;
+					writeDescriptorSet.pBufferInfo = rangeDesc.bufferHandleStart + rangeDesc.offset + rangeIndex;
 					break;
 
 				case DescriptorType::TypedBufferSRV:
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
-					writeDescriptorSet.pTexelBufferView = rangeDesc.texelBufferHandleStart + rangeDesc.offset;
+					writeDescriptorSet.pTexelBufferView = rangeDesc.texelBufferHandleStart + rangeDesc.offset + rangeIndex;
 					break;
 
 				case DescriptorType::TypedBufferUAV:
 					writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
-					writeDescriptorSet.pTexelBufferView = rangeDesc.texelBufferHandleStart + rangeDesc.offset;
+					writeDescriptorSet.pTexelBufferView = rangeDesc.texelBufferHandleStart + rangeDesc.offset + rangeIndex;
 					break;
 				}
 
@@ -360,7 +360,7 @@ void DynamicDescriptorPool::DescriptorHandleCache::StageDescriptorHandles(uint32
 			for (uint32_t i = 0; i < numHandles; ++i)
 			{
 				copyDest[i] = handles[i];
-				rangeDesc.assignedHandlesBitmap |= (1 << i);
+				rangeDesc.assignedHandlesBitmap |= (1 << i) << offset;
 			}
 			descriptorSet.assignedImageHandlesBitMap |= ((1 << numHandles) - 1) << offset;
 			m_staleDescriptorSetBitMap |= (1 << rootIndex);

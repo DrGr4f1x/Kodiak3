@@ -15,11 +15,23 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="Shaders\InstancingVS.hlsl" />
-    <CustomBuild Include="Shaders\InstancingPS.hlsl" />
-    <CustomBuild Include="Shaders\PlanetVS.hlsl" />
-    <CustomBuild Include="Shaders\PlanetPS.hlsl" />
-    <CustomBuild Include="Shaders\StarfieldVS.hlsl" />
-    <CustomBuild Include="Shaders\StarfieldPS.hlsl" />
+    <CustomBuild Include="Shaders\InstancingPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\InstancingVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\PlanetPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\PlanetVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\StarfieldPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\StarfieldVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

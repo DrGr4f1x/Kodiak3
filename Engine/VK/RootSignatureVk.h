@@ -76,16 +76,17 @@ public:
 		assert(m_type == RootParameterType::DescriptorTable);
 		assert(rangeIndex < m_bindings.capacity());
 
-		VkDescriptorSetLayoutBinding binding;
-		binding.stageFlags = static_cast<VkShaderStageFlags>(m_visibility);
-		binding.descriptorCount = count;
-		binding.descriptorType = DescriptorTypeToVulkan(type);
-		binding.binding = m_currentBinding;
-		binding.pImmutableSamplers = nullptr;
+		for (uint32_t i = 0; i < count; ++i)
+		{
+			VkDescriptorSetLayoutBinding binding;
+			binding.stageFlags = static_cast<VkShaderStageFlags>(m_visibility);
+			binding.descriptorCount = 1;
+			binding.descriptorType = DescriptorTypeToVulkan(type);
+			binding.binding = m_currentBinding++;
+			binding.pImmutableSamplers = nullptr;
 
-		m_bindings.push_back(binding);
-
-		++m_currentBinding;
+			m_bindings.push_back(binding);
+		}
 
 		DescriptorRange range;
 		range.type = type;
