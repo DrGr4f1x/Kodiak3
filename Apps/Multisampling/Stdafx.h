@@ -45,7 +45,6 @@ inline void ThrowIfFailed(HRESULT hr)
 #include <d2d1_3.h>
 #include <dwrite_2.h>
 #include <wincodec.h>
-#define MY_IID_PPV_ARGS IID_PPV_ARGS
 #endif
 
 // Graphics APIs
