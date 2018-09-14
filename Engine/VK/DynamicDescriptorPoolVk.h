@@ -134,7 +134,6 @@ private:
 		DescriptorType type;
 		uint32_t offset{ 0 };
 		uint32_t rangeSize{ 0 };
-		uint32_t assignedHandlesBitmap{ 0 };
 		union
 		{
 			VkDescriptorImageInfo* imageHandleStart;

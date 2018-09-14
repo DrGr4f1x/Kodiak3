@@ -151,9 +151,7 @@ void RadialBlurApp::InitRootSigs()
 {
 	m_sceneRootSig.Reset(2, 1);
 	m_sceneRootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
-	m_sceneRootSig[1].InitAsDescriptorTable(2, ShaderVisibility::Pixel);
-	m_sceneRootSig[1].SetTableRange(0, DescriptorType::TextureSRV, 0, 1);
-	m_sceneRootSig[1].SetTableRange(1, DescriptorType::CBV, 0, 1);
+	m_sceneRootSig[1].InitAsDescriptorRange(DescriptorType::TextureSRV, 0, 1, ShaderVisibility::Pixel);
 	m_sceneRootSig.InitStaticSampler(0, CommonStates::SamplerLinearWrap(), ShaderVisibility::Pixel);
 	m_sceneRootSig.Finalize("Scene Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
 
