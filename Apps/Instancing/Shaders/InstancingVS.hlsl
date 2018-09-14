@@ -47,39 +47,38 @@ VSOutput main(VSInput input)
 	float s, c;
 	sincos(input.instanceRot.x + localSpeed, s, c);
 	float3x3 xRotMat = float3x3(
-		float3(  c,   s, 0.0), 
-		float3( -s,   c, 0.0), 
+		float3(  c,  -s, 0.0), 
+		float3(  s,   c, 0.0), 
 		float3(0.0, 0.0, 1.0));
 
 	// Rotate around y
 	sincos(input.instanceRot.y + localSpeed, s, c);
 	float3x3 yRotMat = float3x3(
-		float3(  c, 0.0,   s), 
+		float3(  c, 0.0,  -s), 
 		float3(0.0, 1.0, 0.0), 
-		float3( -s, 0.0,   c));
+		float3(  s, 0.0,   c));
 
 	// Rotate around z
 	sincos(input.instanceRot.z + localSpeed, s, c);
 	float3x3 zRotMat = float3x3(
 		float3(1.0, 0.0, 0.0), 
-		float3(0.0,   c,   s), 
-		float3(0.0,  -s,   c));
+		float3(0.0,   c,  -s), 
+		float3(0.0,   s,   c));
 
 	float3x3 localRotMat = mul(zRotMat, mul(yRotMat, xRotMat));
 
 	sincos(input.instanceRot.y + globalSpeed, s, c);
 	float4x4 globalRotMat = float4x4(
-		float4(  c, 0.0,   s, 0.0),
+		float4(  c, 0.0,  -s, 0.0),
 		float4(0.0, 1.0, 0.0, 0.0),
-		float4( -s, 0.0,   c, 0.0),
+		float4(  s, 0.0,   c, 0.0),
 		float4(0.0, 0.0, 0.0, 1.0));
 
 	float4 localPos = float4(mul(localRotMat, input.pos.xyz), 1.0);
 	float4 pos = float4(input.instanceScale * localPos.xyz + input.instancePos, 1.0);
 
 	output.pos = mul(projectionMatrix, mul(modelViewMatrix, mul(globalRotMat, pos)));
-	output.pos.y *= 1.0;
-	output.normal = mul((float3x3)(mul(modelViewMatrix, globalRotMat)), mul(transpose(localRotMat), input.normal));
+	output.normal = mul((float3x3)(mul(modelViewMatrix, globalRotMat)), mul(localRotMat, input.normal));
 
 	pos = mul(modelViewMatrix, float4(input.pos.xyz + input.instancePos, 1.0));
 	float3 lpos = mul((float3x3)modelViewMatrix, lightPos.xyz);

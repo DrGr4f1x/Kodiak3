@@ -306,11 +306,19 @@ void InstancingApp::UpdateConstantBuffer()
 
 	m_planetConstants.projectionMatrix = m_camera.GetProjMatrix();
 	
-	Matrix4 viewMatrix{ AffineTransform(Vector3(5.5f, -1.85f, 0.0f) + Vector3(0.0f, 0.0f, m_zoom)) };
+	//Matrix4 viewMatrix{ AffineTransform(Vector3(5.5f, -1.85f, 0.0f) + Vector3(0.0f, 0.0f, m_zoom)) };
 	
-	viewMatrix = viewMatrix * Matrix4(AffineTransform::MakeXRotation(XMConvertToRadians(-17.2f)));
-	viewMatrix = viewMatrix * Matrix4(AffineTransform::MakeYRotation(XMConvertToRadians(-4.7f)));
-	viewMatrix = viewMatrix * Matrix4(AffineTransform::MakeZRotation(XMConvertToRadians(0.0f)));
+	//viewMatrix = viewMatrix * Matrix4(AffineTransform::MakeXRotation(XMConvertToRadians(-17.2f)));
+	//viewMatrix = viewMatrix * Matrix4(AffineTransform::MakeYRotation(XMConvertToRadians(-4.7f)));
+	//viewMatrix = viewMatrix * Matrix4(AffineTransform::MakeZRotation(XMConvertToRadians(0.0f)));
+
+	Quaternion rotX{ Vector3(kXUnitVector), XMConvertToRadians(17.2f) };
+	Quaternion rotY{ Vector3(kYUnitVector), XMConvertToRadians(4.7f) };
+	Quaternion rotZ{ Vector3(kZUnitVector), XMConvertToRadians(0.0f) };
+
+	Quaternion rotTotal = rotX * rotY * rotZ;
+
+	Matrix4 viewMatrix{ AffineTransform(rotTotal, Vector3(5.5f, 1.85f, 0.0f) + Vector3(0.0f, 0.0f, m_zoom)) };
 
 	m_planetConstants.modelViewMatrix = viewMatrix;
 	m_planetConstants.localSpeed += m_frameTimer * 0.35f;
