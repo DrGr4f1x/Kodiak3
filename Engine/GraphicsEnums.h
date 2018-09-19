@@ -34,6 +34,7 @@ struct Defaults
 
 struct Limits
 {
+	static const uint32_t ConstantBufferAlignment;
 	static const uint32_t MaxTextureDimension1D;
 	static const uint32_t MaxTextureDimension2D;
 	static const uint32_t MaxTextureDimension3D;

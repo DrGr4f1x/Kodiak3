@@ -206,6 +206,7 @@ enum class ShaderVisibility
 enum class DescriptorType
 {
 	CBV,
+	DynamicCBV,
 	Sampler,
 	TextureSRV,
 	TypedBufferSRV,
@@ -222,6 +223,9 @@ inline VkDescriptorType DescriptorTypeToVulkan(DescriptorType type)
 	{
 	case DescriptorType::CBV:
 		return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+
+	case DescriptorType::DynamicCBV:
+		return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 
 	case DescriptorType::Sampler:
 		return VK_DESCRIPTOR_TYPE_SAMPLER;
@@ -253,7 +257,8 @@ enum class RootParameterType
 {
 	Invalid,
 	DescriptorTable,
-	RootCBV
+	RootCBV,
+	DynamicRootCBV
 };
 
 

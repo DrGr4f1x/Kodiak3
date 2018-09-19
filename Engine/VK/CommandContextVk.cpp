@@ -491,10 +491,10 @@ void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 }
 
 
-void GraphicsContext::SetRootConstantBuffer(uint32_t rootIndex, ConstantBuffer& constantBuffer)
+void GraphicsContext::SetRootConstantBuffer(uint32_t rootIndex, ConstantBuffer& constantBuffer, uint32_t dynamicOffset)
 {
 	VkDescriptorBufferInfo bufferInfo = constantBuffer.GetCBV().GetHandle();
-	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, 0, 1, &bufferInfo);
+	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, 0, 1, &bufferInfo, dynamicOffset);
 }
 
 
@@ -513,8 +513,8 @@ void ComputeContext::SetPipelineState(const ComputePSO& pso)
 }
 
 
-void ComputeContext::SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer)
+void ComputeContext::SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer, uint32_t dynamicOffset)
 {
 	VkDescriptorBufferInfo bufferInfo = constantBuffer.GetCBV().GetHandle();
-	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, 0, 1, &bufferInfo);
+	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, 0, 1, &bufferInfo, dynamicOffset);
 }

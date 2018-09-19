@@ -26,6 +26,7 @@ const byte Defaults::StencilReadMask = 0xFF;
 const byte Defaults::StencilWriteMask = 0xFF;
 const float Defaults::Float32Max = FLT_MAX;
 
+const uint32_t Limits::ConstantBufferAlignment = 256;
 const uint32_t Limits::MaxTextureDimension1D = 16384;
 const uint32_t Limits::MaxTextureDimension2D = 16384;
 const uint32_t Limits::MaxTextureDimension3D = 2048;

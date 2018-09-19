@@ -34,9 +34,9 @@ public:
 	{
 		m_graphicsHandleCache.StageDescriptorHandles(rootIndex, offset, numHandles, handles);
 	}
-	void SetGraphicsDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkDescriptorBufferInfo handles[])
+	void SetGraphicsDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkDescriptorBufferInfo handles[], uint32_t dynamicOffset)
 	{
-		m_graphicsHandleCache.StageDescriptorHandles(rootIndex, offset, numHandles, handles);
+		m_graphicsHandleCache.StageDescriptorHandles(rootIndex, offset, numHandles, handles, dynamicOffset);
 	}
 	void SetGraphicsDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkBufferView handles[])
 	{
@@ -47,9 +47,9 @@ public:
 	{
 		m_computeHandleCache.StageDescriptorHandles(rootIndex, offset, numHandles, handles);
 	}
-	void SetComputeDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkDescriptorBufferInfo handles[])
+	void SetComputeDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkDescriptorBufferInfo handles[], uint32_t dynamicOffset)
 	{
-		m_computeHandleCache.StageDescriptorHandles(rootIndex, offset, numHandles, handles);
+		m_computeHandleCache.StageDescriptorHandles(rootIndex, offset, numHandles, handles, dynamicOffset);
 	}
 	void SetComputeDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkBufferView handles[])
 	{
@@ -152,6 +152,8 @@ private:
 		uint32_t assignedImageHandlesBitMap{ 0 };
 		uint32_t assignedBufferHandlesBitMap{ 0 };
 		uint32_t assignedTexelBufferHandlesBitMap{ 0 };
+		uint32_t dynamicBufferOffset{ 0 };
+		bool isDynamicBuffer{ false };
 	};
 
 	struct DescriptorHandleCache
@@ -163,7 +165,7 @@ private:
 		}
 
 		void StageDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkDescriptorImageInfo handles[]);
-		void StageDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkDescriptorBufferInfo handles[]);
+		void StageDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkDescriptorBufferInfo handles[], uint32_t dynamicOffset);
 		void StageDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkBufferView handles[]);
 
 		static const uint32_t kMaxNumDescriptorSets = 8;

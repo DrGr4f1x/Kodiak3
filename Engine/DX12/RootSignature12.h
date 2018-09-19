@@ -35,6 +35,7 @@ public:
 		Clear();
 	}
 
+
 	void Clear()
 	{
 		if (m_rootParam.ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE)
@@ -45,6 +46,7 @@ public:
 		m_rootParam.ParameterType = (D3D12_ROOT_PARAMETER_TYPE)0xFFFFFFFF;
 	}
 
+
 	void InitAsConstants(uint32_t _register, uint32_t numDwords, ShaderVisibility visibility = ShaderVisibility::All)
 	{
 		m_rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
@@ -54,6 +56,7 @@ public:
 		m_rootParam.Constants.RegisterSpace = 0;
 	}
 
+
 	void InitAsConstantBuffer(uint32_t _register, ShaderVisibility visibility = ShaderVisibility::All)
 	{
 		m_rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -62,11 +65,19 @@ public:
 		m_rootParam.Descriptor.RegisterSpace = 0;
 	}
 
+
+	void InitAsDynamicConstantBuffer(uint32_t _register, ShaderVisibility visibility = ShaderVisibility::All)
+	{
+		InitAsConstantBuffer(_register, visibility);
+	}
+
+
 	void InitAsDescriptorRange(DescriptorType type, uint32_t _register, uint32_t count, ShaderVisibility visibility = ShaderVisibility::All)
 	{
 		InitAsDescriptorTable(1, visibility);
 		SetTableRange(0, type, _register, count);
 	}
+
 
 	void InitAsDescriptorTable(uint32_t rangeCount, ShaderVisibility visibility = ShaderVisibility::All)
 	{
@@ -75,6 +86,7 @@ public:
 		m_rootParam.DescriptorTable.NumDescriptorRanges = rangeCount;
 		m_rootParam.DescriptorTable.pDescriptorRanges = new D3D12_DESCRIPTOR_RANGE[rangeCount];
 	}
+
 
 	void SetTableRange(uint32_t rangeIndex, DescriptorType type, uint32_t _register, uint32_t count, uint32_t space = 0)
 	{
@@ -114,6 +126,7 @@ public:
 	static void DestroyAll();
 	void Destroy() {}
 
+
 	void Reset(uint32_t numRootParams, uint32_t numStaticSamplers = 0)
 	{
 		if (numRootParams > 0)
@@ -138,17 +151,20 @@ public:
 		m_numInitializedStaticSamplers = 0;
 	}
 
+
 	RootParameter& operator[] (size_t entryIndex)
 	{
 		assert(entryIndex < m_numParameters);
 		return m_paramArray.get()[entryIndex];
 	}
 
+
 	const RootParameter& operator[] (size_t entryIndex) const
 	{
 		assert(entryIndex < m_numParameters);
 		return m_paramArray.get()[entryIndex];
 	}
+
 
 	void InitStaticSampler(uint32_t _register, const SamplerStateDesc& nonStaticSamplerDesc,
 		ShaderVisibility visibility = ShaderVisibility::All);

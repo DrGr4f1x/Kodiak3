@@ -198,7 +198,7 @@ private:
 		{
 			bufferInfo.buffer = buffer;
 			bufferInfo.offset = offset;
-			bufferInfo.range = size;
+			bufferInfo.range = VK_WHOLE_SIZE;
 		}
 
 		VkDescriptorImageInfo imageInfo;

@@ -179,6 +179,9 @@ void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& 
 	vector<VkDescriptorSet> descriptorSets;
 	descriptorSets.reserve(8);
 
+	array<uint32_t, 8> dynamicOffsets;
+	uint32_t numDynamicOffsets = 0;
+
 	VkDevice device = GetDevice();
 
 	uint32_t rootIndex = 0;
@@ -230,6 +233,11 @@ void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& 
 				writeDescriptorSet.pBufferInfo = rangeDesc.bufferHandleStart + rangeDesc.offset;
 				break;
 
+			case DescriptorType::DynamicCBV:
+				writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+				writeDescriptorSet.pBufferInfo = rangeDesc.bufferHandleStart + rangeDesc.offset;
+				break;
+
 			case DescriptorType::TextureSRV:
 				writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 				writeDescriptorSet.pImageInfo = rangeDesc.imageHandleStart + rangeDesc.offset;
@@ -260,6 +268,11 @@ void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& 
 			vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, nullptr);
 		}
 
+		if (descriptorSetCache.isDynamicBuffer)
+		{
+			dynamicOffsets[numDynamicOffsets++] = descriptorSetCache.dynamicBufferOffset;
+		}
+
 		descriptorSets.push_back(descriptorSet);
 	}
 	handleCache.m_staleDescriptorSetBitMap = 0;
@@ -271,8 +284,8 @@ void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& 
 		0,
 		static_cast<uint32_t>(descriptorSets.size()),
 		descriptorSets.data(),
-		0,
-		nullptr);
+		numDynamicOffsets,
+		numDynamicOffsets ? dynamicOffsets.data() : nullptr);
 }
 
 
@@ -324,7 +337,8 @@ inline bool IsTextureDescriptor(const DescriptorType type)
 
 inline bool IsBufferDescriptor(const DescriptorType type)
 {
-	return (type == DescriptorType::CBV || type == DescriptorType::StructuredBufferSRV || type == DescriptorType::StructuredBufferUAV);
+	return (type == DescriptorType::CBV || type == DescriptorType::DynamicCBV || 
+		type == DescriptorType::StructuredBufferSRV || type == DescriptorType::StructuredBufferUAV);
 }
 
 
@@ -361,7 +375,7 @@ void DynamicDescriptorPool::DescriptorHandleCache::StageDescriptorHandles(uint32
 }
 
 
-void DynamicDescriptorPool::DescriptorHandleCache::StageDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkDescriptorBufferInfo handles[])
+void DynamicDescriptorPool::DescriptorHandleCache::StageDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const VkDescriptorBufferInfo handles[], uint32_t dynamicOffset)
 {
 	DescriptorSetCache& descriptorSet = m_descriptorSetCache[rootIndex];
 	for (uint32_t rangeIndex = 0; rangeIndex < descriptorSet.rangeCount; ++rangeIndex)
@@ -382,6 +396,11 @@ void DynamicDescriptorPool::DescriptorHandleCache::StageDescriptorHandles(uint32
 			descriptorSet.assignedBufferHandlesBitMap |= ((1 << numHandles) - 1) << offset;
 			m_staleDescriptorSetBitMap |= (1 << rootIndex);
 		}
+	}
+
+	if (descriptorSet.isDynamicBuffer)
+	{
+		descriptorSet.dynamicBufferOffset = dynamicOffset;
 	}
 }
 
@@ -447,6 +466,16 @@ void DynamicDescriptorPool::DescriptorHandleCache::ParseRootSignature(const Root
 			descriptorSet.ranges[0].rangeSize = 1;
 			descriptorSet.ranges[0].offset = 0;
 			descriptorSet.ranges[0].bufferHandleStart = &m_bufferDescriptors[0] + currentBufferOffset;
+			currentBufferOffset++;
+			break;
+
+		case RootParameterType::DynamicRootCBV:
+			descriptorSet.rangeCount = 1;
+			descriptorSet.ranges[0].type = DescriptorType::DynamicCBV;
+			descriptorSet.ranges[0].rangeSize = 1;
+			descriptorSet.ranges[0].offset = 0;
+			descriptorSet.ranges[0].bufferHandleStart = &m_bufferDescriptors[0] + currentBufferOffset;
+			descriptorSet.isDynamicBuffer = true;
 			currentBufferOffset++;
 			break;
 

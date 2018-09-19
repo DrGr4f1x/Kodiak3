@@ -71,6 +71,12 @@ protected:
 	XMVECTOR m_vec;
 };
 
+inline Vector3 operator*(const Vector3& v, float s)
+{
+	return s * v;
+}
+
+
 // A 4-vector, completely defined.
 class Vector4
 {

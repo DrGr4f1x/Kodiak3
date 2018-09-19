@@ -174,7 +174,7 @@ public:
 	void SetStencilRef(uint32_t stencilRef);
 
 	void SetPipelineState(const GraphicsPSO& PSO);
-	void SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer);
+	void SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer, uint32_t offset = 0);
 	void SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer);
 	void SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture);
 	void SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
@@ -302,9 +302,10 @@ inline void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 }
 
 
-inline void GraphicsContext::SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer)
+inline void GraphicsContext::SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer, uint32_t offset)
 {
-	m_commandList->SetGraphicsRootConstantBufferView(rootIndex, constantBuffer.GetGpuAddress());
+	D3D12_GPU_VIRTUAL_ADDRESS virtAddr = constantBuffer.GetGpuAddress();
+	m_commandList->SetGraphicsRootConstantBufferView(rootIndex, virtAddr + offset);
 }
 
 

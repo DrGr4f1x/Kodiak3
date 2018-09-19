@@ -45,7 +45,26 @@ public:
 		binding.stageFlags = static_cast<VkShaderStageFlags>(visibility);
 		binding.descriptorCount = 1;
 		binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		binding.binding = _register;
+		binding.binding = 0;
+		binding.pImmutableSamplers = nullptr;
+
+		m_bindings.push_back(binding);
+	}
+
+
+	void InitAsDynamicConstantBuffer(uint32_t _register, ShaderVisibility visibility = ShaderVisibility::All)
+	{
+		assert(m_type == RootParameterType::Invalid);
+		assert(m_bindings.empty());
+
+		m_type = RootParameterType::DynamicRootCBV;
+		m_visibility = visibility;
+
+		VkDescriptorSetLayoutBinding binding;
+		binding.stageFlags = static_cast<VkShaderStageFlags>(visibility);
+		binding.descriptorCount = 1;
+		binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		binding.binding = 0;
 		binding.pImmutableSamplers = nullptr;
 
 		m_bindings.push_back(binding);

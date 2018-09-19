@@ -93,17 +93,7 @@ void GpuBuffer::Create(const std::string& name, size_t numElements, size_t eleme
 
 void ConstantBuffer::Update(size_t sizeInBytes, const void* data)
 {
-	assert(sizeInBytes <= m_bufferSize);
-
-	VkDevice device = GetDevice();
-
-	// Map uniform buffer and update it
-	uint8_t* pData = nullptr;
-	ThrowIfFailed(vkMapMemory(device, m_resource, 0, sizeInBytes, 0, (void **)&pData));
-	memcpy(pData, data, sizeInBytes);
-	// Unmap after data has been copied
-	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
-	vkUnmapMemory(device, m_resource);
+	Update(sizeInBytes, 0, data);
 }
 
 

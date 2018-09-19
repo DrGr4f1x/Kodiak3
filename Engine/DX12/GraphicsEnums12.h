@@ -201,6 +201,7 @@ enum class ShaderVisibility
 enum class DescriptorType
 {
 	CBV,
+	DynamicCBV,
 	Sampler,
 	TextureSRV,
 	TypedBufferSRV,
@@ -216,6 +217,7 @@ inline D3D12_DESCRIPTOR_RANGE_TYPE DescriptorTypeToDX12(DescriptorType type)
 	switch (type)
 	{
 	case DescriptorType::CBV:
+	case DescriptorType::DynamicCBV:
 		return D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
 
 	case DescriptorType::Sampler:

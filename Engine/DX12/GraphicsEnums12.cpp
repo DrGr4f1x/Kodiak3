@@ -26,6 +26,7 @@ const byte Defaults::StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
 const byte Defaults::StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
 const float Defaults::Float32Max = D3D12_FLOAT32_MAX;
 
+const uint32_t Limits::ConstantBufferAlignment = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
 const uint32_t Limits::MaxTextureDimension1D = D3D12_REQ_TEXTURE1D_U_DIMENSION;
 const uint32_t Limits::MaxTextureDimension2D = D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION;
 const uint32_t Limits::MaxTextureDimension3D = D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION;
