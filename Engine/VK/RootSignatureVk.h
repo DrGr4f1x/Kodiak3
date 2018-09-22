@@ -63,7 +63,7 @@ public:
 		VkDescriptorSetLayoutBinding binding;
 		binding.stageFlags = static_cast<VkShaderStageFlags>(visibility);
 		binding.descriptorCount = 1;
-		binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; // VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 		binding.binding = 0;
 		binding.pImmutableSamplers = nullptr;
 

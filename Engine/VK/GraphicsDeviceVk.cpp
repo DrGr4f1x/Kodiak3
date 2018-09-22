@@ -29,6 +29,9 @@ using namespace Kodiak;
 using namespace std;
 
 
+PFN_vkCmdPushDescriptorSetKHR ext_vkCmdPushDescriptorSetKHR = VK_NULL_HANDLE;
+
+
 namespace
 {
 PFN_vkCreateDebugReportCallbackEXT CreateDebugReportCallback = VK_NULL_HANDLE;
@@ -148,9 +151,13 @@ InstanceHandle CreateInstance(const string& appName)
 	appInfo.pEngineName = "Kodiak";
 	appInfo.apiVersion = VK_API_VERSION_1_1;
 
-	vector<const char*> instanceExtensions = { VK_KHR_SURFACE_EXTENSION_NAME };
-	instanceExtensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
-
+	vector<const char*> instanceExtensions = 
+	{ 
+		VK_KHR_SURFACE_EXTENSION_NAME, 
+		VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+		VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+	};
+	
 	VkInstanceCreateInfo instanceCreateInfo = {};
 	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	instanceCreateInfo.pNext = nullptr;
@@ -458,6 +465,12 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 			//enableDebugMarkers = true;
 		}
 
+		// Enable push descriptors
+		if (IsExtensionSupported(VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME))
+		{
+			deviceExtensions.push_back(VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME);
+		}
+
 		if (deviceExtensions.size() > 0)
 		{
 			deviceCreateInfo.enabledExtensionCount = (uint32_t)deviceExtensions.size();
@@ -472,6 +485,13 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		// Get a graphics queue from the device
 		vkGetDeviceQueue(device, queueFamilyIndices.graphics, 0, &graphicsQueue);
+
+		// Extension function pointers
+		ext_vkCmdPushDescriptorSetKHR = reinterpret_cast<PFN_vkCmdPushDescriptorSetKHR>(vkGetDeviceProcAddr(device, "vkCmdPushDescriptorSetKHR"));
+		if (!ext_vkCmdPushDescriptorSetKHR)
+		{
+			error("Could not get a valid function pointer for vkCmdPushDescriptorSetKHR");
+		}
 	}
 
 	uint32_t GetQueueFamilyIndex(VkQueueFlagBits queueFlags)

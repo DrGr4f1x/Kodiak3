@@ -74,18 +74,16 @@ void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 	Format format)
 {
 	numMips = (numMips == 0 ? ComputeNumMips(width, height) : numMips);
-	const uint32_t numSamples = 1;
-	auto flags = CombineResourceFlags(m_fragmentCount);
-	auto resourceDesc = DescribeTex2D(width, height, 1, numMips, numSamples, format, flags);
+	auto flags = CombineResourceFlags(m_numSamples);
+	auto resourceDesc = DescribeTex2D(width, height, 1, numMips, m_numSamples, format, flags);
 
 	m_width = width;
 	m_height = height;
 	m_arraySize = 1;
-	m_numSamples = numSamples;
 	m_format = format;
 	m_type = ResourceType::Texture2D;
 
-	resourceDesc.SampleDesc.Count = m_fragmentCount;
+	resourceDesc.SampleDesc.Count = m_numSamples;
 	resourceDesc.SampleDesc.Quality = 0;
 
 	D3D12_CLEAR_VALUE clearValue = {};

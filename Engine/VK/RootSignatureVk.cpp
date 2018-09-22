@@ -310,9 +310,11 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 		{
 			auto& parameter = m_paramArray[i];
 
+			const bool usePushDescriptor = parameter.m_type == RootParameterType::RootCBV || parameter.m_type == RootParameterType::DynamicRootCBV;
+
 			VkDescriptorSetLayoutCreateInfo createInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
 			createInfo.pNext = nullptr;
-			createInfo.flags = 0;
+			createInfo.flags = usePushDescriptor ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR : 0;
 			createInfo.bindingCount = static_cast<uint32_t>(parameter.m_bindings.size());
 			createInfo.pBindings = parameter.m_bindings.empty() ? nullptr : parameter.m_bindings.data();
 

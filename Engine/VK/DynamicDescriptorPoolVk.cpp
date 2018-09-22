@@ -186,9 +186,11 @@ void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& 
 
 	uint32_t rootIndex = 0;
 	uint32_t staleParams = handleCache.m_staleDescriptorSetBitMap;
+	uint32_t firstSet = 0xFFFFFFFF;
 	while (BitScanForward((unsigned long*)&rootIndex, staleParams))
 	{
 		staleParams ^= (1 << rootIndex);
+		firstSet = min(firstSet, rootIndex);
 
 		VkDescriptorSetAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -281,7 +283,7 @@ void DynamicDescriptorPool::CopyAndBindStagedDescriptors(DescriptorHandleCache& 
 		cmdBuffer,
 		isCompute ? VK_PIPELINE_BIND_POINT_COMPUTE : VK_PIPELINE_BIND_POINT_GRAPHICS,
 		m_pipelineLayout,
-		0,
+		firstSet,
 		static_cast<uint32_t>(descriptorSets.size()),
 		descriptorSets.data(),
 		numDynamicOffsets,
