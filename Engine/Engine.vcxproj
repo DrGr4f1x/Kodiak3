@@ -346,6 +346,7 @@
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="PixelBuffer.h" />
     <ClInclude Include="QueryHeap.h" />
+    <ClInclude Include="ResourceLayout.h" />
     <ClInclude Include="ResourceView.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="SamplerState.h" />

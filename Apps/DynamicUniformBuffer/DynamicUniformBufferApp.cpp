@@ -88,11 +88,10 @@ void DynamicUniformBufferApp::Render()
 	context.SetIndexBuffer(m_indexBuffer);
 	context.SetVertexBuffer(0, m_vertexBuffer);
 
+	context.SetRootConstantBuffer(0, m_vsConstantBuffer);
+
 	for (uint32_t i = 0; i < m_numCubes; ++i)
 	{
-		// TODO - This is necessary for Vulkan.  Shouldn't have to do this, fix.
-		context.SetRootConstantBuffer(0, m_vsConstantBuffer);
-
 		uint32_t dynamicOffset = i * (uint32_t)m_dynamicAlignment;
 		context.SetRootConstantBuffer(1, m_vsModelConstantBuffer, dynamicOffset);
 		context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
@@ -109,7 +108,7 @@ void DynamicUniformBufferApp::InitRootSig()
 {
 	m_rootSignature.Reset(2);
 	m_rootSignature[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
-	m_rootSignature[1].InitAsDynamicConstantBuffer(1, ShaderVisibility::Vertex);
+	m_rootSignature[1].InitAsConstantBuffer(1, ShaderVisibility::Vertex);
 	m_rootSignature.Finalize("Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout | RootSignatureFlags::DenyPixelShaderRootAccess);
 }
 
@@ -118,7 +117,7 @@ void DynamicUniformBufferApp::InitPSO()
 {
 	m_pso.SetRootSignature(m_rootSignature);
 	m_pso.SetBlendState(CommonStates::BlendDisable());
-	m_pso.SetRasterizerState(CommonStates::RasterizerDefault());
+	m_pso.SetRasterizerState(CommonStates::RasterizerTwoSided());
 	m_pso.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 	m_pso.SetVertexShader("BaseVS");

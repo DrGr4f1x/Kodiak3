@@ -9,4 +9,3 @@ Standardize naming in shaders (e.g. pos vs position, uv vs texcoord, etc)
 Handle window resizing, etc.
 Use inverted Z in all demos
 Fix DX12 constant buffer Create() w/ initial data (use DisplacementApp m_hsConstantBuffer as easy test)
-
