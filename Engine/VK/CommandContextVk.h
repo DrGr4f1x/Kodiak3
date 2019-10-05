@@ -17,7 +17,7 @@
 #include "GpuBuffer.h"
 #include "Texture.h"
 
-#include "DynamicDescriptorPoolVk.h"
+#include "ResourceSetVk.h"
 #include "UtilVk.h"
 
 
@@ -94,9 +94,6 @@ protected:
 	VkPipelineLayout m_curGraphicsPipelineLayout{ VK_NULL_HANDLE };
 	VkPipelineLayout m_curComputePipelineLayout{ VK_NULL_HANDLE };
 
-	// Descriptor pool
-	DynamicDescriptorPool m_dynamicDescriptorPool;
-
 	VkSemaphore m_signalSemaphore{ VK_NULL_HANDLE };
 
 private:
@@ -136,13 +133,8 @@ public:
 	void SetStencilRef(uint32_t stencilRef);
 
 	void SetPipelineState(const GraphicsPSO& PSO);
-	void SetRootConstantBuffer(uint32_t rootIndex, ConstantBuffer& constantBuffer, uint32_t dynamicOffset = 0);
-	void SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer);
-	void SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture);
-	void SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
-	//void SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer);
-	void SetSRV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer);
 	
+	void SetResources(const ResourceSet& resources);	
 
 	void SetIndexBuffer(const IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer);
@@ -165,14 +157,8 @@ public:
 	void SetRootSignature(const RootSignature& RootSig);
 
 	void SetPipelineState(const ComputePSO& PSO);
-	void SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer, uint32_t dynamicOffset = 0);
-	void SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer);
-	void SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture);
-	void SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
-	//void SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer);
-	void SetSRV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer);
-	void SetUAV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer);
-	void SetUAV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer);
+	
+	void SetResources(const ResourceSet& resources);
 
 	void Dispatch(uint32_t groupCountX = 1, uint32_t groupCountY = 1, uint32_t groupCountZ = 1);
 	void Dispatch1D(uint32_t threadCountX, uint32_t groupSizeX = 64);
@@ -318,52 +304,24 @@ inline void GraphicsContext::SetStencilRef(uint32_t stencilRef)
 }
 
 
-inline void GraphicsContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer)
+inline void GraphicsContext::SetResources(const ResourceSet& resources)
 {
-	VkDescriptorBufferInfo handle = constantBuffer.GetCBV().GetHandle();
-	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &handle, 0);
-}
-
-
-inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture)
-{
-	VkDescriptorImageInfo descriptorInfo = {};
-	descriptorInfo.imageView = texture.GetSRV().GetHandle();
-	descriptorInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
-}
-
-
-inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer)
-{
-	if (buffer.m_type == ResourceType::TypedBuffer)
+	for (uint32_t i = 0; i < 8; ++i)
 	{
-		VkBufferView bufferView = buffer.GetSRV().GetHandle();
-		m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &bufferView);
-	}
-	else
-	{
-		VkDescriptorBufferInfo descriptorInfo = {};
-		descriptorInfo.buffer = buffer.GetSRV().GetHandle();
-		descriptorInfo.offset = 0;
-		descriptorInfo.range = buffer.GetSize();
-		m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &descriptorInfo, 0);
+		if (resources.m_resourceTables[i].descriptorSet == VK_NULL_HANDLE)
+			break;
+
+		vkCmdBindDescriptorSets(
+			m_commandList, 
+			VK_PIPELINE_BIND_POINT_GRAPHICS, 
+			m_curGraphicsPipelineLayout, 
+			i, 
+			1, 
+			&resources.m_resourceTables[i].descriptorSet, 
+			0, 
+			nullptr);
 	}
 }
-
-
-inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
-{
-	VkDescriptorImageInfo descriptorInfo = colorBuffer.GetSRV().GetHandle();
-	descriptorInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
-}
-
-
-//inline void GraphicsContext::SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer)
-//{
-//	m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &depthBuffer.GetDepthSRV());
-//}
 
 
 inline void GraphicsContext::SetIndexBuffer(const IndexBuffer& indexBuffer)
@@ -410,7 +368,6 @@ inline void GraphicsContext::DrawInstanced(uint32_t vertexCountPerInstance, uint
 	uint32_t startVertexLocation, uint32_t startInstanceLocation)
 {
 	FlushResourceBarriers();
-	m_dynamicDescriptorPool.CommitGraphicsRootDescriptorSets(m_commandList);
 	vkCmdDraw(m_commandList, vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 }
 
@@ -419,7 +376,6 @@ inline void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance
 	int32_t baseVertexLocation, uint32_t startInstanceLocation)
 {
 	FlushResourceBarriers();
-	m_dynamicDescriptorPool.CommitGraphicsRootDescriptorSets(m_commandList);
 	vkCmdDrawIndexed(m_commandList, indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
 }
 
@@ -458,77 +414,22 @@ inline void GraphicsContext::Resolve(ColorBuffer& src, ColorBuffer& dest, Format
 }
 
 
-inline void ComputeContext::SetConstantBuffer(uint32_t rootIndex, uint32_t offset, const ConstantBuffer& constantBuffer)
+inline void ComputeContext::SetResources(const ResourceSet& resources)
 {
-	VkDescriptorBufferInfo handle = constantBuffer.GetCBV().GetHandle();
-	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &handle, 0);
-}
-
-
-inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const Texture& texture)
-{
-	VkDescriptorImageInfo descriptorInfo = {};
-	descriptorInfo.imageView = texture.GetSRV().GetHandle();
-	descriptorInfo.imageLayout = GetImageLayout(texture.m_usageState);
-	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
-}
-
-
-inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
-{
-	VkDescriptorImageInfo descriptorInfo = colorBuffer.GetSRV().GetHandle();
-	descriptorInfo.imageLayout = GetImageLayout(colorBuffer.m_usageState);
-	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
-}
-
-
-// TODO
-//inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const DepthBuffer& depthBuffer)
-//{
-//	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &depthBuffer.GetDepthSRV());
-//}
-
-
-inline void ComputeContext::SetSRV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer)
-{
-	if (buffer.m_type == ResourceType::TypedBuffer)
+	for (uint32_t i = 0; i < 8; ++i)
 	{
-		VkBufferView bufferView = buffer.GetSRV().GetHandle();
-		m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &bufferView);
-	}
-	else
-	{
-		VkDescriptorBufferInfo descriptorInfo = {};
-		descriptorInfo.buffer = buffer.GetSRV().GetHandle();
-		descriptorInfo.offset = 0;
-		descriptorInfo.range = buffer.GetSize();
-		m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo, 0);
-	}
-}
+		if (resources.m_resourceTables[i].descriptorSet == VK_NULL_HANDLE)
+			break;
 
-
-inline void ComputeContext::SetUAV(uint32_t rootIndex, uint32_t offset, const ColorBuffer& colorBuffer)
-{
-	VkDescriptorImageInfo descriptorInfo = colorBuffer.GetSRV().GetHandle();
-	descriptorInfo.imageLayout = GetImageLayout(colorBuffer.m_usageState);
-	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo);
-}
-
-
-inline void ComputeContext::SetUAV(uint32_t rootIndex, uint32_t offset, const GpuBuffer& buffer)
-{
-	if (buffer.m_type == ResourceType::TypedBuffer)
-	{
-		VkBufferView bufferView = buffer.GetUAV().GetHandle();
-		m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &bufferView);
-	}
-	else
-	{
-		VkDescriptorBufferInfo descriptorInfo = {};
-		descriptorInfo.buffer = buffer.GetUAV().GetHandle();
-		descriptorInfo.offset = 0;
-		descriptorInfo.range = buffer.GetSize();
-		m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, offset, 1, &descriptorInfo, 0);
+		vkCmdBindDescriptorSets(
+			m_commandList,
+			VK_PIPELINE_BIND_POINT_COMPUTE,
+			m_curComputePipelineLayout,
+			i,
+			1,
+			&resources.m_resourceTables[i].descriptorSet,
+			0,
+			nullptr);
 	}
 }
 
@@ -536,7 +437,6 @@ inline void ComputeContext::SetUAV(uint32_t rootIndex, uint32_t offset, const Gp
 inline void ComputeContext::Dispatch(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ)
 {
 	FlushResourceBarriers();
-	m_dynamicDescriptorPool.CommitComputeRootDescriptorSets(m_commandList);
 	vkCmdDispatch(m_commandList, groupCountX, groupCountY, groupCountZ);
 }
 

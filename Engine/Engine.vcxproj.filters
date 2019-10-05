@@ -119,9 +119,6 @@
     <ClInclude Include="VK\DescriptorHeapVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
-    <ClInclude Include="VK\DynamicDescriptorPoolVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
     <ClInclude Include="VK\CommandListManagerVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
@@ -181,8 +178,14 @@
     <ClInclude Include="QueryHeap.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceLayout.h">
+    <ClInclude Include="ResourceSet.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\ResourceSet12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\ResourceSetVk.h">
+      <Filter>Graphics\VK</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -274,9 +277,6 @@
     <ClCompile Include="VK\DescriptorHeapVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
-    <ClCompile Include="VK\DynamicDescriptorPoolVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
     <ClCompile Include="VK\CommandListManagerVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
@@ -352,6 +352,12 @@
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
     <ClCompile Include="VK\QueryHeapVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12\ResourceSet12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\ResourceSetVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
   </ItemGroup>

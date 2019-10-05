@@ -57,6 +57,8 @@ void DisplacementApp::Startup()
 	UpdateConstantBuffers();
 
 	LoadAssets();
+
+	InitResourceSet();
 }
 
 
@@ -94,10 +96,7 @@ void DisplacementApp::Render()
 
 	context.SetRootSignature(m_rootSig);
 	
-	context.SetConstantBuffer(0, 0, m_hsConstantBuffer);
-	context.SetConstantBuffer(1, 0, m_dsConstantBuffer);
-	context.SetSRV(1, 1, *m_texture);
-	context.SetSRV(2, 0, *m_texture);
+	context.SetResources(m_resources);
 
 	context.SetIndexBuffer(m_model->GetIndexBuffer());
 	context.SetVertexBuffer(0, m_model->GetVertexBuffer());
@@ -180,6 +179,17 @@ void DisplacementApp::InitConstantBuffers()
 	m_dsConstants.tessAlpha = 1.0f;
 	m_dsConstants.tessStrength = 0.1f;
 	m_dsConstantBuffer.Create("DS Constant Buffer", 1, sizeof(DSConstants));
+}
+
+
+void DisplacementApp::InitResourceSet()
+{
+	m_resources.Init(&m_rootSig);
+	m_resources.SetCBV(0, 0, m_hsConstantBuffer);
+	m_resources.SetCBV(1, 0, m_dsConstantBuffer);
+	m_resources.SetSRV(1, 1, *m_texture);
+	m_resources.SetSRV(2, 0, *m_texture);
+	m_resources.Finalize();
 }
 
 

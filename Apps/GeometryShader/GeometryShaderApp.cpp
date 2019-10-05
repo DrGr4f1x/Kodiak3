@@ -89,7 +89,7 @@ void GeometryShaderApp::Render()
 	context.SetRootSignature(m_meshRootSig);
 	context.SetPipelineState(m_meshPSO);
 
-	context.SetRootConstantBuffer(0, m_constantBuffer);
+	context.SetResources(m_resources);
 
 	context.SetIndexBuffer(m_model->GetIndexBuffer());
 	context.SetVertexBuffer(0, m_model->GetVertexBuffer());
@@ -99,8 +99,6 @@ void GeometryShaderApp::Render()
 	{
 		context.SetRootSignature(m_geomRootSig);
 		context.SetPipelineState(m_geomPSO);
-		
-		context.SetRootConstantBuffer(0, m_constantBuffer);
 		
 		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
 	}
@@ -115,11 +113,11 @@ void GeometryShaderApp::Render()
 void GeometryShaderApp::InitRootSigs()
 {
 	m_meshRootSig.Reset(1);
-	m_meshRootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_meshRootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
 	m_meshRootSig.Finalize("Mesh Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
 
 	m_geomRootSig.Reset(1);
-	m_geomRootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Geometry);
+	m_geomRootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Geometry);
 	m_geomRootSig.Finalize("Geom Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
 }
 
@@ -173,6 +171,14 @@ void GeometryShaderApp::InitConstantBuffer()
 	m_constantBuffer.Create("Constant Buffer", 1, sizeof(Constants));
 
 	UpdateConstantBuffer();
+}
+
+
+void GeometryShaderApp::InitResourceSet()
+{
+	m_resources.Init(&m_meshRootSig);
+	m_resources.SetCBV(0, 0, m_constantBuffer);
+	m_resources.Finalize();
 }
 
 

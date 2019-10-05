@@ -146,6 +146,9 @@ public:
 		operator VkDescriptorImageInfo() const { return Get()->m_wrappedDescriptor.imageInfo; }
 		operator VkDescriptorBufferInfo() const { return Get()->m_wrappedDescriptor.bufferInfo; }
 
+		operator const VkDescriptorImageInfo*() const { return &Get()->m_wrappedDescriptor.imageInfo; }
+		operator const VkDescriptorBufferInfo*() const { return &Get()->m_wrappedDescriptor.bufferInfo; }
+
 	private:
 		VkDescriptorHandle* Get() const { return Super::get(); }
 	};

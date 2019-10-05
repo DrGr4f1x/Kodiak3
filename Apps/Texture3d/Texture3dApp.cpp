@@ -172,6 +172,7 @@ void Texture3dApp::Startup()
 	InitPSO();
 	InitConstantBuffer();
 	InitTexture();
+	InitResourceSet();
 }
 
 
@@ -209,8 +210,7 @@ void Texture3dApp::Render()
 	context.SetRootSignature(m_rootSig);
 	context.SetPipelineState(m_pso);
 
-	context.SetRootConstantBuffer(0, m_constantBuffer);
-	context.SetSRV(1, 0, *m_texture);
+	context.SetResources(m_resources);
 
 	context.SetVertexBuffer(0, m_vertexBuffer);
 	context.SetIndexBuffer(m_indexBuffer);
@@ -227,7 +227,7 @@ void Texture3dApp::Render()
 void Texture3dApp::InitRootSig()
 {
 	m_rootSig.Reset(2, 1);
-	m_rootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_rootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
 	m_rootSig[1].InitAsDescriptorRange(DescriptorType::TextureSRV, 0, 1, ShaderVisibility::Pixel);
 	m_rootSig.InitStaticSampler(0, CommonStates::SamplerLinearWrap(), ShaderVisibility::Pixel);
 	m_rootSig.Finalize("Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
@@ -312,6 +312,15 @@ void Texture3dApp::InitTexture()
 
 	m_texture = make_shared<Texture>();
 	m_texture->Create3D(width, height, depth, Format::R8_UNorm, data.get());
+}
+
+
+void Texture3dApp::InitResourceSet()
+{
+	m_resources.Init(&m_rootSig);
+	m_resources.SetCBV(0, 0, m_constantBuffer);
+	m_resources.SetSRV(1, 0, *m_texture);
+	m_resources.Finalize();
 }
 
 

@@ -35,9 +35,9 @@ public:
 	void CreateArray(const std::string& name, uint32_t width, uint32_t height, uint32_t arrayCount, Format format);
 
 	// Get pre-created CPU-visible descriptor handles
-	const ShaderResourceView& GetSRV(void) const { return m_srvHandle; }
-	const RenderTargetView& GetRTV(void) const { return m_rtvHandle; }
-	const UnorderedAccessView& GetUAV(void) const { return m_uavHandle; }
+	const ShaderResourceView& GetSRV() const { return m_srvHandle; }
+	const RenderTargetView& GetRTV() const { return m_rtvHandle; }
+	const UnorderedAccessView& GetUAV() const { return m_uavHandle; }
 
 	void SetClearColor(Color clearColor) { m_clearColor = clearColor; }
 	Color GetClearColor() const { return m_clearColor; }

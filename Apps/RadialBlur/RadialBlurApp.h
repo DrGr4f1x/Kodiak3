@@ -14,6 +14,7 @@
 #include "GpuBuffer.h"
 #include "Model.h"
 #include "PipelineState.h"
+#include "ResourceSet.h"
 #include "RootSignature.h"
 #include "Texture.h"
 
@@ -34,6 +35,7 @@ private:
 	void InitPSOs();
 	void InitFramebuffers();
 	void InitConstantBuffers();
+	void InitResourceSets();
 
 	void LoadAssets();
 
@@ -80,6 +82,10 @@ private:
 
 	RadialBlurConstants		m_radialBlurConstants;
 	Kodiak::ConstantBuffer	m_radialBlurConstantBuffer;
+
+	// Resource sets
+	Kodiak::ResourceSet		m_sceneResources;
+	Kodiak::ResourceSet		m_blurResources;
 
 	// Assets
 	Kodiak::ModelPtr		m_model;

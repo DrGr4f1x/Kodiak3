@@ -14,6 +14,7 @@
 #include "ColorBuffer.h"
 #include "GpuBuffer.h"
 #include "PipelineState.h"
+#include "ResourceSet.h"
 #include "RootSignature.h"
 #include "Texture.h"
 
@@ -34,6 +35,7 @@ private:
 	void InitPSOs();
 	void InitConstantBuffers();
 	void InitParticles();
+	void InitResourceSets();
 
 	void UpdateConstantBuffers();
 
@@ -82,6 +84,9 @@ private:
 
 	Kodiak::TexturePtr		m_colorTexture;
 	Kodiak::TexturePtr		m_gradientTexture;
+
+	Kodiak::ResourceSet		m_computeResources;
+	Kodiak::ResourceSet		m_gfxResources;
 
 	float m_animStart{ 20.0f };
 	float m_localTimer{ 0.0f };

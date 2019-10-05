@@ -32,6 +32,13 @@ DescriptorAllocator Kodiak::g_descriptorAllocator[D3D12_DESCRIPTOR_HEAP_TYPE_NUM
 };
 
 
+UserDescriptorHeap Kodiak::g_userDescriptorHeap[2] =
+{
+	{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1024 },
+	{ D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 1024 },
+};
+
+
 void DescriptorAllocator::DestroyAll()
 {
 	lock_guard<mutex> lockGuard(sm_allocationMutex);
@@ -93,6 +100,12 @@ void UserDescriptorHeap::Create(const std::string& debugHeapName)
 	m_numFreeDescriptors = m_heapDesc.NumDescriptors;
 	m_firstHandle = DescriptorHandle(m_heap->GetCPUDescriptorHandleForHeapStart(), m_heap->GetGPUDescriptorHandleForHeapStart());
 	m_nextFreeHandle = m_firstHandle;
+}
+
+
+void UserDescriptorHeap::Destroy()
+{
+	m_heap = nullptr;
 }
 
 

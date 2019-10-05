@@ -14,6 +14,7 @@
 
 #include "CommandContext.h"
 #include "PipelineState.h"
+#include "RootSignature.h"
 #include "Shader.h"
 #include "Texture.h"
 

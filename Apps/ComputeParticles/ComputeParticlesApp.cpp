@@ -45,6 +45,8 @@ void ComputeParticlesApp::Startup()
 	InitParticles();
 
 	LoadAssets();
+
+	InitResourceSets();
 }
 
 
@@ -89,8 +91,7 @@ void ComputeParticlesApp::Render()
 		computeContext.SetRootSignature(m_computeRootSig);
 		computeContext.SetPipelineState(m_computePSO);
 
-		computeContext.SetUAV(0, 0, m_particleBuffer);
-		computeContext.SetConstantBuffer(0, 1, m_csConstantBuffer);
+		computeContext.SetResources(m_computeResources);
 
 		computeContext.Dispatch1D(m_particleCount, 256);
 
@@ -111,10 +112,7 @@ void ComputeParticlesApp::Render()
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
-	context.SetSRV(0, 0, m_particleBuffer);
-	context.SetConstantBuffer(0, 1, m_vsConstantBuffer);
-	context.SetSRV(1, 0, *m_colorTexture);
-	context.SetSRV(1, 1, *m_gradientTexture);
+	context.SetResources(m_gfxResources);
 
 	context.Draw(6 * m_particleCount);
 
@@ -200,6 +198,23 @@ void ComputeParticlesApp::InitParticles()
 	}
 
 	m_particleBuffer.Create("Particle SB", m_particleCount, sizeof(Particle), particles.data());
+}
+
+
+void ComputeParticlesApp::InitResourceSets()
+{
+	m_computeResources.Init(&m_computeRootSig);
+	m_computeResources.SetUAV(0, 0, m_particleBuffer);
+	m_computeResources.SetCBV(0, 1, m_csConstantBuffer);
+	m_computeResources.Finalize();
+
+
+	m_gfxResources.Init(&m_graphicsRootSig);
+	m_gfxResources.SetSRV(0, 0, m_particleBuffer);
+	m_gfxResources.SetCBV(0, 1, m_vsConstantBuffer);
+	m_gfxResources.SetSRV(1, 0, *m_colorTexture);
+	m_gfxResources.SetSRV(1, 1, *m_gradientTexture);
+	m_gfxResources.Finalize();
 }
 
 

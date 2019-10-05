@@ -63,6 +63,8 @@ void ComputeShaderApp::Startup()
 	LoadAssets();
 
 	m_computeScratch.Create("Compute Scratch", m_texture->GetWidth(), m_texture->GetHeight(), 1, Format::R8G8B8A8_UNorm);
+
+	InitResourceSets();
 }
 
 
@@ -125,8 +127,7 @@ void ComputeShaderApp::Render()
 			computeContext.SetPipelineState(m_sharpenPSO);
 		}
 
-		computeContext.SetSRV(0, 0, *m_texture);
-		computeContext.SetUAV(0, 1, m_computeScratch);
+		computeContext.SetResources(m_computeResources);
 
 		computeContext.Dispatch2D(m_computeScratch.GetWidth(), m_computeScratch.GetHeight(), 16, 16);
 
@@ -148,8 +149,7 @@ void ComputeShaderApp::Render()
 	context.SetRootSignature(m_rootSig);
 	context.SetPipelineState(m_pso);
 
-	context.SetRootConstantBuffer(0, m_constantBuffer);
-	context.SetSRV(1, 0, *m_texture);
+	context.SetResources(m_gfxLeftResources);
 
 	context.SetVertexBuffer(0, m_vertexBuffer);
 	context.SetIndexBuffer(m_indexBuffer);
@@ -157,8 +157,9 @@ void ComputeShaderApp::Render()
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 
 	context.SetViewportAndScissor(m_displayWidth / 2, 0u, m_displayWidth / 2, m_displayHeight);
-	context.SetRootConstantBuffer(0, m_constantBuffer); // TODO - it shouldn't be necessary to do this in VK
-	context.SetSRV(1, 0, m_computeScratch);
+
+	context.SetResources(m_gfxRightResources);
+
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 
 	context.EndRenderPass();
@@ -171,7 +172,7 @@ void ComputeShaderApp::Render()
 void ComputeShaderApp::InitRootSigs()
 {
 	m_rootSig.Reset(2, 1);
-	m_rootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_rootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
 	m_rootSig[1].InitAsDescriptorRange(DescriptorType::TextureSRV, 0, 1, ShaderVisibility::Pixel);
 	m_rootSig.InitStaticSampler(0, CommonStates::SamplerLinearClamp(), ShaderVisibility::Pixel);
 	m_rootSig.Finalize("Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
@@ -236,6 +237,27 @@ void ComputeShaderApp::InitConstantBuffer()
 	m_constants.modelMatrix = Math::Matrix4(Math::kIdentity);
 	
 	m_constantBuffer.Update(sizeof(Constants), &m_constants);
+}
+
+
+void ComputeShaderApp::InitResourceSets()
+{
+	m_computeResources.Init(&m_computeRootSig);
+	m_computeResources.SetSRV(0, 0, *m_texture);
+	m_computeResources.SetUAV(0, 1, m_computeScratch);
+	m_computeResources.Finalize();
+
+
+	m_gfxLeftResources.Init(&m_rootSig);
+	m_gfxLeftResources.SetCBV(0, 0, m_constantBuffer);
+	m_gfxLeftResources.SetSRV(1, 0, *m_texture);
+	m_gfxLeftResources.Finalize();
+
+
+	m_gfxRightResources.Init(&m_rootSig);
+	m_gfxRightResources.SetCBV(0, 0, m_constantBuffer);
+	m_gfxRightResources.SetSRV(1, 0, m_computeScratch);
+	m_gfxRightResources.Finalize();
 }
 
 

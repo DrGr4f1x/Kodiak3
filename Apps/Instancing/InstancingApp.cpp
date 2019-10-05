@@ -57,6 +57,8 @@ void InstancingApp::Startup()
 	// the rock texture
 	LoadAssets();
 	InitInstanceBuffer();
+
+	InitResourceSets();
 }
 
 
@@ -103,8 +105,7 @@ void InstancingApp::Render()
 		context.SetRootSignature(m_modelRootSig);
 		context.SetPipelineState(m_planetPSO);
 
-		context.SetRootConstantBuffer(0, m_planetConstantBuffer);
-		context.SetSRV(1, 0, *m_planetTexture);
+		context.SetResources(m_planetResources);
 
 		context.SetIndexBuffer(m_planetModel->GetIndexBuffer());
 		context.SetVertexBuffer(0, m_planetModel->GetVertexBuffer());
@@ -116,8 +117,7 @@ void InstancingApp::Render()
 	{
 		context.SetPipelineState(m_rockPSO);
 
-		context.SetRootConstantBuffer(0, m_planetConstantBuffer);
-		context.SetSRV(1, 0, *m_rockTexture);
+		context.SetResources(m_rockResources);
 
 		context.SetIndexBuffer(m_rockModel->GetIndexBuffer());
 		context.SetVertexBuffer(0, m_rockModel->GetVertexBuffer());
@@ -143,7 +143,7 @@ void InstancingApp::InitRootSigs()
 		RootSignatureFlags::DenyPixelShaderRootAccess);
 
 	m_modelRootSig.Reset(2, 1);
-	m_modelRootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_modelRootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
 	m_modelRootSig[1].InitAsDescriptorRange(DescriptorType::TextureSRV, 0, 1, ShaderVisibility::Pixel);
 	m_modelRootSig.InitStaticSampler(0, CommonStates::SamplerLinearWrap(), ShaderVisibility::Pixel);
 	m_modelRootSig.Finalize("Model RootSig", RootSignatureFlags::AllowInputAssemblerInputLayout);
@@ -297,6 +297,21 @@ void InstancingApp::InitInstanceBuffer()
 	}
 
 	m_instanceBuffer.Create("Per-Instance Buffer", m_numInstances, sizeof(InstanceData), instanceData.data());
+}
+
+
+void InstancingApp::InitResourceSets()
+{
+	m_rockResources.Init(&m_modelRootSig);
+	m_rockResources.SetCBV(0, 0, m_planetConstantBuffer);
+	m_rockResources.SetSRV(1, 0, *m_rockTexture);
+	m_rockResources.Finalize();
+
+
+	m_planetResources.Init(&m_modelRootSig);
+	m_planetResources.SetCBV(0, 0, m_planetConstantBuffer);
+	m_planetResources.SetSRV(1, 0, *m_planetTexture);
+	m_planetResources.Finalize();
 }
 
 

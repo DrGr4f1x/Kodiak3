@@ -69,6 +69,7 @@ void TriangleApp::Startup()
 
 	InitRootSig();
 	InitPSO();
+	InitResourceSet();
 }
 
 
@@ -105,7 +106,7 @@ void TriangleApp::Render()
 	context.SetRootSignature(m_rootSig);
 	context.SetPipelineState(m_pso);
 
-	context.SetRootConstantBuffer(0, m_constantBuffer);
+	context.SetResources(m_resources);
 
 	context.SetVertexBuffer(0, m_vertexBuffer);
 	context.SetIndexBuffer(m_indexBuffer);
@@ -132,7 +133,7 @@ void TriangleApp::UpdateConstantBuffer()
 void TriangleApp::InitRootSig()
 {
 	m_rootSig.Reset(1);
-	m_rootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_rootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
 	m_rootSig.Finalize("Root sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
 }
 
@@ -163,4 +164,12 @@ void TriangleApp::InitPSO()
 	m_pso.SetInputLayout(vertexStream, vertexElements);
 
 	m_pso.Finalize();
+}
+
+
+void TriangleApp::InitResourceSet()
+{
+	m_resources.Init(&m_rootSig);
+	m_resources.SetCBV(0, 0, m_constantBuffer);
+	m_resources.Finalize();
 }

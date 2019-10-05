@@ -16,6 +16,7 @@
 #include "Model.h"
 #include "PipelineState.h"
 #include "QueryHeap.h"
+#include "ResourceSet.h"
 #include "RootSignature.h"
 
 
@@ -39,6 +40,7 @@ private:
 	void InitPSOs();
 	void InitConstantBuffers();
 	void InitQueryHeap();
+	void InitResourceSets();
 
 	void UpdateConstantBuffers();
 
@@ -61,7 +63,11 @@ private:
 	Kodiak::ConstantBuffer m_teapotCB;
 	Kodiak::ConstantBuffer m_sphereCB;
 	
-	Kodiak::RootSignature m_rootSignature;
+	Kodiak::ResourceSet	m_occluderResources;
+	Kodiak::ResourceSet m_teapotResources;
+	Kodiak::ResourceSet	m_sphereResources;
+
+	Kodiak::RootSignature m_rootSig;
 
 	Kodiak::GraphicsPSO m_solidPSO;
 	Kodiak::GraphicsPSO m_simplePSO;

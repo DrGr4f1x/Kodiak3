@@ -72,6 +72,8 @@ void TextureArrayApp::Startup()
 	// We have to load the texture first, so we know how many array slices there are
 	LoadAssets();
 	InitConstantBuffer();
+
+	InitResourceSet();
 }
 
 
@@ -109,8 +111,7 @@ void TextureArrayApp::Render()
 	context.SetRootSignature(m_rootSig);
 	context.SetPipelineState(m_pso);
 
-	context.SetRootConstantBuffer(0, m_constantBuffer);
-	context.SetSRV(1, 0, *m_texture);
+	context.SetResources(m_resources);
 
 	context.SetVertexBuffer(0, m_vertexBuffer);
 	context.SetIndexBuffer(m_indexBuffer);
@@ -127,7 +128,7 @@ void TextureArrayApp::Render()
 void TextureArrayApp::InitRootSig()
 {
 	m_rootSig.Reset(2, 1);
-	m_rootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_rootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
 	m_rootSig[1].InitAsDescriptorTable(1, ShaderVisibility::Pixel);
 	m_rootSig[1].SetTableRange(0, DescriptorType::TextureSRV, 0, 1);
 	m_rootSig.InitStaticSampler(0, CommonStates::SamplerLinearClamp(), ShaderVisibility::Pixel);
@@ -186,6 +187,15 @@ void TextureArrayApp::InitConstantBuffer()
 		m_constants.instance[i].arrayIndex.SetX(static_cast<float>(i));
 	}
 	m_constantBuffer.Update(m_layerCount * sizeof(InstanceData), sizeof(Matrix4), m_constants.instance);
+}
+
+
+void TextureArrayApp::InitResourceSet()
+{
+	m_resources.Init(&m_rootSig);
+	m_resources.SetCBV(0, 0, m_constantBuffer);
+	m_resources.SetSRV(1, 0, *m_texture);
+	m_resources.Finalize();
 }
 
 

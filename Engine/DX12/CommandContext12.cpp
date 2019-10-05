@@ -148,8 +148,6 @@ uint64_t CommandContext::Finish(bool waitForCompletion)
 
 	m_cpuLinearAllocator.CleanupUsedPages(fenceValue);
 	m_gpuLinearAllocator.CleanupUsedPages(fenceValue);
-	m_dynamicViewDescriptorHeap.CleanupUsedHeaps(fenceValue);
-	m_dynamicSamplerDescriptorHeap.CleanupUsedHeaps(fenceValue);
 
 	if (waitForCompletion)
 	{
@@ -302,8 +300,6 @@ void CommandContext::BindDescriptorHeaps()
 
 CommandContext::CommandContext(CommandListType type)
 	: m_type(type)
-	, m_dynamicViewDescriptorHeap(*this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
-	, m_dynamicSamplerDescriptorHeap(*this, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER)
 	, m_cpuLinearAllocator(kCpuWritable)
 	, m_gpuLinearAllocator(kGpuExclusive)
 {

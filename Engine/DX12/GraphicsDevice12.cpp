@@ -282,6 +282,9 @@ void GraphicsDevice::PlatformCreate()
 
 	g_device = m_platformData->device;
 
+	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Create("User Descriptor Heap, CBV_SRV_UAV");
+	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER].Create("User Descriptor Heap, SAMPLER");
+
 	ConfigureInfoQueue(m_platformData->device.Get());
 
 	g_commandManager.Create(m_platformData->device.Get());
@@ -326,5 +329,7 @@ void GraphicsDevice::PlatformDestroyData()
 
 void GraphicsDevice::PlatformDestroy()
 {
+	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Destroy();
+	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER].Destroy();
 	g_commandManager.Shutdown();
 }

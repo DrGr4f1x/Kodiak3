@@ -58,6 +58,8 @@ void StencilBufferApp::Startup()
 	InitConstantBuffer();
 
 	LoadAssets();
+
+	InitResourceSet();
 }
 
 
@@ -94,7 +96,7 @@ void StencilBufferApp::Render()
 
 	context.SetRootSignature(m_rootSig);
 
-	context.SetRootConstantBuffer(0, m_constantBuffer);
+	context.SetResources(m_resources);
 
 	context.SetVertexBuffer(0, m_model->GetVertexBuffer());
 	context.SetIndexBuffer(m_model->GetIndexBuffer());
@@ -123,7 +125,7 @@ void StencilBufferApp::Render()
 void StencilBufferApp::InitRootSig()
 {
 	m_rootSig.Reset(1);
-	m_rootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_rootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
 	m_rootSig.Finalize("Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
 }
 
@@ -212,6 +214,14 @@ void StencilBufferApp::InitConstantBuffer()
 	m_constantBuffer.Create("Constant Buffer", 1, sizeof(Constants));
 
 	UpdateConstantBuffer();
+}
+
+
+void StencilBufferApp::InitResourceSet()
+{
+	m_resources.Init(&m_rootSig);
+	m_resources.SetCBV(0, 0, m_constantBuffer);
+	m_resources.Finalize();
 }
 
 

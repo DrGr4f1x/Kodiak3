@@ -14,6 +14,7 @@
 #include "ColorBuffer.h"
 #include "GpuBuffer.h"
 #include "PipelineState.h"
+#include "ResourceSet.h"
 #include "RootSignature.h"
 #include "Texture.h"
 
@@ -33,6 +34,7 @@ private:
 	void InitRootSigs();
 	void InitPSOs();
 	void InitConstantBuffer();
+	void InitResourceSets();
 
 	void LoadAssets();
 
@@ -63,6 +65,10 @@ private:
 	Kodiak::ComputePSO		m_edgeDetectPSO;
 	Kodiak::ComputePSO		m_embossPSO;
 	Kodiak::ComputePSO		m_sharpenPSO;
+
+	Kodiak::ResourceSet		m_computeResources;
+	Kodiak::ResourceSet		m_gfxLeftResources;
+	Kodiak::ResourceSet		m_gfxRightResources;
 
 	Kodiak::ColorBuffer		m_computeScratch;
 

@@ -14,6 +14,7 @@
 #include "CameraController.h"
 #include "Model.h"
 #include "PipelineState.h"
+#include "ResourceSet.h"
 #include "RootSignature.h"
 #include "Texture.h"
 
@@ -37,6 +38,7 @@ private:
 	void InitRootSig();
 	void InitPSO();
 	void InitConstantBuffer();
+	void InitResources();
 
 	void LoadAssets();
 
@@ -67,6 +69,8 @@ private:
 
 	Constants					m_constants;
 	Kodiak::ConstantBuffer		m_constantBuffer;
+
+	Kodiak::ResourceSet			m_resources;
 
 	Kodiak::RootSignature		m_rootSig;
 	Kodiak::GraphicsPSO			m_pso;

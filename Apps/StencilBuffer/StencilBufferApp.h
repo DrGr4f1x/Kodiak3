@@ -15,6 +15,7 @@
 #include "GpuBuffer.h"
 #include "Model.h"
 #include "PipelineState.h"
+#include "ResourceSet.h"
 #include "RootSignature.h"
 
 
@@ -37,6 +38,7 @@ private:
 	void InitRootSig();
 	void InitPSOs();
 	void InitConstantBuffer();
+	void InitResourceSet();
 
 	void UpdateConstantBuffer();
 
@@ -57,6 +59,8 @@ private:
 
 	Kodiak::ConstantBuffer	m_constantBuffer;
 	Constants				m_constants;
+
+	Kodiak::ResourceSet		m_resources;
 
 	Kodiak::ModelPtr		m_model;
 

@@ -44,6 +44,8 @@ void RadialBlurApp::Startup()
 	InitConstantBuffers();
 
 	LoadAssets();
+
+	InitResourceSets();
 }
 
 
@@ -91,8 +93,7 @@ void RadialBlurApp::Render()
 		context.SetPipelineState(m_colorPassPSO);
 
 		// Draw the model
-		context.SetRootConstantBuffer(0, m_sceneConstantBuffer);
-		context.SetSRV(1, 0, *m_gradientTex);
+		context.SetResources(m_sceneResources);
 
 		context.SetVertexBuffer(0, m_model->GetVertexBuffer());
 		context.SetIndexBuffer(m_model->GetIndexBuffer());
@@ -121,8 +122,7 @@ void RadialBlurApp::Render()
 		context.SetPipelineState(m_phongPassPSO);
 
 		// Draw the model
-		context.SetRootConstantBuffer(0, m_sceneConstantBuffer);
-		context.SetSRV(1, 0, *m_gradientTex);
+		context.SetResources(m_sceneResources);
 
 		context.SetVertexBuffer(0, m_model->GetVertexBuffer());
 		context.SetIndexBuffer(m_model->GetIndexBuffer());
@@ -133,8 +133,7 @@ void RadialBlurApp::Render()
 			context.SetRootSignature(m_radialBlurRootSig);
 			context.SetPipelineState(m_radialBlurPSO);
 			
-			context.SetSRV(0, 0, *m_offscreenFramebuffer->GetColorBuffer(0));
-			context.SetConstantBuffer(0, 1, m_radialBlurConstantBuffer);
+			context.SetResources(m_blurResources);
 
 			context.Draw(3);
 		}
@@ -150,7 +149,7 @@ void RadialBlurApp::Render()
 void RadialBlurApp::InitRootSigs()
 {
 	m_sceneRootSig.Reset(2, 1);
-	m_sceneRootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_sceneRootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
 	m_sceneRootSig[1].InitAsDescriptorRange(DescriptorType::TextureSRV, 0, 1, ShaderVisibility::Pixel);
 	m_sceneRootSig.InitStaticSampler(0, CommonStates::SamplerLinearWrap(), ShaderVisibility::Pixel);
 	m_sceneRootSig.Finalize("Scene Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
@@ -227,6 +226,21 @@ void RadialBlurApp::InitConstantBuffers()
 
 	m_radialBlurConstantBuffer.Create("Radial Blur Constant Buffer", 1, sizeof(RadialBlurConstants));
 	m_radialBlurConstantBuffer.Update(sizeof(m_radialBlurConstants), &m_radialBlurConstants);
+}
+
+
+void RadialBlurApp::InitResourceSets()
+{
+	m_sceneResources.Init(&m_sceneRootSig);
+	m_sceneResources.SetCBV(0, 0, m_sceneConstantBuffer);
+	m_sceneResources.SetSRV(1, 0, *m_gradientTex);
+	m_sceneResources.Finalize();
+
+
+	m_blurResources.Init(&m_radialBlurRootSig);
+	m_blurResources.SetSRV(0, 0, *m_offscreenFramebuffer->GetColorBuffer(0));
+	m_blurResources.SetCBV(0, 1, m_radialBlurConstantBuffer);
+	m_blurResources.Finalize();
 }
 
 

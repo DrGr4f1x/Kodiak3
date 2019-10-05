@@ -54,6 +54,8 @@ void ParticleFireApp::Startup()
 	UpdateConstantBuffers();
 
 	LoadAssets();
+
+	InitResourceSet();
 }
 
 
@@ -99,9 +101,7 @@ void ParticleFireApp::Render()
 		context.SetRootSignature(m_rootSig);
 		context.SetPipelineState(m_modelPSO);
 		
-		context.SetRootConstantBuffer(0, m_modelVsConstantBuffer);
-		context.SetSRV(1, 0, *m_modelColorTex);
-		context.SetSRV(1, 1, *m_modelNormalTex);
+		context.SetResources(m_resources);
 
 		context.SetIndexBuffer(m_model->GetIndexBuffer());
 		context.SetVertexBuffer(0, m_model->GetVertexBuffer());
@@ -118,7 +118,7 @@ void ParticleFireApp::Render()
 void ParticleFireApp::InitRootSigs()
 {
 	m_rootSig.Reset(2, 1);
-	m_rootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_rootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
 	m_rootSig[1].InitAsDescriptorTable(2, ShaderVisibility::Pixel);
 	m_rootSig[1].SetTableRange(0, DescriptorType::TextureSRV, 0, 1);
 	m_rootSig[1].SetTableRange(1, DescriptorType::TextureSRV, 1, 1);
@@ -162,6 +162,16 @@ void ParticleFireApp::InitPSOs()
 void ParticleFireApp::InitConstantBuffers()
 {
 	m_modelVsConstantBuffer.Create("Model Constant Buffer", 1, sizeof(ModelVSConstants));
+}
+
+
+void ParticleFireApp::InitResourceSet()
+{
+	m_resources.Init(&m_rootSig);
+	m_resources.SetCBV(0, 0, m_modelVsConstantBuffer);
+	m_resources.SetSRV(1, 0, *m_modelColorTex);
+	m_resources.SetSRV(1, 1, *m_modelNormalTex);
+	m_resources.Finalize();
 }
 
 

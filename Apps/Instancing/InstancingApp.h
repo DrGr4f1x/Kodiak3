@@ -15,6 +15,7 @@
 #include "CameraController.h"
 #include "Model.h"
 #include "PipelineState.h"
+#include "ResourceSet.h"
 #include "RootSignature.h"
 #include "Texture.h"
 
@@ -39,6 +40,7 @@ private:
 	void InitPSOs();
 	void InitConstantBuffer();
 	void InitInstanceBuffer();
+	void InitResourceSets();
 
 	void UpdateConstantBuffer();
 
@@ -72,6 +74,9 @@ private:
 
 	Kodiak::ModelPtr m_rockModel;
 	Kodiak::ModelPtr m_planetModel;
+
+	Kodiak::ResourceSet m_rockResources;
+	Kodiak::ResourceSet m_planetResources;
 
 	Kodiak::CameraController m_controller;
 	float m_zoom{ -18.5 };

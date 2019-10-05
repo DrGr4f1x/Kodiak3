@@ -57,6 +57,8 @@ void TextureCubeMapApp::Startup()
 	InitConstantBuffers();
 
 	LoadAssets();
+
+	InitResourceSets();
 }
 
 
@@ -99,8 +101,7 @@ void TextureCubeMapApp::Render()
 		context.SetRootSignature(m_skyboxRootSig);
 		context.SetPipelineState(m_skyboxPSO);
 
-		context.SetRootConstantBuffer(0, m_vsSkyboxConstantBuffer);
-		context.SetSRV(1, 0, *m_skyboxTex);
+		context.SetResources(m_skyboxResources);
 
 		context.SetIndexBuffer(m_skyboxModel->GetIndexBuffer());
 		context.SetVertexBuffer(0, m_skyboxModel->GetVertexBuffer());
@@ -115,9 +116,7 @@ void TextureCubeMapApp::Render()
 		context.SetRootSignature(m_modelRootSig);
 		context.SetPipelineState(m_modelPSO);
 
-		context.SetRootConstantBuffer(0, m_vsModelConstantBuffer);
-		context.SetConstantBuffer(1, 0, m_psConstantBuffer);
-		context.SetSRV(1, 1, *m_skyboxTex);
+		context.SetResources(m_modelResources);
 
 		context.SetIndexBuffer(model->GetIndexBuffer());
 		context.SetVertexBuffer(0, model->GetVertexBuffer());
@@ -135,13 +134,13 @@ void TextureCubeMapApp::Render()
 void TextureCubeMapApp::InitRootSigs()
 {
 	m_skyboxRootSig.Reset(2, 1);
-	m_skyboxRootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_skyboxRootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
 	m_skyboxRootSig[1].InitAsDescriptorRange(DescriptorType::TextureSRV, 0, 1, ShaderVisibility::Pixel);
 	m_skyboxRootSig.InitStaticSampler(0, CommonStates::SamplerLinearClamp(), ShaderVisibility::Pixel);
 	m_skyboxRootSig.Finalize("Skybox Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
 
 	m_modelRootSig.Reset(2, 1);
-	m_modelRootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_modelRootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
 	m_modelRootSig[1].InitAsDescriptorTable(2, ShaderVisibility::Pixel);
 	m_modelRootSig[1].SetTableRange(0, DescriptorType::CBV, 0, 1);
 	m_modelRootSig[1].SetTableRange(1, DescriptorType::TextureSRV, 0, 1);
@@ -201,6 +200,22 @@ void TextureCubeMapApp::InitConstantBuffers()
 	m_psConstantBuffer.Create("PS Constant Buffer", 1, sizeof(PSConstants));
 
 	UpdateConstantBuffers();
+}
+
+
+void TextureCubeMapApp::InitResourceSets()
+{
+	m_modelResources.Init(&m_modelRootSig);
+	m_modelResources.SetCBV(0, 0, m_vsModelConstantBuffer);
+	m_modelResources.SetCBV(1, 0, m_psConstantBuffer);
+	m_modelResources.SetSRV(1, 1, *m_skyboxTex);
+	m_modelResources.Finalize();
+
+
+	m_skyboxResources.Init(&m_skyboxRootSig);
+	m_skyboxResources.SetCBV(0, 0, m_vsSkyboxConstantBuffer);
+	m_skyboxResources.SetSRV(1, 0, *m_skyboxTex);
+	m_skyboxResources.Finalize();
 }
 
 

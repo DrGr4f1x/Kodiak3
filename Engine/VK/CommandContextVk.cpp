@@ -94,7 +94,6 @@ void ContextManager::DestroyAllContexts()
 
 CommandContext::CommandContext(CommandListType type)
 	: m_type(type)
-	, m_dynamicDescriptorPool(*this)
 {
 	VkSemaphoreCreateInfo semaphoreCreateInfo{};
 	semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -116,7 +115,6 @@ void CommandContext::DestroyAllContexts()
 #if 0
 	LinearAllocator::DestroyAll();
 #endif
-	DynamicDescriptorPool::DestroyAll();
 	g_contextManager.DestroyAllContexts();
 }
 
@@ -170,7 +168,6 @@ void CommandContext::Finish(bool waitForCompletion)
 	//m_vertexBufferAllocator.CleanupUsedBuffers(fence);
 	//m_indexBufferAllocator.CleanupUsedBuffers(fence);
 	//m_constantBufferAllocator.CleanupUsedBuffers(fence);
-	m_dynamicDescriptorPool.CleanupUsedPools(fence);
 
 	if (waitForCompletion)
 	{
@@ -446,8 +443,6 @@ void GraphicsContext::SetRootSignature(const RootSignature& rootSig)
 {
 	m_curComputePipelineLayout = VK_NULL_HANDLE;
 	m_curGraphicsPipelineLayout = rootSig.GetLayout();
-
-	m_dynamicDescriptorPool.ParseGraphicsRootSignature(rootSig);
 }
 
 
@@ -494,42 +489,14 @@ void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 }
 
 
-void GraphicsContext::SetRootConstantBuffer(uint32_t rootIndex, ConstantBuffer& constantBuffer, uint32_t dynamicOffset)
-{
-	VkDescriptorBufferInfo bufferInfo = constantBuffer.GetCBV().GetHandle();
-	bufferInfo.offset = dynamicOffset;
-
-	VkWriteDescriptorSet writeDescriptor = {};
-	writeDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	writeDescriptor.dstSet = 0;
-	writeDescriptor.dstBinding = 0;
-	writeDescriptor.descriptorCount = 1;
-	writeDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	writeDescriptor.pBufferInfo = &bufferInfo;
-
-	ext_vkCmdPushDescriptorSetKHR(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, m_curGraphicsPipelineLayout, rootIndex, 1, &writeDescriptor);
-
-	//m_dynamicDescriptorPool.SetGraphicsDescriptorHandles(rootIndex, 0, 1, &bufferInfo, dynamicOffset);
-}
-
-
 void ComputeContext::SetRootSignature(const RootSignature& rootSig)
 {
 	m_curGraphicsPipelineLayout = VK_NULL_HANDLE;
 	m_curComputePipelineLayout = rootSig.GetLayout();
-
-	m_dynamicDescriptorPool.ParseComputeRootSignature(rootSig);
 }
 
 
 void ComputeContext::SetPipelineState(const ComputePSO& pso)
 {
 	vkCmdBindPipeline(m_commandList, VK_PIPELINE_BIND_POINT_COMPUTE, pso.GetHandle());
-}
-
-
-void ComputeContext::SetRootConstantBuffer(uint32_t rootIndex, const ConstantBuffer& constantBuffer, uint32_t dynamicOffset)
-{
-	VkDescriptorBufferInfo bufferInfo = constantBuffer.GetCBV().GetHandle();
-	m_dynamicDescriptorPool.SetComputeDescriptorHandles(rootIndex, 0, 1, &bufferInfo, dynamicOffset);
 }

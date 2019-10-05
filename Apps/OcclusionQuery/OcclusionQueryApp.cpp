@@ -56,12 +56,14 @@ void OcclusionQueryApp::Startup()
 	InitQueryHeap();
 
 	LoadAssets();
+
+	InitResourceSets();
 }
 
 
 void OcclusionQueryApp::Shutdown()
 {
-	m_rootSignature.Destroy();
+	m_rootSig.Destroy();
 }
 
 
@@ -89,7 +91,7 @@ void OcclusionQueryApp::Render()
 	context.BeginRenderPass(GetBackBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
-	context.SetRootSignature(m_rootSignature);
+	context.SetRootSignature(m_rootSig);
 
 	auto curFrame = GetCurrentFrame();
 
@@ -97,7 +99,7 @@ void OcclusionQueryApp::Render()
 		context.SetPipelineState(m_simplePSO);
 
 		// Occluder plane
-		context.SetRootConstantBuffer(0, m_occluderCB);
+		context.SetResources(m_occluderResources);
 		context.SetVertexBuffer(0, m_occluderModel->GetVertexBuffer());
 		context.SetIndexBuffer(m_occluderModel->GetIndexBuffer());
 		context.DrawIndexed((uint32_t)m_occluderModel->GetIndexBuffer().GetElementCount());
@@ -105,7 +107,7 @@ void OcclusionQueryApp::Render()
 		// Teapot
 		context.BeginOcclusionQuery(m_queryHeap, 2 * curFrame);
 
-		context.SetRootConstantBuffer(0, m_teapotCB);
+		context.SetResources(m_teapotResources);
 		context.SetVertexBuffer(0, m_teapotModel->GetVertexBuffer());
 		context.SetIndexBuffer(m_teapotModel->GetIndexBuffer());
 		context.DrawIndexed((uint32_t)m_teapotModel->GetIndexBuffer().GetElementCount());
@@ -115,7 +117,7 @@ void OcclusionQueryApp::Render()
 		// Sphere
 		context.BeginOcclusionQuery(m_queryHeap, 2 * curFrame + 1);
 
-		context.SetRootConstantBuffer(0, m_sphereCB);
+		context.SetResources(m_sphereResources);
 		context.SetVertexBuffer(0, m_sphereModel->GetVertexBuffer());
 		context.SetIndexBuffer(m_sphereModel->GetIndexBuffer());
 		context.DrawIndexed((uint32_t)m_sphereModel->GetIndexBuffer().GetElementCount());
@@ -135,24 +137,24 @@ void OcclusionQueryApp::Render()
 	context.BeginRenderPass(GetBackBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
-	context.SetRootSignature(m_rootSignature);
+	context.SetRootSignature(m_rootSig);
 	{
 		// Teapot
 		context.SetPipelineState(m_solidPSO);
-		context.SetRootConstantBuffer(0, m_teapotCB);
+		context.SetResources(m_teapotResources);
 		context.SetVertexBuffer(0, m_teapotModel->GetVertexBuffer());
 		context.SetIndexBuffer(m_teapotModel->GetIndexBuffer());
 		context.DrawIndexed((uint32_t)m_teapotModel->GetIndexBuffer().GetElementCount());
 
 		// Sphere
-		context.SetRootConstantBuffer(0, m_sphereCB);
+		context.SetResources(m_sphereResources);
 		context.SetVertexBuffer(0, m_sphereModel->GetVertexBuffer());
 		context.SetIndexBuffer(m_sphereModel->GetIndexBuffer());
 		context.DrawIndexed((uint32_t)m_sphereModel->GetIndexBuffer().GetElementCount());
 
 		// Occluder plane
 		context.SetPipelineState(m_occluderPSO);
-		context.SetRootConstantBuffer(0, m_occluderCB);
+		context.SetResources(m_occluderResources);
 		context.SetVertexBuffer(0, m_occluderModel->GetVertexBuffer());
 		context.SetIndexBuffer(m_occluderModel->GetIndexBuffer());
 		context.DrawIndexed((uint32_t)m_occluderModel->GetIndexBuffer().GetElementCount());
@@ -167,15 +169,15 @@ void OcclusionQueryApp::Render()
 
 void OcclusionQueryApp::InitRootSig()
 {
-	m_rootSignature.Reset(1);
-	m_rootSignature[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
-	m_rootSignature.Finalize("Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout | RootSignatureFlags::DenyPixelShaderRootAccess);
+	m_rootSig.Reset(1);
+	m_rootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
+	m_rootSig.Finalize("Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout | RootSignatureFlags::DenyPixelShaderRootAccess);
 }
 
 
 void OcclusionQueryApp::InitPSOs()
 {
-	m_solidPSO.SetRootSignature(m_rootSignature);
+	m_solidPSO.SetRootSignature(m_rootSig);
 	m_solidPSO.SetBlendState(CommonStates::BlendDisable());
 	m_solidPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 	m_solidPSO.SetRasterizerState(CommonStates::RasterizerDefaultCW());
@@ -230,6 +232,24 @@ void OcclusionQueryApp::InitQueryHeap()
 {
 	m_queryHeap.Create(2 * NumSwapChainBuffers);
 	m_readbackBuffer.Create("Readback Buffer", 2 * NumSwapChainBuffers, sizeof(uint64_t));
+}
+
+
+void OcclusionQueryApp::InitResourceSets()
+{
+	m_occluderResources.Init(&m_rootSig);
+	m_occluderResources.SetCBV(0, 0, m_occluderCB);
+	m_occluderResources.Finalize();
+
+
+	m_teapotResources.Init(&m_rootSig);
+	m_teapotResources.SetCBV(0, 0, m_teapotCB);
+	m_teapotResources.Finalize();
+
+
+	m_sphereResources.Init(&m_rootSig);
+	m_sphereResources.SetCBV(0, 0, m_sphereCB);
+	m_sphereResources.Finalize();
 }
 
 

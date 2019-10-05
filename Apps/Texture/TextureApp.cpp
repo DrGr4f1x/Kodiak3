@@ -63,6 +63,8 @@ void TextureApp::Startup()
 	InitConstantBuffer();
 
 	LoadAssets();
+
+	InitResourceSet();
 }
 
 
@@ -100,8 +102,7 @@ void TextureApp::Render()
 	context.SetRootSignature(m_rootSig);
 	context.SetPipelineState(m_pso);
 
-	context.SetRootConstantBuffer(0, m_constantBuffer);
-	context.SetSRV(1, 0, *m_texture);
+	context.SetResources(m_resources);
 
 	context.SetVertexBuffer(0, m_vertexBuffer);
 	context.SetIndexBuffer(m_indexBuffer);
@@ -118,7 +119,7 @@ void TextureApp::Render()
 void TextureApp::InitRootSig()
 {
 	m_rootSig.Reset(2, 1);
-	m_rootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_rootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
 	m_rootSig[1].InitAsDescriptorTable(1, ShaderVisibility::Pixel);
 	m_rootSig[1].SetTableRange(0, DescriptorType::TextureSRV, 0, 1);
 	m_rootSig.InitStaticSampler(0, CommonStates::SamplerLinearClamp(), ShaderVisibility::Pixel);
@@ -161,6 +162,15 @@ void TextureApp::InitConstantBuffer()
 	m_constantBuffer.Create("Constant Buffer", 1, sizeof(Constants));
 
 	UpdateConstantBuffer();
+}
+
+
+void TextureApp::InitResourceSet()
+{
+	m_resources.Init(&m_rootSig);
+	m_resources.SetCBV(0, 0, m_constantBuffer);
+	m_resources.SetSRV(1, 0, *m_texture);
+	m_resources.Finalize();
 }
 
 

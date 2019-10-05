@@ -31,6 +31,22 @@ map<size_t, Microsoft::WRL::ComPtr<ID3D12RootSignature>> s_rootSignatureHashMap;
 } // anonymous namespace
 
 
+uint32_t RootParameter::GetNumDescriptors() const
+{
+	uint32_t numDescriptors = 0;
+
+	if (m_rootParam.ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE)
+	{
+		for (uint32_t i = 0; i < m_rootParam.DescriptorTable.NumDescriptorRanges; ++i)
+		{
+			numDescriptors += m_rootParam.DescriptorTable.pDescriptorRanges[i].NumDescriptors;
+		}
+	}
+
+	return numDescriptors;
+}
+
+
 void RootSignature::DestroyAll()
 {
 	s_rootSignatureHashMap.clear();

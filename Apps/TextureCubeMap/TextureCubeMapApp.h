@@ -15,6 +15,7 @@
 #include "GpuBuffer.h"
 #include "Model.h"
 #include "PipelineState.h"
+#include "ResourceSet.h"
 #include "RootSignature.h"
 #include "Texture.h"
 
@@ -37,6 +38,7 @@ private:
 	void InitRootSigs();
 	void InitPSOs();
 	void InitConstantBuffers();
+	void InitResourceSets();
 
 	void UpdateConstantBuffers();
 
@@ -73,6 +75,9 @@ private:
 	Kodiak::ConstantBuffer		m_vsSkyboxConstantBuffer;
 	Kodiak::ConstantBuffer		m_vsModelConstantBuffer;
 	Kodiak::ConstantBuffer		m_psConstantBuffer;
+
+	Kodiak::ResourceSet			m_modelResources;
+	Kodiak::ResourceSet			m_skyboxResources;
 
 	Kodiak::TexturePtr			m_skyboxTex;
 	Kodiak::ModelPtr			m_skyboxModel;

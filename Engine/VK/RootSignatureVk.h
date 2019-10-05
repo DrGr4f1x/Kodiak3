@@ -48,6 +48,8 @@ public:
 		binding.binding = 0;
 		binding.pImmutableSamplers = nullptr;
 
+		++m_numDescriptors;
+
 		m_bindings.push_back(binding);
 	}
 
@@ -66,6 +68,8 @@ public:
 		binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; // VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 		binding.binding = 0;
 		binding.pImmutableSamplers = nullptr;
+
+		++m_numDescriptors;
 
 		m_bindings.push_back(binding);
 	}
@@ -104,6 +108,8 @@ public:
 			binding.binding = m_currentBinding++;
 			binding.pImmutableSamplers = nullptr;
 
+			++m_numDescriptors;
+
 			m_bindings.push_back(binding);
 		}
 
@@ -125,6 +131,8 @@ public:
 	RootParameterType GetType() const { return m_type; }
 
 
+	uint32_t GetNumDescriptors() const { return m_numDescriptors; }
+
 protected:
 	RootParameterType	m_type{ RootParameterType::Invalid };
 	ShaderVisibility	m_visibility;
@@ -135,6 +143,7 @@ protected:
 
 	std::vector<VkDescriptorSetLayoutBinding> m_bindings;
 	uint32_t m_currentBinding{ 0 };
+	uint32_t m_numDescriptors{ 0 };
 };
 
 
@@ -188,6 +197,8 @@ public:
 		assert(entryIndex < m_numParameters);
 		return m_paramArray.get()[entryIndex];
 	}
+
+	uint32_t GetNumParameters() const { return m_numParameters; }
 
 	void InitStaticSampler(uint32_t _register, const SamplerStateDesc& nonStaticSamplerDesc,
 		ShaderVisibility visibility = ShaderVisibility::All);

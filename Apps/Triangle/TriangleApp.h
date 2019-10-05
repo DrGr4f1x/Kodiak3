@@ -14,6 +14,7 @@
 #include "CameraController.h"
 #include "GpuBuffer.h"
 #include "PipelineState.h"
+#include "ResourceSet.h"
 #include "RootSignature.h"
 
 
@@ -37,6 +38,7 @@ private:
 
 	void InitRootSig();
 	void InitPSO();
+	void InitResourceSet();
 
 private:
 	// Vertex layout used in this example
@@ -67,4 +69,6 @@ private:
 
 	Kodiak::RootSignature	m_rootSig;
 	Kodiak::GraphicsPSO		m_pso;
+
+	Kodiak::ResourceSet		m_resources;
 };

@@ -100,6 +100,8 @@ public:
 
 	//const D3D12_ROOT_PARAMETER& operator()() const { return m_rootParam; }
 
+	uint32_t GetNumDescriptors() const;
+
 protected:
 	D3D12_ROOT_PARAMETER m_rootParam;
 };
@@ -165,6 +167,7 @@ public:
 		return m_paramArray.get()[entryIndex];
 	}
 
+	uint32_t GetNumParameters() const { return m_numParameters; }
 
 	void InitStaticSampler(uint32_t _register, const SamplerStateDesc& nonStaticSamplerDesc,
 		ShaderVisibility visibility = ShaderVisibility::All);

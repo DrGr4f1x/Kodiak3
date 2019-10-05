@@ -105,6 +105,7 @@ public:
 	}
 
 	void Create(const std::string& debugHeapName);
+	void Destroy();
 
 	bool HasAvailableSpace(uint32_t count) const { return count <= m_numFreeDescriptors; }
 	DescriptorHandle Alloc(uint32_t count = 1);
@@ -129,6 +130,12 @@ extern DescriptorAllocator g_descriptorAllocator[];
 inline D3D12_CPU_DESCRIPTOR_HANDLE AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE type, UINT count = 1)
 {
 	return g_descriptorAllocator[type].Allocate(count);
+}
+
+extern UserDescriptorHeap g_userDescriptorHeap[];
+inline DescriptorHandle AllocateUserDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE type, UINT count = 1)
+{
+	return g_userDescriptorHeap[type].Alloc(count);
 }
 
 } // namespace Kodiak

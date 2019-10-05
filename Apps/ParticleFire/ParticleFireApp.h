@@ -15,6 +15,7 @@
 #include "GpuBuffer.h"
 #include "Model.h"
 #include "PipelineState.h"
+#include "ResourceSet.h"
 #include "RootSignature.h"
 #include "Texture.h"
 
@@ -39,6 +40,7 @@ private:
 	void InitRootSigs();
 	void InitPSOs();
 	void InitConstantBuffers();
+	void InitResourceSet();
 
 	void UpdateConstantBuffers();
 
@@ -77,6 +79,8 @@ private:
 	Kodiak::TexturePtr			m_particleFireTex;
 	Kodiak::TexturePtr			m_particleSmokeTex;
 	Kodiak::ModelPtr			m_model;
+
+	Kodiak::ResourceSet			m_resources;
 
 	Kodiak::CameraController	m_controller;
 	float						m_zoom{ -75.0f };
