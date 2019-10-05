@@ -53,6 +53,8 @@ void GeometryShaderApp::Startup()
 	InitConstantBuffer();
 
 	LoadAssets();
+
+	InitResourceSet();
 }
 
 

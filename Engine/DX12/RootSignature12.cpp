@@ -147,6 +147,8 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 		{
 			assert(rootParam.DescriptorTable.pDescriptorRanges != nullptr);
 
+			hashCode = Utility::HashState(&rootParam, 1, hashCode);
+
 			hashCode = Utility::HashState(rootParam.DescriptorTable.pDescriptorRanges,
 				rootParam.DescriptorTable.NumDescriptorRanges, hashCode);
 
