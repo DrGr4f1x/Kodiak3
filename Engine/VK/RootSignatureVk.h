@@ -207,6 +207,8 @@ public:
 
 	VkPipelineLayout GetLayout() const { return m_layout; }
 
+	VkDescriptorSet GetStaticSamplers() const { return m_staticSamplerSet; }
+
 protected:
 	bool m_finalized{ false };
 	uint32_t m_numParameters{ 0 };

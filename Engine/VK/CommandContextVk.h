@@ -306,7 +306,8 @@ inline void GraphicsContext::SetStencilRef(uint32_t stencilRef)
 
 inline void GraphicsContext::SetResources(const ResourceSet& resources)
 {
-	for (uint32_t i = 0; i < 8; ++i)
+	uint32_t i = 0;
+	for (i = 0; i < 8; ++i)
 	{
 		if (resources.m_resourceTables[i].descriptorSet == VK_NULL_HANDLE)
 			break;
@@ -319,6 +320,19 @@ inline void GraphicsContext::SetResources(const ResourceSet& resources)
 			1, 
 			&resources.m_resourceTables[i].descriptorSet, 
 			0, 
+			nullptr);
+	}
+
+	if (resources.m_staticSamplers != VK_NULL_HANDLE)
+	{
+		vkCmdBindDescriptorSets(
+			m_commandList,
+			VK_PIPELINE_BIND_POINT_GRAPHICS,
+			m_curGraphicsPipelineLayout,
+			i,
+			1,
+			&resources.m_staticSamplers,
+			0,
 			nullptr);
 	}
 }
@@ -416,7 +430,8 @@ inline void GraphicsContext::Resolve(ColorBuffer& src, ColorBuffer& dest, Format
 
 inline void ComputeContext::SetResources(const ResourceSet& resources)
 {
-	for (uint32_t i = 0; i < 8; ++i)
+	uint32_t i = 0;
+	for (i = 0; i < 8; ++i)
 	{
 		if (resources.m_resourceTables[i].descriptorSet == VK_NULL_HANDLE)
 			break;
@@ -428,6 +443,19 @@ inline void ComputeContext::SetResources(const ResourceSet& resources)
 			i,
 			1,
 			&resources.m_resourceTables[i].descriptorSet,
+			0,
+			nullptr);
+	}
+
+	if (resources.m_staticSamplers != VK_NULL_HANDLE)
+	{
+		vkCmdBindDescriptorSets(
+			m_commandList,
+			VK_PIPELINE_BIND_POINT_COMPUTE,
+			m_curGraphicsPipelineLayout,
+			i,
+			1,
+			&resources.m_staticSamplers,
 			0,
 			nullptr);
 	}

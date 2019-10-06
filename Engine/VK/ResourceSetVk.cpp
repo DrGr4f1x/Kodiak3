@@ -44,6 +44,8 @@ void ResourceSet::Init(const RootSignature* rootSig)
 			writeSet.pNext = nullptr;
 		}
 	}
+
+	m_staticSamplers = m_rootSig->GetStaticSamplers();
 }
 
 

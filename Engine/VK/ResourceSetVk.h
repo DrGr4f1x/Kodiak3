@@ -50,6 +50,7 @@ private:
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets;
 	};
 	std::array<ResourceTable, 8> m_resourceTables;
+	VkDescriptorSet m_staticSamplers{ VK_NULL_HANDLE };
 
 	const RootSignature* m_rootSig{ nullptr };
 };
