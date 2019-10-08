@@ -159,6 +159,7 @@ public:
 	void BeginOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex);
 	void EndOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex);
 	void ResolveOcclusionQueries(OcclusionQueryHeap& queryHeap, uint32_t startIndex, uint32_t numQueries, GpuResource& destBuffer, uint64_t destBufferOffset);
+	void ResetOcclusionQueries(OcclusionQueryHeap& queryHeap, uint32_t startIndex, uint32_t numQueries) {}
 
 	void SetRootSignature(const RootSignature& rootSig);
 
@@ -172,6 +173,7 @@ public:
 
 	void SetPipelineState(const GraphicsPSO& PSO);
 
+	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
 	void SetResources(const ResourceSet& resources);
 
 	void SetIndexBuffer(const IndexBuffer& indexBuffer);
@@ -196,6 +198,7 @@ public:
 
 	void SetPipelineState(const ComputePSO& PSO);
 	
+	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
 	void SetResources(const ResourceSet& resources);
 
 	void Dispatch(uint32_t groupCountX = 1, uint32_t groupCountY = 1, uint32_t groupCountZ = 1);
@@ -283,6 +286,12 @@ inline void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 		m_commandList->IASetPrimitiveTopology(topology);
 		m_curPrimitiveTopology = topology;
 	}
+}
+
+
+inline void GraphicsContext::SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants)
+{
+	m_commandList->SetGraphicsRoot32BitConstants(rootIndex, numConstants, constants, 0);
 }
 
 
@@ -389,6 +398,12 @@ inline void ComputeContext::SetPipelineState(const ComputePSO& pso)
 		m_commandList->SetPipelineState(pipelineState);
 		m_curComputePipelineState = pipelineState;
 	}
+}
+
+
+inline void ComputeContext::SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants)
+{
+	m_commandList->SetComputeRoot32BitConstants(rootIndex, numConstants, constants, 0);
 }
 
 

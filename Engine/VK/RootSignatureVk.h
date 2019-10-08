@@ -33,6 +33,15 @@ public:
 
 	~RootParameter();
 
+	void InitAsConstants(uint32_t _register, uint32_t numDwords, ShaderVisibility visibility = ShaderVisibility::All)
+	{
+		m_pushConstantRange.offset = 0;
+		m_pushConstantRange.size = numDwords * sizeof(DWORD);
+		m_pushConstantRange.stageFlags = static_cast<VkShaderStageFlags>(visibility);
+
+		m_visibility = visibility;
+	}
+
 	void InitAsConstantBuffer(uint32_t _register, ShaderVisibility visibility = ShaderVisibility::All)
 	{
 		assert(m_type == RootParameterType::Invalid);
@@ -131,6 +140,7 @@ public:
 	RootParameterType GetType() const { return m_type; }
 
 
+	ShaderVisibility GetShaderVisibility() const { return m_visibility; }
 	uint32_t GetNumDescriptors() const { return m_numDescriptors; }
 
 protected:
@@ -138,6 +148,7 @@ protected:
 	ShaderVisibility	m_visibility;
 
 	VkDescriptorSetLayout m_descriptorSetLayout{ VK_NULL_HANDLE };
+	VkPushConstantRange m_pushConstantRange{};
 
 	std::vector<DescriptorRange> m_ranges;
 

@@ -16,6 +16,7 @@ namespace Kodiak
 struct TextureViewDesc
 {
 	Format format;
+	ResourceState usage;
 	uint32_t arraySize;
 	uint32_t firstArraySlice;
 	uint32_t mipCount;

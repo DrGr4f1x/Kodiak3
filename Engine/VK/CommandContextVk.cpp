@@ -141,7 +141,7 @@ CommandContext& CommandContext::Begin(const string ID)
 	return *newContext;
 }
 
-#pragma optimize("",off)
+
 void CommandContext::Finish(bool waitForCompletion)
 {
 	assert(m_type == CommandListType::Direct || m_type == CommandListType::Compute);
@@ -176,7 +176,6 @@ void CommandContext::Finish(bool waitForCompletion)
 
 	g_contextManager.FreeContext(this);
 }
-#pragma optimize("",on)
 
 
 void CommandContext::Initialize()
@@ -231,7 +230,7 @@ void CommandContext::InitializeTexture(Texture& dest, size_t numBytes, const voi
 		numBuffers,
 		bufferCopies);
 
-	context.TransitionResource(dest, ResourceState::GenericRead);
+	context.TransitionResource(dest, ResourceState::ShaderResource);
 
 	context.Finish(true);
 
@@ -435,7 +434,15 @@ void GraphicsContext::ResolveOcclusionQueries(OcclusionQueryHeap& queryHeap, uin
 		destBuffer.GetHandle(),
 		destBufferOffset,
 		sizeof(uint64_t), // TODO - don't hardcode this
-		VK_QUERY_RESULT_64_BIT);
+		VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT);
+}
+
+
+void GraphicsContext::ResetOcclusionQueries(OcclusionQueryHeap& queryHeap, uint32_t startIndex, uint32_t numQueries)
+{
+	assert(!m_isRenderPassActive);
+
+	vkCmdResetQueryPool(m_commandList, queryHeap.GetHandle(), startIndex, numQueries);
 }
 
 
@@ -443,6 +450,16 @@ void GraphicsContext::SetRootSignature(const RootSignature& rootSig)
 {
 	m_curComputePipelineLayout = VK_NULL_HANDLE;
 	m_curGraphicsPipelineLayout = rootSig.GetLayout();
+
+	uint32_t i = 0;
+	for (i = 0; i < rootSig.GetNumParameters(); ++i)
+	{
+		m_shaderStages[i] = static_cast<VkShaderStageFlags>(rootSig[i].GetShaderVisibility());
+	}
+	for (; i < 8; ++i)
+	{
+		m_shaderStages[i] = VK_SHADER_STAGE_ALL;
+	}
 }
 
 
@@ -493,6 +510,11 @@ void ComputeContext::SetRootSignature(const RootSignature& rootSig)
 {
 	m_curGraphicsPipelineLayout = VK_NULL_HANDLE;
 	m_curComputePipelineLayout = rootSig.GetLayout();
+
+	for (uint32_t i = 0; i < 8; ++i)
+	{
+		m_shaderStages[i] = VK_SHADER_STAGE_COMPUTE_BIT;
+	}
 }
 
 

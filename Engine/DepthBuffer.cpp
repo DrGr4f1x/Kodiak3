@@ -62,6 +62,7 @@ void DepthBuffer::CreateDerivedViews()
 
 	TextureViewDesc srvDesc = {};
 	srvDesc.format = m_format;
+	srvDesc.usage = ResourceState::ShaderResource;
 	srvDesc.arraySize = 1;
 	srvDesc.mipCount = 1;
 	srvDesc.isDepth = true;

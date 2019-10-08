@@ -86,14 +86,15 @@ void OcclusionQueryApp::Render()
 	context.ClearColor(GetColorBuffer());
 	context.ClearDepthAndStencil(GetDepthBuffer());
 
+	auto curFrame = GetCurrentFrame();
+
 	// Occlusion pass
 
+	context.ResetOcclusionQueries(m_queryHeap, 2 * curFrame, 2);
 	context.BeginRenderPass(GetBackBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 	context.SetRootSignature(m_rootSig);
-
-	auto curFrame = GetCurrentFrame();
 
 	{
 		context.SetPipelineState(m_simplePSO);

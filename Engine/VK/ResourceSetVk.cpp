@@ -31,9 +31,13 @@ void ResourceSet::Init(const RootSignature* rootSig)
 
 	for (uint32_t i = 0; i < m_rootSig->GetNumParameters(); ++i)
 	{
-		m_resourceTables[i].descriptorSet = AllocateDescriptorSet((*m_rootSig)[i].GetLayout());
-
 		uint32_t numDescriptors = (*m_rootSig)[i].GetNumDescriptors();
+
+		if (numDescriptors > 0)
+		{
+			m_resourceTables[i].descriptorSet = AllocateDescriptorSet((*m_rootSig)[i].GetLayout());
+		}
+
 		m_resourceTables[i].writeDescriptorSets.resize(numDescriptors);
 
 		for (uint32_t j = 0; j < numDescriptors; ++j)
@@ -130,7 +134,7 @@ void ResourceSet::SetUAV(int rootIndex, int paramIndex, const ColorBuffer& buffe
 	writeSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
 	writeSet.dstSet = m_resourceTables[rootIndex].descriptorSet;
 	writeSet.dstBinding = paramIndex;
-	writeSet.pImageInfo = buffer.GetSRV().GetHandle();
+	writeSet.pImageInfo = buffer.GetUAV().GetHandle();
 }
 
 
@@ -148,7 +152,7 @@ void ResourceSet::SetUAV(int rootIndex, int paramIndex, const StructuredBuffer& 
 	writeSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 	writeSet.dstSet = m_resourceTables[rootIndex].descriptorSet;
 	writeSet.dstBinding = paramIndex;
-	writeSet.pBufferInfo = buffer.GetSRV().GetHandle();
+	writeSet.pBufferInfo = buffer.GetUAV().GetHandle();
 }
 
 

@@ -40,6 +40,7 @@ void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t
 	m_rtvHandle.Create(m_resource, rtvDesc);
 
 	TextureViewDesc srvDesc = {};
+	srvDesc.usage = ResourceState::ShaderResource;
 	srvDesc.format = format;
 	srvDesc.arraySize = m_arraySize;
 	srvDesc.mipCount = numMips;
@@ -59,6 +60,7 @@ void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t
 	if (m_fragmentCount == 1)
 	{
 		TextureViewDesc uavDesc = {};
+		uavDesc.usage = ResourceState::UnorderedAccess;
 		uavDesc.format = m_format;
 		uavDesc.mipCount = numMips;
 		uavDesc.mipLevel = 0;

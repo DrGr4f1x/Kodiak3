@@ -94,6 +94,9 @@ protected:
 	VkPipelineLayout m_curGraphicsPipelineLayout{ VK_NULL_HANDLE };
 	VkPipelineLayout m_curComputePipelineLayout{ VK_NULL_HANDLE };
 
+	// Shader stages for the 8 descriptor set slots
+	VkShaderStageFlags m_shaderStages[8];
+
 	VkSemaphore m_signalSemaphore{ VK_NULL_HANDLE };
 
 private:
@@ -124,6 +127,7 @@ public:
 	void BeginOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex);
 	void EndOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex);
 	void ResolveOcclusionQueries(OcclusionQueryHeap& queryHeap, uint32_t startIndex, uint32_t numQueries, GpuResource& destBuffer, uint64_t destBufferOffset);
+	void ResetOcclusionQueries(OcclusionQueryHeap& queryHeap, uint32_t startIndex, uint32_t numQueries);
 
 	void SetRootSignature(const RootSignature& rootSig);
 
@@ -134,6 +138,7 @@ public:
 
 	void SetPipelineState(const GraphicsPSO& PSO);
 	
+	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
 	void SetResources(const ResourceSet& resources);	
 
 	void SetIndexBuffer(const IndexBuffer& indexBuffer);
@@ -158,6 +163,7 @@ public:
 
 	void SetPipelineState(const ComputePSO& PSO);
 	
+	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
 	void SetResources(const ResourceSet& resources);
 
 	void Dispatch(uint32_t groupCountX = 1, uint32_t groupCountY = 1, uint32_t groupCountZ = 1);
@@ -304,6 +310,18 @@ inline void GraphicsContext::SetStencilRef(uint32_t stencilRef)
 }
 
 
+inline void GraphicsContext::SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants)
+{
+	vkCmdPushConstants(
+		m_commandList, 
+		m_curGraphicsPipelineLayout, 
+		m_shaderStages[rootIndex],
+		0, 
+		numConstants * sizeof(DWORD), 
+		constants);
+}
+
+
 inline void GraphicsContext::SetResources(const ResourceSet& resources)
 {
 	uint32_t i = 0;
@@ -425,6 +443,18 @@ inline void GraphicsContext::Resolve(ColorBuffer& src, ColorBuffer& dest, Format
 		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
 		1, 
 		&resolve);
+}
+
+
+inline void ComputeContext::SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants)
+{
+	vkCmdPushConstants(
+		m_commandList,
+		m_curGraphicsPipelineLayout,
+		VK_SHADER_STAGE_COMPUTE_BIT,
+		0,
+		numConstants * sizeof(DWORD),
+		constants);
 }
 
 

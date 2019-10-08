@@ -178,7 +178,7 @@ InstanceHandle CreateInstance(const string& appName)
 	// On desktop the LunarG loaders exposes a meta layer that contains all layers
 	int32_t validationLayerCount = 1;
 	const char* validationLayerNames[] = {
-		"VK_LAYER_LUNARG_standard_validation"
+		"VK_LAYER_KHRONOS_validation"
 	};
 
 	instanceCreateInfo.enabledLayerCount = validationLayerCount;
@@ -921,7 +921,7 @@ void GraphicsDevice::PlatformCreate()
 
 	// The report flags determine what type of messages for the layers will be displayed
 	// For validating (debugging) an application the error and warning bits should suffice
-	VkDebugReportFlagsEXT debugReportFlags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_INFORMATION_BIT_EXT;
+	VkDebugReportFlagsEXT debugReportFlags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
 	// Additional flags include performance info, loader and layer debug messages, etc.
 	InitializeDebugging(m_platformData->instance, debugReportFlags, VK_NULL_HANDLE);
 #endif

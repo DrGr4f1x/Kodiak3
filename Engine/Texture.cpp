@@ -148,6 +148,7 @@ void Texture::CreateDerivedViews()
 {
 	TextureViewDesc desc = {};
 	desc.format = m_format;
+	desc.usage = ResourceState::ShaderResource;
 	desc.arraySize = m_arraySize;
 	desc.mipCount = m_numMips;
 	desc.isDepth = false;

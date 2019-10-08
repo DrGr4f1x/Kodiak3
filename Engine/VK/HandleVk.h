@@ -124,9 +124,9 @@ public:
 		VkPointer() = default;
 		VkPointer(VkDescriptorHandle* handle) : Super(handle) {}
 
-		static VkPointer Create(VkImageView imageView)
+		static VkPointer Create(VkImageView imageView, VkImageLayout layout)
 		{
-			return VkPointer(new VkDescriptorHandle(imageView));
+			return VkPointer(new VkDescriptorHandle(imageView, layout));
 		}
 
 		static VkPointer Create(VkBufferView bufferView)
@@ -138,6 +138,8 @@ public:
 		{
 			return VkPointer(new VkDescriptorHandle(buffer, offset, size));
 		}
+
+		operator bool() const { return Get(); }
 
 		operator VkImageView() const { return Get()->m_wrapped.imageView; }
 		operator VkBufferView() const { return Get()->m_wrapped.bufferView; }
@@ -158,9 +160,9 @@ public:
 private:
 	friend class VkPointer;
 
-	VkDescriptorHandle(VkImageView imageView)
+	VkDescriptorHandle(VkImageView imageView, VkImageLayout layout)
 		: m_wrapped(imageView)
-		, m_wrappedDescriptor(imageView)
+		, m_wrappedDescriptor(imageView, layout)
 		, m_isImageView(true)
 		, m_isBufferView(false)
 	{}
@@ -193,9 +195,11 @@ private:
 	union WrappedDescriptor
 	{
 		WrappedDescriptor() = default;
-		WrappedDescriptor(VkImageView imageView)
+		WrappedDescriptor(VkImageView imageView, VkImageLayout layout)
 		{
+			imageInfo.sampler = VK_NULL_HANDLE;
 			imageInfo.imageView = imageView;
+			imageInfo.imageLayout = layout;
 		}
 		WrappedDescriptor(VkBuffer buffer, uint32_t offset, uint32_t size)
 		{

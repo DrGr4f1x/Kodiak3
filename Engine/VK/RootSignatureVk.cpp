@@ -303,12 +303,21 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 		vector<VkDescriptorSetLayout> descriptorSetLayouts;
 		descriptorSetLayouts.reserve(m_numParameters);
 
+		vector<VkPushConstantRange> pushConstantRanges;
+		pushConstantRanges.reserve(m_numParameters);
+
 		VkDevice device = GetDevice();
 
 		// Gather the descriptor layouts and push constants
 		for (uint32_t i = 0; i < m_numParameters; ++i)
 		{
 			auto& parameter = m_paramArray[i];
+
+			if (parameter.m_pushConstantRange.size != 0)
+			{
+				pushConstantRanges.push_back(parameter.m_pushConstantRange);
+				continue;
+			}
 
 			const bool usePushDescriptor = parameter.m_type == RootParameterType::RootCBV || parameter.m_type == RootParameterType::DynamicRootCBV;
 
@@ -368,8 +377,8 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 		pipelineInfo.flags = 0;
 		pipelineInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
 		pipelineInfo.pSetLayouts = descriptorSetLayouts.empty() ? nullptr : descriptorSetLayouts.data();
-		pipelineInfo.pushConstantRangeCount = 0;
-		pipelineInfo.pPushConstantRanges = nullptr;
+		pipelineInfo.pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size());
+		pipelineInfo.pPushConstantRanges = pushConstantRanges.empty() ? nullptr : pushConstantRanges.data();
 
 		ThrowIfFailed(vkCreatePipelineLayout(device, &pipelineInfo, nullptr, &m_layout));
 

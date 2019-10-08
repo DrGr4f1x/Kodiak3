@@ -54,7 +54,7 @@ void GeometryShaderApp::Startup()
 
 	LoadAssets();
 
-	InitResourceSet();
+	InitResourceSets();
 }
 
 
@@ -91,7 +91,7 @@ void GeometryShaderApp::Render()
 	context.SetRootSignature(m_meshRootSig);
 	context.SetPipelineState(m_meshPSO);
 
-	context.SetResources(m_resources);
+	context.SetResources(m_meshResources);
 
 	context.SetIndexBuffer(m_model->GetIndexBuffer());
 	context.SetVertexBuffer(0, m_model->GetVertexBuffer());
@@ -102,6 +102,8 @@ void GeometryShaderApp::Render()
 		context.SetRootSignature(m_geomRootSig);
 		context.SetPipelineState(m_geomPSO);
 		
+		context.SetResources(m_geomResources);
+
 		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
 	}
 
@@ -176,11 +178,15 @@ void GeometryShaderApp::InitConstantBuffer()
 }
 
 
-void GeometryShaderApp::InitResourceSet()
+void GeometryShaderApp::InitResourceSets()
 {
-	m_resources.Init(&m_meshRootSig);
-	m_resources.SetCBV(0, 0, m_constantBuffer);
-	m_resources.Finalize();
+	m_meshResources.Init(&m_meshRootSig);
+	m_meshResources.SetCBV(0, 0, m_constantBuffer);
+	m_meshResources.Finalize();
+
+	m_geomResources.Init(&m_geomRootSig);
+	m_geomResources.SetCBV(0, 0, m_constantBuffer);
+	m_geomResources.Finalize();
 }
 
 

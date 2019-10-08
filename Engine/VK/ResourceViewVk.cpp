@@ -43,7 +43,7 @@ void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType typ
 	VkImageView imageView{ VK_NULL_HANDLE };
 	ThrowIfFailed(vkCreateImageView(GetDevice(), &createInfo, nullptr, &imageView));
 
-	m_handle = SrvHandle::Create(imageView);
+	m_handle = SrvHandle::Create(imageView, GetImageLayout(desc.usage));
 }
 
 
@@ -79,7 +79,7 @@ void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType ty
 	VkImageView imageView{ VK_NULL_HANDLE };
 	ThrowIfFailed(vkCreateImageView(GetDevice(), &createInfo, nullptr, &imageView));
 
-	m_handle = UavHandle::Create(imageView);
+	m_handle = UavHandle::Create(imageView, GetImageLayout(desc.usage));
 }
 
 

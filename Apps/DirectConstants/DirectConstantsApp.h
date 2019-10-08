@@ -12,20 +12,18 @@
 
 #include "Application.h"
 #include "CameraController.h"
-#include "GpuBuffer.h"
 #include "Model.h"
 #include "PipelineState.h"
 #include "ResourceSet.h"
 #include "RootSignature.h"
-#include "Texture.h"
 
 
-class GeometryShaderApp : public Kodiak::Application
+class DirectConstantsApp : public Kodiak::Application
 {
 public:
-	GeometryShaderApp()
-		: Kodiak::Application("Geometry Shader")
-		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
+	DirectConstantsApp() 
+		: Application("Direct Constants")
+		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector)) 
 	{}
 
 	void Configure() final;
@@ -36,10 +34,10 @@ public:
 	void Render() final;
 
 private:
-	void InitRootSigs();
-	void InitPSOs();
+	void InitRootSig();
+	void InitPSO();
 	void InitConstantBuffer();
-	void InitResourceSets();
+	void InitResourceSet();
 
 	void UpdateConstantBuffer();
 
@@ -59,17 +57,20 @@ private:
 		Math::Matrix4 modelMatrix;
 	};
 
-	Kodiak::RootSignature		m_meshRootSig;
-	Kodiak::RootSignature		m_geomRootSig;
+	struct LightConstants
+	{
+		Math::Vector4 lightPositions[6];
+	};
 
-	Kodiak::GraphicsPSO			m_meshPSO;
-	Kodiak::GraphicsPSO			m_geomPSO;
+	Kodiak::RootSignature		m_rootSig;
+	Kodiak::GraphicsPSO			m_PSO;
 
 	Kodiak::ConstantBuffer		m_constantBuffer;
 	Constants					m_constants;
 
-	Kodiak::ResourceSet			m_meshResources;
-	Kodiak::ResourceSet			m_geomResources;
+	LightConstants				m_lightConstants;
+
+	Kodiak::ResourceSet			m_resources;
 
 	Kodiak::ModelPtr			m_model;
 

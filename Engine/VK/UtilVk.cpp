@@ -278,8 +278,8 @@ VkPipelineStageFlags GetShaderStageMask(ResourceState state, bool isSrc)
 	switch (state)
 	{
 	case ResourceState::Undefined:
-	case ResourceState::Common:
 	case ResourceState::PreInitialized:
+	case ResourceState::Common:
 		assert(isSrc);
 		return isSrc ? VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT : (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
 	case ResourceState::VertexBuffer:
