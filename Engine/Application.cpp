@@ -15,6 +15,7 @@
 #include "GraphicsDevice.h"
 #include "Input.h"
 
+#include <iostream>
 
 #pragma comment(lib, "runtimeobject.lib")
 
@@ -232,7 +233,7 @@ bool Application::Tick()
 
 	auto timeEnd = chrono::high_resolution_clock::now();
 	auto timeDiff = chrono::duration<double, std::milli>(timeEnd - timeStart).count();
-	m_frameTimer = static_cast<float>(timeDiff * 0.001);
+	m_frameTimer = static_cast<float>(timeDiff) / 1000.0f;
 
 	if (!m_paused)
 	{

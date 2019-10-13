@@ -30,6 +30,8 @@ void DirectConstantsApp::Configure()
 	filesystem.SetDefaultRootDir();
 	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
 	filesystem.AddSearchPath("Data\\Models");
+
+	m_timerSpeed = 0.125f;
 }
 
 
@@ -42,7 +44,8 @@ void DirectConstantsApp::Startup()
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.001f,
 		256.0f);
-	m_camera.SetPosition(Math::Vector3(-30.0f, -30.0f, 0.0f));
+	m_camera.SetPosition(Math::Vector3(18.65f, -14.4f, -18.65f));
+	m_camera.SetZoomRotation(-30.0f, -32.5f, 45.0f, 0.0f);
 
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);
@@ -68,12 +71,13 @@ void DirectConstantsApp::Shutdown()
 bool DirectConstantsApp::Update()
 {
 	m_controller.Update(m_frameTimer);
+	//m_camera.Update();
 
 	UpdateConstantBuffer();
 
 	constexpr float r = 7.5f;
-	const float sin_t = sinf(DirectX::XMConvertToRadians(m_frameTimer * 360.0f));
-	const float cos_t = cosf(DirectX::XMConvertToRadians(m_frameTimer * 360.0f));
+	const float sin_t = sinf(DirectX::XMConvertToRadians(m_timer * 360.0f));
+	const float cos_t = cosf(DirectX::XMConvertToRadians(m_timer * 360.0f));
 	constexpr float y = 4.0f;
 
 	m_lightConstants.lightPositions[0] = Math::Vector4(r * 1.1f * sin_t, y, r * 1.1f * cos_t, 1.0f);

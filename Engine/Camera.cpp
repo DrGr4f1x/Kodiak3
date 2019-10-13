@@ -23,6 +23,7 @@ using namespace Math;
 
 void BaseCamera::SetLookDirection(Vector3 forward, Vector3 up)
 {
+	m_vulkanCompatMode = false;
 	// Given, but ensure normalization
 	Scalar forwardLenSq = LengthSquare(forward);
 	forward = Select(forward * RecipSqrt(forwardLenSq), -Vector3(kZUnitVector), forwardLenSq < Scalar(0.000001f));
@@ -41,8 +42,29 @@ void BaseCamera::SetLookDirection(Vector3 forward, Vector3 up)
 }
 
 
+void BaseCamera::SetZoomRotation(float zoom, float rotX, float rotY, float rotZ)
+{
+	m_vulkanCompatMode = true;
+	m_zoom = zoom;
+	m_rotateX = DirectX::XMConvertToRadians(rotX);
+	m_rotateY = DirectX::XMConvertToRadians(rotY);
+	m_rotateZ = DirectX::XMConvertToRadians(rotZ);
+}
+
+
 void BaseCamera::Update()
 {
+	if (m_vulkanCompatMode)
+	{
+		// Vertex shader
+		m_cameraToWorld.SetTranslation(Vector3(0.0f, 2.0f, m_zoom));
+		m_cameraToWorld.SetRotation(Quaternion(kIdentity));
+		
+		m_cameraToWorld = OrthogonalTransform::MakeXRotation(m_rotateX) * m_cameraToWorld;
+		m_cameraToWorld = OrthogonalTransform::MakeYRotation(m_rotateY) * m_cameraToWorld;
+		m_cameraToWorld = OrthogonalTransform::MakeZRotation(m_rotateZ) * m_cameraToWorld;
+	}
+
 	m_previousViewProjMatrix = m_viewProjMatrix;
 
 	m_viewMatrix = Matrix4(~m_cameraToWorld);

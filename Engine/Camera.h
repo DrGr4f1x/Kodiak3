@@ -34,6 +34,7 @@ public:
 	void SetRotation(Quaternion basisRotation);
 	void SetPosition(Vector3 worldPos);
 	void SetTransform(const AffineTransform& xform);
+	void SetZoomRotation(float zoom, float rotX, float rotY, float rotZ);
 
 	const Quaternion GetRotation() const { return m_cameraToWorld.GetRotation(); }
 	const Vector3 GetRightVec() const { return m_basis.GetX(); }
@@ -81,6 +82,12 @@ protected:
 
 	Frustum m_frustumVS;		// View-space view frustum
 	Frustum m_frustumWS;		// World-space view frustum
+
+	bool m_vulkanCompatMode{ false };
+	float m_zoom{ 0.0f };
+	float m_rotateX{ 0.0f };
+	float m_rotateY{ 0.0f };
+	float m_rotateZ{ 0.0f };
 };
 
 
@@ -115,6 +122,7 @@ private:
 
 inline void BaseCamera::SetEyeAtUp(Vector3 eye, Vector3 at, Vector3 up)
 {
+	m_vulkanCompatMode = false;
 	SetLookDirection(at - eye, up);
 	SetPosition(eye);
 }
@@ -122,12 +130,14 @@ inline void BaseCamera::SetEyeAtUp(Vector3 eye, Vector3 at, Vector3 up)
 
 inline void BaseCamera::SetPosition(Vector3 worldPos)
 {
+	m_vulkanCompatMode = false;
 	m_cameraToWorld.SetTranslation(worldPos);
 }
 
 
 inline void BaseCamera::SetTransform(const AffineTransform& xform)
 {
+	m_vulkanCompatMode = false;
 	// By using these functions, we rederive an orthogonal transform.
 	SetLookDirection(-xform.GetZ(), xform.GetY());
 	SetPosition(xform.GetTranslation());
@@ -136,6 +146,7 @@ inline void BaseCamera::SetTransform(const AffineTransform& xform)
 
 inline void BaseCamera::SetRotation(Quaternion basisRotation)
 {
+	m_vulkanCompatMode = false;
 	m_cameraToWorld.SetRotation(Normalize(basisRotation));
 	m_basis = Matrix3(m_cameraToWorld.GetRotation());
 }
