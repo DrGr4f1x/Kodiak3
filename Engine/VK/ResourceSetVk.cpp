@@ -29,27 +29,33 @@ void ResourceSet::Init(const RootSignature* rootSig)
 {
 	m_rootSig = rootSig;
 
+	int rootIndex = 0;
 	for (uint32_t i = 0; i < m_rootSig->GetNumParameters(); ++i)
 	{
+		ResourceTable& resourceTable = m_resourceTables[i];
 		uint32_t numDescriptors = (*m_rootSig)[i].GetNumDescriptors();
 
-		if (numDescriptors > 0)
-		{
-			m_resourceTables[i].descriptorSet = AllocateDescriptorSet((*m_rootSig)[i].GetLayout());
-		}
+		if (numDescriptors == 0)
+			continue;
 
-		m_resourceTables[i].writeDescriptorSets.resize(numDescriptors);
+		resourceTable.descriptorSet = AllocateDescriptorSet((*m_rootSig)[i].GetLayout());
+
+		resourceTable.writeDescriptorSets.resize(numDescriptors);
 
 		for (uint32_t j = 0; j < numDescriptors; ++j)
 		{
-			VkWriteDescriptorSet& writeSet = m_resourceTables[i].writeDescriptorSets[j];
+			VkWriteDescriptorSet& writeSet = resourceTable.writeDescriptorSets[j];
 			writeSet = {};
 			writeSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			writeSet.pNext = nullptr;
 		}
+		resourceTable.rootIndex = rootIndex;
+		++rootIndex;
 	}
 
 	m_staticSamplers = m_rootSig->GetStaticSamplers();
+	if (m_staticSamplers != VK_NULL_HANDLE)
+		m_staticSamplerIndex = rootIndex;
 }
 
 
@@ -57,13 +63,18 @@ void ResourceSet::Finalize()
 {
 	for (uint32_t i = 0; i < 8; ++i)
 	{
-		if (m_resourceTables[i].writeDescriptorSets.empty())
+		ResourceTable& resourceTable = m_resourceTables[i];
+
+		if (resourceTable.rootIndex == -1)
 			break;
+
+		if (resourceTable.writeDescriptorSets.empty())
+			continue;
 
 		vkUpdateDescriptorSets(
 			GetDevice(), 
-			(uint32_t)m_resourceTables[i].writeDescriptorSets.size(), 
-			m_resourceTables[i].writeDescriptorSets.data(), 
+			(uint32_t)resourceTable.writeDescriptorSets.size(), 
+			resourceTable.writeDescriptorSets.data(), 
 			0, 
 			nullptr);
 	}

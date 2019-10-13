@@ -48,6 +48,7 @@ private:
 	{
 		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> descriptors;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuDescriptor{ D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN };
+		int rootIndex{ -1 };
 		bool isSamplerTable{ false };
 	};
 	std::array<ResourceTable, 8> m_resourceTables;

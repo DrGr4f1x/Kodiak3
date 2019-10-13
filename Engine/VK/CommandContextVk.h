@@ -327,14 +327,18 @@ inline void GraphicsContext::SetResources(const ResourceSet& resources)
 	uint32_t i = 0;
 	for (i = 0; i < 8; ++i)
 	{
-		if (resources.m_resourceTables[i].descriptorSet == VK_NULL_HANDLE)
+		int rootIndex = resources.m_resourceTables[i].rootIndex;
+		if (rootIndex == -1)
 			break;
+
+		if (resources.m_resourceTables[i].descriptorSet == VK_NULL_HANDLE)
+			continue;
 
 		vkCmdBindDescriptorSets(
 			m_commandList, 
 			VK_PIPELINE_BIND_POINT_GRAPHICS, 
 			m_curGraphicsPipelineLayout, 
-			i, 
+			(uint32_t)rootIndex, 
 			1, 
 			&resources.m_resourceTables[i].descriptorSet, 
 			0, 
@@ -347,7 +351,7 @@ inline void GraphicsContext::SetResources(const ResourceSet& resources)
 			m_commandList,
 			VK_PIPELINE_BIND_POINT_GRAPHICS,
 			m_curGraphicsPipelineLayout,
-			i,
+			(uint32_t)resources.m_staticSamplerIndex,
 			1,
 			&resources.m_staticSamplers,
 			0,

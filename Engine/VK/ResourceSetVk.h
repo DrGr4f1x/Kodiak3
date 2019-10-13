@@ -48,9 +48,11 @@ private:
 	{
 		VkDescriptorSet descriptorSet{ VK_NULL_HANDLE };
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets;
+		int rootIndex{ -1 };
 	};
 	std::array<ResourceTable, 8> m_resourceTables;
 	VkDescriptorSet m_staticSamplers{ VK_NULL_HANDLE };
+	int m_staticSamplerIndex{ -1 };
 
 	const RootSignature* m_rootSig{ nullptr };
 };

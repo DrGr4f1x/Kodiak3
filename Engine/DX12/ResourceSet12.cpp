@@ -32,13 +32,19 @@ void ResourceSet::Init(const RootSignature* rootSig)
 
 	for (uint32_t i = 0; i < m_rootSig->GetNumParameters(); ++i)
 	{
+		ResourceTable& resourceTable = m_resourceTables[i];
+
 		uint32_t numDescriptors = (*m_rootSig)[i].GetNumDescriptors();
-		m_resourceTables[i].descriptors.resize(numDescriptors);
+		resourceTable.descriptors.resize(numDescriptors);
+
 		for (uint32_t j = 0; j < numDescriptors; ++j)
 		{
-			m_resourceTables[i].descriptors[j].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+			resourceTable.descriptors[j].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 		}
-		m_resourceTables[i].isSamplerTable = false;
+		resourceTable.gpuDescriptor.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	
+		resourceTable.rootIndex = i;
+		resourceTable.isSamplerTable = false;
 	}
 }
 
@@ -51,13 +57,18 @@ void ResourceSet::Finalize()
 
 	for (uint32_t i = 0; i < 8; ++i)
 	{
-		if (m_resourceTables[i].descriptors.empty())
+		ResourceTable& resourceTable = m_resourceTables[i];
+
+		if (resourceTable.rootIndex == -1)
 			break;
 
-		uint32_t numDescriptors = static_cast<uint32_t>(m_resourceTables[i].descriptors.size());
+		uint32_t numDescriptors = static_cast<uint32_t>(resourceTable.descriptors.size());
+		if (numDescriptors == 0)
+			continue;
+
 		D3D12_DESCRIPTOR_HEAP_TYPE heapType{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV };
 
-		if (m_resourceTables[i].isSamplerTable)
+		if (resourceTable.isSamplerTable)
 		{
 			heapType = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;	
 		}
@@ -65,12 +76,12 @@ void ResourceSet::Finalize()
 		DescriptorHandle descHandle = AllocateUserDescriptor(heapType, numDescriptors);
 		uint32_t descriptorSize = device->GetDescriptorHandleIncrementSize(heapType);
 
-		m_resourceTables[i].gpuDescriptor = descHandle.GetGpuHandle();
+		resourceTable.gpuDescriptor = descHandle.GetGpuHandle();
 
 		for (uint32_t j = 0; j < numDescriptors; ++j)
 		{
 			DescriptorHandle offsetHandle = descHandle + j * descriptorSize;
-			device->CopyDescriptorsSimple(1, offsetHandle.GetCpuHandle(), m_resourceTables[i].descriptors[j], heapType);
+			device->CopyDescriptorsSimple(1, offsetHandle.GetCpuHandle(), resourceTable.descriptors[j], heapType);
 		}
 	}
 

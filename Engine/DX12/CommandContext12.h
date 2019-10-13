@@ -305,10 +305,14 @@ inline void GraphicsContext::SetResources(const ResourceSet& resources)
 
 	for (uint32_t i = 0; i < 8; ++i)
 	{
-		if (resources.m_resourceTables[i].descriptors.empty())
+		int rootIndex = resources.m_resourceTables[i].rootIndex;
+		if (rootIndex == -1)
 			break;
 
-		m_commandList->SetGraphicsRootDescriptorTable(i, resources.m_resourceTables[i].gpuDescriptor);
+		if (resources.m_resourceTables[i].gpuDescriptor.ptr != D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+		{
+			m_commandList->SetGraphicsRootDescriptorTable((UINT)rootIndex, resources.m_resourceTables[i].gpuDescriptor);
+		}
 	}
 }
 
