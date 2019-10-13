@@ -283,6 +283,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="Shaders\LightsVS.hlsl">
       <FileType>Document</FileType>
@@ -304,6 +307,41 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Shaders\LightsPS.glsl">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Compiling GLSL to SPIR-V...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Compiling GLSL to SPIR-V...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Compiling GLSL to SPIR-V...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">glslc.exe -DVK=1 -fshader-stage=frag %(Fullpath) -o $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">glslc.exe -DVK=1 -fshader-stage=frag %(Fullpath) -o $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">glslc.exe -DVK=1 -fshader-stage=frag %(Fullpath) -o $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\LightsVS.glsl">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Compiling GLSL to SPIR-V...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Compiling GLSL to SPIR-V...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Compiling GLSL to SPIR-V...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">glslc.exe -DVK=1 -fshader-stage=vert %(Fullpath) -o $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">glslc.exe -DVK=1 -fshader-stage=vert %(Fullpath) -o $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">glslc.exe -DVK=1 -fshader-stage=vert %(Fullpath) -o $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

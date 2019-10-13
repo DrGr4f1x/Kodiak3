@@ -26,11 +26,7 @@ cbuffer VSConstants : register(b0)
 
 VSOutput main(VSInput input)
 {
-#if VK
-	VSOutput output;
-#else
 	VSOutput output = (VSOutput)0;
-#endif
 
 	output.normal = input.normal;
 	output.color = input.color;
