@@ -1,13 +1,7 @@
-[[vk::binding(0, 0)]]
 cbuffer VSConstants : register(b0)
 {
 	float4x4 projectionMatrix;
 	float4x4 viewMatrix;
-};
-
-[[vk::binding(0, 1)]]
-cbuffer VSModelConstants : register(b1)
-{
 	float4x4 modelMatrix;
 };
 

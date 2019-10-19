@@ -38,6 +38,25 @@ class OcclusionQueryHeap;
 class ReadbackBuffer;
 
 
+struct DWParam
+{
+	DWParam(float f) : _float(f) {}
+	DWParam(uint32_t u) : _uint(u) {}
+	DWParam(int32_t i) : _int(i) {}
+
+	void operator=(float f) { _float = f; }
+	void operator=(uint32_t u) { _uint = u; }
+	void operator=(int32_t i) { _int = i; }
+
+	union
+	{
+		float		_float;
+		uint32_t	_uint;
+		int32_t		_int;
+	};
+};
+
+
 class ContextManager
 {
 public:
@@ -174,6 +193,7 @@ public:
 	void SetPipelineState(const GraphicsPSO& PSO);
 
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
+	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset);
 	void SetResources(const ResourceSet& resources);
 
 	void SetIndexBuffer(const IndexBuffer& indexBuffer);
@@ -199,6 +219,7 @@ public:
 	void SetPipelineState(const ComputePSO& PSO);
 	
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
+	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset);
 	void SetResources(const ResourceSet& resources);
 
 	void Dispatch(uint32_t groupCountX = 1, uint32_t groupCountY = 1, uint32_t groupCountZ = 1);
@@ -292,6 +313,12 @@ inline void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 inline void GraphicsContext::SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants)
 {
 	m_commandList->SetGraphicsRoot32BitConstants(rootIndex, numConstants, constants, 0);
+}
+
+
+inline void GraphicsContext::SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset)
+{
+	m_commandList->SetGraphicsRoot32BitConstants(rootIndex, numConstants, constants, offset);
 }
 
 
@@ -408,6 +435,12 @@ inline void ComputeContext::SetPipelineState(const ComputePSO& pso)
 inline void ComputeContext::SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants)
 {
 	m_commandList->SetComputeRoot32BitConstants(rootIndex, numConstants, constants, 0);
+}
+
+
+inline void ComputeContext::SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset)
+{
+	m_commandList->SetComputeRoot32BitConstants(rootIndex, numConstants, constants, offset);
 }
 
 

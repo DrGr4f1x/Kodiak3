@@ -42,6 +42,10 @@ uint32_t RootParameter::GetNumDescriptors() const
 			numDescriptors += m_rootParam.DescriptorTable.pDescriptorRanges[i].NumDescriptors;
 		}
 	}
+	else if (m_rootParam.ParameterType == D3D12_ROOT_PARAMETER_TYPE_CBV)
+	{
+		numDescriptors = 1;
+	}
 
 	return numDescriptors;
 }

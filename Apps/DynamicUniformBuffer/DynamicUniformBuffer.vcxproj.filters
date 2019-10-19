@@ -22,4 +22,12 @@
       <Filter>Shaders</Filter>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\BaseVS.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\BasePS.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
 </Project>

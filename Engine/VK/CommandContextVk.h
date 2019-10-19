@@ -139,6 +139,7 @@ public:
 	void SetPipelineState(const GraphicsPSO& PSO);
 	
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
+	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset);
 	void SetResources(const ResourceSet& resources);	
 
 	void SetIndexBuffer(const IndexBuffer& indexBuffer);
@@ -164,6 +165,7 @@ public:
 	void SetPipelineState(const ComputePSO& PSO);
 	
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
+	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset);
 	void SetResources(const ResourceSet& resources);
 
 	void Dispatch(uint32_t groupCountX = 1, uint32_t groupCountY = 1, uint32_t groupCountZ = 1);
@@ -322,6 +324,18 @@ inline void GraphicsContext::SetConstantArray(uint32_t rootIndex, uint32_t numCo
 }
 
 
+inline void GraphicsContext::SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset)
+{
+	vkCmdPushConstants(
+		m_commandList,
+		m_curGraphicsPipelineLayout,
+		m_shaderStages[rootIndex],
+		offset * sizeof(DWORD),
+		numConstants * sizeof(DWORD),
+		constants);
+}
+
+
 inline void GraphicsContext::SetResources(const ResourceSet& resources)
 {
 	uint32_t i = 0;
@@ -457,6 +471,18 @@ inline void ComputeContext::SetConstantArray(uint32_t rootIndex, uint32_t numCon
 		m_curGraphicsPipelineLayout,
 		VK_SHADER_STAGE_COMPUTE_BIT,
 		0,
+		numConstants * sizeof(DWORD),
+		constants);
+}
+
+
+inline void ComputeContext::SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset)
+{
+	vkCmdPushConstants(
+		m_commandList,
+		m_curGraphicsPipelineLayout,
+		VK_SHADER_STAGE_COMPUTE_BIT,
+		offset * sizeof(DWORD),
 		numConstants * sizeof(DWORD),
 		constants);
 }

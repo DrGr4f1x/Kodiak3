@@ -3,8 +3,15 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Stdafx.cpp" />
+    <ClCompile Include="BloomApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="BloomApp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{43caa214-5c29-48f6-bfd4-9336ae14e2c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

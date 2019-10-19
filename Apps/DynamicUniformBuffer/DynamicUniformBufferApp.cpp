@@ -88,12 +88,14 @@ void DynamicUniformBufferApp::Render()
 	context.SetIndexBuffer(m_indexBuffer);
 	context.SetVertexBuffer(0, m_vertexBuffer);
 
-	context.SetRootConstantBuffer(0, m_vsConstantBuffer);
+	context.SetConstantArray(0, 32, &m_vsConstants);
 
 	for (uint32_t i = 0; i < m_numCubes; ++i)
 	{
 		uint32_t dynamicOffset = i * (uint32_t)m_dynamicAlignment;
-		context.SetRootConstantBuffer(1, m_vsModelConstantBuffer, dynamicOffset);
+		
+		context.SetConstantArray(0, 16, (byte*)(m_vsModelConstants.modelMatrix) + dynamicOffset, 32);
+
 		context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 	}
 
@@ -106,9 +108,8 @@ void DynamicUniformBufferApp::Render()
 
 void DynamicUniformBufferApp::InitRootSig()
 {
-	m_rootSignature.Reset(2);
-	m_rootSignature[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
-	m_rootSignature[1].InitAsConstantBuffer(1, ShaderVisibility::Vertex);
+	m_rootSignature.Reset(1);
+	m_rootSignature[0].InitAsConstants(0, 48, ShaderVisibility::Vertex);
 	m_rootSignature.Finalize("Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout | RootSignatureFlags::DenyPixelShaderRootAccess);
 }
 
@@ -147,7 +148,6 @@ void DynamicUniformBufferApp::InitConstantBuffers()
 	m_vsModelConstants.modelMatrix = (Matrix4*)_aligned_malloc(allocSize, m_dynamicAlignment);
 
 	m_vsConstantBuffer.Create("VS Constant Buffer", 1, sizeof(VSConstants));
-	m_vsModelConstantBuffer.Create("VS Model Constant Buffer", 1, allocSize);
 
 	UpdateConstantBuffers();
 
@@ -240,5 +240,4 @@ void DynamicUniformBufferApp::UpdateConstantBuffers()
 	}
 
 	m_animationTimer = 0.0f;
-	m_vsModelConstantBuffer.Update(m_numCubes * m_dynamicAlignment, m_vsModelConstants.modelMatrix);
 }

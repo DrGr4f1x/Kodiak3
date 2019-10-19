@@ -27,7 +27,6 @@ class ResourceSet
 	friend class GraphicsContext;
 
 public:
-
 	void Init(const RootSignature* rootSig);
 	void Finalize();
 

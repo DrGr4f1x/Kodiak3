@@ -14,6 +14,7 @@
 #include "CameraController.h"
 #include "GpuBuffer.h"
 #include "PipelineState.h"
+#include "ResourceSet.h"
 #include "RootSignature.h"
 
 
@@ -52,14 +53,12 @@ private:
 	VSConstants m_vsConstants;
 	Kodiak::ConstantBuffer m_vsConstantBuffer;
 
-	
 	struct alignas(256) VSModelConstants
 	{
 		Math::Matrix4* modelMatrix{ nullptr };
 	};
 	size_t m_dynamicAlignment{ 0 };
 	VSModelConstants m_vsModelConstants;
-	Kodiak::ConstantBuffer m_vsModelConstantBuffer;
 
 	Kodiak::RootSignature m_rootSignature;
 	Kodiak::GraphicsPSO m_pso;
