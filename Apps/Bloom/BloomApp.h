@@ -77,7 +77,8 @@ private:
 
 	Kodiak::GraphicsPSO		m_colorPassPSO;
 	Kodiak::GraphicsPSO		m_phongPassPSO;
-	Kodiak::GraphicsPSO		m_blurPSO;
+	Kodiak::GraphicsPSO		m_blurVertPSO;
+	Kodiak::GraphicsPSO		m_blurHorizPSO;
 	Kodiak::GraphicsPSO		m_skyboxPSO;
 
 	// Constant buffers

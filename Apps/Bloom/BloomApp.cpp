@@ -38,16 +38,19 @@ void BloomApp::Configure()
 void BloomApp::Startup()
 {
 	m_camera.SetPerspectiveMatrix(
-		XMConvertToRadians(60.0f),
+		XMConvertToRadians(45.0f),
 		(float)m_displayHeight / (float)m_displayWidth,
-		0.001f,
+		0.1f,
 		256.0f);
-	m_camera.SetPosition(Math::Vector3(18.65f, -14.4f, -18.65f));
-	//m_camera.SetZoomRotation(-30.0f, -32.5f, 45.0f, 0.0f);
+	m_camera.SetPosition(Math::Vector3(0.0f, 0.0f, -10.25f));
+	m_camera.SetRotation(Math::Quaternion(XMConvertToRadians(7.5f), XMConvertToRadians(-343.0f), 0.0f));
+	m_camera.Update();
+
+	m_timerSpeed = 0.125f;
 
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);
-	m_controller.SetOrbitTarget(Vector3(0.0f, 0.0f, 0.0f), Length(m_camera.GetPosition()), 4.0f);
+	m_controller.SetOrbitTarget(Vector3(0.0f, -2.0f, 0.0f), Length(m_camera.GetPosition()), 4.0f);
 
 	InitRootSigs();
 	InitPSOs();
@@ -83,7 +86,50 @@ void BloomApp::Render()
 {
 	auto& context = GraphicsContext::Begin("Render frame");
 
+	// Offscreen color pass
+
+	context.TransitionResource(*m_offscreenFramebuffer[0]->GetColorBuffer(0), ResourceState::RenderTarget);
+	context.TransitionResource(*m_offscreenFramebuffer[0]->GetDepthBuffer(), ResourceState::DepthWrite);
+	context.ClearColor(*m_offscreenFramebuffer[0]->GetColorBuffer(0));
+	context.ClearDepth(*m_offscreenFramebuffer[0]->GetDepthBuffer());
+
+	context.BeginRenderPass(*m_offscreenFramebuffer[0]);
+
+	context.SetViewportAndScissor(0u, 0u, 256, 256);
+
+	// 3D scene (glow pass)
+	context.SetRootSignature(m_sceneRootSig);
+	context.SetPipelineState(m_colorPassPSO);
+
+	context.SetResources(m_sceneResources);
+
+	context.SetIndexBuffer(m_ufoGlowModel->GetIndexBuffer());
+	context.SetVertexBuffer(0, m_ufoGlowModel->GetVertexBuffer());
+
+	context.DrawIndexed((uint32_t)m_ufoGlowModel->GetIndexBuffer().GetElementCount());
+
+	context.EndRenderPass();
+
+	// Vertical blur pass
+
+	context.TransitionResource(*m_offscreenFramebuffer[0]->GetColorBuffer(0), ResourceState::PixelShaderResource);
+	context.TransitionResource(*m_offscreenFramebuffer[1]->GetColorBuffer(0), ResourceState::RenderTarget);
+	context.ClearColor(*m_offscreenFramebuffer[1]->GetColorBuffer(0));
+
+	context.BeginRenderPass(*m_offscreenFramebuffer[1]);
+
+	context.SetRootSignature(m_blurRootSig);
+	context.SetPipelineState(m_blurVertPSO);
+
+	context.SetResources(m_blurVertResources);
+	context.Draw(3);
+
+	context.EndRenderPass();
+
+	// Backbuffer color pass
+
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
+	context.TransitionResource(*m_offscreenFramebuffer[1]->GetColorBuffer(0), ResourceState::PixelShaderResource);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
 	context.ClearColor(GetColorBuffer());
 	context.ClearDepth(GetDepthBuffer());
@@ -91,7 +137,7 @@ void BloomApp::Render()
 	context.BeginRenderPass(GetBackBuffer());
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
-
+	   
 	// Skybox
 	context.SetRootSignature(m_skyboxRootSig);
 	context.SetPipelineState(m_skyboxPSO);
@@ -113,6 +159,13 @@ void BloomApp::Render()
 	context.SetVertexBuffer(0, m_ufoModel->GetVertexBuffer());
 
 	context.DrawIndexed((uint32_t)m_ufoModel->GetIndexBuffer().GetElementCount());
+
+	// Horizontal blur pass
+	context.SetRootSignature(m_blurRootSig);
+	context.SetPipelineState(m_blurHorizPSO);
+
+	context.SetResources(m_blurHorizResources);
+	context.Draw(3);
 
 	context.EndRenderPass();
 	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
@@ -144,7 +197,7 @@ void BloomApp::InitRootSigs()
 void BloomApp::InitPSOs()
 {
 	m_colorPassPSO.SetRootSignature(m_sceneRootSig);
-	m_colorPassPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
+	m_colorPassPSO.SetRenderTargetFormat(Format::R8G8B8A8_UNorm, GetDepthFormat());
 	m_colorPassPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 	m_colorPassPSO.SetBlendState(CommonStates::BlendDisable());
 	m_colorPassPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
@@ -152,10 +205,21 @@ void BloomApp::InitPSOs()
 	m_colorPassPSO.SetVertexShader("ColorPassVS");
 	m_colorPassPSO.SetPixelShader("ColorPassPS");
 
-	m_blurPSO = m_colorPassPSO;
-	m_blurPSO.SetRootSignature(m_blurRootSig);
-	m_blurPSO.SetVertexShader("GaussBlurVS");
-	m_blurPSO.SetPixelShader("GaussBlurPS");
+	m_blurVertPSO = m_colorPassPSO;
+	m_blurVertPSO.SetRootSignature(m_blurRootSig);
+	m_blurVertPSO.SetRenderTargetFormat(Format::R8G8B8A8_UNorm, Format::Unknown);
+	m_blurVertPSO.SetBlendState(CommonStates::BlendDisable());
+	m_blurVertPSO.SetDepthStencilState(CommonStates::DepthStateDisabled());
+	m_blurVertPSO.SetVertexShader("GaussBlurVS");
+	m_blurVertPSO.SetPixelShader("GaussBlurPS");
+
+	m_blurHorizPSO = m_colorPassPSO;
+	m_blurHorizPSO.SetRootSignature(m_blurRootSig);
+	m_blurHorizPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
+	m_blurHorizPSO.SetBlendState(CommonStates::BlendAdditive());
+	m_blurHorizPSO.SetDepthStencilState(CommonStates::DepthStateDisabled());
+	m_blurHorizPSO.SetVertexShader("GaussBlurVS");
+	m_blurHorizPSO.SetPixelShader("GaussBlurPS");
 
 	VertexStreamDesc vertexStream = { 0, sizeof(Vertex), InputClassification::PerVertexData };
 	vector<VertexElementDesc> vertexElements =
@@ -168,18 +232,21 @@ void BloomApp::InitPSOs()
 	m_colorPassPSO.SetInputLayout(vertexStream, vertexElements);
 
 	m_phongPassPSO = m_colorPassPSO;
+	m_phongPassPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 	m_phongPassPSO.SetVertexShader("PhongPassVS");
 	m_phongPassPSO.SetPixelShader("PhongPassPS");
 
 	m_skyboxPSO = m_colorPassPSO;
 	m_skyboxPSO.SetRootSignature(m_skyboxRootSig);
+	m_skyboxPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 	m_skyboxPSO.SetDepthStencilState(CommonStates::DepthStateDisabled());
 	m_skyboxPSO.SetVertexShader("SkyBoxVS");
 	m_skyboxPSO.SetPixelShader("SkyBoxPS");
 
 	m_colorPassPSO.Finalize();
 	m_phongPassPSO.Finalize();
-	m_blurPSO.Finalize();
+	m_blurVertPSO.Finalize();
+	m_blurHorizPSO.Finalize();
 	m_skyboxPSO.Finalize();
 }
 
@@ -189,15 +256,20 @@ void BloomApp::InitFramebuffers()
 	for (int i = 0; i < 2; ++i) 
 	{
 		// Framebuffer for offscreen pass
-		auto colorBuffer = make_shared<ColorBuffer>(DirectX::Colors::Black);
-		colorBuffer->Create("Offscreen Color Buffer " + to_string(i), GetWidth(), GetHeight(), 1, Format::R8G8B8A8_UNorm);
-
-		auto depthBuffer = make_shared<DepthBuffer>(1.0f);
-		depthBuffer->Create("Offscreen Depth Buffer " + to_string(i), GetWidth(), GetHeight(), GetDepthFormat());
-
 		m_offscreenFramebuffer[i] = make_shared<FrameBuffer>();
+
+		auto colorBuffer = make_shared<ColorBuffer>(DirectX::Colors::Black);
+		colorBuffer->Create("Offscreen Color Buffer " + to_string(i), 256, 256, 1, Format::R8G8B8A8_UNorm);
+
 		m_offscreenFramebuffer[i]->SetColorBuffer(0, colorBuffer);
-		m_offscreenFramebuffer[i]->SetDepthBuffer(depthBuffer);
+
+		if (i == 0)
+		{
+			auto depthBuffer = make_shared<DepthBuffer>(1.0f);
+			depthBuffer->Create("Offscreen Depth Buffer " + to_string(i), 256, 256, GetDepthFormat());
+			m_offscreenFramebuffer[i]->SetDepthBuffer(depthBuffer);
+		}
+		
 		m_offscreenFramebuffer[i]->Finalize();
 	}
 }
@@ -272,9 +344,14 @@ void BloomApp::UpdateConstantBuffers()
 	m_sceneConstants.viewMat = m_camera.GetViewMatrix();
 	m_sceneConstants.modelMat = Matrix4(kIdentity);
 
+	AffineTransform modelTrans{ kIdentity };
+	modelTrans = AffineTransform::MakeTranslation(Vector3(sinf(XMConvertToRadians(m_timer * 360.0f)) * 0.25f, -2.0f, cosf(XMConvertToRadians(m_timer * 360.0f)) * 0.25f));
+	modelTrans = modelTrans * AffineTransform::MakeXRotation(-sinf(XMConvertToRadians(m_timer * 360.0f)) * 0.15f);
+	modelTrans = modelTrans * AffineTransform::MakeYRotation(XMConvertToRadians(m_timer * 360.0f));
+	m_sceneConstants.modelMat = modelTrans;
+
 	m_skyboxConstants.projectionMat = Matrix4::MakePerspective(XMConvertToRadians(45.0f), (float)GetWidth() / (float)GetHeight(), 0.1f, 256.0f);
-	m_skyboxConstants.viewMat = m_sceneConstants.viewMat;
-	m_skyboxConstants.viewMat.SetW(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+	m_skyboxConstants.viewMat = Matrix4(Matrix3(m_sceneConstants.viewMat));
 	m_skyboxConstants.modelMat = Matrix4(kIdentity);
 
 	m_sceneConstantBuffer.Update(sizeof(SceneConstants), &m_sceneConstants);

@@ -34,7 +34,7 @@ VSOutput main(VSInput input)
 	float4x4 modelToProjection = mul(projectionMatrix, mul(viewMatrix, modelMatrix));
 	output.pos = mul(modelToProjection, input.pos);
 
-	float3 lightPos = float3(-5.0f, -5.0f, 0.0f);
+	float3 lightPos = float3(-5.0f, 5.0f, 0.0f);
 	float4 pos = mul(viewMatrix, mul(modelMatrix, input.pos));
 
 	output.normal = mul((float3x3)viewMatrix, mul((float3x3)modelMatrix, input.normal));
