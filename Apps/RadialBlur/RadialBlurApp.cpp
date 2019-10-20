@@ -205,18 +205,16 @@ void RadialBlurApp::InitPSOs()
 void RadialBlurApp::InitFramebuffers()
 {
 	// Framebuffer for offscreen pass
-	{
-		auto colorBuffer = make_shared<ColorBuffer>(DirectX::Colors::Black);
-		colorBuffer->Create("Offscreen Color Buffer", s_offscreenSize, s_offscreenSize, 1, Format::R8G8B8A8_UNorm);
+	auto colorBuffer = make_shared<ColorBuffer>(DirectX::Colors::Black);
+	colorBuffer->Create("Offscreen Color Buffer", s_offscreenSize, s_offscreenSize, 1, Format::R8G8B8A8_UNorm);
 
-		auto depthBuffer = make_shared<DepthBuffer>(1.0f);
-		depthBuffer->Create("Offscreen Depth Buffer", s_offscreenSize, s_offscreenSize, GetDepthFormat());
+	auto depthBuffer = make_shared<DepthBuffer>(1.0f);
+	depthBuffer->Create("Offscreen Depth Buffer", s_offscreenSize, s_offscreenSize, GetDepthFormat());
 
-		m_offscreenFramebuffer = make_shared<FrameBuffer>();
-		m_offscreenFramebuffer->SetColorBuffer(0, colorBuffer);
-		m_offscreenFramebuffer->SetDepthBuffer(depthBuffer);
-		m_offscreenFramebuffer->Finalize();
-	}
+	m_offscreenFramebuffer = make_shared<FrameBuffer>();
+	m_offscreenFramebuffer->SetColorBuffer(0, colorBuffer);
+	m_offscreenFramebuffer->SetDepthBuffer(depthBuffer);
+	m_offscreenFramebuffer->Finalize();
 }
 
 

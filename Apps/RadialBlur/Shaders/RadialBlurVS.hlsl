@@ -5,7 +5,7 @@ struct VSOutput
 };
 
 
-VSOutput main( uint vertId : SV_VertexID )
+VSOutput main(uint vertId : SV_VertexID)
 {
 	VSOutput output = (VSOutput)0;
 

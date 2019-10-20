@@ -22,7 +22,7 @@ struct VSOutput
 	float gradientU : TEXCOORD1;
 };
 
-VSOutput main(uint vertId : SV_VertexId)
+VSOutput main(uint vertId : SV_VertexID)
 {
 	VSOutput output = (VSOutput)0;
 

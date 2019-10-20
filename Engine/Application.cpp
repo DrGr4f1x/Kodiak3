@@ -159,6 +159,14 @@ uint32_t Application::GetFrameNumber() const
 }
 
 
+string Application::GetWindowTitle() const
+{
+	string title = s_apiPrefixString + " " + m_name + " - " + std::to_string(m_frameCounter) + " fps";
+
+	return title;
+}
+
+
 const string& Application::GetDefaultShaderPath()
 {
 	return s_defaultShaderPath;
@@ -231,6 +239,8 @@ bool Application::Tick()
 		m_graphicsDevice->SubmitFrame();
 	}
 
+	++m_frameCounter;
+
 	auto timeEnd = chrono::high_resolution_clock::now();
 	auto timeDiff = chrono::duration<double, std::milli>(timeEnd - timeStart).count();
 	m_frameTimer = static_cast<float>(timeDiff) / 1000.0f;
@@ -242,6 +252,18 @@ bool Application::Tick()
 		{
 			m_timer -= 1.0f;
 		}
+	}
+
+	float fpsTimer = (float)(std::chrono::duration<double, std::milli>(timeEnd - m_lastTimestamp).count());
+	if (fpsTimer > 1000.0f)
+	{
+		m_lastFps = static_cast<uint32_t>((float)m_frameCounter * (1000.0f / fpsTimer));
+
+		std::string windowTitle = GetWindowTitle();
+		SetWindowText(m_hwnd, windowTitle.c_str());
+
+		m_frameCounter = 0;
+		m_lastTimestamp = timeEnd;
 	}
 
 	return res;

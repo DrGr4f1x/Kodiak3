@@ -71,7 +71,6 @@ void DirectConstantsApp::Shutdown()
 bool DirectConstantsApp::Update()
 {
 	m_controller.Update(m_frameTimer);
-	//m_camera.Update();
 
 	UpdateConstantBuffer();
 

@@ -62,6 +62,8 @@ public:
 	uint32_t GetCurrentFrame() const;
 	uint32_t GetFrameNumber() const;
 
+	std::string GetWindowTitle() const;
+
 protected:
 	const std::string m_name;
 
@@ -74,6 +76,9 @@ protected:
 	float m_frameTimer{ 0.0f };
 	float m_timer{ 0.0f };
 	float m_timerSpeed{ 1.0f };
+	uint32_t m_lastFps{ 0 };
+	uint32_t m_frameCounter{ 0 };
+	std::chrono::time_point<std::chrono::high_resolution_clock> m_lastTimestamp;
 
 	Math::Camera m_camera;
 

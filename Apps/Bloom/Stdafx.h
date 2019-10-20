@@ -17,6 +17,8 @@
 #define NOMINMAX
 #endif
 
+#define _DISABLE_EXTENDED_ALIGNED_STORAGE
+
 // Windows
 #include <windows.h>
 #include <wrl.h>
