@@ -1,5 +1,18 @@
-[[vk::binding(0,1)]] Texture2D gradientTex : register(t0);
-[[vk::binding(0,2)]] SamplerState linearSampler : register(s0);
+//
+// This code is licensed under the MIT License (MIT).
+// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
+// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
+// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
+// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
+//
+// Author:  David Elder
+//
+
+[[vk::binding(0,1)]] 
+Texture2D gradientTex : register(t0);
+
+[[vk::binding(0,2)]] 
+SamplerState linearSampler : register(s0);
 
 
 struct PSInput
@@ -23,7 +36,7 @@ float4 main(PSInput input) : SV_TARGET
 
 	float3 reflectedLightVec = reflect(-lightVec, normal);
 
-	float3 diffuse = max(dot(normal, lightVec), 0.0f) * float3(1.0f, 1.0f, 1.0f);
+	float3 diffuse = max(dot(normal, lightVec), 0.0f);
 	float3 specular = pow(max(dot(reflectedLightVec, viewVec), 0.0f), 16.0f) * color.a;
 
 	return float4(diffuse * color.rgb + specular, 1.0f);

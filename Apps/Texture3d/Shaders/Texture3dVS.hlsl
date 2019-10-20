@@ -1,3 +1,13 @@
+//
+// This code is licensed under the MIT License (MIT).
+// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
+// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
+// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
+// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
+//
+// Author:  David Elder
+//
+
 struct VSInput
 {
 	float3 pos : POSITION;
@@ -35,7 +45,7 @@ VSOutput main(VSInput input)
 	output.normal = mul((float3x3)modelMatrix, input.normal);
 	output.uv = float3(input.uv, depth);
 
-	float3 lightPos = float3(0.0f, 0.0f, 0.0f);
+	float3 lightPos = 0.0.xxx;
 	float3 lPos = mul((float3x3)modelMatrix, lightPos);
 	output.lightVec = lPos - worldPos;
 	output.viewVec = viewPos.xyz - worldPos;

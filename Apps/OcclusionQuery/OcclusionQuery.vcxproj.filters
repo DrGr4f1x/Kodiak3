@@ -15,8 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="Shaders\SimplePS.hlsl" />
-    <CustomBuild Include="Shaders\SimpleVS.hlsl" />
     <CustomBuild Include="Shaders\MeshPS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
@@ -27,6 +25,12 @@
       <Filter>Shaders</Filter>
     </CustomBuild>
     <CustomBuild Include="Shaders\OccluderVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\SimplePS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\SimpleVS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
   </ItemGroup>
