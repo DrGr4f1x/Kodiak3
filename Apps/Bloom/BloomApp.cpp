@@ -69,6 +69,13 @@ void BloomApp::Shutdown()
 	m_ufoGlowModel.reset();
 	m_skyboxModel.reset();
 	m_skyboxTex.reset();
+
+	m_offscreenFramebuffer[0].reset();
+	m_offscreenFramebuffer[1].reset();
+
+	m_sceneRootSig.Destroy();
+	m_blurRootSig.Destroy();
+	m_skyboxRootSig.Destroy();
 }
 
 
