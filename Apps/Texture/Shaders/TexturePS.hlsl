@@ -8,13 +8,6 @@
 // Author:  David Elder
 //
 
-[[vk::binding(0,1)]] 
-Texture2D gradientTex : register(t0);
-
-[[vk::binding(0,2)]] 
-SamplerState linearSampler : register(s0);
-
-
 struct PSInput
 {
 	float4 pos : SV_Position;
@@ -26,9 +19,16 @@ struct PSInput
 };
 
 
+[[vk::binding(0, 1)]]
+Texture2D colorTex : register(t0);
+
+[[vk::binding(0, 2)]]
+SamplerState linearSampler : register(s0);
+
+
 float4 main(PSInput input) : SV_TARGET
 {
-	float4 color = gradientTex.SampleLevel(linearSampler, input.uv, input.lodBias);
+	float4 color = colorTex.SampleLevel(linearSampler, input.uv, input.lodBias);
 
 	float3 normal = normalize(input.normal);
 	float3 lightVec = normalize(input.lightVec);
