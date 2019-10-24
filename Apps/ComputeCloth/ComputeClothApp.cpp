@@ -42,12 +42,12 @@ void ComputeClothApp::Startup()
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.1f,
 		512.0f);
-	m_camera.SetPosition(Math::Vector3(-2.7f, -2.7f, -2.7f));
+	m_camera.SetPosition(Math::Vector3(-2.0f, -2.0f, -2.0f));
 	//m_camera.SetZoomRotation(-30.0f, -32.5f, 45.0f, 0.0f);
 
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);
-	m_controller.SetOrbitTarget(Vector3(0.0f, 0.0f, 0.0f), Length(m_camera.GetPosition()), 4.0f);
+	m_controller.SetOrbitTarget(Vector3(0.0f, 0.0f, 0.0f), Length(m_camera.GetPosition()), 2.0f);
 
 	InitRootSigs();
 	InitPSOs();
@@ -216,7 +216,7 @@ void ComputeClothApp::InitPSOs()
 
 void ComputeClothApp::InitConstantBuffers()
 {
-	m_vsConstants.lightPos = Vector4(-1.0f, 2.0f, -1.0f, 1.0f);
+	m_vsConstants.lightPos = Vector4(2.0f, 4.0f, 2.0f, 1.0f);
 	m_vsConstantBuffer.Create("VS Constant Buffer", 1, sizeof(VSConstants));
 
 	float dx = m_size[0] / (m_gridSize[0] - 1);
@@ -364,15 +364,21 @@ void ComputeClothApp::UpdateConstantBuffers()
 	m_vsConstantBuffer.Update(sizeof(VSConstants), &m_vsConstants);
 
 	// TODO - Base on frame time
-	m_csConstants.deltaT = 0.000005f;
+	m_csConstants.deltaT = m_frameTimer / 64.0f;
+	m_csNormalConstants.deltaT = m_csConstants.deltaT;
 	if (m_simulateWind)
 	{
-		// TODO
+		float scale = (1.0f + g_rng.NextFloat(5.0f)) - (1.0f + g_rng.NextFloat(5.0f));
+		m_csConstants.gravity.SetX(cosf(XMConvertToRadians(m_timer * 360.0f)) * scale);
+		scale = (1.0f + g_rng.NextFloat(5.0f)) - (1.0f + g_rng.NextFloat(5.0f));
+		m_csConstants.gravity.SetZ(sinf(XMConvertToRadians(m_timer * 360.0f)) * scale);
 	}
 	else
 	{
 		m_csConstants.gravity.SetX(0.0f);
 		m_csConstants.gravity.SetZ(0.0f);
 	}
+	m_csNormalConstants.gravity = m_csConstants.gravity;
 	m_csConstantBuffer.Update(sizeof(CSConstants), &m_csConstants);
+	m_csNormalConstantBuffer.Update(sizeof(CSConstants), &m_csNormalConstants);
 }

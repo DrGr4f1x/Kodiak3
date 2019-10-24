@@ -118,7 +118,7 @@ private:
 	const float m_sphereRadius{ 0.5f };
 	const uint32_t m_gridSize[2]{ 64, 64 };
 	const float m_size[2]{ 2.5f, 2.5f };
-	bool m_simulateWind{ false };
+	bool m_simulateWind{ true };
 	bool m_pinnedCloth{ false };
 	uint32_t m_readSet{ 1 };
 };
