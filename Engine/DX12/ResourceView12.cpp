@@ -108,8 +108,11 @@ void ShaderResourceView::Create(const ResourceHandle& resource, ResourceType typ
 
 	switch (type)
 	{
-	case ResourceType::GenericBuffer:
 	case ResourceType::IndexBuffer:
+	case ResourceType::ConstantBuffer:
+	case ResourceType::ByteAddressBuffer:
+	case ResourceType::IndirectArgsBuffer:
+	case ResourceType::ReadbackBuffer:
 		srvDesc.Format = DXGI_FORMAT_R32_TYPELESS;
 		srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
 		srvDesc.Buffer.NumElements = desc.bufferSize / sizeof(float);
@@ -210,8 +213,11 @@ void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType ty
 
 	switch (type)
 	{
-	case ResourceType::GenericBuffer:
 	case ResourceType::IndexBuffer:
+	case ResourceType::ConstantBuffer:
+	case ResourceType::ByteAddressBuffer:
+	case ResourceType::IndirectArgsBuffer:
+	case ResourceType::ReadbackBuffer:
 		uavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
 		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
 		uavDesc.Buffer.NumElements = desc.bufferSize / sizeof(float);

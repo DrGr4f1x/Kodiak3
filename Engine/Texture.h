@@ -98,6 +98,7 @@ public:
 protected:
 	void LoadDDS(const std::string& fullpath, bool sRgb);
 	void LoadKTX(const std::string& fullpath, bool sRgb);
+	void LoadImage(const std::string& fullpath, bool sRgb);
 
 	void CreateDerivedViews();
 

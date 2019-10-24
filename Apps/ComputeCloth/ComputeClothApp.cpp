@@ -42,7 +42,7 @@ void ComputeClothApp::Startup()
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.1f,
 		512.0f);
-	m_camera.SetPosition(Math::Vector3(3.0f, -3.0f, -3.0f));
+	m_camera.SetPosition(Math::Vector3(-2.7f, -2.7f, -2.7f));
 	//m_camera.SetZoomRotation(-30.0f, -32.5f, 45.0f, 0.0f);
 
 	m_controller.SetSpeedScale(0.01f);
@@ -82,9 +82,33 @@ void ComputeClothApp::Render()
 {
 	auto& context = GraphicsContext::Begin("Render frame");
 
+	// Cloth simulation
+	{
+		auto& computeContext = context.GetComputeContext();
+
+		computeContext.TransitionResource(m_clothBuffer[0], ResourceState::NonPixelShaderResource);
+		computeContext.TransitionResource(m_clothBuffer[1], ResourceState::NonPixelShaderResource);
+
+		computeContext.SetRootSignature(m_computeRootSig);
+		computeContext.SetPipelineState(m_computePSO);
+
+		const uint32_t iterations = 64;
+		for (uint32_t j = 0; j < iterations; ++j)
+		{
+			m_readSet = 1 - m_readSet;
+			if (j == iterations - 1)
+				computeContext.SetResources(m_computeNormalResources);
+			else
+				computeContext.SetResources(m_computeResources[m_readSet]);
+			computeContext.Dispatch2D(m_gridSize[0], m_gridSize[1]);
+		}
+	}
+
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
-	context.ClearColor(GetColorBuffer());
+	context.TransitionResource(m_clothBuffer[0], ResourceState::VertexBuffer);
+	Color clearColor{ DirectX::Colors::LightGray };
+	context.ClearColor(GetColorBuffer(), clearColor);
 	context.ClearDepth(GetDepthBuffer());
 
 	context.BeginRenderPass(GetBackBuffer());
@@ -102,7 +126,19 @@ void ComputeClothApp::Render()
 
 	context.DrawIndexed((uint32_t)m_sphereModel->GetIndexBuffer().GetElementCount());
 
+	// Cloth
+	context.SetRootSignature(m_clothRootSig);
+	context.SetPipelineState(m_clothPSO);
+
+	context.SetResources(m_clothResources);
+
+	context.SetIndexBuffer(m_clothIndexBuffer);
+	context.SetVertexBuffer(0, m_clothBuffer[0]);
+
+	context.DrawIndexed((uint32_t)m_clothIndexBuffer.GetElementCount());
+
 	context.EndRenderPass();
+
 	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
@@ -156,12 +192,12 @@ void ComputeClothApp::InitPSOs()
 	m_clothPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleStrip);
 	m_clothPSO.SetPrimitiveRestart(IndexBufferStripCutValue::Value_0xFFFFFFFF);
 
-	VertexStreamDesc clothVtxStream{ 0, sizeof(ClothVertex), InputClassification::PerVertexData };
+	VertexStreamDesc clothVtxStream{ 0, sizeof(Particle), InputClassification::PerVertexData };
 	vector<VertexElementDesc> clothVtxElements =
 	{
-		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(ClothVertex, position), InputClassification::PerVertexData, 0 },
-		{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(ClothVertex, texcoord), InputClassification::PerVertexData, 0 },
-		{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(ClothVertex, normal), InputClassification::PerVertexData, 0 },
+		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Particle, pos), InputClassification::PerVertexData, 0 },
+		{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Particle, uv), InputClassification::PerVertexData, 0 },
+		{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Particle, normal), InputClassification::PerVertexData, 0 },
 
 	};
 	m_clothPSO.SetInputLayout(clothVtxStream, clothVtxElements);
@@ -195,11 +231,17 @@ void ComputeClothApp::InitConstantBuffers()
 	m_csConstants.restDistD = sqrtf(dx * dx + dy * dy);
 	m_csConstants.sphereRadius = m_sphereRadius;
 	m_csConstants.spherePos = m_pinnedCloth ? Vector4(0.0f, 0.0f, -10.0f, 0.0f) : Vector4(0.0f);
-	m_csConstants.gravity = Vector4(0.0f, 9.8f, 0.0f, 0.0f);
+	m_csConstants.gravity = Vector4(0.0f, -9.8f, 0.0f, 0.0f);
 	m_csConstants.particleCount[0] = m_gridSize[0];
 	m_csConstants.particleCount[1] = m_gridSize[1];
+	m_csConstants.calculateNormals = 0;
 
 	m_csConstantBuffer.Create("CS Constant Buffer", 1, sizeof(CSConstants), &m_csConstants);
+
+	m_csNormalConstants = m_csConstants;
+	m_csNormalConstants.calculateNormals = 1;
+
+	m_csNormalConstantBuffer.Create("CS Constant Buffer", 1, sizeof(CSConstants), &m_csNormalConstants);
 }
 
 
@@ -225,13 +267,14 @@ void ComputeClothApp::InitCloth()
 				particle.vel = Vector4(0.0f);
 				particle.uv = Vector4(du * j, dv * i, 0.0f, 0.0f);
 				particle.normal = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
-				particle.pinned = (i == 0) && ((j == 0) || (j == m_gridSize[0] / 3) || (j == m_gridSize[0] - m_gridSize[0] / 3) || (j == m_gridSize[0] - 1));
+				float p = (i == 0) && ((j == 0) || (j == m_gridSize[0] / 3) || (j == m_gridSize[0] - m_gridSize[0] / 3) || (j == m_gridSize[0] - 1));
+				particle.pinned = Vector4(p, 0.0f, 0.0f, 0.0f);
 			}
 		}
 	}
 	else
 	{
-		Matrix4 transMat = AffineTransform::MakeTranslation(Vector3(-m_size[0] / 2.0f, -2.0f, -m_size[1] / 2.0f));
+		Matrix4 transMat = AffineTransform::MakeTranslation(Vector3(-m_size[0] / 2.0f, 2.0f, -m_size[1] / 2.0f));
 		for (uint32_t i = 0; i < m_gridSize[1]; i++) 
 		{
 			for (uint32_t j = 0; j < m_gridSize[0]; j++) 
@@ -241,13 +284,13 @@ void ComputeClothApp::InitCloth()
 				particle.vel = Vector4(0.0f);
 				particle.uv = Vector4(1.0f - du * i, dv * j, 0.0f, 0.0f);
 				particle.normal = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
-				particle.pinned = 0.0f;
+				particle.pinned = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
 			}
 		}
 	}
 
-	m_clothBuffer[0].Create("Cloth Buffer 0", numParticles, sizeof(Particle), particles.data());
-	m_clothBuffer[1].Create("Cloth Buffer 1", numParticles, sizeof(Particle), particles.data());
+	m_clothBuffer[0].CreateWithFlags("Cloth Buffer 0", numParticles, sizeof(Particle), ResourceType::VertexBuffer, particles.data());
+	m_clothBuffer[1].CreateWithFlags("Cloth Buffer 1", numParticles, sizeof(Particle), ResourceType::VertexBuffer, particles.data());
 
 	// Indices
 	vector<uint32_t> indices;
@@ -288,6 +331,12 @@ void ComputeClothApp::InitResourceSets()
 	m_computeResources[1].SetUAV(0, 1, m_clothBuffer[0]);
 	m_computeResources[1].SetCBV(0, 2, m_csConstantBuffer);
 	m_computeResources[1].Finalize();
+
+	m_computeNormalResources.Init(&m_computeRootSig);
+	m_computeNormalResources.SetSRV(0, 0, m_clothBuffer[1]);
+	m_computeNormalResources.SetUAV(0, 1, m_clothBuffer[0]);
+	m_computeNormalResources.SetCBV(0, 2, m_csNormalConstantBuffer);
+	m_computeNormalResources.Finalize();
 }
 
 

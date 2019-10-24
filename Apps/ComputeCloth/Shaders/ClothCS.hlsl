@@ -14,7 +14,7 @@ struct Particle
 	float4 vel;
 	float4 uv;
 	float4 normal;
-	float pinned;
+	float4 pinned;
 };
 
 
@@ -50,7 +50,7 @@ float3 SpringForce(float3 p0, float3 p1, float restDist)
 }
 
 
-[numthreads(10, 10, 1)]
+[numthreads(8, 8, 1)]
 void main(uint3 DTid : SV_DispatchThreadId)
 {
 	uint index = DTid.y * particleCount.x + DTid.x;
@@ -58,9 +58,9 @@ void main(uint3 DTid : SV_DispatchThreadId)
 		return;
 
 	// Pinned?
-	if (particleIn[index].pinned == 1.0) 
+	if (particleIn[index].pinned.x == 1.0) 
 	{
-		particleOut[index].pos = particleOut[index].pos;
+		particleOut[index].pos = particleIn[index].pos;
 		particleOut[index].vel = 0.0.xxxx;
 		return;
 	}
@@ -125,7 +125,7 @@ void main(uint3 DTid : SV_DispatchThreadId)
 
 	// Integrate
 	float3 f = force * (1.0 / particleMass);
-	particleOut[index].pos = float4(pos + vel * deltaT + 0.5 * f * deltaT * deltaT, 1.0);
+	particleOut[index].pos =  float4(pos + vel * deltaT + 0.5 * f * deltaT * deltaT, 1.0);
 	particleOut[index].vel = float4(vel + f * deltaT, 0.0);
 
 	// Sphere collision

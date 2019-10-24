@@ -20,6 +20,15 @@ using namespace Kodiak;
 using namespace std;
 
 
+static const ResourceType s_genericBuffer = 
+ResourceType::ByteAddressBuffer | ResourceType::IndirectArgsBuffer | ResourceType::ReadbackBuffer;
+
+static inline bool HasFlag(ResourceType type, ResourceType flag)
+{
+	return (type & flag) != 0;
+}
+
+
 void GpuBuffer::Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData)
 {
 	m_resource = nullptr;
@@ -31,12 +40,12 @@ void GpuBuffer::Create(const std::string& name, size_t numElements, size_t eleme
 	m_bufferSize = numElements * elementSize;
 
 	VkBufferUsageFlags flags = 0;
-	flags |= (m_type == ResourceType::IndexBuffer) ? VK_BUFFER_USAGE_INDEX_BUFFER_BIT : 0;
-	flags |= (m_type == ResourceType::VertexBuffer) ? VK_BUFFER_USAGE_VERTEX_BUFFER_BIT : 0;
-	flags |= (m_type == ResourceType::TypedBuffer) ? (VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT) : 0;
-	flags |= (m_type == ResourceType::GenericBuffer) ? VK_BUFFER_USAGE_STORAGE_BUFFER_BIT : 0;
-	flags |= (m_type == ResourceType::StructuredBuffer) ? VK_BUFFER_USAGE_STORAGE_BUFFER_BIT : 0;
-	flags |= m_isConstantBuffer ? VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT : 0;
+	flags |= HasFlag(m_type, ResourceType::IndexBuffer) ? VK_BUFFER_USAGE_INDEX_BUFFER_BIT : 0;
+	flags |= HasFlag(m_type, ResourceType::VertexBuffer) ? VK_BUFFER_USAGE_VERTEX_BUFFER_BIT : 0;
+	flags |= HasFlag(m_type, ResourceType::TypedBuffer) ? (VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT) : 0;
+	flags |= HasFlag(m_type, s_genericBuffer) ? VK_BUFFER_USAGE_STORAGE_BUFFER_BIT : 0;
+	flags |= HasFlag(m_type, ResourceType::StructuredBuffer) ? VK_BUFFER_USAGE_STORAGE_BUFFER_BIT : 0;
+	flags |= HasFlag(m_type, ResourceType::ConstantBuffer) ? VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT : 0;
 
 	VkBufferCreateInfo bufferInfo = {};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -49,7 +58,7 @@ void GpuBuffer::Create(const std::string& name, size_t numElements, size_t eleme
 	VkMemoryRequirements memReqs;
 	vkGetBufferMemoryRequirements(device, buffer, &memReqs);
 
-	const bool bHostMappable = m_isConstantBuffer;
+	const bool bHostMappable = HasFlag(m_type, ResourceType::ConstantBuffer);
 	VkMemoryPropertyFlags memFlags = bHostMappable ?
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT :
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
@@ -132,7 +141,6 @@ void ReadbackBuffer::Create(const string& name, uint32_t numElements, uint32_t e
 	VkMemoryRequirements memReqs;
 	vkGetBufferMemoryRequirements(device, buffer, &memReqs);
 
-	const bool bHostMappable = m_isConstantBuffer;
 	VkMemoryPropertyFlags memFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
 	VkBufferCreateInfo vertexbufferInfo = {};

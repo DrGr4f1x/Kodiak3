@@ -306,22 +306,27 @@ inline bool IsDepthStencilFormat(Format format)
 
 enum class ResourceType
 {
-	Unknown,
-	Texture1D,
-	Texture1D_Array,
-	Texture2D,
-	Texture2D_Array,
-	Texture2DMS,
-	Texture2DMS_Array,
-	TextureCube,
-	TextureCube_Array,
-	Texture3D,
-	GenericBuffer,
-	IndexBuffer,
-	VertexBuffer,
-	StructuredBuffer,
-	TypedBuffer
+	Unknown =				1 << 0,
+	Texture1D =				1 << 1,
+	Texture1D_Array =		1 << 2,
+	Texture2D =				1 << 3,
+	Texture2D_Array =		1 << 4,
+	Texture2DMS =			1 << 5,
+	Texture2DMS_Array =		1 << 6,
+	TextureCube =			1 << 7,
+	TextureCube_Array =		1 << 8,
+	Texture3D =				1 << 9,
+	IndexBuffer =			1 << 10,
+	VertexBuffer =			1 << 11,
+	ConstantBuffer =		1 << 12,
+	ByteAddressBuffer =		1 << 13,
+	IndirectArgsBuffer =	1 << 14,
+	StructuredBuffer =		1 << 15,
+	TypedBuffer =			1 << 16,
+	ReadbackBuffer =		1 << 17,
 };
+
+template <> struct EnableBitmaskOperators<ResourceType> { static const bool enable = true; };
 
 
 inline bool IsTextureResource(ResourceType type)

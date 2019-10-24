@@ -15,6 +15,9 @@
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 
 using namespace Kodiak;
 using namespace std;
@@ -96,8 +99,7 @@ shared_ptr<Texture> Texture::Load(const string& filename, bool sRgb)
 	}
 	else
 	{
-		assert_msg(false, "Unknown file extension %s", extension.c_str());
-		return nullptr;
+		return MakeTexture(fullpath, [sRgb](Texture* texture, const string& filename) { texture->LoadImage(filename, sRgb); });
 	}
 }
 
@@ -141,6 +143,26 @@ shared_ptr<Texture> Texture::GetMagentaTex2D()
 void Texture::DestroyAll()
 {
 	s_textureCache.clear();
+}
+
+
+void Texture::LoadImage(const string& fullpath, bool sRgb)
+{
+	int x, y, n;
+	unsigned char* data = stbi_load(fullpath.c_str(), &x, &y, &n, 4);
+	assert_msg(data != nullptr, "Failed to load image %s", fullpath.c_str());
+
+	Format format = Format::Unknown;
+	if (n == 1)
+		format = Format::R8_UNorm;
+	else if (n == 2)
+		format = Format::R8G8_UNorm;
+	else if (n == 3 || n == 4)
+		format = Format::R8G8B8A8_UNorm;
+
+	Create2D(x, y, format, data);
+
+	stbi_image_free(data);
 }
 
 

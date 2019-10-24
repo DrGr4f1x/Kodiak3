@@ -37,11 +37,14 @@ D3D12_UAV_DIMENSION GetUAVDimension(ResourceType type)
 	case ResourceType::TextureCube:
 		return D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
 
-	case ResourceType::GenericBuffer:
 	case ResourceType::IndexBuffer:
 	case ResourceType::VertexBuffer:
+	case ResourceType::ConstantBuffer:
+	case ResourceType::ByteAddressBuffer:
+	case ResourceType::IndirectArgsBuffer:
 	case ResourceType::StructuredBuffer:
 	case ResourceType::TypedBuffer:
+	case ResourceType::ReadbackBuffer:
 		return D3D12_UAV_DIMENSION_BUFFER;
 
 	default:
@@ -74,11 +77,14 @@ D3D12_SRV_DIMENSION GetSRVDimension(ResourceType type)
 	case ResourceType::TextureCube_Array:
 		return D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
 
-	case ResourceType::GenericBuffer:
 	case ResourceType::IndexBuffer:
 	case ResourceType::VertexBuffer:
+	case ResourceType::ConstantBuffer:
+	case ResourceType::ByteAddressBuffer:
+	case ResourceType::IndirectArgsBuffer:
 	case ResourceType::StructuredBuffer:
 	case ResourceType::TypedBuffer:
+	case ResourceType::ReadbackBuffer:
 		return D3D12_SRV_DIMENSION_BUFFER;
 
 	default:
@@ -107,11 +113,14 @@ D3D12_RESOURCE_DIMENSION GetResourceDimension(ResourceType type)
 	case ResourceType::Texture3D:
 		return D3D12_RESOURCE_DIMENSION_TEXTURE3D;
 
-	case ResourceType::GenericBuffer:
 	case ResourceType::IndexBuffer:
 	case ResourceType::VertexBuffer:
+	case ResourceType::ConstantBuffer:
+	case ResourceType::ByteAddressBuffer:
+	case ResourceType::IndirectArgsBuffer:
 	case ResourceType::StructuredBuffer:
 	case ResourceType::TypedBuffer:
+	case ResourceType::ReadbackBuffer:
 		return D3D12_RESOURCE_DIMENSION_BUFFER;
 
 	default:

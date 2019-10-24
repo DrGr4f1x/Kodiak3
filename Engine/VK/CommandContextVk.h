@@ -144,6 +144,7 @@ public:
 
 	void SetIndexBuffer(const IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer);
+	void SetVertexBuffer(uint32_t slot, const StructuredBuffer& vertexBuffer);
 	void SetVertexBuffers(uint32_t startSlot, uint32_t count, VertexBuffer vertexBuffers[]);
 
 	void Draw(uint32_t vertexCount, uint32_t vertexStartOffset = 0);
@@ -382,6 +383,14 @@ inline void GraphicsContext::SetIndexBuffer(const IndexBuffer& indexBuffer)
 
 
 inline void GraphicsContext::SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer)
+{
+	VkDeviceSize offsets[1] = { 0 };
+	VkBuffer buffers[1] = { vertexBuffer.m_resource };
+	vkCmdBindVertexBuffers(m_commandList, slot, 1, buffers, offsets);
+}
+
+
+inline void GraphicsContext::SetVertexBuffer(uint32_t slot, const StructuredBuffer& vertexBuffer)
 {
 	VkDeviceSize offsets[1] = { 0 };
 	VkBuffer buffers[1] = { vertexBuffer.m_resource };

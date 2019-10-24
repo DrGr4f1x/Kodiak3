@@ -53,13 +53,6 @@ private:
 		float normal[3];
 	};
 
-	struct ClothVertex
-	{
-		float position[3];
-		float texcoord[2];
-		float normal[3];
-	};
-
 	struct VSConstants
 	{
 		Math::Matrix4 projectionMatrix;
@@ -89,7 +82,7 @@ private:
 		Math::Vector4 vel;
 		Math::Vector4 uv;
 		Math::Vector4 normal;
-		float pinned;
+		Math::Vector4 pinned;
 	};
 
 	Kodiak::RootSignature	m_sphereRootSig;
@@ -105,6 +98,8 @@ private:
 
 	CSConstants				m_csConstants;
 	Kodiak::ConstantBuffer	m_csConstantBuffer;
+	CSConstants				m_csNormalConstants;
+	Kodiak::ConstantBuffer	m_csNormalConstantBuffer;
 
 	Kodiak::StructuredBuffer m_clothBuffer[2];
 	Kodiak::IndexBuffer		m_clothIndexBuffer;
@@ -115,13 +110,15 @@ private:
 	Kodiak::ResourceSet		m_sphereResources;
 	Kodiak::ResourceSet		m_clothResources;
 	Kodiak::ResourceSet		m_computeResources[2];
+	Kodiak::ResourceSet		m_computeNormalResources;
 
 	Kodiak::CameraController m_controller;
 
 	// Cloth dimensions
 	const float m_sphereRadius{ 0.5f };
-	const uint32_t m_gridSize[2]{ 60, 60 };
+	const uint32_t m_gridSize[2]{ 64, 64 };
 	const float m_size[2]{ 2.5f, 2.5f };
 	bool m_simulateWind{ false };
 	bool m_pinnedCloth{ false };
+	uint32_t m_readSet{ 1 };
 };

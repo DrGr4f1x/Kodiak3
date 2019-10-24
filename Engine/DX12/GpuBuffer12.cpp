@@ -22,11 +22,18 @@ using namespace Kodiak;
 using namespace std;
 
 
+static inline bool HasFlag(ResourceType type, ResourceType flag)
+{
+	return (type & flag) != 0;
+}
+
+
 void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSize, const void* initialData)
 {
 	m_resource = nullptr;
 
-	if (m_isConstantBuffer)
+	const bool isConstantBuffer = HasFlag(m_type, ResourceType::ConstantBuffer);
+	if (isConstantBuffer)
 	{
 		elementSize = Math::AlignUp(elementSize, 256);
 	}
@@ -39,7 +46,7 @@ void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSiz
 	desc.Alignment = 0;
 	desc.DepthOrArraySize = 1;
 	desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	desc.Flags = m_isConstantBuffer ? D3D12_RESOURCE_FLAG_NONE : D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	desc.Flags = isConstantBuffer ? D3D12_RESOURCE_FLAG_NONE : D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 	desc.Format = DXGI_FORMAT_UNKNOWN;
 	desc.Height = 1;
 	desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
@@ -49,7 +56,7 @@ void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSiz
 	desc.Width = (UINT64)m_bufferSize;
 
 	D3D12_HEAP_PROPERTIES heapProps;
-	heapProps.Type = m_isConstantBuffer ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_DEFAULT;
+	heapProps.Type = isConstantBuffer ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_DEFAULT;
 	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 	heapProps.CreationNodeMask = 1;

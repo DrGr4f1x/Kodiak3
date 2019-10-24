@@ -19,6 +19,12 @@
 using namespace Kodiak;
 
 
+static inline bool HasFlag(ResourceType type, ResourceType flag)
+{
+	return (type & flag) != 0;
+}
+
+
 GpuBuffer::~GpuBuffer()
 {
 	g_graphicsDevice->ReleaseResource(m_resource);
@@ -79,8 +85,12 @@ void StructuredBuffer::CreateDerivedViews()
 {
 	BufferViewDesc resDesc = GetDesc();
 
-	m_srv.Create(m_resource, m_type, resDesc);
-	m_uav.Create(m_resource, m_type, resDesc);
+	m_srv.Create(m_resource, ResourceType::StructuredBuffer, resDesc);
+	m_uav.Create(m_resource, ResourceType::StructuredBuffer, resDesc);
+	if (HasFlag(m_type, ResourceType::VertexBuffer))
+	{
+		m_vbv.Create(m_resource, resDesc);
+	}
 
 	m_counterBuffer.Create("Counter Buffer", 1, 4);
 }

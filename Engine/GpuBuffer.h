@@ -12,6 +12,7 @@
 
 
 #include "GpuResource.h"
+#include "GraphicsEnums.h"
 #include "ResourceView.h"
 
 
@@ -55,9 +56,6 @@ protected:
 
 	uint64_t m_gpuAddress{ 0 };
 
-	// TODO Hacky, rework this
-	bool m_isConstantBuffer{ false };
-
 	ShaderResourceView m_srv;
 	UnorderedAccessView m_uav;
 };
@@ -99,11 +97,21 @@ private:
 class ConstantBuffer : public GpuBuffer
 {
 public:
-	ConstantBuffer() : GpuBuffer(ResourceType::GenericBuffer)
+	ConstantBuffer() : GpuBuffer(ResourceType::ConstantBuffer)
 	{
-		m_isConstantBuffer = true;
 		m_usageState = ResourceState::GenericRead;
 	}
+
+#if DX12
+	void Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData = nullptr)
+	{
+		GpuBuffer::Create(name, numElements, elementSize);
+		if (initialData)
+		{
+			Update(m_bufferSize, initialData);
+		}
+	}
+#endif
 
 	const ConstantBufferView& GetCBV() const { return m_cbv; }
 
@@ -121,7 +129,7 @@ private:
 class ByteAddressBuffer : public GpuBuffer
 {
 public:
-	ByteAddressBuffer() : GpuBuffer(ResourceType::GenericBuffer) {}
+	ByteAddressBuffer() : GpuBuffer(ResourceType::ByteAddressBuffer) {}
 
 protected:
 	void CreateDerivedViews() override;
@@ -129,7 +137,14 @@ protected:
 
 
 class IndirectArgsBuffer : public ByteAddressBuffer
-{};
+{
+public:
+	IndirectArgsBuffer()
+		: ByteAddressBuffer()
+	{
+		m_type = ResourceType::IndirectArgsBuffer;
+	}
+};
 
 
 class StructuredBuffer : public GpuBuffer
@@ -142,11 +157,20 @@ public:
 	const ShaderResourceView& GetCounterSRV(CommandContext& context);
 	const UnorderedAccessView& GetCounterUAV(CommandContext& context);
 
+	const VertexBufferView& GetVBV() const { return m_vbv; }
+
+	void CreateWithFlags(const std::string& name, size_t numElements, size_t elementSize, ResourceType flags, const void* initialData = nullptr)
+	{
+		m_type |= flags;
+		GpuBuffer::Create(name, numElements, elementSize, initialData);
+	}
+
 protected:
 	void CreateDerivedViews();
 
 private:
 	ByteAddressBuffer m_counterBuffer;
+	VertexBufferView m_vbv;
 };
 
 
@@ -169,7 +193,7 @@ private:
 class ReadbackBuffer : public GpuBuffer
 {
 public:
-	ReadbackBuffer() : GpuBuffer(ResourceType::GenericBuffer) {}
+	ReadbackBuffer() : GpuBuffer(ResourceType::ReadbackBuffer) {}
 
 	void Create(const std::string& name, uint32_t numElements, uint32_t elementSize);
 
