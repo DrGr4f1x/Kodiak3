@@ -98,7 +98,6 @@ private:
 
 	CSConstants				m_csConstants;
 	Kodiak::ConstantBuffer	m_csConstantBuffer;
-	CSConstants				m_csNormalConstants;
 	Kodiak::ConstantBuffer	m_csNormalConstantBuffer;
 
 	Kodiak::StructuredBuffer m_clothBuffer[2];
