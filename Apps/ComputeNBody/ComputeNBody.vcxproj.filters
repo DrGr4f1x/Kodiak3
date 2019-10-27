@@ -3,8 +3,30 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Stdafx.cpp" />
+    <ClCompile Include="ComputeNBodyApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="ComputeNBodyApp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{d97f9532-bd14-4108-9ec4-4e6658812a7f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Shaders\ParticleIntegrateCS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ParticleGS.hlsl" />
+    <CustomBuild Include="Shaders\ParticleCalculateCS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ParticlePS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ParticleVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
