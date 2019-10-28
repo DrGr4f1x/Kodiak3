@@ -25,7 +25,7 @@ using namespace std;
 void MultisamplingApp::Configure()
 {
 	// Setup file system
-	auto& filesystem = Kodiak::Filesystem::GetInstance();
+	auto& filesystem = Filesystem::GetInstance();
 
 	filesystem.SetDefaultRootDir();
 	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());

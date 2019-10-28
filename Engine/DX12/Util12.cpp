@@ -14,6 +14,8 @@
 
 #include "GraphicsDevice.h"
 
+using namespace std;
+
 
 namespace Kodiak
 {
@@ -440,7 +442,7 @@ D3D12_RESOURCE_DESC DescribeTex2D(uint32_t width, uint32_t height, uint32_t dept
 }
 
 
-ResourceHandle CreateTextureResource(const std::string& name, const D3D12_RESOURCE_DESC& resourceDesc, D3D12_CLEAR_VALUE clearValue)
+ResourceHandle CreateTextureResource(const string& name, const D3D12_RESOURCE_DESC& resourceDesc, D3D12_CLEAR_VALUE clearValue)
 {
 	ResourceHandle resource;
 

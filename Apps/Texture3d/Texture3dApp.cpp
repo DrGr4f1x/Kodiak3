@@ -51,11 +51,11 @@ public:
 	PerlinNoise()
 	{
 		// Generate random lookup for permutations containing all numbers from 0..255
-		std::vector<uint8_t> plookup;
+		vector<uint8_t> plookup;
 		plookup.resize(256);
-		std::iota(plookup.begin(), plookup.end(), 0);
-		std::default_random_engine rndEngine(std::random_device{}());
-		std::shuffle(plookup.begin(), plookup.end(), rndEngine);
+		iota(plookup.begin(), plookup.end(), 0);
+		default_random_engine rndEngine(random_device{}());
+		shuffle(plookup.begin(), plookup.end(), rndEngine);
 
 		for (uint32_t i = 0; i < 256; i++)
 		{
@@ -136,7 +136,7 @@ public:
 void Texture3dApp::Configure()
 {
 	// Setup file system
-	auto& filesystem = Kodiak::Filesystem::GetInstance();
+	auto& filesystem = Filesystem::GetInstance();
 
 	filesystem.SetDefaultRootDir();
 	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
@@ -284,7 +284,7 @@ void Texture3dApp::InitTexture()
 	PerlinNoise<float> perlinNoise;
 	FractalNoise<float> fractalNoise(perlinNoise);
 
-	std::default_random_engine rndEngine(std::random_device{}());
+	default_random_engine rndEngine(random_device{}());
 	const int32_t noiseType = rand() % 2;
 	const float noiseScale = static_cast<float>(rand() % 10) + 4.0f;
 

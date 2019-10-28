@@ -18,9 +18,10 @@
 
 
 using namespace Kodiak;
+using namespace std;
 
 
-void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t height, Format format)
+void DepthBuffer::Create(const string& name, uint32_t width, uint32_t height, Format format)
 {
 	m_format = format;
 
@@ -43,7 +44,7 @@ void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 }
 
 
-void DepthBuffer::Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numSamples, Format format)
+void DepthBuffer::Create(const string& name, uint32_t width, uint32_t height, uint32_t numSamples, Format format)
 {
 	m_format = format;
 

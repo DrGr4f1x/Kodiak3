@@ -21,3 +21,15 @@
 using namespace Kodiak;
 using namespace Math;
 using namespace std;
+
+
+void TerrainTessellationApp::Configure()
+{
+	// Setup file system
+	auto& filesystem = Filesystem::GetInstance();
+
+	filesystem.SetDefaultRootDir();
+	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
+	filesystem.AddSearchPath("Data\\Models");
+	filesystem.AddSearchPath("Data\\Textures");
+}

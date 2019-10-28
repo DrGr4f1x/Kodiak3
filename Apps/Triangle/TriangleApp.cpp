@@ -26,7 +26,7 @@ using namespace std;
 void TriangleApp::Configure()
 {
 	// Setup file system
-	auto& filesystem = Kodiak::Filesystem::GetInstance();
+	auto& filesystem = Filesystem::GetInstance();
 
 	filesystem.SetDefaultRootDir();
 	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());

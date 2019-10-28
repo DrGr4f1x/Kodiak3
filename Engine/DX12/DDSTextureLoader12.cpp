@@ -32,7 +32,7 @@ struct handle_closer
 		if (h) CloseHandle(h); 
 	} 
 };
-typedef public std::unique_ptr<void, handle_closer> ScopedHandle;
+typedef public unique_ptr<void, handle_closer> ScopedHandle;
 
 inline HANDLE safe_handle(HANDLE h)
 { 
@@ -42,7 +42,7 @@ inline HANDLE safe_handle(HANDLE h)
 
 //--------------------------------------------------------------------------------------
 HRESULT LoadTextureDataFromFile(const char* fileName,
-	std::unique_ptr<uint8_t[]>& ddsData,
+	unique_ptr<uint8_t[]>& ddsData,
 	DDS_HEADER** header,
 	uint8_t** bitData,
 	size_t* bitSize
@@ -94,7 +94,7 @@ HRESULT LoadTextureDataFromFile(const char* fileName,
 	}
 
 	// create enough space for the file data
-	ddsData.reset(new (std::nothrow) uint8_t[FileSize.LowPart]);
+	ddsData.reset(new (nothrow) uint8_t[FileSize.LowPart]);
 	if (!ddsData)
 	{
 		return E_OUTOFMEMORY;
@@ -1146,7 +1146,7 @@ static HRESULT CreateTextureFromDDS(ID3D12Device* d3dDevice,
 	{
 		// Create the texture
 		UINT subresourceCount = static_cast<UINT>(mipCount) * arraySize;
-		std::unique_ptr<D3D12_SUBRESOURCE_DATA[]> initData(new (std::nothrow) D3D12_SUBRESOURCE_DATA[subresourceCount]);
+		unique_ptr<D3D12_SUBRESOURCE_DATA[]> initData(new (nothrow) D3D12_SUBRESOURCE_DATA[subresourceCount]);
 		if (!initData)
 		{
 			return E_OUTOFMEMORY;

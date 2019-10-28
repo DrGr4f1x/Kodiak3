@@ -152,7 +152,7 @@ struct TextureInitializer::PlatformData
 		: data(size)
 	{}
 
-	std::vector<D3D12_SUBRESOURCE_DATA> data;
+	vector<D3D12_SUBRESOURCE_DATA> data;
 };
 
 } // namespace Kodiak

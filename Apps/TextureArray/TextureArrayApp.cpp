@@ -19,13 +19,14 @@
 
 
 using namespace Kodiak;
+using namespace Math;
 using namespace std;
 
 
 void TextureArrayApp::Configure()
 {
 	// Setup file system
-	auto& filesystem = Kodiak::Filesystem::GetInstance();
+	auto& filesystem = Filesystem::GetInstance();
 
 	filesystem.SetDefaultRootDir();
 	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
@@ -38,10 +39,10 @@ void TextureArrayApp::Startup()
 	// Setup vertices for a single uv-mapped quad made from two triangles
 	vector<Vertex> vertexData =
 	{
-		{ { 2.5f,  2.5f, 0.0f },{ 1.0f, 1.0f } },
-		{ { -2.5f,  2.5f, 0.0f },{ 0.0f, 1.0f } },
-		{ { -2.5f, -2.5f, 0.0f },{ 0.0f, 0.0f } },
-		{ { 2.5f, -2.5f, 0.0f },{ 1.0f, 0.0f } }
+		{ {  2.5f,  2.5f,  0.0f }, { 1.0f, 1.0f } },
+		{ { -2.5f,  2.5f,  0.0f }, { 0.0f, 1.0f } },
+		{ { -2.5f, -2.5f,  0.0f }, { 0.0f, 0.0f } },
+		{ {  2.5f, -2.5f,  0.0f }, { 1.0f, 0.0f } }
 	};
 	m_vertexBuffer.Create("Vertex Buffer", vertexData.size(), sizeof(Vertex), vertexData.data());
 
@@ -50,21 +51,17 @@ void TextureArrayApp::Startup()
 	m_indexBuffer.Create("Index Buffer", indexData.size(), sizeof(uint32_t), indexData.data());
 
 	// Setup camera
-	{
-		using namespace Math;
+	m_camera.SetPerspectiveMatrix(
+		XMConvertToRadians(60.0f),
+		(float)m_displayHeight / (float)m_displayWidth,
+		0.001f,
+		256.0f);
+	m_camera.SetPosition(Vector3(0.0f, -1.0f, -m_zoom));
 
-		m_camera.SetPerspectiveMatrix(
-			XMConvertToRadians(60.0f),
-			(float)m_displayHeight / (float)m_displayWidth,
-			0.001f,
-			256.0f);
-		m_camera.SetPosition(Vector3(0.0f, -1.0f, -m_zoom));
+	m_camera.Update();
 
-		m_camera.Update();
-
-		m_controller.SetSpeedScale(0.01f);
-		m_controller.RefreshFromCamera();
-	}
+	m_controller.SetSpeedScale(0.01f);
+	m_controller.RefreshFromCamera();
 
 	InitRootSig();
 	InitPSO();
@@ -168,13 +165,11 @@ void TextureArrayApp::InitPSO()
 void TextureArrayApp::InitConstantBuffer()
 {
 	m_constants.instance = new InstanceData[m_layerCount];
-	size_t size = sizeof(Math::Matrix4) + (m_layerCount * sizeof(InstanceData));
+	size_t size = sizeof(Matrix4) + (m_layerCount * sizeof(InstanceData));
 
 	m_constantBuffer.Create("Constant Buffer", 1, size);
 
 	UpdateConstantBuffer();
-
-	using namespace Math;
 
 	// Setup the per-instance data
 	float offset = 1.5f;
@@ -201,9 +196,6 @@ void TextureArrayApp::InitResourceSet()
 
 void TextureArrayApp::UpdateConstantBuffer()
 {
-	using namespace Math;
-	using namespace DirectX;
-
 	m_constants.viewProjectionMatrix = m_camera.GetViewProjMatrix();
 
 	// Just update the vp matrix

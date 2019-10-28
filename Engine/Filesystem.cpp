@@ -194,7 +194,7 @@ bool Filesystem::Exists(const string& fname)
 }
 
 
-bool Filesystem::IsRegularFile(const std::string& fname)
+bool Filesystem::IsRegularFile(const string& fname)
 {
 	shared_lock<shared_mutex> CS(m_mutex);
 
@@ -207,7 +207,7 @@ bool Filesystem::IsRegularFile(const std::string& fname)
 }
 
 
-bool Filesystem::IsDirectory(const std::string& fname)
+bool Filesystem::IsDirectory(const string& fname)
 {
 	shared_lock<shared_mutex> CS(m_mutex);
 

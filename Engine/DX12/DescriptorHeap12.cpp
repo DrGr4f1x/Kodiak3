@@ -49,7 +49,7 @@ void DescriptorAllocator::DestroyAll()
 
 ID3D12DescriptorHeap* DescriptorAllocator::RequestNewHeap(D3D12_DESCRIPTOR_HEAP_TYPE type)
 {
-	std::lock_guard<std::mutex> LockGuard(sm_allocationMutex);
+	lock_guard<mutex> LockGuard(sm_allocationMutex);
 
 	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 	desc.Type = type;
@@ -85,7 +85,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE DescriptorAllocator::Allocate(uint32_t count)
 }
 
 
-void UserDescriptorHeap::Create(const std::string& debugHeapName)
+void UserDescriptorHeap::Create(const string& debugHeapName)
 {
 	auto device = GetDevice();
 

@@ -44,7 +44,7 @@ D3D12_RESOURCE_FLAGS CombineResourceFlags(uint32_t fragmentCount)
 
 
 
-void ColorBuffer::CreateFromSwapChain(const std::string& name, const ResourceHandle& resource, uint32_t width, uint32_t height, Format format)
+void ColorBuffer::CreateFromSwapChain(const string& name, const ResourceHandle& resource, uint32_t width, uint32_t height, Format format)
 {
 	assert(resource != nullptr);
 	D3D12_RESOURCE_DESC resourceDesc = resource->GetDesc();
@@ -70,7 +70,7 @@ void ColorBuffer::CreateFromSwapChain(const std::string& name, const ResourceHan
 }
 
 
-void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips,
+void ColorBuffer::Create(const string& name, uint32_t width, uint32_t height, uint32_t numMips,
 	Format format)
 {
 	numMips = (numMips == 0 ? ComputeNumMips(width, height) : numMips);
@@ -100,7 +100,7 @@ void ColorBuffer::Create(const std::string& name, uint32_t width, uint32_t heigh
 }
 
 
-void ColorBuffer::CreateArray(const std::string& name, uint32_t width, uint32_t height, uint32_t arrayCount,
+void ColorBuffer::CreateArray(const string& name, uint32_t width, uint32_t height, uint32_t arrayCount,
 	Format format)
 {
 	const uint32_t numMips = 1;

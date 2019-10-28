@@ -29,7 +29,7 @@ static inline bool HasFlag(ResourceType type, ResourceType flag)
 }
 
 
-void GpuBuffer::Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData)
+void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSize, const void* initialData)
 {
 	m_resource = nullptr;
 

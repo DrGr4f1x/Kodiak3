@@ -343,7 +343,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		// Check if the debug marker extension is present (which is the case if run from a graphics debugger)
 		uint32_t extensionCount;
 		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
-		std::vector<VkExtensionProperties> extensions(extensionCount);
+		vector<VkExtensionProperties> extensions(extensionCount);
 		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, extensions.data());
 		for (auto extension : extensions)
 		{
@@ -385,7 +385,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		// Due to differing queue family configurations of Vulkan implementations this can be a bit tricky, especially if the application
 		// requests different queue types
 
-		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos{};
+		vector<VkDeviceQueueCreateInfo> queueCreateInfos{};
 
 		// Queue family properties, used for setting up requested queues upon device creation
 		uint32_t queueFamilyCount;

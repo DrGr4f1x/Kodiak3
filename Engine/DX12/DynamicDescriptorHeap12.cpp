@@ -27,7 +27,7 @@ using namespace std;
 
 mutex DynamicDescriptorHeap::sm_mutex;
 vector<Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>> DynamicDescriptorHeap::sm_descriptorHeapPool[2];
-queue<std::pair<uint64_t, ID3D12DescriptorHeap*>> DynamicDescriptorHeap::sm_retiredDescriptorHeaps[2];
+queue<pair<uint64_t, ID3D12DescriptorHeap*>> DynamicDescriptorHeap::sm_retiredDescriptorHeaps[2];
 queue<ID3D12DescriptorHeap*> DynamicDescriptorHeap::sm_availableDescriptorHeaps[2];
 
 
@@ -64,7 +64,7 @@ ID3D12DescriptorHeap* DynamicDescriptorHeap::RequestDescriptorHeap(D3D12_DESCRIP
 }
 
 
-void DynamicDescriptorHeap::DiscardDescriptorHeaps(D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint64_t fenceValue, const std::vector<ID3D12DescriptorHeap*>& usedHeaps)
+void DynamicDescriptorHeap::DiscardDescriptorHeaps(D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint64_t fenceValue, const vector<ID3D12DescriptorHeap*>& usedHeaps)
 {
 	uint32_t idx = heapType == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER ? 1 : 0;
 
@@ -72,7 +72,7 @@ void DynamicDescriptorHeap::DiscardDescriptorHeaps(D3D12_DESCRIPTOR_HEAP_TYPE he
 
 	for (auto iter = usedHeaps.begin(); iter != usedHeaps.end(); ++iter)
 	{
-		sm_retiredDescriptorHeaps[idx].push(std::make_pair(fenceValue, *iter));
+		sm_retiredDescriptorHeaps[idx].push(make_pair(fenceValue, *iter));
 	}
 }
 

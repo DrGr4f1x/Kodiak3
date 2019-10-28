@@ -24,13 +24,11 @@ using namespace std;
 void OcclusionQueryApp::Configure()
 {
 	// Setup file system
-	auto& filesystem = Kodiak::Filesystem::GetInstance();
+	auto& filesystem = Filesystem::GetInstance();
 
 	filesystem.SetDefaultRootDir();
 	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
 	filesystem.AddSearchPath("Data\\Models");
-
-	//g_input.SetCaptureMouse(false);
 }
 
 
