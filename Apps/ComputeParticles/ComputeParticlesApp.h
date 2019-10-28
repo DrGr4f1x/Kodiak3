@@ -21,7 +21,7 @@
 class ComputeParticlesApp : public Kodiak::Application
 {
 public:
-	ComputeParticlesApp() : Kodiak::Application("Compute Particles") {}
+	ComputeParticlesApp() : Application("Compute Particles") {}
 
 	void Configure() final;
 	void Startup() final;

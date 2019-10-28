@@ -23,7 +23,7 @@ class Texture3dApp : public Kodiak::Application
 {
 public:
 	Texture3dApp() 
-		: Kodiak::Application("Texture 3D")
+		: Application("Texture 3D")
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
 	{
 		m_constants.depth = 0.0f;

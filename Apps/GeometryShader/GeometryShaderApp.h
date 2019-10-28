@@ -24,7 +24,7 @@ class GeometryShaderApp : public Kodiak::Application
 {
 public:
 	GeometryShaderApp()
-		: Kodiak::Application("Geometry Shader")
+		: Application("Geometry Shader")
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
 	{}
 

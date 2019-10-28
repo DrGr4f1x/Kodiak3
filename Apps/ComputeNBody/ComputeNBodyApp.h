@@ -24,7 +24,7 @@ class ComputeNBodyApp : public Kodiak::Application
 {
 public:
 	ComputeNBodyApp()
-		: Kodiak::Application("Compute N-Body")
+		: Application("Compute N-Body")
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
 	{}
 

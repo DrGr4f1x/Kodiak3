@@ -39,10 +39,10 @@ void ComputeShaderApp::Startup()
 	// Setup vertices for a single uv-mapped quad made from two triangles
 	vector<Vertex> vertexData =
 	{
-		{ { 1.0f,  1.0f, 0.0f },{ 1.0f, 0.0f } },
-		{ { -1.0f,  1.0f, 0.0f },{ 0.0f, 0.0f } },
-		{ { -1.0f, -1.0f, 0.0f },{ 0.0f, 1.0f } },
-		{ { 1.0f, -1.0f, 0.0f },{ 1.0f, 1.0f } }
+		{ {  1.0f,  1.0f,  0.0f }, { 1.0f, 0.0f } },
+		{ { -1.0f,  1.0f,  0.0f }, { 0.0f, 0.0f } },
+		{ { -1.0f, -1.0f,  0.0f }, { 0.0f, 1.0f } },
+		{ {  1.0f, -1.0f,  0.0f }, { 1.0f, 1.0f } }
 	};
 	m_vertexBuffer.Create("Vertex buffer", vertexData.size(), sizeof(Vertex), vertexData.data());
 

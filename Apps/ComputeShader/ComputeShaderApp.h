@@ -21,7 +21,7 @@
 class ComputeShaderApp : public Kodiak::Application
 {
 public:
-	ComputeShaderApp() : Kodiak::Application("Compute Shader") {}
+	ComputeShaderApp() : Application("Compute Shader") {}
 
 	void Configure() final;
 	void Startup() final;

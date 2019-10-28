@@ -22,7 +22,7 @@ class MultisamplingApp : public Kodiak::Application
 {
 public:
 	MultisamplingApp()
-		: Kodiak::Application("Multisampling")
+		: Application("Multisampling")
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
 	{}
 

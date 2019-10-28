@@ -23,7 +23,7 @@ class TextureApp : public Kodiak::Application
 {
 public:
 	TextureApp() 
-		: Kodiak::Application("Texture")
+		: Application("Texture")
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
 	{}
 

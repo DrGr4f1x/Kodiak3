@@ -24,7 +24,7 @@ class InstancingApp : public Kodiak::Application
 {
 public:
 	InstancingApp()
-		: Kodiak::Application("Instancing")
+		: Application("Instancing")
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
 	{}
 

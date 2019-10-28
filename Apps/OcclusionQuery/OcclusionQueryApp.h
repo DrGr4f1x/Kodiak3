@@ -24,7 +24,7 @@ class OcclusionQueryApp : public Kodiak::Application
 {
 public:
 	OcclusionQueryApp()
-		: Kodiak::Application("Occlusion Query")
+		: Application("Occlusion Query")
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
 	{}
 

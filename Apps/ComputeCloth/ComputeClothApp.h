@@ -24,7 +24,7 @@ class ComputeClothApp : public Kodiak::Application
 {
 public:
 	ComputeClothApp() 
-		: Kodiak::Application("Compute Cloth") 
+		: Application("Compute Cloth") 
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector)) 
 	{}
 

@@ -22,7 +22,7 @@ class DynamicUniformBufferApp : public Kodiak::Application
 {
 public:
 	DynamicUniformBufferApp()
-		: Kodiak::Application("Dynamic Uniform Buffer")
+		: Application("Dynamic Uniform Buffer")
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
 	{}
 

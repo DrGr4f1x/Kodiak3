@@ -3,8 +3,23 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Stdafx.cpp" />
+    <ClCompile Include="TerrainTessellationApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="TerrainTessellationApp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{3e1ec690-8398-4610-9abc-13642b5df023}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Shaders\SkySpherePS.hlsl" />
+    <CustomBuild Include="Shaders\SkySphereVS.hlsl" />
+    <CustomBuild Include="Shaders\TerrainPS.hlsl" />
+    <CustomBuild Include="Shaders\TerrainVS.hlsl" />
+    <CustomBuild Include="Shaders\TerrainHS.hlsl" />
+    <CustomBuild Include="Shaders\TerrainDS.hlsl" />
   </ItemGroup>
 </Project>

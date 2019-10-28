@@ -23,7 +23,7 @@ class DisplacementApp : public Kodiak::Application
 {
 public:
 	DisplacementApp()
-		: Kodiak::Application("Displacement")
+		: Application("Displacement")
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
 	{}
 

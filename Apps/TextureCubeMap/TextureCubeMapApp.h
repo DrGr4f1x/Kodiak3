@@ -23,7 +23,7 @@ class TextureCubeMapApp : public Kodiak::Application
 {
 public:
 	TextureCubeMapApp()
-		: Kodiak::Application("Texture CubeMap")
+		: Application("Texture CubeMap")
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
 	{}
 

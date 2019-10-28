@@ -23,7 +23,7 @@ class StencilBufferApp : public Kodiak::Application
 {
 public:
 	StencilBufferApp() 
-		: Kodiak::Application("Stencil Buffer")
+		: Application("Stencil Buffer")
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
 	{}
 

@@ -16,8 +16,6 @@
 #include "CommonStates.h"
 #include "GraphicsDevice.h"
 #include "Filesystem.h"
-#include "Input.h"
-#include "Shader.h"
 
 
 using namespace Kodiak;
@@ -32,8 +30,6 @@ void StencilBufferApp::Configure()
 	filesystem.SetDefaultRootDir();
 	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
 	filesystem.AddSearchPath("Data\\Models");
-
-	//g_input.SetCaptureMouse(false);
 }
 
 
