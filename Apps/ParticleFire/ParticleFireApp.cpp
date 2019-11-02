@@ -196,10 +196,10 @@ void ParticleFireApp::UpdateConstantBuffers()
 
 void ParticleFireApp::LoadAssets()
 {
-	m_modelColorTex = Texture::Load("fireplace_colormap_bc3_unorm.ktx", true);
+	m_modelColorTex = Texture::Load("fireplace_colormap_bc3_unorm.ktx", Format::Unknown, true);
 	m_modelNormalTex = Texture::Load("fireplace_normalmap_bc3_unorm.ktx");
-	m_particleFireTex = Texture::Load("particle_fire.ktx", true);
-	m_particleSmokeTex = Texture::Load("particle_smoke.ktx", true);
+	m_particleFireTex = Texture::Load("particle_fire.ktx", Format::Unknown, true);
+	m_particleSmokeTex = Texture::Load("particle_smoke.ktx", Format::Unknown, true);
 
 	auto layout = VertexLayout(
 	{

@@ -80,7 +80,7 @@ Texture::~Texture()
 }
 
 
-shared_ptr<Texture> Texture::Load(const string& filename, bool sRgb)
+shared_ptr<Texture> Texture::Load(const string& filename, Format format, bool sRgb)
 {
 	auto& filesystem = Filesystem::GetInstance();
 	string fullpath = filesystem.GetFullPath(filename);
@@ -91,15 +91,15 @@ shared_ptr<Texture> Texture::Load(const string& filename, bool sRgb)
 
 	if (extension == ".dds")
 	{
-		return MakeTexture(fullpath, [sRgb](Texture* texture, const string& filename) { texture->LoadDDS(filename, sRgb); });
+		return MakeTexture(fullpath, [format, sRgb](Texture* texture, const string& filename) { texture->LoadDDS(filename, format, sRgb); });
 	}
 	else if (extension == ".ktx")
 	{
-		return MakeTexture(fullpath, [sRgb](Texture* texture, const string& filename) { texture->LoadKTX(filename, sRgb); });
+		return MakeTexture(fullpath, [format, sRgb](Texture* texture, const string& filename) { texture->LoadKTX(filename, format, sRgb); });
 	}
 	else
 	{
-		return MakeTexture(fullpath, [sRgb](Texture* texture, const string& filename) { texture->LoadImage(filename, sRgb); });
+		return MakeTexture(fullpath, [format, sRgb](Texture* texture, const string& filename) { texture->LoadTexture(filename, format, sRgb); });
 	}
 }
 
@@ -146,21 +146,30 @@ void Texture::DestroyAll()
 }
 
 
-void Texture::LoadImage(const string& fullpath, bool sRgb)
+void Texture::LoadTexture(const string& fullpath, Format format, bool sRgb)
 {
 	int x, y, n;
 	unsigned char* data = stbi_load(fullpath.c_str(), &x, &y, &n, 4);
 	assert_msg(data != nullptr, "Failed to load image %s", fullpath.c_str());
 
-	Format format = Format::Unknown;
-	if (n == 1)
-		format = Format::R8_UNorm;
-	else if (n == 2)
-		format = Format::R8G8_UNorm;
-	else if (n == 3 || n == 4)
-		format = Format::R8G8B8A8_UNorm;
+	if (format == Format::Unknown)
+	{
+		if (n == 1)
+			format = Format::R8_UNorm;
+		else if (n == 2)
+			format = Format::R8G8_UNorm;
+		else if (n == 3 || n == 4)
+			format = Format::R8G8B8A8_UNorm;
+	}
 
 	Create2D(x, y, format, data);
+
+	if (m_retainData)
+	{
+		m_dataSize = x * y * n;
+		m_data.reset(new byte[m_dataSize]);
+		memcpy(m_data.get(), data, m_dataSize);
+	}
 
 	stbi_image_free(data);
 }
@@ -177,6 +186,16 @@ void Texture::CreateDerivedViews()
 	desc.isStencil = false;
 
 	m_srv.Create(m_resource, m_type, desc);
+}
+
+
+void Texture::ClearRetainedData()
+{
+	if (!m_retainData)
+	{
+		m_data.reset();
+		m_dataSize = 0;
+	}
 }
 
 

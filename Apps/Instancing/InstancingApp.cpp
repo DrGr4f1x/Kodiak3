@@ -345,8 +345,8 @@ void InstancingApp::UpdateConstantBuffer()
 
 void InstancingApp::LoadAssets()
 {
-	m_rockTexture = Texture::Load("texturearray_rocks_bc3_unorm.ktx", true);
-	m_planetTexture = Texture::Load("lavaplanet_bc3_unorm.ktx", true);
+	m_rockTexture = Texture::Load("texturearray_rocks_bc3_unorm.ktx", Format::Unknown, true);
+	m_planetTexture = Texture::Load("lavaplanet_bc3_unorm.ktx", Format::Unknown, true);
 
 	auto layout = VertexLayout(
 	{

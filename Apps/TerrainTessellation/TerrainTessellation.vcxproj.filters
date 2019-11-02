@@ -15,11 +15,23 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="Shaders\SkySpherePS.hlsl" />
-    <CustomBuild Include="Shaders\SkySphereVS.hlsl" />
-    <CustomBuild Include="Shaders\TerrainPS.hlsl" />
-    <CustomBuild Include="Shaders\TerrainVS.hlsl" />
-    <CustomBuild Include="Shaders\TerrainHS.hlsl" />
-    <CustomBuild Include="Shaders\TerrainDS.hlsl" />
+    <CustomBuild Include="Shaders\SkySpherePS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\SkySphereVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\TerrainDS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\TerrainHS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\TerrainPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\TerrainVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

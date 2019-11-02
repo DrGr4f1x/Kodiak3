@@ -337,29 +337,30 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 
 		if (m_numSamplers > 0)
 		{
-			VkDescriptorSetLayoutBinding samplerBinding;
-			samplerBinding.binding = 0;
-			samplerBinding.descriptorCount = m_numSamplers;
-			samplerBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
-			samplerBinding.stageFlags = VK_SHADER_STAGE_ALL;
+			vector<VkDescriptorSetLayoutBinding> samplerBindings(m_numSamplers);
+
+			for (uint32_t i = 0; i < m_numSamplers; ++i)
+			{
+				VkDescriptorSetLayoutBinding& samplerBinding = samplerBindings[i];
+				samplerBinding.binding = i;
+				samplerBinding.descriptorCount = 1;
+				samplerBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+				samplerBinding.stageFlags = VK_SHADER_STAGE_ALL;
+
+				ThrowIfFailed(vkCreateSampler(device, &m_samplerArray[i].createInfo, nullptr, &m_samplers[i]));
+				samplerBinding.pImmutableSamplers = &m_samplers[i];
+			}
 
 			// TODO
 			// This code assumes samplers are contiguous from 0 to m_numSamplers-1 and all have the same
 			// shader visibility.  A better system would create ranges of contiguous sampler bindings
 			// per shader visibility type.
 
-			for (uint32_t i = 0; i < m_numSamplers; ++i)
-			{
-				ThrowIfFailed(vkCreateSampler(device, &m_samplerArray[i].createInfo, nullptr, &m_samplers[i]));
-			}
-
-			samplerBinding.pImmutableSamplers = m_samplers.data();
-
 			VkDescriptorSetLayoutCreateInfo createInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
 			createInfo.pNext = nullptr;
 			createInfo.flags = 0;
-			createInfo.bindingCount = 1;
-			createInfo.pBindings = &samplerBinding;
+			createInfo.bindingCount = m_numSamplers;
+			createInfo.pBindings = samplerBindings.data();
 
 			ThrowIfFailed(vkCreateDescriptorSetLayout(device, &createInfo, nullptr, &m_samplerLayout));
 

@@ -34,24 +34,24 @@ struct DSOutput
 	float3 lightVec : TEXCOORD1;
 };
 
-
-cbuffer HSConstants : register(b0)
+[[vk::binding(0, 1)]]
+cbuffer DSConstants : register(b0)
 {
 	float4x4 projectionMatrix;
 	float4x4 modelViewMatrix;
 	float4 lightPos;
 	float4 frustumPlanes[6];
+	float2 viewportDim;
 	float displacementFactor;
 	float tessellationFactor;
-	float2 viewportDim;
 	float tessellatedEdgeSize;
 };
 
-[[vk::binding(0, 1)]]
-Texture2D displacementTex : register(t0);
+[[vk::binding(1, 1)]]
+Texture2D heightTex : register(t0);
 
 [[vk::binding(0, 3)]]
-SamplerState linearSampler : register(s0);
+SamplerState linearSamplerMirror : register(s0);
 
 
 [domain("quad")]
@@ -75,7 +75,7 @@ DSOutput main(DSConstantInput constInput, float3 triCoords : SV_DomainLocation, 
 	float4 pos = lerp(pos1, pos2, triCoords.y);
 
 	// Displace
-	pos.y -= displacementTex.SampleLevel(linearSampler, output.uv, 0.0).r * displacementFactor;
+	pos.y -= heightTex.SampleLevel(linearSamplerMirror, output.uv, 0.0).r * displacementFactor;
 	// Perspective projection
 	output.pos = mul(projectionMatrix, mul(modelViewMatrix, pos));
 

@@ -21,6 +21,7 @@ HRESULT __cdecl CreateKTXTextureFromMemory(
 	const byte* ktxData,
 	size_t ktxDataSize,
 	size_t maxsize,
+	Format format,
 	bool forceSRGB,
 	Texture* texture
 );
@@ -29,6 +30,7 @@ HRESULT __cdecl CreateKTXTextureFromMemory(
 HRESULT __cdecl CreateKTXTextureFromFile(
 	const char* szFileName,
 	size_t maxsize,
+	Format format,
 	bool forceSRGB,
 	Texture* texture
 );

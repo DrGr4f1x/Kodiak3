@@ -21,7 +21,6 @@ namespace Kodiak
 // Forward declarations
 class ManagedTexture;
 
-
 class TextureInitializer
 {
 	friend class Texture;
@@ -86,7 +85,14 @@ public:
 	// Create a texture from an initializer
 	void Create(TextureInitializer& init);
 
-	static std::shared_ptr<Texture> Load(const std::string& filename, bool sRgb = false);
+	// Get pointer to retained data
+	const byte* GetData() const
+	{
+		assert(m_retainData);
+		return m_data.get();
+	}
+
+	static std::shared_ptr<Texture> Load(const std::string& filename, Format format = Format::Unknown, bool sRgb = false);
 	static std::shared_ptr<Texture> GetBlackTex2D();
 	static std::shared_ptr<Texture> GetWhiteTex2D();
 	static std::shared_ptr<Texture> GetMagentaTex2D();
@@ -96,14 +102,19 @@ public:
 	const ShaderResourceView& GetSRV() const { return m_srv; }
 
 protected:
-	void LoadDDS(const std::string& fullpath, bool sRgb);
-	void LoadKTX(const std::string& fullpath, bool sRgb);
-	void LoadImage(const std::string& fullpath, bool sRgb);
+	void LoadDDS(const std::string& fullpath, Format format, bool sRgb);
+	void LoadKTX(const std::string& fullpath, Format format, bool sRgb);
+	void LoadTexture(const std::string& fullpath, Format format, bool sRgb);
 
 	void CreateDerivedViews();
+	void ClearRetainedData();
 
 protected:
 	ShaderResourceView m_srv;
+
+	std::unique_ptr<byte[]>		m_data;
+	size_t						m_dataSize{ 0 };
+	bool						m_retainData{ false };
 };
 
 using TexturePtr = std::shared_ptr<Texture>;

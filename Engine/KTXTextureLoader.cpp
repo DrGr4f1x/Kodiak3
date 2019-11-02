@@ -666,6 +666,7 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 	const byte* ktxData,
 	size_t ktxDataSize,
 	size_t maxsize,
+	Format format,
 	bool forceSRGB,
 	Texture* texture
 )
@@ -696,7 +697,8 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 	// Skip key value data
 	offset += header.bytesOfKeyValueData;
 
-	auto format = MapKTXFormatToEngine(header.glInternalFormat, header.glFormat, header.glType);
+	if (format == Format::Unknown)
+		format = MapKTXFormatToEngine(header.glInternalFormat, header.glFormat, header.glType);
 	assert(format != Format::Unknown);
 
 	size_t blockSize = BlockSize(format);
@@ -797,6 +799,7 @@ HRESULT Kodiak::CreateKTXTextureFromMemory(
 HRESULT Kodiak::CreateKTXTextureFromFile(
 	const char* szFileName,
 	size_t maxsize,
+	Format format,
 	bool forceSRGB,
 	Texture* texture
 )

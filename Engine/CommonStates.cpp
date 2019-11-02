@@ -562,3 +562,10 @@ const SamplerStateDesc& CommonStates::SamplerLinearBorder()
 
 	return desc;
 }
+
+
+const SamplerStateDesc& CommonStates::SamplerLinearMirror()
+{
+	static SamplerStateDesc desc{ TextureFilter::MinMagMipLinear, TextureAddress::Mirror };
+	return desc;
+}

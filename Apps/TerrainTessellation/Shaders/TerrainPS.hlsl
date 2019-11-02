@@ -24,7 +24,10 @@ Texture2D heightTex : register(t0);
 Texture2DArray layerTexArray : register(t1);
 
 [[vk::binding(0, 3)]]
-SamplerState linearSampler : register(s0);
+SamplerState linearSamplerMirror : register(s0);
+
+[[vk::binding(1, 3)]]
+SamplerState linearSamplerWrap : register(s1);
 
 
 float3 SampleTerrainLayer(float2 uv)
@@ -41,14 +44,14 @@ float3 SampleTerrainLayer(float2 uv)
 	float3 color = 0.0.xxx;
 
 	// Get height from displacement map
-	float height = heightTex.SampleLevel(linearSampler, uv, 0.0).r * 255.0;
+	float height = heightTex.SampleLevel(linearSamplerMirror, uv, 0.0).r * 255.0;
 
 	for (int i = 0; i < 6; ++i)
 	{
 		float range = layers[i].y - layers[i].x;
 		float weight = (range - abs(height - layers[i].y)) / range;
 		weight = max(0.0, weight);
-		color += weight * layerTexArray.Sample(linearSampler, float3(uv * 16.0, i)).rgb;
+		color += weight * layerTexArray.Sample(linearSamplerWrap, float3(uv * 16.0, i)).rgb;
 	}
 
 	return color;

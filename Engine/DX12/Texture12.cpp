@@ -285,11 +285,8 @@ void Texture::Create(TextureInitializer& init)
 }
 
 
-void Texture::LoadDDS(const string& fullpath, bool sRgb)
+void Texture::LoadDDS(const string& fullpath, Format format, bool sRgb)
 {
-	unique_ptr<byte[]> data;
-	size_t dataSize;
-
 	// TODO this is janky
 	auto& descriptorHandle = m_srv.GetHandle();
 
@@ -298,19 +295,18 @@ void Texture::LoadDDS(const string& fullpath, bool sRgb)
 		descriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
-	ThrowIfFailed(BinaryReader::ReadEntireFile(fullpath, data, &dataSize));
+	ThrowIfFailed(BinaryReader::ReadEntireFile(fullpath, m_data, &m_dataSize));
 
 	auto device = GetDevice();
 
-	ThrowIfFailed(CreateDDSTextureFromMemory(device.Get(), data.get(), dataSize, 0, sRgb, &m_resource, descriptorHandle));
+	ThrowIfFailed(CreateDDSTextureFromMemory(device.Get(), m_data.get(), m_dataSize, 0, format, sRgb, &m_resource, descriptorHandle));
+
+	ClearRetainedData();
 }
 
 
-void Texture::LoadKTX(const string& fullpath, bool sRgb)
+void Texture::LoadKTX(const string& fullpath, Format format, bool sRgb)
 {
-	unique_ptr<byte[]> data;
-	size_t dataSize;
-	
 	// TODO this is janky
 	auto& descriptorHandle = m_srv.GetHandle();
 
@@ -319,9 +315,11 @@ void Texture::LoadKTX(const string& fullpath, bool sRgb)
 		descriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
-	ThrowIfFailed(BinaryReader::ReadEntireFile(fullpath, data, &dataSize));
+	ThrowIfFailed(BinaryReader::ReadEntireFile(fullpath, m_data, &m_dataSize));
 
-	ThrowIfFailed(CreateKTXTextureFromMemory(data.get(), dataSize, 0, sRgb, this));
+	ThrowIfFailed(CreateKTXTextureFromMemory(m_data.get(), m_dataSize, 0, format, sRgb, this));
+
+	ClearRetainedData();
 }
 
 

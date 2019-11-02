@@ -33,9 +33,9 @@ cbuffer HSConstants : register(b0)
 	float4x4 modelViewMatrix;
 	float4 lightPos;
 	float4 frustumPlanes[6];
+	float2 viewportDim;
 	float displacementFactor;
 	float tessellationFactor;
-	float2 viewportDim;
 	float tessellatedEdgeSize;
 };
 
@@ -44,7 +44,7 @@ cbuffer HSConstants : register(b0)
 Texture2D heightTex : register(t0);
 
 [[vk::binding(0, 3)]]
-SamplerState linearSampler : register(s0);
+SamplerState linearSamplerMirror : register(s0);
 
 
 // Calculate the tessellation factor based on screen space
@@ -84,7 +84,7 @@ bool FrustumCheck(float4 pos, float2 uv)
 {
 	// Fixed radius (increase if patch size is increased in example)
 	const float radius = 8.0f;
-	pos.y -= heightTex.SampleLevel(linearSampler, uv, 0.0).r * displacementFactor;
+	pos.y -= heightTex.SampleLevel(linearSamplerMirror, uv, 0.0).r * displacementFactor;
 
 	// Check sphere against frustum planes
 	for (int i = 0; i < 6; i++) 
@@ -146,8 +146,8 @@ struct HSOutput
 
 
 [domain("quad")]
-[partitioning("fractional_even")]
-[outputtopology("triangle_ccw")]
+[partitioning("integer")]
+[outputtopology("triangle_cw")]
 [outputcontrolpoints(OUTPUT_PATCH_SIZE)]
 [patchconstantfunc("HSConstantMain")]
 HSOutput main(InputPatch<HSInput, INPUT_PATCH_SIZE> inputPatch, uint i : SV_OutputControlPointID)

@@ -56,6 +56,7 @@ public:
 	static const SamplerStateDesc& SamplerPointClamp();
 	static const SamplerStateDesc& SamplerPointBorder();
 	static const SamplerStateDesc& SamplerLinearBorder();
+	static const SamplerStateDesc& SamplerLinearMirror();
 };
 
 } // namespace Kodiak

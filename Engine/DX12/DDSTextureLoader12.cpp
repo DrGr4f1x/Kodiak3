@@ -972,6 +972,7 @@ static HRESULT CreateTextureFromDDS(ID3D12Device* d3dDevice,
 	const uint8_t* bitData,
 	size_t bitSize,
 	size_t maxsize,
+	Format format,
 	bool forceSRGB,
 	ID3D12Resource** texture,
 	D3D12_CPU_DESCRIPTOR_HANDLE textureView)
@@ -984,7 +985,7 @@ static HRESULT CreateTextureFromDDS(ID3D12Device* d3dDevice,
 
 	uint32_t resDim = D3D12_RESOURCE_DIMENSION_UNKNOWN;
 	UINT arraySize = 1;
-	DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+	DXGI_FORMAT dxgiFormat = DXGI_FORMAT_UNKNOWN;
 	bool isCubeMap = false;
 
 	size_t mipCount = header->mipMapCount;
@@ -1018,7 +1019,10 @@ static HRESULT CreateTextureFromDDS(ID3D12Device* d3dDevice,
 			}
 		}
 
-		format = d3d10ext->dxgiFormat;
+		if (format == Format::Unknown)
+			dxgiFormat = d3d10ext->dxgiFormat;
+		else
+			dxgiFormat = static_cast<DXGI_FORMAT>(format);
 
 		switch (d3d10ext->resourceDimension)
 		{
@@ -1060,9 +1064,12 @@ static HRESULT CreateTextureFromDDS(ID3D12Device* d3dDevice,
 	}
 	else
 	{
-		format = GetDXGIFormat(header->ddspf);
+		if (format == Format::Unknown)
+			dxgiFormat = GetDXGIFormat(header->ddspf);
+		else
+			dxgiFormat = static_cast<DXGI_FORMAT>(format);
 
-		if (format == DXGI_FORMAT_UNKNOWN)
+		if (dxgiFormat == DXGI_FORMAT_UNKNOWN)
 		{
 			return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
 		}
@@ -1156,13 +1163,13 @@ static HRESULT CreateTextureFromDDS(ID3D12Device* d3dDevice,
 		size_t twidth = 0;
 		size_t theight = 0;
 		size_t tdepth = 0;
-		hr = FillInitData(width, height, depth, mipCount, arraySize, format, maxsize, bitSize, bitData,
+		hr = FillInitData(width, height, depth, mipCount, arraySize, dxgiFormat, maxsize, bitSize, bitData,
 			twidth, theight, tdepth, skipMip, initData.get());
 
 		if (SUCCEEDED(hr))
 		{
 			hr = CreateD3DResources(d3dDevice, resDim, twidth, theight, tdepth, mipCount - skipMip, arraySize,
-				format, forceSRGB,
+				dxgiFormat, forceSRGB,
 				isCubeMap, texture, textureView);
 
 			if (FAILED(hr) && !maxsize && (mipCount > 1))
@@ -1172,12 +1179,12 @@ static HRESULT CreateTextureFromDDS(ID3D12Device* d3dDevice,
 					? 2048 /*D3D10_REQ_TEXTURE3D_U_V_OR_W_DIMENSION*/
 					: 8192 /*D3D10_REQ_TEXTURE2D_U_OR_V_DIMENSION*/;
 
-				hr = FillInitData(width, height, depth, mipCount, arraySize, format, maxsize, bitSize, bitData,
+				hr = FillInitData(width, height, depth, mipCount, arraySize, dxgiFormat, maxsize, bitSize, bitData,
 					twidth, theight, tdepth, skipMip, initData.get());
 				if (SUCCEEDED(hr))
 				{
 					hr = CreateD3DResources(d3dDevice, resDim, twidth, theight, tdepth, mipCount - skipMip, arraySize,
-						format, forceSRGB,
+						dxgiFormat, forceSRGB,
 						isCubeMap, texture, textureView);
 				}
 			}
@@ -1231,6 +1238,7 @@ HRESULT Kodiak::CreateDDSTextureFromMemory(
 	const uint8_t* ddsData,
 	size_t ddsDataSize,
 	size_t maxsize,
+	Format format,
 	bool forceSRGB,
 	ID3D12Resource** texture,
 	D3D12_CPU_DESCRIPTOR_HANDLE textureView,
@@ -1287,7 +1295,7 @@ HRESULT Kodiak::CreateDDSTextureFromMemory(
 
 	HRESULT hr = CreateTextureFromDDS(d3dDevice,
 		header, ddsData + offset, ddsDataSize - offset, maxsize,
-		forceSRGB, texture, textureView);
+		format, forceSRGB, texture, textureView);
 	if (SUCCEEDED(hr))
 	{
 		if (texture != nullptr && *texture != nullptr)
@@ -1307,6 +1315,7 @@ HRESULT Kodiak::CreateDDSTextureFromFile(
 	ID3D12Device* d3dDevice,
 	const char* fileName,
 	size_t maxsize,
+	Format format,
 	bool forceSRGB,
 	ID3D12Resource** texture,
 	D3D12_CPU_DESCRIPTOR_HANDLE textureView,
@@ -1340,7 +1349,7 @@ HRESULT Kodiak::CreateDDSTextureFromFile(
 
 	hr = CreateTextureFromDDS(d3dDevice,
 		header, bitData, bitSize, maxsize,
-		forceSRGB, texture, textureView);
+		format, forceSRGB, texture, textureView);
 
 	if (alphaMode)
 	{
