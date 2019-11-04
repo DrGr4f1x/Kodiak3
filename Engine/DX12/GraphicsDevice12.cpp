@@ -12,6 +12,7 @@
 
 #include "GraphicsDevice.h"
 
+#include "GraphicsFeatures.h"
 #include "Shader.h"
 #include "Texture.h"
 
@@ -21,6 +22,7 @@
 
 
 using namespace Kodiak;
+using namespace Utility;
 using namespace std;
 
 
@@ -124,6 +126,102 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	PlatformData() = default;
 	~PlatformData() { Destroy(); }
 
+	void EnableFeatures(bool optionalFeatures)
+	{
+		ReadCaps();
+
+		auto& requestedFeatures = optionalFeatures ? OptionalFeatures() : RequiredFeatures();
+		auto& enabledFeatures = const_cast<GraphicsFeatureSet&>(EnabledFeatures());
+
+		auto numFeatures = requestedFeatures.GetNumFeatures();
+		for (auto i = 0; i < numFeatures; ++i)
+		{
+			const auto& requestedFeature = requestedFeatures[i];
+			auto& enabledFeature = enabledFeatures[i];
+
+			if (!requestedFeature)
+				continue;
+
+			const string& name = requestedFeature.GetName();
+
+			switch (requestedFeature.GetFeature())
+			{
+			case GraphicsFeature::RobustBufferAccess:
+				enabledFeature = true;
+				break;
+			case GraphicsFeature::FullDrawIndexUint32:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel >= D3D_FEATURE_LEVEL_10_0);
+				break;
+			case GraphicsFeature::ImageCubeArray:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel >= D3D_FEATURE_LEVEL_10_1);
+				break;
+			case GraphicsFeature::IndependentBlend:
+				enabledFeature = true;
+				break;
+			case GraphicsFeature::GeometryShader:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel >= D3D_FEATURE_LEVEL_10_0);
+				break;
+			case GraphicsFeature::TessellationShader:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel >= D3D_FEATURE_LEVEL_11_0);
+				break;
+			case GraphicsFeature::SampleRateShading:
+			case GraphicsFeature::DualSrcBlend:
+				enabledFeature = true;
+				break;
+			case GraphicsFeature::LogicOp:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, dataOptions.OutputMergerLogicOp == TRUE);
+				break;
+			case GraphicsFeature::DepthClamp:
+			case GraphicsFeature::DepthBiasClamp:
+			case GraphicsFeature::FillModeNonSolid:
+				enabledFeature = true;
+				break;
+			case GraphicsFeature::DepthBounds:
+				enabledFeature = TryEnableFeature(optionalFeatures,	name, dataOptions2.DepthBoundsTestSupported == TRUE);
+				break;
+			case GraphicsFeature::WideLines:
+			case GraphicsFeature::LargePoints:
+			case GraphicsFeature::AlphaToOne:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, false);
+				break;
+			case GraphicsFeature::MultiViewport:
+			case GraphicsFeature::SamplerAnisotropy:
+				enabledFeature = true;
+				break;
+			case GraphicsFeature::TextureCompressionETC2:
+			case GraphicsFeature::TextureCompressionASTC_LDR:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, false);
+				break;
+			case GraphicsFeature::TextureCompressionBC:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel >= D3D_FEATURE_LEVEL_11_0);
+				break;
+			}
+		}
+	}
+
+	bool TryEnableFeature(bool optional, const string& name, bool supported)
+	{
+		if (!optional && !supported)
+		{
+			ExitFatal(
+				"Required Feature Not Supported",
+				"This Application requires " + name + ", which is unavailable.  You may need to update your GPU or graphics driver");
+		}
+		return supported;
+	}
+
+	void ReadCaps()
+	{
+		if (capsRead)
+			return;
+
+		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &dataOptions, sizeof(dataOptions));
+		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS1, &dataOptions1, sizeof(dataOptions1));
+		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS2, &dataOptions2, sizeof(dataOptions2));
+
+		capsRead = true;
+	}
+
 	void Destroy()
 	{
 		swapChain = nullptr;
@@ -144,6 +242,13 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	Microsoft::WRL::ComPtr<ID3D12Device> device;
 	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain;
 	uint64_t fenceValues[NumSwapChainBuffers]{ 0, 0, 0 };
+
+	D3D_FEATURE_LEVEL bestFeatureLevel{ D3D_FEATURE_LEVEL_11_0 };
+
+	bool capsRead{ false };
+	D3D12_FEATURE_DATA_D3D12_OPTIONS dataOptions;
+	D3D12_FEATURE_DATA_D3D12_OPTIONS1 dataOptions1;
+	D3D12_FEATURE_DATA_D3D12_OPTIONS2 dataOptions2;
 };
 
 
@@ -224,11 +329,18 @@ void GraphicsDevice::PlatformCreate()
 			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
 				continue;
 
-			if (desc.DedicatedVideoMemory > maxSize && SUCCEEDED(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&pDevice))))
+			D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0 };
+
+			for (int i = 0; i < _countof(featureLevels); ++i)
 			{
-				pAdapter->GetDesc1(&desc);
-				Utility::Printf(L"D3D12-capable hardware found:  %s (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
-				maxSize = desc.DedicatedVideoMemory;
+				if (desc.DedicatedVideoMemory > maxSize && SUCCEEDED(D3D12CreateDevice(pAdapter.Get(), featureLevels[i], IID_PPV_ARGS(&pDevice))))
+				{
+					pAdapter->GetDesc1(&desc);
+					Utility::Printf(L"D3D12-capable hardware found:  %s (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
+					maxSize = desc.DedicatedVideoMemory;
+					m_platformData->bestFeatureLevel = featureLevels[i];
+					break;
+				}
 			}
 		}
 
@@ -250,7 +362,7 @@ void GraphicsDevice::PlatformCreate()
 		}
 
 		assert_succeeded(dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&pAdapter)));
-		assert_succeeded(D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice)));
+		assert_succeeded(D3D12CreateDevice(pAdapter.Get(), m_platformData->bestFeatureLevel, IID_PPV_ARGS(&pDevice)));
 		m_platformData->device = pDevice;
 	}
 #ifndef _RELEASE
@@ -281,6 +393,9 @@ void GraphicsDevice::PlatformCreate()
 		}
 	}
 #endif
+
+	m_platformData->EnableFeatures(false);
+	m_platformData->EnableFeatures(true);
 
 	g_device = m_platformData->device;
 

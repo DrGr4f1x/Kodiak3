@@ -30,6 +30,10 @@ void GeometryShaderApp::Configure()
 	filesystem.SetDefaultRootDir();
 	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
 	filesystem.AddSearchPath("Data\\Models");
+
+	// Specify required graphics features 
+	auto& requiredFeatures = RequiredFeatures();
+	requiredFeatures.geometryShader = true;
 }
 
 

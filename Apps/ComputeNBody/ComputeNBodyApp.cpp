@@ -34,6 +34,10 @@ void ComputeNBodyApp::Configure()
 	filesystem.SetDefaultRootDir();
 	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
 	filesystem.AddSearchPath("Data\\Textures");
+
+	// Specify required graphics features 
+	auto& requiredFeatures = RequiredFeatures();
+	requiredFeatures.geometryShader = true;
 }
 
 

@@ -331,6 +331,7 @@
     <ClInclude Include="GpuResource.h" />
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="GraphicsEnums.h" />
+    <ClInclude Include="GraphicsFeatures.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="InputLayout.h" />
@@ -526,6 +527,7 @@
     <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="GpuBuffer.cpp" />
     <ClCompile Include="GraphicsDevice.cpp" />
+    <ClCompile Include="GraphicsFeatures.cpp" />
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="KTXTextureLoader.cpp" />

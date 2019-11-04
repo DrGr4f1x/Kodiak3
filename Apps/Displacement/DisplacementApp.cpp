@@ -31,6 +31,11 @@ void DisplacementApp::Configure()
 	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
 	filesystem.AddSearchPath("Data\\Models");
 	filesystem.AddSearchPath("Data\\Textures");
+
+	// Specify required graphics features 
+	auto& requiredFeatures = RequiredFeatures();
+	requiredFeatures.tessellationShader = true;
+	requiredFeatures.fillModeNonSolid = true;
 }
 
 

@@ -12,6 +12,7 @@
 
 #include "GraphicsDevice.h"
 
+#include "GraphicsFeatures.h"
 #include "PipelineState.h"
 #include "Texture.h"
 #include "Utility.h"
@@ -26,6 +27,7 @@
 
 
 using namespace Kodiak;
+using namespace Utility;
 using namespace std;
 
 
@@ -309,30 +311,9 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		vkGetPhysicalDeviceFeatures(physicalDevice, &physicalDeviceSupportedFeatures);
 		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &physicalDeviceMemoryProperties);
 
-		if (physicalDeviceSupportedFeatures.textureCompressionBC == VK_TRUE)
-		{
-			physicalDeviceEnabledFeatures.textureCompressionBC = VK_TRUE;
-		}
-
-		if (physicalDeviceSupportedFeatures.tessellationShader == VK_TRUE)
-		{
-			physicalDeviceEnabledFeatures.tessellationShader = VK_TRUE;
-		}
-
-		if (physicalDeviceSupportedFeatures.geometryShader == VK_TRUE)
-		{
-			physicalDeviceEnabledFeatures.geometryShader = VK_TRUE;
-		}
-
-		if (physicalDeviceSupportedFeatures.fillModeNonSolid == VK_TRUE)
-		{
-			physicalDeviceEnabledFeatures.fillModeNonSolid = VK_TRUE;
-		}
-
-		if (physicalDeviceSupportedFeatures.vertexPipelineStoresAndAtomics == VK_TRUE)
-		{
-			physicalDeviceEnabledFeatures.vertexPipelineStoresAndAtomics = VK_TRUE;
-		}
+		// Enabled required and optional features, as requested by the application
+		EnableFeatures(false);
+		EnableFeatures(true);
 	}
 
 	void InitializeDebugMarkup()
@@ -825,6 +806,208 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 			
 			vkCreateFence(device, &fenceInfo, nullptr, &presentFences[i]);
 		}
+	}
+
+	void EnableFeatures(bool optionalFeatures)
+	{
+		auto& requestedFeatures = optionalFeatures ? OptionalFeatures() : RequiredFeatures();
+		auto& enabledFeatures = const_cast<GraphicsFeatureSet&>(EnabledFeatures());
+
+		auto numFeatures = requestedFeatures.GetNumFeatures();
+		for (auto i = 0; i < numFeatures; ++i)
+		{
+			const auto& requestedFeature = requestedFeatures[i];
+			auto& enabledFeature = enabledFeatures[i];
+
+			if (!requestedFeature)
+				continue;
+
+			const string& name = requestedFeature.GetName();
+
+			switch (requestedFeature.GetFeature())
+			{
+			case GraphicsFeature::RobustBufferAccess:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.robustBufferAccess,
+					physicalDeviceEnabledFeatures.robustBufferAccess);
+				break;
+
+			case GraphicsFeature::FullDrawIndexUint32:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.fullDrawIndexUint32,
+					physicalDeviceEnabledFeatures.fullDrawIndexUint32);
+				break;
+
+			case GraphicsFeature::ImageCubeArray:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.imageCubeArray,
+					physicalDeviceEnabledFeatures.imageCubeArray);
+				break;
+
+			case GraphicsFeature::IndependentBlend:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.independentBlend,
+					physicalDeviceEnabledFeatures.independentBlend);
+				break;
+
+			case GraphicsFeature::GeometryShader:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.geometryShader,
+					physicalDeviceEnabledFeatures.geometryShader);
+				break;
+
+			case GraphicsFeature::TessellationShader:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.tessellationShader,
+					physicalDeviceEnabledFeatures.tessellationShader);
+				break;
+
+			case GraphicsFeature::SampleRateShading:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.sampleRateShading,
+					physicalDeviceEnabledFeatures.sampleRateShading);
+				break;
+
+			case GraphicsFeature::DualSrcBlend:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.dualSrcBlend,
+					physicalDeviceEnabledFeatures.dualSrcBlend);
+				break;
+
+			case GraphicsFeature::LogicOp:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.logicOp,
+					physicalDeviceEnabledFeatures.logicOp);
+				break;
+
+			case GraphicsFeature::DepthClamp:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.depthClamp,
+					physicalDeviceEnabledFeatures.depthClamp);
+				break;
+
+			case GraphicsFeature::DepthBiasClamp:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.depthBiasClamp,
+					physicalDeviceEnabledFeatures.depthBiasClamp);
+				break;
+
+			case GraphicsFeature::FillModeNonSolid:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.fillModeNonSolid,
+					physicalDeviceEnabledFeatures.fillModeNonSolid);
+				break;
+
+			case GraphicsFeature::DepthBounds:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.depthBounds,
+					physicalDeviceEnabledFeatures.depthBounds);
+				break;
+
+			case GraphicsFeature::WideLines:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.wideLines,
+					physicalDeviceEnabledFeatures.wideLines);
+				break;
+
+			case GraphicsFeature::LargePoints:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.largePoints,
+					physicalDeviceEnabledFeatures.largePoints);
+				break;
+
+			case GraphicsFeature::AlphaToOne:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.alphaToOne,
+					physicalDeviceEnabledFeatures.alphaToOne);
+				break;
+
+			case GraphicsFeature::MultiViewport:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.multiViewport,
+					physicalDeviceEnabledFeatures.multiViewport);
+				break;
+
+			case GraphicsFeature::SamplerAnisotropy:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.samplerAnisotropy,
+					physicalDeviceEnabledFeatures.samplerAnisotropy);
+				break;
+
+			case GraphicsFeature::TextureCompressionETC2:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.textureCompressionETC2,
+					physicalDeviceEnabledFeatures.textureCompressionETC2);
+				break;
+
+			case GraphicsFeature::TextureCompressionASTC_LDR:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.textureCompressionASTC_LDR,
+					physicalDeviceEnabledFeatures.textureCompressionASTC_LDR);
+				break;
+
+			case GraphicsFeature::TextureCompressionBC:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.textureCompressionBC,
+					physicalDeviceEnabledFeatures.textureCompressionBC);
+				break;
+			}
+		}
+	}
+
+	bool TryEnableFeature(bool optional, const string& name, const VkBool32& supportedFeature, VkBool32& enabledFeature)
+	{
+		bool supported = VK_TRUE == supportedFeature;
+		if (!optional && !supported)
+		{
+			ExitFatal(
+				"Required Feature Not Supported",
+				"This Application requires " + name + ", which is unavailable.  You may need to update your GPU or graphics driver");
+		}
+		enabledFeature = supportedFeature;
+		return supported;
 	}
 
 	InstanceHandle instance;
