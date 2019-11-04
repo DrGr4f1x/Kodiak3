@@ -171,6 +171,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 			case GraphicsFeature::LogicOp:
 				enabledFeature = TryEnableFeature(optionalFeatures, name, dataOptions.OutputMergerLogicOp == TRUE);
 				break;
+			case GraphicsFeature::DrawIndirectFirstInstance:
 			case GraphicsFeature::DepthClamp:
 			case GraphicsFeature::DepthBiasClamp:
 			case GraphicsFeature::FillModeNonSolid:
@@ -195,6 +196,20 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 			case GraphicsFeature::TextureCompressionBC:
 				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel >= D3D_FEATURE_LEVEL_11_0);
 				break;
+			case GraphicsFeature::OcclusionQueryPrecise:
+			case GraphicsFeature::PipelineStatisticsQuery:
+				enabledFeature = true;
+				break;
+			case GraphicsFeature::VertexPipelineStoresAndAtomics:
+			case GraphicsFeature::PixelShaderStoresAndAtomics:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel > D3D_FEATURE_LEVEL_11_0);
+				break;
+			case GraphicsFeature::ShaderTessellationAndGeometryPointSize:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, false);
+				break;
+			case GraphicsFeature::ShaderTextureGatherExtended:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, bestShaderModel >= D3D_SHADER_MODEL_5_1);
+				break;
 			}
 		}
 	}
@@ -203,9 +218,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	{
 		if (!optional && !supported)
 		{
-			ExitFatal(
-				"Required Feature Not Supported",
-				"This Application requires " + name + ", which is unavailable.  You may need to update your GPU or graphics driver");
+			unsupportedRequiredFeatures.push_back(name);
 		}
 		return supported;
 	}
@@ -218,6 +231,10 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &dataOptions, sizeof(dataOptions));
 		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS1, &dataOptions1, sizeof(dataOptions1));
 		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS2, &dataOptions2, sizeof(dataOptions2));
+
+		dataShaderModel.HighestShaderModel = bestShaderModel;
+		device->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &dataShaderModel, sizeof(dataShaderModel));
+		bestShaderModel = dataShaderModel.HighestShaderModel;
 
 		capsRead = true;
 	}
@@ -244,11 +261,15 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	uint64_t fenceValues[NumSwapChainBuffers]{ 0, 0, 0 };
 
 	D3D_FEATURE_LEVEL bestFeatureLevel{ D3D_FEATURE_LEVEL_11_0 };
+	D3D_SHADER_MODEL bestShaderModel{ D3D_SHADER_MODEL_6_4 };
 
 	bool capsRead{ false };
 	D3D12_FEATURE_DATA_D3D12_OPTIONS dataOptions;
 	D3D12_FEATURE_DATA_D3D12_OPTIONS1 dataOptions1;
 	D3D12_FEATURE_DATA_D3D12_OPTIONS2 dataOptions2;
+	D3D12_FEATURE_DATA_SHADER_MODEL dataShaderModel;
+
+	vector<string> unsupportedRequiredFeatures;
 };
 
 
@@ -396,6 +417,28 @@ void GraphicsDevice::PlatformCreate()
 
 	m_platformData->EnableFeatures(false);
 	m_platformData->EnableFeatures(true);
+
+	// Report missing features and exit
+	if (!m_platformData->unsupportedRequiredFeatures.empty())
+	{
+		string errMsg;
+		string errDetails;
+		if (m_platformData->unsupportedRequiredFeatures.size() > 1)
+		{
+			errMsg = "Required Features Not Supported";
+			errDetails = "This Application requires:\n ";
+			for (size_t i = 0; i < m_platformData->unsupportedRequiredFeatures.size(); ++i)
+				errDetails += m_platformData->unsupportedRequiredFeatures[i] + "\n";
+			errDetails += "\n, which are unavailable.  You may need to update your GPU or graphics driver";
+		}
+		else
+		{
+			errMsg = "Required Feature Not Supported";
+			errDetails = "This Application requires:\n " + m_platformData->unsupportedRequiredFeatures[0] + "\n, which is unavailable.  You may need to update your GPU or graphics driver";
+
+		}
+		ExitFatal(errMsg, errDetails);
+	}
 
 	g_device = m_platformData->device;
 

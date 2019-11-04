@@ -314,6 +314,28 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		// Enabled required and optional features, as requested by the application
 		EnableFeatures(false);
 		EnableFeatures(true);
+
+		// Report missing features and exit
+		if (!unsupportedRequiredFeatures.empty())
+		{
+			string errMsg;
+			string errDetails;
+			if (unsupportedRequiredFeatures.size() > 1)
+			{
+				errMsg = "Required Features Not Supported";
+				errDetails = "This Application requires:\n ";
+				for (size_t i = 0; i < unsupportedRequiredFeatures.size(); ++i)
+					errDetails += unsupportedRequiredFeatures[i] + "\n";
+				errDetails += "\n, which are unavailable.  You may need to update your GPU or graphics driver";
+			}
+			else
+			{
+				errMsg = "Required Feature Not Supported";
+				errDetails = "This Application requires:\n " + unsupportedRequiredFeatures[0] + "\n, which is unavailable.  You may need to update your GPU or graphics driver";
+
+			}
+			ExitFatal(errMsg, errDetails);
+		}
 	}
 
 	void InitializeDebugMarkup()
@@ -898,6 +920,14 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 					physicalDeviceEnabledFeatures.logicOp);
 				break;
 
+			case GraphicsFeature::DrawIndirectFirstInstance:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.drawIndirectFirstInstance,
+					physicalDeviceEnabledFeatures.drawIndirectFirstInstance);
+				break;
+
 			case GraphicsFeature::DepthClamp:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
@@ -993,6 +1023,54 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 					physicalDeviceSupportedFeatures.textureCompressionBC,
 					physicalDeviceEnabledFeatures.textureCompressionBC);
 				break;
+
+			case GraphicsFeature::OcclusionQueryPrecise:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.occlusionQueryPrecise,
+					physicalDeviceEnabledFeatures.occlusionQueryPrecise);
+				break;
+
+			case GraphicsFeature::PipelineStatisticsQuery:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.pipelineStatisticsQuery,
+					physicalDeviceEnabledFeatures.pipelineStatisticsQuery);
+				break;
+
+			case GraphicsFeature::VertexPipelineStoresAndAtomics:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.vertexPipelineStoresAndAtomics,
+					physicalDeviceEnabledFeatures.vertexPipelineStoresAndAtomics);
+				break;
+
+			case GraphicsFeature::PixelShaderStoresAndAtomics:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.fragmentStoresAndAtomics,
+					physicalDeviceEnabledFeatures.fragmentStoresAndAtomics);
+				break;
+
+			case GraphicsFeature::ShaderTessellationAndGeometryPointSize:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.shaderTessellationAndGeometryPointSize,
+					physicalDeviceEnabledFeatures.shaderTessellationAndGeometryPointSize);
+				break;
+
+			case GraphicsFeature::ShaderTextureGatherExtended:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					physicalDeviceSupportedFeatures.shaderImageGatherExtended,
+					physicalDeviceEnabledFeatures.shaderImageGatherExtended);
+				break;
 			}
 		}
 	}
@@ -1002,6 +1080,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		bool supported = VK_TRUE == supportedFeature;
 		if (!optional && !supported)
 		{
+			unsupportedRequiredFeatures.push_back(name);
 			ExitFatal(
 				"Required Feature Not Supported",
 				"This Application requires " + name + ", which is unavailable.  You may need to update your GPU or graphics driver");
@@ -1017,6 +1096,8 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	VkPhysicalDeviceFeatures physicalDeviceSupportedFeatures{};
 	VkPhysicalDeviceFeatures physicalDeviceEnabledFeatures{};
 	VkPhysicalDeviceMemoryProperties physicalDeviceMemoryProperties{};
+
+	vector<string> unsupportedRequiredFeatures;
 
 	DeviceHandle device;
 

@@ -26,6 +26,8 @@ enum class GraphicsFeature
 	SampleRateShading,
 	DualSrcBlend,
 	LogicOp,
+	// MultiDrawIndirect,			TODO
+	DrawIndirectFirstInstance,
 	DepthClamp,
 	DepthBiasClamp,
 	FillModeNonSolid,
@@ -38,6 +40,12 @@ enum class GraphicsFeature
 	TextureCompressionETC2,
 	TextureCompressionASTC_LDR,
 	TextureCompressionBC,
+	OcclusionQueryPrecise,
+	PipelineStatisticsQuery,
+	VertexPipelineStoresAndAtomics,
+	PixelShaderStoresAndAtomics,
+	ShaderTessellationAndGeometryPointSize,
+	ShaderTextureGatherExtended,
 };
 
 class GraphicsFeatureProxy
@@ -80,6 +88,7 @@ public:
 	GraphicsFeatureProxy sampleRateShading{ this, "Sample Rate Shading", GraphicsFeature::SampleRateShading };
 	GraphicsFeatureProxy dualSrcBlend{ this, "Dual Src Blend", GraphicsFeature::DualSrcBlend };
 	GraphicsFeatureProxy logicOp{ this, "Logic Op", GraphicsFeature::LogicOp };
+	GraphicsFeatureProxy drawIndirectFirstInstance{ this, "Draw Indirect First Instance", GraphicsFeature::DrawIndirectFirstInstance };
 	GraphicsFeatureProxy depthClamp{ this, "Depth Clamp", GraphicsFeature::DepthClamp };
 	GraphicsFeatureProxy depthBiasClamp{ this, "Depth Bias Clamp", GraphicsFeature::DepthBiasClamp };
 	GraphicsFeatureProxy fillModeNonSolid{ this, "Fill Mode Non-Solid", GraphicsFeature::FillModeNonSolid };
@@ -92,6 +101,12 @@ public:
 	GraphicsFeatureProxy textureCompressionETC2{ this, "Texture Compression ETC2", GraphicsFeature::TextureCompressionETC2 };
 	GraphicsFeatureProxy textureCompressionASTC_LDR{ this, "Texture Compression ASTC LDR", GraphicsFeature::TextureCompressionASTC_LDR };
 	GraphicsFeatureProxy textureCompressionBS{ this, "Texture Compression BC", GraphicsFeature::TextureCompressionBC };
+	GraphicsFeatureProxy occlusionQueryPrecise{ this, "Occlusion Query Precise", GraphicsFeature::OcclusionQueryPrecise };
+	GraphicsFeatureProxy pipelineStatisticsQuery{ this, "Pipeline Statistics Query", GraphicsFeature::PipelineStatisticsQuery };
+	GraphicsFeatureProxy vertexPipelineStoresAndAtomics{ this, "Vertex Pipeline Stores and Atomics", GraphicsFeature::VertexPipelineStoresAndAtomics };
+	GraphicsFeatureProxy pixelShaderStoresAndAtomics{ this, "Pixel Shader Stores and Atomics", GraphicsFeature::PixelShaderStoresAndAtomics };
+	GraphicsFeatureProxy shaderTessellationAndGeometryPointSize{ this, "Shader Tessellation and Geometry Point Size", GraphicsFeature::ShaderTessellationAndGeometryPointSize };
+	GraphicsFeatureProxy shaderTextureGatherExtended{ this, "Shader Texture Gather Extended", GraphicsFeature::ShaderTextureGatherExtended };
 
 	const GraphicsFeatureProxy& operator[](size_t index) const { return *m_features[index]; }
 	GraphicsFeatureProxy& operator[](size_t index) { return *m_features[index]; }
