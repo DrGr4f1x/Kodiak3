@@ -152,7 +152,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 			case GraphicsFeature::FullDrawIndexUint32:
 				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel >= D3D_FEATURE_LEVEL_10_0);
 				break;
-			case GraphicsFeature::ImageCubeArray:
+			case GraphicsFeature::TextureCubeArray:
 				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel >= D3D_FEATURE_LEVEL_10_1);
 				break;
 			case GraphicsFeature::IndependentBlend:
@@ -166,6 +166,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 				break;
 			case GraphicsFeature::SampleRateShading:
 			case GraphicsFeature::DualSrcBlend:
+			case GraphicsFeature::MultiDrawIndirect:
 				enabledFeature = true;
 				break;
 			case GraphicsFeature::LogicOp:

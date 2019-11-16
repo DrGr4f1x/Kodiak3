@@ -19,14 +19,14 @@ enum class GraphicsFeature
 {
 	RobustBufferAccess,
 	FullDrawIndexUint32,
-	ImageCubeArray,
+	TextureCubeArray,
 	IndependentBlend,
 	GeometryShader,
 	TessellationShader,
 	SampleRateShading,
 	DualSrcBlend,
 	LogicOp,
-	// MultiDrawIndirect,			TODO
+	MultiDrawIndirect,
 	DrawIndirectFirstInstance,
 	DepthClamp,
 	DepthBiasClamp,
@@ -46,12 +46,13 @@ enum class GraphicsFeature
 	PixelShaderStoresAndAtomics,
 	ShaderTessellationAndGeometryPointSize,
 	ShaderTextureGatherExtended,
+	ShaderUAVExtendedFormats
 };
 
 class GraphicsFeatureProxy
 {
 public:
-	GraphicsFeatureProxy(GraphicsFeatureSet* featureSet, const std::string& name, GraphicsFeature feature);
+	GraphicsFeatureProxy(GraphicsFeatureSet* featureSet, GraphicsFeature feature);
 
 	operator bool() const { return m_enabled; }
 
@@ -63,7 +64,7 @@ public:
 
 	GraphicsFeature GetFeature() const { return m_feature; }
 
-	const std::string& GetName() const { return m_name; }
+	const std::string GetName() const;
 
 protected:
 	const std::string m_name;
@@ -79,34 +80,35 @@ class GraphicsFeatureSet : NonCopyable
 	std::vector<GraphicsFeatureProxy*> m_features;
 
 public:
-	GraphicsFeatureProxy robustBufferAccess{ this, "Robust Buffer Access", GraphicsFeature::TessellationShader };
-	GraphicsFeatureProxy fullDrawIndexUint32{ this, "Full Draw Index Uint32", GraphicsFeature::FullDrawIndexUint32 };
-	GraphicsFeatureProxy imageCubeArray{ this, "Image Cube Array", GraphicsFeature::ImageCubeArray };
-	GraphicsFeatureProxy independentBlend{ this, "Independent Blend", GraphicsFeature::IndependentBlend };
-	GraphicsFeatureProxy geometryShader{ this, "Geometry Shader", GraphicsFeature::GeometryShader };
-	GraphicsFeatureProxy tessellationShader{ this, "Tessellation Shader", GraphicsFeature::TessellationShader };
-	GraphicsFeatureProxy sampleRateShading{ this, "Sample Rate Shading", GraphicsFeature::SampleRateShading };
-	GraphicsFeatureProxy dualSrcBlend{ this, "Dual Src Blend", GraphicsFeature::DualSrcBlend };
-	GraphicsFeatureProxy logicOp{ this, "Logic Op", GraphicsFeature::LogicOp };
-	GraphicsFeatureProxy drawIndirectFirstInstance{ this, "Draw Indirect First Instance", GraphicsFeature::DrawIndirectFirstInstance };
-	GraphicsFeatureProxy depthClamp{ this, "Depth Clamp", GraphicsFeature::DepthClamp };
-	GraphicsFeatureProxy depthBiasClamp{ this, "Depth Bias Clamp", GraphicsFeature::DepthBiasClamp };
-	GraphicsFeatureProxy fillModeNonSolid{ this, "Fill Mode Non-Solid", GraphicsFeature::FillModeNonSolid };
-	GraphicsFeatureProxy depthBounds{ this, "Depth Bounds", GraphicsFeature::DepthBounds };
-	GraphicsFeatureProxy wideLines{ this, "Wide Lines", GraphicsFeature::WideLines };
-	GraphicsFeatureProxy largePoints{ this, "Large Points", GraphicsFeature::LargePoints };
-	GraphicsFeatureProxy alphaToOne{ this, "Alpha to One", GraphicsFeature::AlphaToOne };
-	GraphicsFeatureProxy multiViewport{ this, "Multi Viewport", GraphicsFeature::MultiViewport };
-	GraphicsFeatureProxy samplerAnisotropy{ this, "Sampler Anisotropy", GraphicsFeature::SamplerAnisotropy };
-	GraphicsFeatureProxy textureCompressionETC2{ this, "Texture Compression ETC2", GraphicsFeature::TextureCompressionETC2 };
-	GraphicsFeatureProxy textureCompressionASTC_LDR{ this, "Texture Compression ASTC LDR", GraphicsFeature::TextureCompressionASTC_LDR };
-	GraphicsFeatureProxy textureCompressionBS{ this, "Texture Compression BC", GraphicsFeature::TextureCompressionBC };
-	GraphicsFeatureProxy occlusionQueryPrecise{ this, "Occlusion Query Precise", GraphicsFeature::OcclusionQueryPrecise };
-	GraphicsFeatureProxy pipelineStatisticsQuery{ this, "Pipeline Statistics Query", GraphicsFeature::PipelineStatisticsQuery };
-	GraphicsFeatureProxy vertexPipelineStoresAndAtomics{ this, "Vertex Pipeline Stores and Atomics", GraphicsFeature::VertexPipelineStoresAndAtomics };
-	GraphicsFeatureProxy pixelShaderStoresAndAtomics{ this, "Pixel Shader Stores and Atomics", GraphicsFeature::PixelShaderStoresAndAtomics };
-	GraphicsFeatureProxy shaderTessellationAndGeometryPointSize{ this, "Shader Tessellation and Geometry Point Size", GraphicsFeature::ShaderTessellationAndGeometryPointSize };
-	GraphicsFeatureProxy shaderTextureGatherExtended{ this, "Shader Texture Gather Extended", GraphicsFeature::ShaderTextureGatherExtended };
+	GraphicsFeatureProxy robustBufferAccess{ this, GraphicsFeature::TessellationShader };
+	GraphicsFeatureProxy fullDrawIndexUint32{ this, GraphicsFeature::FullDrawIndexUint32 };
+	GraphicsFeatureProxy textureCubeArray{ this, GraphicsFeature::TextureCubeArray };
+	GraphicsFeatureProxy independentBlend{ this, GraphicsFeature::IndependentBlend };
+	GraphicsFeatureProxy geometryShader{ this, GraphicsFeature::GeometryShader };
+	GraphicsFeatureProxy tessellationShader{ this, GraphicsFeature::TessellationShader };
+	GraphicsFeatureProxy sampleRateShading{ this, GraphicsFeature::SampleRateShading };
+	GraphicsFeatureProxy dualSrcBlend{ this, GraphicsFeature::DualSrcBlend };
+	GraphicsFeatureProxy logicOp{ this, GraphicsFeature::LogicOp };
+	GraphicsFeatureProxy multiDrawIndirect{ this, GraphicsFeature::MultiDrawIndirect };
+	GraphicsFeatureProxy drawIndirectFirstInstance{ this, GraphicsFeature::DrawIndirectFirstInstance };
+	GraphicsFeatureProxy depthClamp{ this, GraphicsFeature::DepthClamp };
+	GraphicsFeatureProxy depthBiasClamp{ this, GraphicsFeature::DepthBiasClamp };
+	GraphicsFeatureProxy fillModeNonSolid{ this, GraphicsFeature::FillModeNonSolid };
+	GraphicsFeatureProxy depthBounds{ this, GraphicsFeature::DepthBounds };
+	GraphicsFeatureProxy wideLines{ this, GraphicsFeature::WideLines };
+	GraphicsFeatureProxy largePoints{ this, GraphicsFeature::LargePoints };
+	GraphicsFeatureProxy alphaToOne{ this, GraphicsFeature::AlphaToOne };
+	GraphicsFeatureProxy multiViewport{ this, GraphicsFeature::MultiViewport };
+	GraphicsFeatureProxy samplerAnisotropy{ this, GraphicsFeature::SamplerAnisotropy };
+	GraphicsFeatureProxy textureCompressionETC2{ this, GraphicsFeature::TextureCompressionETC2 };
+	GraphicsFeatureProxy textureCompressionASTC_LDR{ this, GraphicsFeature::TextureCompressionASTC_LDR };
+	GraphicsFeatureProxy textureCompressionBS{ this, GraphicsFeature::TextureCompressionBC };
+	GraphicsFeatureProxy occlusionQueryPrecise{ this, GraphicsFeature::OcclusionQueryPrecise };
+	GraphicsFeatureProxy pipelineStatisticsQuery{ this, GraphicsFeature::PipelineStatisticsQuery };
+	GraphicsFeatureProxy vertexPipelineStoresAndAtomics{ this, GraphicsFeature::VertexPipelineStoresAndAtomics };
+	GraphicsFeatureProxy pixelShaderStoresAndAtomics{ this, GraphicsFeature::PixelShaderStoresAndAtomics };
+	GraphicsFeatureProxy shaderTessellationAndGeometryPointSize{ this, GraphicsFeature::ShaderTessellationAndGeometryPointSize };
+	GraphicsFeatureProxy shaderTextureGatherExtended{ this, GraphicsFeature::ShaderTextureGatherExtended };
 
 	const GraphicsFeatureProxy& operator[](size_t index) const { return *m_features[index]; }
 	GraphicsFeatureProxy& operator[](size_t index) { return *m_features[index]; }
@@ -116,5 +118,9 @@ public:
 private:
 	void RegisterFeature(GraphicsFeatureProxy* featureProxy);
 };
+
+
+const std::string GraphicsFeatureToString(GraphicsFeature feature);
+
 
 } // namespace Kodiak

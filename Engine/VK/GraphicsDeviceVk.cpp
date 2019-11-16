@@ -864,7 +864,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 					physicalDeviceEnabledFeatures.fullDrawIndexUint32);
 				break;
 
-			case GraphicsFeature::ImageCubeArray:
+			case GraphicsFeature::TextureCubeArray:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
