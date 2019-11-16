@@ -12,6 +12,7 @@
 
 #include "Application.h"
 
+#include "Filesystem.h"
 #include "GraphicsDevice.h"
 #include "Input.h"
 
@@ -114,6 +115,20 @@ void Application::Run()
 }
 
 
+void Application::Configure()
+{
+	// Setup file system
+	auto& filesystem = Filesystem::GetInstance();
+
+	filesystem.SetDefaultRootDir();
+	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
+	filesystem.AddSearchPath("..\\Data");
+	filesystem.AddSearchPath("..\\Data\\" + GetDefaultShaderPath());
+	filesystem.AddSearchPath("..\\Data\\Textures");
+	filesystem.AddSearchPath("..\\Data\\Models");
+}
+
+
 FrameBuffer& Application::GetBackBuffer() const
 {
 	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
@@ -188,6 +203,9 @@ void Application::Initialize()
 
 	g_input.Initialize(m_hwnd);
 
+	m_uiOverlay = make_unique<UIOverlay>();
+	m_uiOverlay->Startup(GetWidth(), GetHeight());
+
 	Startup();
 
 	m_isRunning = true;
@@ -197,6 +215,9 @@ void Application::Initialize()
 void Application::Finalize()
 {
 	Shutdown();
+
+	m_uiOverlay->Shutdown();
+	m_uiOverlay.reset();
 
 	for (int i = 0; i < NumSwapChainBuffers; ++i)
 	{

@@ -190,6 +190,9 @@
     <ClInclude Include="GraphicsFeatures.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="UIOverlay.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -366,6 +369,9 @@
     <ClCompile Include="GraphicsFeatures.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="UIOverlay.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -383,10 +389,20 @@
     <Filter Include="Graphics\Resources">
       <UniqueIdentifier>{df89c8a2-9a4f-44e2-8031-febe351dfa20}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics\Shaders">
+      <UniqueIdentifier>{f04b60cd-3c95-4fa0-b8f4-9fedce18ea93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Shaders\UI">
+      <UniqueIdentifier>{23b14d49-0f2b-4293-8df5-c248809cf292}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Math\Functions.inl">
       <Filter>Math</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Shaders\UIPS.hlsl" />
+    <CustomBuild Include="Shaders\UIVS.hlsl" />
   </ItemGroup>
 </Project>

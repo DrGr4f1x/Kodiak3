@@ -13,6 +13,7 @@
 #include "Camera.h"
 #include "DepthBuffer.h"
 #include "Framebuffer.h"
+#include "UIOverlay.h"
 
 
 namespace Kodiak
@@ -31,7 +32,7 @@ public:
 	void Run();
 
 	// Override these methods in derived classes
-	virtual void Configure() {}
+	virtual void Configure();
 	virtual void Startup() {}
 	virtual void Shutdown() {}
 
@@ -87,9 +88,11 @@ protected:
 
 	std::unique_ptr<GraphicsDevice>			m_graphicsDevice;
 
-	std::array<Kodiak::FrameBufferPtr, NumSwapChainBuffers>
+	std::array<FrameBufferPtr, NumSwapChainBuffers>
 											m_defaultFramebuffers;
-	Kodiak::DepthBufferPtr					m_defaultDepthBuffer;
+	DepthBufferPtr							m_defaultDepthBuffer;
+
+	std::unique_ptr<UIOverlay>				m_uiOverlay;
 
 private:
 	void Initialize();

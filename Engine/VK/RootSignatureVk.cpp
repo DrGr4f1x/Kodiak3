@@ -298,80 +298,80 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 		}
 	}
 
+	vector<VkDescriptorSetLayout> descriptorSetLayouts;
+	descriptorSetLayouts.reserve(m_numParameters);
+
+	vector<VkPushConstantRange> pushConstantRanges;
+	pushConstantRanges.reserve(m_numParameters);
+
+	VkDevice device = GetDevice();
+
+	// Gather the descriptor layouts and push constants
+	for (uint32_t i = 0; i < m_numParameters; ++i)
+	{
+		auto& parameter = m_paramArray[i];
+
+		if (parameter.m_pushConstantRange.size != 0)
+		{
+			pushConstantRanges.push_back(parameter.m_pushConstantRange);
+			continue;
+		}
+
+		const bool usePushDescriptor = parameter.m_type == RootParameterType::RootCBV || parameter.m_type == RootParameterType::DynamicRootCBV;
+
+		VkDescriptorSetLayoutCreateInfo createInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
+		createInfo.pNext = nullptr;
+		createInfo.flags = usePushDescriptor ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR : 0;
+		createInfo.bindingCount = static_cast<uint32_t>(parameter.m_bindings.size());
+		createInfo.pBindings = parameter.m_bindings.empty() ? nullptr : parameter.m_bindings.data();
+
+		ThrowIfFailed(vkCreateDescriptorSetLayout(device, &createInfo, nullptr, &parameter.m_descriptorSetLayout));
+
+		descriptorSetLayouts.push_back(parameter.m_descriptorSetLayout);
+	}
+
+	// Create static samplers
+	m_samplers.resize(m_numSamplers);
+
+	if (m_numSamplers > 0)
+	{
+		vector<VkDescriptorSetLayoutBinding> samplerBindings(m_numSamplers);
+
+		for (uint32_t i = 0; i < m_numSamplers; ++i)
+		{
+			VkDescriptorSetLayoutBinding& samplerBinding = samplerBindings[i];
+			samplerBinding.binding = i;
+			samplerBinding.descriptorCount = 1;
+			samplerBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+			samplerBinding.stageFlags = VK_SHADER_STAGE_ALL;
+
+			ThrowIfFailed(vkCreateSampler(device, &m_samplerArray[i].createInfo, nullptr, &m_samplers[i]));
+			samplerBinding.pImmutableSamplers = &m_samplers[i];
+		}
+
+		// TODO
+		// This code assumes samplers are contiguous from 0 to m_numSamplers-1 and all have the same
+		// shader visibility.  A better system would create ranges of contiguous sampler bindings
+		// per shader visibility type.
+
+		VkDescriptorSetLayoutCreateInfo createInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
+		createInfo.pNext = nullptr;
+		createInfo.flags = 0;
+		createInfo.bindingCount = m_numSamplers;
+		createInfo.pBindings = samplerBindings.data();
+
+		ThrowIfFailed(vkCreateDescriptorSetLayout(device, &createInfo, nullptr, &m_samplerLayout));
+
+		m_staticSamplerSetIndex = static_cast<uint32_t>(descriptorSetLayouts.size());
+
+		descriptorSetLayouts.push_back(m_samplerLayout);
+
+		// Finally, create a dummy descriptor set for the static samplers
+		m_staticSamplerSet = AllocateDescriptorSet(m_samplerLayout);
+	}
+
 	if (firstCompile)
 	{
-		vector<VkDescriptorSetLayout> descriptorSetLayouts;
-		descriptorSetLayouts.reserve(m_numParameters);
-
-		vector<VkPushConstantRange> pushConstantRanges;
-		pushConstantRanges.reserve(m_numParameters);
-
-		VkDevice device = GetDevice();
-
-		// Gather the descriptor layouts and push constants
-		for (uint32_t i = 0; i < m_numParameters; ++i)
-		{
-			auto& parameter = m_paramArray[i];
-
-			if (parameter.m_pushConstantRange.size != 0)
-			{
-				pushConstantRanges.push_back(parameter.m_pushConstantRange);
-				continue;
-			}
-
-			const bool usePushDescriptor = parameter.m_type == RootParameterType::RootCBV || parameter.m_type == RootParameterType::DynamicRootCBV;
-
-			VkDescriptorSetLayoutCreateInfo createInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
-			createInfo.pNext = nullptr;
-			createInfo.flags = usePushDescriptor ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR : 0;
-			createInfo.bindingCount = static_cast<uint32_t>(parameter.m_bindings.size());
-			createInfo.pBindings = parameter.m_bindings.empty() ? nullptr : parameter.m_bindings.data();
-
-			ThrowIfFailed(vkCreateDescriptorSetLayout(device, &createInfo, nullptr, &parameter.m_descriptorSetLayout));
-
-			descriptorSetLayouts.push_back(parameter.m_descriptorSetLayout);
-		}
-
-		// Create static samplers
-		m_samplers.resize(m_numSamplers);
-
-		if (m_numSamplers > 0)
-		{
-			vector<VkDescriptorSetLayoutBinding> samplerBindings(m_numSamplers);
-
-			for (uint32_t i = 0; i < m_numSamplers; ++i)
-			{
-				VkDescriptorSetLayoutBinding& samplerBinding = samplerBindings[i];
-				samplerBinding.binding = i;
-				samplerBinding.descriptorCount = 1;
-				samplerBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
-				samplerBinding.stageFlags = VK_SHADER_STAGE_ALL;
-
-				ThrowIfFailed(vkCreateSampler(device, &m_samplerArray[i].createInfo, nullptr, &m_samplers[i]));
-				samplerBinding.pImmutableSamplers = &m_samplers[i];
-			}
-
-			// TODO
-			// This code assumes samplers are contiguous from 0 to m_numSamplers-1 and all have the same
-			// shader visibility.  A better system would create ranges of contiguous sampler bindings
-			// per shader visibility type.
-
-			VkDescriptorSetLayoutCreateInfo createInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
-			createInfo.pNext = nullptr;
-			createInfo.flags = 0;
-			createInfo.bindingCount = m_numSamplers;
-			createInfo.pBindings = samplerBindings.data();
-
-			ThrowIfFailed(vkCreateDescriptorSetLayout(device, &createInfo, nullptr, &m_samplerLayout));
-
-			m_staticSamplerSetIndex = static_cast<uint32_t>(descriptorSetLayouts.size());
-
-			descriptorSetLayouts.push_back(m_samplerLayout);
-
-			// Finally, create a dummy descriptor set for the static samplers
-			m_staticSamplerSet = AllocateDescriptorSet(m_samplerLayout);
-		}
-
 		// Create the pipeline layout
 		VkPipelineLayoutCreateInfo pipelineInfo{ VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO };
 		pipelineInfo.pNext = nullptr;

@@ -14,30 +14,15 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "Filesystem.h"
-#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
+using namespace Math;
 using namespace std;
-
-
-void MultisamplingApp::Configure()
-{
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Models");
-	filesystem.AddSearchPath("Data\\Textures");
-}
 
 
 void MultisamplingApp::Startup()
 {
-	using namespace Math;
-
 	m_camera.SetPerspectiveMatrix(
 		DirectX::XMConvertToRadians(60.0f),
 		(float)m_displayHeight / (float)m_displayWidth,
@@ -208,8 +193,6 @@ void MultisamplingApp::LoadAssets()
 
 void MultisamplingApp::UpdateConstantBuffer()
 {
-	using namespace Math;
-
 	m_constants.viewProjectionMatrix = m_camera.GetProjMatrix();
 	m_constants.modelMatrix = m_camera.GetViewMatrix();
 	m_constants.lightPos = Vector4(5.0f, 5.0f, 5.0f, 1.0f);

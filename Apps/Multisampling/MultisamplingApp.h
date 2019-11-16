@@ -26,7 +26,6 @@ public:
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
 	{}
 
-	void Configure() final;
 	void Startup() final;
 	void Shutdown() final;
 

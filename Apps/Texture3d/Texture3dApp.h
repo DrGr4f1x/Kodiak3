@@ -29,7 +29,6 @@ public:
 		m_constants.depth = 0.0f;
 	}
 
-	void Configure() final;
 	void Startup() final;
 	void Shutdown() final;
 

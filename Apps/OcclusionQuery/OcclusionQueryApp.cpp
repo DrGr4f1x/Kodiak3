@@ -14,28 +14,15 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "Filesystem.h"
 
 
 using namespace Kodiak;
+using namespace Math;
 using namespace std;
-
-
-void OcclusionQueryApp::Configure()
-{
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Models");
-}
 
 
 void OcclusionQueryApp::Startup()
 {
-	using namespace Math;
-
 	m_camera.SetPerspectiveMatrix(
 		DirectX::XMConvertToRadians(60.0f),
 		(float)m_displayHeight / (float)m_displayWidth,
@@ -254,7 +241,6 @@ void OcclusionQueryApp::InitResourceSets()
 
 void OcclusionQueryApp::UpdateConstantBuffers()
 {
-	using namespace Math;
 	using namespace DirectX;
 
 	Matrix4 projectionMatrix = m_camera.GetProjMatrix();

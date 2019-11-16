@@ -14,11 +14,10 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "Filesystem.h"
-#include "GraphicsDevice.h"
 
 #include <numeric>
 #include <random>
+
 
 using namespace Kodiak;
 using namespace std;
@@ -131,16 +130,6 @@ public:
 		return (sum + (T)1.0) / (T)2.0;
 	}
 };
-
-
-void Texture3dApp::Configure()
-{
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-}
 
 
 void Texture3dApp::Startup()

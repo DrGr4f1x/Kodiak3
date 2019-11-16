@@ -14,24 +14,10 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "Filesystem.h"
-#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
 using namespace std;
-
-
-void ParticleFireApp::Configure()
-{
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Models");
-	filesystem.AddSearchPath("Data\\Textures");
-}
 
 
 void ParticleFireApp::Startup()
@@ -84,8 +70,6 @@ bool ParticleFireApp::Update()
 void ParticleFireApp::Render()
 {
 	auto& context = GraphicsContext::Begin("Render frame");
-
-	uint32_t curFrame = m_graphicsDevice->GetCurrentBuffer();
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);

@@ -14,24 +14,11 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "Filesystem.h"
-#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
 using namespace Math;
 using namespace std;
-
-
-void TextureArrayApp::Configure()
-{
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Textures");
-}
 
 
 void TextureArrayApp::Startup()

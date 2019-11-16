@@ -14,8 +14,6 @@
 
 #include "CommonStates.h"
 #include "CommandContext.h"
-#include "Filesystem.h"
-#include "GraphicsDevice.h"
 #include "Input.h"
 
 
@@ -26,12 +24,7 @@ using namespace std;
 
 void ComputeParticlesApp::Configure()
 {
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Textures");
+	Application::Configure();
 
 	g_input.SetCaptureMouse(false);
 }

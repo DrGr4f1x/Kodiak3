@@ -14,7 +14,6 @@
 
 #include "CommonStates.h"
 #include "CommandContext.h"
-#include "Filesystem.h"
 #include "GraphicsDevice.h"
 
 
@@ -28,12 +27,7 @@ using namespace std;
 
 void ComputeNBodyApp::Configure()
 {
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Textures");
+	Application::Configure();
 
 	// Specify required graphics features 
 	auto& requiredFeatures = RequiredFeatures();

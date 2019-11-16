@@ -14,24 +14,10 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "Filesystem.h"
-#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
 using namespace std;
-
-
-void RadialBlurApp::Configure()
-{
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Textures");
-	filesystem.AddSearchPath("Data\\Models");
-}
 
 
 void RadialBlurApp::Startup()

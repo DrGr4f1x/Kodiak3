@@ -14,23 +14,10 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "Filesystem.h"
 
 
 using namespace Kodiak;
 using namespace std;
-
-
-void InstancingApp::Configure()
-{
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Models");
-	filesystem.AddSearchPath("Data\\Textures");
-}
 
 
 void InstancingApp::Startup()

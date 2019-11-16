@@ -14,7 +14,6 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "Filesystem.h"
 #include "GraphicsDevice.h"
 
 
@@ -24,12 +23,7 @@ using namespace std;
 
 void GeometryShaderApp::Configure()
 {
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Models");
+	Application::Configure();
 
 	// Specify required graphics features 
 	auto& requiredFeatures = RequiredFeatures();

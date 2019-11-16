@@ -14,24 +14,11 @@
 
 #include "CommonStates.h"
 #include "CommandContext.h"
-#include "Filesystem.h"
-#include "GraphicsDevice.h"
 #include "Input.h"
 
 
 using namespace Kodiak;
 using namespace std;
-
-
-void ComputeShaderApp::Configure()
-{
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Texture");
-}
 
 
 void ComputeShaderApp::Startup()

@@ -14,29 +14,15 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "GraphicsDevice.h"
-#include "Filesystem.h"
 
 
 using namespace Kodiak;
+using namespace Math;
 using namespace std;
-
-
-void StencilBufferApp::Configure()
-{
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Models");
-}
 
 
 void StencilBufferApp::Startup()
 {
-	using namespace Math;
-
 	m_camera.SetPerspectiveMatrix(
 		DirectX::XMConvertToRadians(60.0f),
 		(float)m_displayHeight / (float)m_displayWidth,
@@ -223,8 +209,6 @@ void StencilBufferApp::InitResourceSet()
 
 void StencilBufferApp::UpdateConstantBuffer()
 {
-	using namespace Math;
-
 	m_constants.viewProjectionMatrix = m_camera.GetViewProjMatrix();
 	m_constants.modelMatrix = Matrix4(kIdentity);
 	m_constants.lightPos = Vector4(m_camera.GetPosition(), 1.0f);

@@ -29,7 +29,6 @@ public:
 		m_timerSpeed = 2.0f;
 	}
 
-	void Configure() final;
 	void Startup() final;
 	void Shutdown() final;
 

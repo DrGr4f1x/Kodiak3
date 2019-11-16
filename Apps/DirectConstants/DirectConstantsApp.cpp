@@ -14,8 +14,6 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "Filesystem.h"
-#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
@@ -24,12 +22,7 @@ using namespace std;
 
 void DirectConstantsApp::Configure()
 {
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Models");
+	Application::Configure();
 
 	m_timerSpeed = 0.125f;
 }

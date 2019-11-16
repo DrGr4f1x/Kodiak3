@@ -23,7 +23,6 @@ class RadialBlurApp : public Kodiak::Application
 public:
 	RadialBlurApp() : Application("Radial Blur") {}
 
-	void Configure() final;
 	void Startup() final;
 	void Shutdown() final;
 

@@ -14,25 +14,11 @@
 
 #include "CommonStates.h"
 #include "CommandContext.h"
-#include "Filesystem.h"
-#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
 using namespace Math;
 using namespace std;
-
-
-void ComputeClothApp::Configure()
-{
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Models");
-	filesystem.AddSearchPath("Data\\Textures");
-}
 
 
 void ComputeClothApp::Startup()

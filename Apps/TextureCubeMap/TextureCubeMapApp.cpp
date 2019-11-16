@@ -14,30 +14,15 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "Filesystem.h"
-#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
+using namespace Math;
 using namespace std;
-
-
-void TextureCubeMapApp::Configure()
-{
-	// Setup file system
-	auto& filesystem = Filesystem::GetInstance();
-
-	filesystem.SetDefaultRootDir();
-	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
-	filesystem.AddSearchPath("Data\\Models");
-	filesystem.AddSearchPath("Data\\Textures");
-}
 
 
 void TextureCubeMapApp::Startup()
 {
-	using namespace Math;
-
 	m_camera.SetPerspectiveMatrix(
 		XMConvertToRadians(60.0f),
 		(float)m_displayHeight / (float)m_displayWidth,
@@ -221,8 +206,6 @@ void TextureCubeMapApp::InitResourceSets()
 
 void TextureCubeMapApp::UpdateConstantBuffers()
 {
-	using namespace Math;
-
 	Matrix4 modelMatrix = Matrix4(kIdentity);
 
 	Matrix4 viewMatrix = AffineTransform(m_camera.GetRotation(), Vector3(0.0f, 0.0f, 0.0f));

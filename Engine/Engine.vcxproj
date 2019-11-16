@@ -133,14 +133,14 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>_MBCS;DX12;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)12_d.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>assimp-vc141-mt_d.lib;IrrXML_d.lib;zlibstaticd.lib</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc141-mt_d.lib;IrrXML_d.lib;zlibstaticd.lib;ImGui_d.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib;$(ProjectDir)..\Extern\Bin</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">
@@ -150,14 +150,14 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>_MBCS;VK;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)Vk_d.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>assimp-vc141-mt_d.lib;IrrXML_d.lib;zlibstaticd.lib</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc141-mt_d.lib;IrrXML_d.lib;zlibstaticd.lib;ImGui_d.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib;$(ProjectDir)..\Extern\Bin</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">
@@ -169,7 +169,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>_MBCS;DX12;_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)12.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -177,10 +177,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>assimp-vc141-mt.lib;IrrXML.lib;zlibstatic.lib</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc141-mt.lib;IrrXML.lib;zlibstatic.lib;ImGui.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib;$(ProjectDir)..\Extern\Bin</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">
@@ -192,7 +192,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>_MBCS;DX12;_PROFILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)12_p.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -200,10 +200,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>assimp-vc141-mt.lib;IrrXML.lib;zlibstatic.lib</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc141-mt.lib;IrrXML.lib;zlibstatic.lib;ImGui_p.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib;$(ProjectDir)..\Extern\Bin</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">
@@ -215,7 +215,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>_MBCS;VK;_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)Vk.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -223,10 +223,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>assimp-vc141-mt.lib;IrrXML.lib;zlibstatic.lib</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc141-mt.lib;IrrXML.lib;zlibstatic.lib;ImGui.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib;$(ProjectDir)..\Extern\Bin</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">
@@ -238,7 +238,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>_MBCS;VK;_PROFILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)Vk_p.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -246,10 +246,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>assimp-vc141-mt.lib;IrrXML.lib;zlibstatic.lib</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc141-mt.lib;IrrXML.lib;zlibstatic.lib;ImGui_p.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib;$(ProjectDir)..\Extern\Bin</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -359,6 +359,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="UIOverlay.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="VectorMath.h" />
     <ClInclude Include="VK\CommandBufferPoolVk.h">
@@ -545,6 +546,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="UIOverlay.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="VK\ColorBufferVk.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
@@ -644,6 +646,50 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Math\Functions.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Shaders\UIPS.hlsl">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)..\Apps\Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)..\Apps\Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)..\Apps\Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Compiling HLSL to DXIL...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Compiling HLSL to DXIL...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Compiling HLSL to DXIL...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Compiling HLSL to SPIR-V...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Compiling HLSL to SPIR-V...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Compiling HLSL to SPIR-V...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)..\Apps\Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)..\Apps\Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)..\Apps\Data\Shaders\SPIR-V\%(Filename).spv</Command>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\UIVS.hlsl">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)..\Apps\Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)..\Apps\Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)..\Apps\Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Compiling HLSL to DXIL...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Compiling HLSL to DXIL...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Compiling HLSL to DXIL...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Compiling HLSL to SPIR-V...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Compiling HLSL to SPIR-V...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Compiling HLSL to SPIR-V...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)..\Apps\Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)..\Apps\Data\Shaders\SPIR-V\%(Filename).spv</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)..\Apps\Data\Shaders\SPIR-V\%(Filename).spv</Command>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
