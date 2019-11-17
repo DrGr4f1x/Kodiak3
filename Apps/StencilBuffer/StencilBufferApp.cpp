@@ -65,7 +65,7 @@ bool StencilBufferApp::Update()
 
 void StencilBufferApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Render frame");
+	auto& context = GraphicsContext::Begin("Scene");
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
@@ -98,7 +98,6 @@ void StencilBufferApp::Render()
 	}
 
 	context.EndRenderPass();
-	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

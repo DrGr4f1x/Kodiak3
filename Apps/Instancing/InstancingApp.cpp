@@ -68,7 +68,7 @@ bool InstancingApp::Update()
 
 void InstancingApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Render Frame");
+	auto& context = GraphicsContext::Begin("Scene");
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
@@ -114,7 +114,6 @@ void InstancingApp::Render()
 	}
 
 	context.EndRenderPass();
-	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -126,7 +125,6 @@ void InstancingApp::InitRootSigs()
 	m_starfieldRootSig.Finalize(
 		"Starfield RootSig",
 		RootSignatureFlags::AllowInputAssemblerInputLayout | 
-		RootSignatureFlags::DenyPixelShaderRootAccess | 
 		RootSignatureFlags::DenyPixelShaderRootAccess);
 
 	m_modelRootSig.Reset(2, 1);

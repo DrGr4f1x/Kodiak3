@@ -65,7 +65,7 @@ bool ComputeClothApp::Update()
 
 void ComputeClothApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Render frame");
+	auto& context = GraphicsContext::Begin("Scene");
 
 	// Cloth simulation
 	{
@@ -123,8 +123,6 @@ void ComputeClothApp::Render()
 	context.DrawIndexed((uint32_t)m_clothIndexBuffer.GetElementCount());
 
 	context.EndRenderPass();
-
-	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

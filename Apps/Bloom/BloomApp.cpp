@@ -77,7 +77,7 @@ bool BloomApp::Update()
 
 void BloomApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Render frame");
+	auto& context = GraphicsContext::Begin("Scene");
 
 	// Offscreen color pass
 
@@ -161,7 +161,6 @@ void BloomApp::Render()
 	context.Draw(3);
 
 	context.EndRenderPass();
-	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

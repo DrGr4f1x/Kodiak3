@@ -73,7 +73,7 @@ bool ComputeParticlesApp::Update()
 
 void ComputeParticlesApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Render frame");
+	auto& context = GraphicsContext::Begin("Scene");
 
 	// Simulate particles on compute
 	{
@@ -110,7 +110,6 @@ void ComputeParticlesApp::Render()
 	context.Draw(6 * m_particleCount);
 
 	context.EndRenderPass();
-	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

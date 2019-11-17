@@ -64,7 +64,7 @@ void RadialBlurApp::Render()
 {
 	// Offscreen pass [offscreen render target]
 	{
-		auto& context = GraphicsContext::Begin("Offscreen");
+		auto& context = GraphicsContext::Begin("Offscreen Pass");
 
 		context.TransitionResource(*m_offscreenFramebuffer->GetColorBuffer(0), ResourceState::RenderTarget);
 		context.TransitionResource(*m_offscreenFramebuffer->GetDepthBuffer(), ResourceState::DepthWrite);
@@ -92,7 +92,7 @@ void RadialBlurApp::Render()
 
 	// Main pass [backbuffer]
 	{
-		auto& context = GraphicsContext::Begin("Render frame");
+		auto& context = GraphicsContext::Begin("Scene");
 
 		context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 		context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
@@ -125,7 +125,6 @@ void RadialBlurApp::Render()
 		}
 
 		context.EndRenderPass();
-		context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 		context.Finish();
 	}

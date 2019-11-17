@@ -18,7 +18,6 @@
     <CustomBuild Include="Shaders\ParticleIntegrateCS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\ParticleGS.hlsl" />
     <CustomBuild Include="Shaders\ParticleCalculateCS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
@@ -26,6 +25,9 @@
       <Filter>Shaders</Filter>
     </CustomBuild>
     <CustomBuild Include="Shaders\ParticleVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ParticleGS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
   </ItemGroup>

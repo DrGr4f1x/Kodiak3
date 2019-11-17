@@ -67,7 +67,7 @@ bool MultisamplingApp::Update()
 
 void MultisamplingApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Render frame");
+	auto& context = GraphicsContext::Begin("Scene");
 
 	Color clearColor{ DirectX::Colors::White };
 	context.TransitionResource(*m_frameBuffer->GetColorBuffer(0), ResourceState::RenderTarget);
@@ -95,8 +95,6 @@ void MultisamplingApp::Render()
 	context.TransitionResource(GetColorBuffer(), ResourceState::ResolveDest);
 
 	context.Resolve(*m_frameBuffer->GetColorBuffer(0), GetColorBuffer(), GetColorFormat());
-
-	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

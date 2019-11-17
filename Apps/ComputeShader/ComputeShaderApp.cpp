@@ -91,7 +91,7 @@ bool ComputeShaderApp::Update()
 
 void ComputeShaderApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Render frame");
+	auto& context = GraphicsContext::Begin("Scene");
 
 	// Compute
 	{
@@ -150,7 +150,6 @@ void ComputeShaderApp::Render()
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 
 	context.EndRenderPass();
-	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

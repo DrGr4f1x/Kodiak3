@@ -83,6 +83,71 @@ void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSiz
 }
 
 
+// TODO - Unify this code with VertexBuffer, ConstantBuffer
+void IndexBuffer::Update(size_t sizeInBytes, const void* data)
+{
+	assert(sizeInBytes <= m_bufferSize);
+
+	CD3DX12_RANGE readRange(0, 0);
+
+	// Map uniform buffer and update it
+	void* pData = nullptr;
+	ThrowIfFailed(m_resource->Map(0, &readRange, &pData));
+	memcpy(pData, data, sizeInBytes);
+	// Unmap after data has been copied
+	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
+	m_resource->Unmap(0, nullptr);
+}
+
+
+void IndexBuffer::Update(size_t sizeInBytes, size_t offset, const void* data)
+{
+	assert((sizeInBytes + offset) <= m_bufferSize);
+
+	CD3DX12_RANGE readRange(0, 0);
+
+	// Map uniform buffer and update it
+	byte* pData = nullptr;
+	ThrowIfFailed(m_resource->Map(0, &readRange, reinterpret_cast<void**>(&pData)));
+	memcpy((void*)(pData + offset), data, sizeInBytes);
+	// Unmap after data has been copied
+	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
+	m_resource->Unmap(0, nullptr);
+}
+
+
+void VertexBuffer::Update(size_t sizeInBytes, const void* data)
+{
+	assert(sizeInBytes <= m_bufferSize);
+
+	CD3DX12_RANGE readRange(0, 0);
+
+	// Map uniform buffer and update it
+	void* pData = nullptr;
+	ThrowIfFailed(m_resource->Map(0, &readRange, &pData));
+	memcpy(pData, data, sizeInBytes);
+	// Unmap after data has been copied
+	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
+	m_resource->Unmap(0, nullptr);
+}
+
+
+void VertexBuffer::Update(size_t sizeInBytes, size_t offset, const void* data)
+{
+	assert((sizeInBytes + offset) <= m_bufferSize);
+
+	CD3DX12_RANGE readRange(0, 0);
+
+	// Map uniform buffer and update it
+	byte* pData = nullptr;
+	ThrowIfFailed(m_resource->Map(0, &readRange, reinterpret_cast<void**>(&pData)));
+	memcpy((void*)(pData + offset), data, sizeInBytes);
+	// Unmap after data has been copied
+	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
+	m_resource->Unmap(0, nullptr);
+}
+
+
 void ConstantBuffer::Update(size_t sizeInBytes, const void* data)
 {
 	assert(sizeInBytes <= m_bufferSize);

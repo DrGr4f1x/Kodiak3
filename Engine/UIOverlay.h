@@ -19,11 +19,18 @@
 namespace Kodiak
 {
 
+// Forward declarations
+class GraphicsContext;
+
+
 class UIOverlay
 {
 public:
 	void Startup(uint32_t width, uint32_t height);
 	void Shutdown();
+
+	void Update();
+	void Render(GraphicsContext& context);
 
 protected:
 	void InitImGui();

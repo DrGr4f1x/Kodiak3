@@ -19,7 +19,10 @@
 namespace Kodiak
 {
 
+// Forward declarations
+class GraphicsContext;
 class GraphicsDevice;
+
 
 class Application
 {

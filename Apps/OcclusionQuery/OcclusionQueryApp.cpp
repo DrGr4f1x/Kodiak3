@@ -64,7 +64,7 @@ bool OcclusionQueryApp::Update()
 
 void OcclusionQueryApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Render Frame");
+	auto& context = GraphicsContext::Begin("Scene");
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
@@ -147,7 +147,6 @@ void OcclusionQueryApp::Render()
 	}
 
 	context.EndRenderPass();
-	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

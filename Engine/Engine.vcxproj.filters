@@ -402,7 +402,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="Shaders\UIPS.hlsl" />
-    <CustomBuild Include="Shaders\UIVS.hlsl" />
+    <CustomBuild Include="Shaders\UIPS.hlsl">
+      <Filter>Graphics\Shaders\UI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\UIVS.hlsl">
+      <Filter>Graphics\Shaders\UI</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

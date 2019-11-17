@@ -12,6 +12,7 @@
 
 #include "Application.h"
 
+#include "CommandContext.h"
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
 #include "Input.h"
@@ -256,6 +257,16 @@ bool Application::Tick()
 	if (res)
 	{
 		Render();
+
+		// Render UI and prepare present
+		{
+			auto& context = GraphicsContext::Begin("UI");
+
+			m_uiOverlay->Render(context);
+
+			context.TransitionResource(GetColorBuffer(), ResourceState::Present);
+			context.Finish();
+		}
 
 		m_graphicsDevice->SubmitFrame();
 	}

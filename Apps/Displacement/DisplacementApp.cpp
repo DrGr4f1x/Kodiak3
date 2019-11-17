@@ -80,7 +80,7 @@ bool DisplacementApp::Update()
 
 void DisplacementApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Render frame");
+	auto& context = GraphicsContext::Begin("Scene");
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
@@ -110,7 +110,6 @@ void DisplacementApp::Render()
 	context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
 
 	context.EndRenderPass();
-	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

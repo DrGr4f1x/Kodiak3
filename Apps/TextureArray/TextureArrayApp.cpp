@@ -81,7 +81,7 @@ bool TextureArrayApp::Update()
 
 void TextureArrayApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Render frame");
+	auto& context = GraphicsContext::Begin("Scene");
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
@@ -103,7 +103,6 @@ void TextureArrayApp::Render()
 	context.DrawIndexedInstanced((uint32_t)m_indexBuffer.GetElementCount(), m_layerCount, 0, 0, 0);
 
 	context.EndRenderPass();
-	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

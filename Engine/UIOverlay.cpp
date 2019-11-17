@@ -43,6 +43,52 @@ void UIOverlay::Shutdown()
 }
 
 
+void UIOverlay::Update()
+{
+	ImDrawData* imDrawData = ImGui::GetDrawData();
+
+	if (!imDrawData)
+		return;
+
+	// Note: Alignment is done inside buffer creation
+	uint32_t vertexBufferSize = imDrawData->TotalVtxCount * sizeof(ImDrawVert);
+	uint32_t indexBufferSize = imDrawData->TotalIdxCount * sizeof(ImDrawIdx);
+
+	// Update buffers only if vertex or index count has been changed compared to current buffer size
+	if ((vertexBufferSize == 0) || (indexBufferSize == 0))
+		return;
+
+	if (m_vertexBuffer.GetSize() == 0 || (m_vertexCount != imDrawData->TotalVtxCount))
+	{
+		m_vertexBuffer.Create("UI Vertex Buffer", imDrawData->TotalVtxCount, sizeof(ImDrawVert));
+		m_vertexCount = imDrawData->TotalVtxCount;
+	}
+
+	if (m_indexBuffer.GetSize() == 0 || (m_indexCount != imDrawData->TotalIdxCount))
+	{
+		m_indexBuffer.Create("UI Index Buffer", imDrawData->TotalIdxCount, sizeof(ImDrawIdx));
+		m_indexCount = imDrawData->TotalIdxCount;
+	}
+
+	size_t indexOffset = 0;
+	size_t vertexOffset = 0;
+	for (int n = 0; n < imDrawData->CmdListsCount; n++) 
+	{
+		const ImDrawList* cmd_list = imDrawData->CmdLists[n];
+
+		m_indexBuffer.Update(cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), indexOffset, cmd_list->IdxBuffer.Data);
+		m_vertexBuffer.Update(cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), vertexOffset, cmd_list->VtxBuffer.Data);
+
+		indexOffset += cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx);
+		vertexOffset += cmd_list->VtxBuffer.Size * sizeof(ImDrawVert);
+	}
+}
+
+
+void UIOverlay::Render(GraphicsContext& context)
+{}
+
+
 void UIOverlay::InitImGui()
 {
 	// Init ImGui

@@ -68,6 +68,9 @@ public:
 
 	const IndexBufferView& GetIBV() const { return m_ibv; }
 
+	void Update(size_t sizeInBytes, const void* data);
+	void Update(size_t sizeInBytes, size_t offset, const void* data);
+
 	bool IndexSize16Bit() const { return m_indexSize16; }
 
 protected:
@@ -85,6 +88,9 @@ public:
 	VertexBuffer() : GpuBuffer(ResourceType::VertexBuffer) {}
 
 	const VertexBufferView& GetVBV() const { return m_vbv; }
+
+	void Update(size_t sizeInBytes, const void* data);
+	void Update(size_t sizeInBytes, size_t offset, const void* data);
 
 protected:
 	void CreateDerivedViews() override;

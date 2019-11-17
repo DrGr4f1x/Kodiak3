@@ -185,7 +185,7 @@ bool Texture3dApp::Update()
 
 void Texture3dApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Render frame");
+	auto& context = GraphicsContext::Begin("Scene");
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);
@@ -207,7 +207,6 @@ void Texture3dApp::Render()
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 
 	context.EndRenderPass();
-	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

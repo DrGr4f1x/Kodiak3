@@ -78,7 +78,7 @@ bool ComputeNBodyApp::Update()
 
 void ComputeNBodyApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Render frame");
+	auto& context = GraphicsContext::Begin("Scene");
 
 	// Particle simulation
 	{
@@ -94,8 +94,6 @@ void ComputeNBodyApp::Render()
 		computeContext.Dispatch1D(6 * PARTICLES_PER_ATTRACTOR, 256);
 
 		computeContext.SetPipelineState(m_computeIntegratePSO);
-
-		//computeContext.SetResources(m_computeResources);
 
 		computeContext.Dispatch1D(6 * PARTICLES_PER_ATTRACTOR, 256);
 	}
@@ -118,8 +116,6 @@ void ComputeNBodyApp::Render()
 	context.Draw(6 * PARTICLES_PER_ATTRACTOR);
 
 	context.EndRenderPass();
-
-	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
