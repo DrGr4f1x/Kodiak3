@@ -29,9 +29,13 @@ static inline bool HasFlag(ResourceType type, ResourceType flag)
 }
 
 
-void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSize, const void* initialData)
+void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSize, bool allowCpuWrites, const void* initialData)
 {
-	m_resource = nullptr;
+	if (m_resource)
+	{
+		g_graphicsDevice->ReleaseResource(m_resource);
+		m_resource = nullptr;
+	}
 
 	VkDevice device = GetDevice();
 
@@ -58,7 +62,7 @@ void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSiz
 	VkMemoryRequirements memReqs;
 	vkGetBufferMemoryRequirements(device, buffer, &memReqs);
 
-	const bool bHostMappable = HasFlag(m_type, ResourceType::ConstantBuffer);
+	const bool bHostMappable = allowCpuWrites || HasFlag(m_type, ResourceType::ConstantBuffer);
 	VkMemoryPropertyFlags memFlags = bHostMappable ?
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT :
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
@@ -97,6 +101,50 @@ void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSiz
 	}
 
 	CreateDerivedViews();
+}
+
+
+void IndexBuffer::Update(size_t sizeInBytes, const void* data)
+{
+	Update(sizeInBytes, 0, data);
+}
+
+
+void IndexBuffer::Update(size_t sizeInBytes, size_t offset, const void* data)
+{
+	assert((sizeInBytes + offset) <= m_bufferSize);
+
+	VkDevice device = GetDevice();
+
+	// Map uniform buffer and update it
+	uint8_t* pData = nullptr;
+	ThrowIfFailed(vkMapMemory(device, m_resource, offset, sizeInBytes, 0, (void **)&pData));
+	memcpy(pData, data, sizeInBytes);
+	// Unmap after data has been copied
+	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
+	vkUnmapMemory(device, m_resource);
+}
+
+
+void VertexBuffer::Update(size_t sizeInBytes, const void* data)
+{
+	Update(sizeInBytes, 0, data);
+}
+
+
+void VertexBuffer::Update(size_t sizeInBytes, size_t offset, const void* data)
+{
+	assert((sizeInBytes + offset) <= m_bufferSize);
+
+	VkDevice device = GetDevice();
+
+	// Map uniform buffer and update it
+	uint8_t* pData = nullptr;
+	ThrowIfFailed(vkMapMemory(device, m_resource, offset, sizeInBytes, 0, (void **)&pData));
+	memcpy(pData, data, sizeInBytes);
+	// Unmap after data has been copied
+	// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
+	vkUnmapMemory(device, m_resource);
 }
 
 

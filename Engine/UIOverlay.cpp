@@ -25,11 +25,12 @@ using namespace Math;
 using namespace std;
 
 
-void UIOverlay::Startup(uint32_t width, uint32_t height, Format format)
+void UIOverlay::Startup(uint32_t width, uint32_t height, Format format, Format depthFormat)
 {
 	m_width = width;
 	m_height = height;
 	m_format = format;
+	m_depthFormat = depthFormat;
 
 	InitImGui();
 	InitRootSig();
@@ -45,9 +46,6 @@ void UIOverlay::Shutdown()
 	m_rootSig.Destroy();
 	m_fontTex.reset();
 }
-
-
-static void whoa() {}
 
 
 void UIOverlay::Update()
@@ -78,9 +76,6 @@ void UIOverlay::Update()
 		m_indexBuffer.Create("UI Index Buffer", imDrawData->TotalIdxCount, sizeof(ImDrawIdx), true);
 		m_indexCount = imDrawData->TotalIdxCount;
 	}
-
-	if (imDrawData->CmdListsCount > 1)
-		whoa();
 
 	size_t indexOffset = 0;
 	size_t vertexOffset = 0;
@@ -291,7 +286,7 @@ void UIOverlay::InitPSO()
 	m_pso.SetRasterizerState(CommonStates::RasterizerTwoSided());
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
-	m_pso.SetRenderTargetFormat(m_format, Format::Unknown);
+	m_pso.SetRenderTargetFormat(m_format, m_depthFormat);
 
 	// Vertex inputs
 	VertexStreamDesc vertexStream = { 0, sizeof(Vertex), InputClassification::PerVertexData };

@@ -270,7 +270,7 @@ void Application::Initialize()
 	g_input.Initialize(m_hwnd);
 
 	m_uiOverlay = make_unique<UIOverlay>();
-	m_uiOverlay->Startup(GetWidth(), GetHeight(), GetColorFormat());
+	m_uiOverlay->Startup(GetWidth(), GetHeight(), GetColorFormat(), GetDepthFormat());
 
 	Startup();
 
@@ -322,16 +322,6 @@ bool Application::Tick()
 	if (res)
 	{
 		Render();
-
-		// Render UI and prepare present
-		{
-			auto& context = GraphicsContext::Begin("UI");
-
-			m_uiOverlay->Render(context);
-
-			context.TransitionResource(GetColorBuffer(), ResourceState::Present);
-			context.Finish();
-		}
 
 		m_graphicsDevice->SubmitFrame();
 	}

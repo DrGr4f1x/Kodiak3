@@ -27,7 +27,7 @@ class GraphicsContext;
 class UIOverlay
 {
 public:
-	void Startup(uint32_t width, uint32_t height, Format format);
+	void Startup(uint32_t width, uint32_t height, Format format, Format depthFormat);
 	void Shutdown();
 
 	void Update();
@@ -60,7 +60,7 @@ protected:
 	{
 		float position[2];
 		float uv[2];
-		float color[4];
+		uint32_t color;
 	};
 
 	struct VSConstants
@@ -88,6 +88,7 @@ protected:
 	uint32_t		m_width{ 0 };
 	uint32_t		m_height{ 0 };
 	Format			m_format;
+	Format			m_depthFormat;
 };
 
 } // namespace Kodiak

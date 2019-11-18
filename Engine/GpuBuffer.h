@@ -108,16 +108,19 @@ public:
 		m_usageState = ResourceState::GenericRead;
 	}
 
-#if DX12
 	void Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData = nullptr)
 	{
+		
+#if DX12
 		GpuBuffer::Create(name, numElements, elementSize, true);
 		if (initialData)
 		{
 			Update(m_bufferSize, initialData);
 		}
-	}
+#else
+		GpuBuffer::Create(name, numElements, elementSize, true, initialData);
 #endif
+	}
 
 	const ConstantBufferView& GetCBV() const { return m_cbv; }
 
