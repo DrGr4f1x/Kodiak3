@@ -40,5 +40,9 @@ VSOutput main(VSInput input)
 	output.color = input.color;
 	output.pos = float4(input.pos * scale + translate, 0.0, 1.0);
 
+#if !VK
+	output.pos.y = -output.pos.y;
+#endif
+
 	return output;
 }

@@ -31,11 +31,11 @@ void TextureArrayApp::Startup()
 		{ { -2.5f, -2.5f,  0.0f }, { 0.0f, 0.0f } },
 		{ {  2.5f, -2.5f,  0.0f }, { 1.0f, 0.0f } }
 	};
-	m_vertexBuffer.Create("Vertex Buffer", vertexData.size(), sizeof(Vertex), vertexData.data());
+	m_vertexBuffer.Create("Vertex Buffer", vertexData.size(), sizeof(Vertex), false, vertexData.data());
 
 	// Setup indices
 	vector<uint32_t> indexData = { 0,1,2, 2,3,0 };
-	m_indexBuffer.Create("Index Buffer", indexData.size(), sizeof(uint32_t), indexData.data());
+	m_indexBuffer.Create("Index Buffer", indexData.size(), sizeof(uint32_t), false, indexData.data());
 
 	// Setup camera
 	m_camera.SetPerspectiveMatrix(
@@ -102,7 +102,10 @@ void TextureArrayApp::Render()
 
 	context.DrawIndexedInstanced((uint32_t)m_indexBuffer.GetElementCount(), m_layerCount, 0, 0, 0);
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

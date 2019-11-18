@@ -70,11 +70,27 @@ void DisplacementApp::Shutdown()
 
 bool DisplacementApp::Update()
 {
-	m_controller.Update(m_frameTimer);
+	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
 
 	UpdateConstantBuffers();
 
 	return true;
+}
+
+
+void DisplacementApp::UpdateUI()
+{
+	if (m_uiOverlay->Header("Settings")) 
+	{
+		m_uiOverlay->CheckBox("Tessellation displacement", &m_displacement);
+		m_uiOverlay->InputFloat("Strength", &m_dsConstants.tessStrength, 0.025f, 3);
+		m_uiOverlay->InputFloat("Level", &m_hsConstants.tessLevel, 0.5f, 2);
+
+		if (EnabledFeatures().fillModeNonSolid) 
+		{
+			m_uiOverlay->CheckBox("Splitscreen", &m_split);
+		}
+	}
 }
 
 
@@ -109,7 +125,10 @@ void DisplacementApp::Render()
 	context.SetScissor(m_split ? m_displayWidth / 2 : 0u, 0u, m_displayWidth, m_displayHeight);
 	context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -191,7 +210,17 @@ void DisplacementApp::InitResourceSet()
 
 void DisplacementApp::UpdateConstantBuffers()
 {
+	float savedLevel = m_hsConstants.tessLevel;
+	if (!m_displacement)
+	{
+		m_hsConstants.tessLevel = 1.0f;
+	}
 	m_hsConstantBuffer.Update(sizeof(m_hsConstants), &m_hsConstants);
+
+	if (!m_displacement)
+	{
+		m_hsConstants.tessLevel = savedLevel;
+	}
 
 	m_dsConstants.lightPos.SetY(5.0f - m_dsConstants.tessStrength);
 	m_dsConstants.projectionMatrix = m_camera.GetProjMatrix();

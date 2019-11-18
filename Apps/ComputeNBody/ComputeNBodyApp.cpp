@@ -15,6 +15,7 @@
 #include "CommonStates.h"
 #include "CommandContext.h"
 #include "GraphicsDevice.h"
+#include "UIOverlay.h"
 
 
 using namespace Kodiak;
@@ -115,7 +116,10 @@ void ComputeNBodyApp::Render()
 
 	context.Draw(6 * PARTICLES_PER_ATTRACTOR);
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -249,7 +253,7 @@ void ComputeNBodyApp::InitParticles()
 		}
 	}
 
-	m_particleBuffer.Create("Particle UAV", particles.size(), sizeof(Particle), particles.data());
+	m_particleBuffer.Create("Particle UAV", particles.size(), sizeof(Particle), false, particles.data());
 }
 
 

@@ -14,6 +14,8 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
+#include "Input.h"
+#include "UIOverlay.h"
 
 
 using namespace Kodiak;
@@ -54,11 +56,21 @@ void OcclusionQueryApp::Shutdown()
 
 bool OcclusionQueryApp::Update()
 {
-	m_controller.Update(m_frameTimer);
+	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
 
 	UpdateConstantBuffers();
 
 	return true;
+}
+
+
+void OcclusionQueryApp::UpdateUI()
+{
+	if (m_uiOverlay->Header("Occlusion query results")) 
+	{
+		m_uiOverlay->Text("Teapot: %d samples passed", m_passedSamples[0]);
+		m_uiOverlay->Text("Sphere: %d samples passed", m_passedSamples[1]);
+	}
 }
 
 
@@ -146,7 +158,10 @@ void OcclusionQueryApp::Render()
 		context.DrawIndexed((uint32_t)m_occluderModel->GetIndexBuffer().GetElementCount());
 	}
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -263,6 +278,9 @@ void OcclusionQueryApp::UpdateConstantBuffers()
 
 		teapotQueryResult = data[2 * resultFrame];
 		sphereQueryResult = data[2 * resultFrame + 1];
+
+		m_passedSamples[0] = (uint32_t)teapotQueryResult;
+		m_passedSamples[1] = (uint32_t)sphereQueryResult;
 
 		m_readbackBuffer.Unmap();
 	}

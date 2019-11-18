@@ -26,16 +26,18 @@ public:
 		, m_controller(m_camera, Math::Vector3(Math::kYUnitVector))
 	{}
 
+	void Configure() final;
 	void Startup() final;
 	void Shutdown() final;
 
 	bool Update() final;
+	void UpdateUI() final;
 	void Render() final;
 
 private:
 	void InitRenderTargets();
 	void InitRootSig();
-	void InitPSO();
+	void InitPSOs();
 	void InitConstantBuffer();
 	void InitResources();
 
@@ -72,10 +74,13 @@ private:
 	Kodiak::ResourceSet			m_resources;
 
 	Kodiak::RootSignature		m_rootSig;
-	Kodiak::GraphicsPSO			m_pso;
+	Kodiak::GraphicsPSO			m_psoMsaa;
+	Kodiak::GraphicsPSO			m_psoMsaaSampleRate;
 
 	Kodiak::TexturePtr			m_texture;
 	Kodiak::ModelPtr			m_model;
 
 	Kodiak::CameraController	m_controller;
+
+	bool m_sampleRateShading{ false };
 };

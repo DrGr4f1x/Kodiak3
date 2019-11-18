@@ -32,6 +32,7 @@ public:
 	void Shutdown() final;
 
 	bool Update() final;
+	void UpdateUI() final;
 	void Render() final;
 
 private:
@@ -81,4 +82,6 @@ private:
 
 	Kodiak::CameraController m_controller;
 	float m_zoom{ -35.0f };
+
+	uint32_t m_passedSamples[2]{ 0,0 };
 };

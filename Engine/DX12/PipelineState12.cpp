@@ -44,8 +44,6 @@ void GraphicsPSO::Finalize()
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
 	desc.NodeMask = 1;
 	desc.SampleMask = m_sampleMask;
-	desc.SampleDesc.Count = m_msaaCount;
-	desc.SampleDesc.Quality = m_msaaQuality;
 	desc.InputLayout.NumElements = 0;
 
 	// Blend state
@@ -114,7 +112,7 @@ void GraphicsPSO::Finalize()
 	desc.NumRenderTargets = m_numRtvs;
 	desc.DSVFormat = static_cast<DXGI_FORMAT>(m_dsvFormat);
 	desc.SampleDesc.Count = m_msaaCount;
-	desc.SampleDesc.Quality = m_msaaQuality;
+	desc.SampleDesc.Quality = 0; // TODO Rework this to enable quality levels in DX12
 
 	// Input layout
 	desc.InputLayout.NumElements = (UINT)m_vertexElements.size();

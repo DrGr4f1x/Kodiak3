@@ -142,10 +142,10 @@ void Texture3dApp::Startup()
 		{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } },
 		{ {  1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } }
 	};
-	m_vertexBuffer.Create("Vertex buffer", vertexData.size(), sizeof(Vertex), vertexData.data());
+	m_vertexBuffer.Create("Vertex buffer", vertexData.size(), sizeof(Vertex), false, vertexData.data());
 
 	vector<uint32_t> indexData = { 0,1,2, 2,3,0 };
-	m_indexBuffer.Create("Index buffer", indexData.size(), sizeof(uint32_t), indexData.data());
+	m_indexBuffer.Create("Index buffer", indexData.size(), sizeof(uint32_t), false, indexData.data());
 
 	m_camera.SetPerspectiveMatrix(DirectX::XMConvertToRadians(60.0f),
 		(float)m_displayHeight / (float)m_displayWidth,
@@ -175,7 +175,7 @@ void Texture3dApp::Shutdown()
 
 bool Texture3dApp::Update()
 {
-	m_controller.Update(m_frameTimer);
+	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
 
 	UpdateConstantBuffer();
 
@@ -206,7 +206,10 @@ void Texture3dApp::Render()
 
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

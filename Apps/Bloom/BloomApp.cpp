@@ -14,6 +14,7 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
+#include "UIOverlay.h"
 
 
 using namespace Kodiak;
@@ -28,8 +29,8 @@ void BloomApp::Startup()
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.1f,
 		256.0f);
-	m_camera.SetPosition(Math::Vector3(0.0f, 0.0f, -10.25f));
-	m_camera.SetRotation(Math::Quaternion(XMConvertToRadians(7.5f), XMConvertToRadians(-343.0f), 0.0f));
+	m_camera.SetPosition(Vector3(0.0f, 0.0f, -10.25f));
+	m_camera.SetRotation(Quaternion(XMConvertToRadians(7.5f), XMConvertToRadians(-343.0f), 0.0f));
 	m_camera.Update();
 
 	m_timerSpeed = 0.125f;
@@ -67,11 +68,24 @@ void BloomApp::Shutdown()
 
 bool BloomApp::Update()
 {
-	m_controller.Update(m_frameTimer);
+	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
 
 	UpdateConstantBuffers();
 
 	return true;
+}
+
+
+void BloomApp::UpdateUI()
+{
+	if (m_uiOverlay->Header("Settings")) 
+	{
+		m_uiOverlay->CheckBox("Bloom", &m_bloom);
+		if (m_uiOverlay->InputFloat("Scale", &m_blurScale, 0.1f, 2))
+		{
+			UpdateBlurConstants();
+		}
+	}
 }
 
 
@@ -81,43 +95,51 @@ void BloomApp::Render()
 
 	// Offscreen color pass
 
-	context.TransitionResource(*m_offscreenFramebuffer[0]->GetColorBuffer(0), ResourceState::RenderTarget);
-	context.TransitionResource(*m_offscreenFramebuffer[0]->GetDepthBuffer(), ResourceState::DepthWrite);
-	context.ClearColor(*m_offscreenFramebuffer[0]->GetColorBuffer(0));
-	context.ClearDepth(*m_offscreenFramebuffer[0]->GetDepthBuffer());
+	if (m_bloom)
+	{
+		context.TransitionResource(*m_offscreenFramebuffer[0]->GetColorBuffer(0), ResourceState::RenderTarget);
+		context.TransitionResource(*m_offscreenFramebuffer[0]->GetDepthBuffer(), ResourceState::DepthWrite);
+		context.ClearColor(*m_offscreenFramebuffer[0]->GetColorBuffer(0));
+		context.ClearDepth(*m_offscreenFramebuffer[0]->GetDepthBuffer());
 
-	context.BeginRenderPass(*m_offscreenFramebuffer[0]);
+		context.BeginRenderPass(*m_offscreenFramebuffer[0]);
 
-	context.SetViewportAndScissor(0u, 0u, 256, 256);
+		context.SetViewportAndScissor(0u, 0u, 256, 256);
 
-	// 3D scene (glow pass)
-	context.SetRootSignature(m_sceneRootSig);
-	context.SetPipelineState(m_colorPassPSO);
+		// 3D scene (glow pass)
+		context.SetRootSignature(m_sceneRootSig);
+		context.SetPipelineState(m_colorPassPSO);
 
-	context.SetResources(m_sceneResources);
+		context.SetResources(m_sceneResources);
 
-	context.SetIndexBuffer(m_ufoGlowModel->GetIndexBuffer());
-	context.SetVertexBuffer(0, m_ufoGlowModel->GetVertexBuffer());
+		context.SetIndexBuffer(m_ufoGlowModel->GetIndexBuffer());
+		context.SetVertexBuffer(0, m_ufoGlowModel->GetVertexBuffer());
 
-	context.DrawIndexed((uint32_t)m_ufoGlowModel->GetIndexBuffer().GetElementCount());
+		context.DrawIndexed((uint32_t)m_ufoGlowModel->GetIndexBuffer().GetElementCount());
 
-	context.EndRenderPass();
+		context.EndRenderPass();
 
-	// Vertical blur pass
+		// Vertical blur pass
 
-	context.TransitionResource(*m_offscreenFramebuffer[0]->GetColorBuffer(0), ResourceState::PixelShaderResource);
-	context.TransitionResource(*m_offscreenFramebuffer[1]->GetColorBuffer(0), ResourceState::RenderTarget);
-	context.ClearColor(*m_offscreenFramebuffer[1]->GetColorBuffer(0));
+		context.TransitionResource(*m_offscreenFramebuffer[0]->GetColorBuffer(0), ResourceState::PixelShaderResource);
+		context.TransitionResource(*m_offscreenFramebuffer[1]->GetColorBuffer(0), ResourceState::RenderTarget);
+		context.ClearColor(*m_offscreenFramebuffer[1]->GetColorBuffer(0));
 
-	context.BeginRenderPass(*m_offscreenFramebuffer[1]);
+		context.BeginRenderPass(*m_offscreenFramebuffer[1]);
 
-	context.SetRootSignature(m_blurRootSig);
-	context.SetPipelineState(m_blurVertPSO);
+		context.SetRootSignature(m_blurRootSig);
+		context.SetPipelineState(m_blurVertPSO);
 
-	context.SetResources(m_blurVertResources);
-	context.Draw(3);
+		context.SetResources(m_blurVertResources);
+		context.Draw(3);
 
-	context.EndRenderPass();
+		context.EndRenderPass();
+	}
+	else
+	{
+		context.TransitionResource(*m_offscreenFramebuffer[1]->GetColorBuffer(0), ResourceState::RenderTarget);
+		context.ClearColor(*m_offscreenFramebuffer[1]->GetColorBuffer(0));
+	}
 
 	// Backbuffer color pass
 
@@ -160,7 +182,10 @@ void BloomApp::Render()
 	context.SetResources(m_blurHorizResources);
 	context.Draw(3);
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -273,11 +298,11 @@ void BloomApp::InitConstantBuffers()
 
 	m_skyboxConstantBuffer.Create("Skybox Constant Buffer", 1, sizeof(SceneConstants));
 
-	m_blurHorizConstants.blurScale = 1.0f;
+	m_blurHorizConstants.blurScale = m_blurScale;
 	m_blurHorizConstants.blurStrength = 1.5f;
 	m_blurHorizConstants.blurDirection = 1;
 
-	m_blurVertConstants.blurScale = 1.0f;
+	m_blurVertConstants.blurScale = m_blurScale;
 	m_blurVertConstants.blurStrength = 1.5f;
 	m_blurVertConstants.blurDirection = 0;
 
@@ -348,4 +373,14 @@ void BloomApp::UpdateConstantBuffers()
 
 	m_sceneConstantBuffer.Update(sizeof(SceneConstants), &m_sceneConstants);
 	m_skyboxConstantBuffer.Update(sizeof(SceneConstants), &m_skyboxConstants);
+}
+
+
+void BloomApp::UpdateBlurConstants()
+{
+	m_blurHorizConstants.blurScale = m_blurScale;
+	m_blurVertConstants.blurScale = m_blurScale;
+
+	m_blurHorizConstantBuffer.Update(sizeof(BlurConstants), &m_blurHorizConstants);
+	m_blurVertConstantBuffer.Update(sizeof(BlurConstants), &m_blurVertConstants);
 }

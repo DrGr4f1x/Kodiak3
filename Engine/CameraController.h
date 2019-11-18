@@ -27,7 +27,7 @@ public:
 	// Assumes worldUp is not the X basis vector
 	CameraController(Math::Camera& camera, Math::Vector3 worldUp);
 
-	void Update(float deltaTime);
+	void Update(float deltaTime, bool ignoreInput = false);
 
 	void RefreshFromCamera();
 
@@ -46,8 +46,8 @@ private:
 
 	void ApplyMomentum(float& oldValue, float& newValue, float deltaTime);
 
-	void UpdateWASD(float deltaTime);
-	void UpdateArcBall(float deltaTime);
+	void UpdateWASD(float deltaTime, bool ignoreInput);
+	void UpdateArcBall(float deltaTime, bool ignoreInput);
 
 private:
 	CameraMode m_mode{ CameraMode::WASD };

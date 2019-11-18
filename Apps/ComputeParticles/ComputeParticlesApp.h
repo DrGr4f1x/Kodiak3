@@ -23,11 +23,11 @@ class ComputeParticlesApp : public Kodiak::Application
 public:
 	ComputeParticlesApp() : Application("Compute Particles") {}
 
-	void Configure() final;
 	void Startup() final;
 	void Shutdown() final;
 
 	bool Update() final;
+	void UpdateUI() final;
 	void Render() final;
 
 private:
@@ -88,6 +88,7 @@ private:
 	Kodiak::ResourceSet		m_computeResources;
 	Kodiak::ResourceSet		m_gfxResources;
 
+	bool m_animate{ true };
 	float m_animStart{ 20.0f };
 	float m_localTimer{ 0.0f };
 };

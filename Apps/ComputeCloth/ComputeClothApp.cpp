@@ -14,6 +14,7 @@
 
 #include "CommonStates.h"
 #include "CommandContext.h"
+#include "UIOverlay.h"
 
 
 using namespace Kodiak;
@@ -55,11 +56,20 @@ void ComputeClothApp::Shutdown()
 
 bool ComputeClothApp::Update()
 {
-	m_controller.Update(m_frameTimer);
+	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
 
 	UpdateConstantBuffers();
 
 	return true;
+}
+
+
+void ComputeClothApp::UpdateUI()
+{
+	if (m_uiOverlay->Header("Settings")) 
+	{
+		m_uiOverlay->CheckBox("Simulate wind", &m_simulateWind);
+	}
 }
 
 
@@ -122,7 +132,10 @@ void ComputeClothApp::Render()
 
 	context.DrawIndexed((uint32_t)m_clothIndexBuffer.GetElementCount());
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -285,7 +298,7 @@ void ComputeClothApp::InitCloth()
 		indices.push_back(0xFFFFFFFF);
 	}
 
-	m_clothIndexBuffer.Create("Cloth Index Buffer", indices.size(), sizeof(uint32_t), indices.data());
+	m_clothIndexBuffer.Create("Cloth Index Buffer", indices.size(), sizeof(uint32_t), false, indices.data());
 }
 
 

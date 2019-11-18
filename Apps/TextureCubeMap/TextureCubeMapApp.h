@@ -31,6 +31,7 @@ public:
 	void Shutdown() final;
 
 	bool Update() final;
+	void UpdateUI() final;
 	void Render() final;
 
 private:
@@ -81,6 +82,9 @@ private:
 	Kodiak::TexturePtr			m_skyboxTex;
 	Kodiak::ModelPtr			m_skyboxModel;
 	std::vector<Kodiak::ModelPtr> m_models;
+	std::vector<std::string>	m_modelNames;
+	int32_t						m_curModel{ 0 };
+	bool						m_displaySkybox{ true };
 
 	Kodiak::CameraController	m_controller;
 };

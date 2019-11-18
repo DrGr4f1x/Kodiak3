@@ -88,7 +88,10 @@ void DynamicUniformBufferApp::Render()
 		context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 	}
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -168,7 +171,7 @@ void DynamicUniformBufferApp::InitBox()
 		{ { -1.0f,  1.0f, -1.0f },{ 0.0f, 0.0f, 0.0f } },
 	};
 
-	m_vertexBuffer.Create("Vertex Buffer", vertices.size(), sizeof(Vertex), vertices.data());
+	m_vertexBuffer.Create("Vertex Buffer", vertices.size(), sizeof(Vertex), false, vertices.data());
 
 	vector<uint16_t> indices = 
 	{
@@ -180,7 +183,7 @@ void DynamicUniformBufferApp::InitBox()
 		3,2,6, 6,7,3, // Face 5
 	};
 
-	m_indexBuffer.Create("Index Buffer", indices.size(), sizeof(uint16_t), indices.data());
+	m_indexBuffer.Create("Index Buffer", indices.size(), sizeof(uint16_t), false, indices.data());
 }
 
 

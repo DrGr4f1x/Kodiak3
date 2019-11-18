@@ -167,13 +167,13 @@ void GraphicsPSO::SetPrimitiveTopology(PrimitiveTopology topology)
 }
 
 
-void GraphicsPSO::SetRenderTargetFormat(Format rtvFormat, Format dsvFormat, uint32_t msaaCount, uint32_t msaaQuality)
+void GraphicsPSO::SetRenderTargetFormat(Format rtvFormat, Format dsvFormat, uint32_t msaaCount, bool sampleRateShading)
 {
-	SetRenderTargetFormats(1, &rtvFormat, dsvFormat, msaaCount, msaaQuality);
+	SetRenderTargetFormats(1, &rtvFormat, dsvFormat, msaaCount, sampleRateShading);
 }
 
 
-void GraphicsPSO::SetRenderTargetFormats(uint32_t numRtvs, const Format* rtvFormats, Format dsvFormat, uint32_t msaaCount, uint32_t msaaQuality)
+void GraphicsPSO::SetRenderTargetFormats(uint32_t numRtvs, const Format* rtvFormats, Format dsvFormat, uint32_t msaaCount, bool sampleRateShading)
 {
 	for (uint32_t i = 0; i < numRtvs; ++i)
 	{
@@ -182,7 +182,7 @@ void GraphicsPSO::SetRenderTargetFormats(uint32_t numRtvs, const Format* rtvForm
 	m_numRtvs = numRtvs;
 	m_dsvFormat = dsvFormat;
 	m_msaaCount = msaaCount;
-	m_msaaQuality = msaaQuality;
+	m_sampleRateShading = sampleRateShading;
 }
 
 

@@ -221,7 +221,7 @@ private:
 	IDirectInput8A* m_di{ nullptr };
 	IDirectInputDevice8A* m_keyboard{ nullptr };
 	IDirectInputDevice8A* m_mouse{ nullptr };
-	bool m_captureMouse{ true };
+	bool m_captureMouse{ false };
 };
 
 extern Input g_input;

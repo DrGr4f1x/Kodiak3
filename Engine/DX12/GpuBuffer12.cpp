@@ -28,9 +28,16 @@ static inline bool HasFlag(ResourceType type, ResourceType flag)
 }
 
 
-void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSize, const void* initialData)
+void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSize, bool allowCpuWrites, const void* initialData)
 {
-	m_resource = nullptr;
+	if (m_resource)
+	{
+		g_graphicsDevice->ReleaseResource(m_resource);
+		m_resource = nullptr;
+	}
+
+	if (allowCpuWrites)
+		m_usageState = ResourceState::GenericRead;
 
 	const bool isConstantBuffer = HasFlag(m_type, ResourceType::ConstantBuffer);
 	if (isConstantBuffer)
@@ -46,7 +53,7 @@ void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSiz
 	desc.Alignment = 0;
 	desc.DepthOrArraySize = 1;
 	desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	desc.Flags = isConstantBuffer ? D3D12_RESOURCE_FLAG_NONE : D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	desc.Flags = (isConstantBuffer || allowCpuWrites) ? D3D12_RESOURCE_FLAG_NONE : D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 	desc.Format = DXGI_FORMAT_UNKNOWN;
 	desc.Height = 1;
 	desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
@@ -56,7 +63,7 @@ void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSiz
 	desc.Width = (UINT64)m_bufferSize;
 
 	D3D12_HEAP_PROPERTIES heapProps;
-	heapProps.Type = isConstantBuffer ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_DEFAULT;
+	heapProps.Type = (isConstantBuffer || allowCpuWrites) ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_DEFAULT;
 	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 	heapProps.CreationNodeMask = 1;

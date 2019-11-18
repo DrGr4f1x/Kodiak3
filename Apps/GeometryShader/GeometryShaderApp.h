@@ -33,6 +33,7 @@ public:
 	void Shutdown() final;
 
 	bool Update() final;
+	void UpdateUI() final;
 	void Render() final;
 
 private:
@@ -74,4 +75,6 @@ private:
 	Kodiak::ModelPtr			m_model;
 
 	Kodiak::CameraController	m_controller;
+
+	bool m_showNormals{ true };
 };

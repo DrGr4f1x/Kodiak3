@@ -27,6 +27,7 @@ public:
 	void Shutdown() final;
 
 	bool Update() final;
+	void UpdateUI() final;
 	void Render() final;
 
 private:
@@ -74,6 +75,7 @@ private:
 	Kodiak::GraphicsPSO		m_radialBlurPSO;
 	Kodiak::GraphicsPSO		m_colorPassPSO;
 	Kodiak::GraphicsPSO		m_phongPassPSO;
+	Kodiak::GraphicsPSO		m_displayTexPSO;
 
 	// Constant buffers
 	SceneConstants			m_sceneConstants;
@@ -96,5 +98,6 @@ private:
 
 	// Features
 	bool m_blur{ true };
+	bool m_displayTexture{ false };
 	Math::Vector3 m_rotation{ -16.25f, -28.75f, 0.0f };
 };

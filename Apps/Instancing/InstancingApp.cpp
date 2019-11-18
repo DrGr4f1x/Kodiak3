@@ -58,11 +58,20 @@ void InstancingApp::Shutdown()
 
 bool InstancingApp::Update()
 {
-	m_controller.Update(m_frameTimer);
+	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
 
 	UpdateConstantBuffer();
 
 	return true;
+}
+
+
+void InstancingApp::UpdateUI()
+{
+	if (m_uiOverlay->Header("Statistics")) 
+	{
+		m_uiOverlay->Text("Instances: %d", m_numInstances);
+	}
 }
 
 
@@ -113,7 +122,10 @@ void InstancingApp::Render()
 		context.DrawIndexedInstanced((uint32_t)m_rockModel->GetIndexBuffer().GetElementCount(), m_numInstances, 0, 0, 0);
 	}
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -281,7 +293,7 @@ void InstancingApp::InitInstanceBuffer()
 		instanceData[i2].index = rng.NextInt(0, numLayers - 1);
 	}
 
-	m_instanceBuffer.Create("Per-Instance Buffer", m_numInstances, sizeof(InstanceData), instanceData.data());
+	m_instanceBuffer.Create("Per-Instance Buffer", m_numInstances, sizeof(InstanceData), false, instanceData.data());
 }
 
 

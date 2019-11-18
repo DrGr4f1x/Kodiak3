@@ -19,6 +19,8 @@
 
 #include <iostream>
 
+#include "imgui.h"
+
 #pragma comment(lib, "runtimeobject.lib")
 
 
@@ -116,6 +118,19 @@ void Application::Run()
 }
 
 
+void Application::OnMouseMove(uint32_t x, uint32_t y)
+{
+	m_mouseX = x;
+	m_mouseY = y;
+
+	if (m_showUI) 
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		m_mouseMoveHandled = io.WantCaptureMouse;
+	}
+}
+
+
 void Application::Configure()
 {
 	// Setup file system
@@ -177,7 +192,11 @@ uint32_t Application::GetFrameNumber() const
 
 string Application::GetWindowTitle() const
 {
-	string title = s_apiPrefixString + " " + m_name + " - " + std::to_string(m_frameCounter) + " fps";
+	string title = s_apiPrefixString + " " + m_name;
+	if (!m_showUI)
+	{
+		title += " - " + std::to_string(m_frameCounter) + " fps";
+	}
 
 	return title;
 }
@@ -186,6 +205,52 @@ string Application::GetWindowTitle() const
 const string& Application::GetDefaultShaderPath()
 {
 	return s_defaultShaderPath;
+}
+
+
+void Application::PrepareUI()
+{
+	if (!m_showUI)
+		return;
+
+	ImGuiIO& io = ImGui::GetIO();
+
+	io.DisplaySize = ImVec2((float)m_displayWidth, (float)m_displayHeight);
+	io.DeltaTime = m_frameTimer;
+
+	io.MousePos = ImVec2((float)m_mouseX, (float)m_mouseY);
+	io.MouseDown[0] = g_input.IsPressed(DigitalInput::kMouse0);
+	io.MouseDown[1] = g_input.IsPressed(DigitalInput::kMouse1);
+
+	ImGui::NewFrame();
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
+	ImGui::SetNextWindowPos(ImVec2(10, 10));
+	ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiCond_FirstUseEver);
+	string caption = s_apiName + " Example";
+	ImGui::Begin(caption.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+	ImGui::TextUnformatted(m_name.c_str());
+	ImGui::TextUnformatted(m_graphicsDevice->GetDeviceName().c_str());
+	ImGui::Text("%.2f ms/frame (%.1d fps)", (1000.0f / m_lastFps), m_lastFps);
+
+	ImGui::PushItemWidth(110.0f * m_uiOverlay->GetScale());
+	UpdateUI();
+	ImGui::PopItemWidth();
+
+	ImGui::End();
+	ImGui::PopStyleVar();
+	ImGui::Render();
+
+	m_uiOverlay->Update();
+}
+
+
+void Application::RenderUI(GraphicsContext& context)
+{
+	if (!m_showUI)
+		return;
+
+	m_uiOverlay->Render(context);
 }
 
 
@@ -205,7 +270,7 @@ void Application::Initialize()
 	g_input.Initialize(m_hwnd);
 
 	m_uiOverlay = make_unique<UIOverlay>();
-	m_uiOverlay->Startup(GetWidth(), GetHeight());
+	m_uiOverlay->Startup(GetWidth(), GetHeight(), GetColorFormat());
 
 	Startup();
 
@@ -298,6 +363,8 @@ bool Application::Tick()
 		m_lastTimestamp = timeEnd;
 	}
 
+	PrepareUI();
+
 	return res;
 }
 
@@ -343,6 +410,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
 		EndPaint(hWnd, &ps);
+		break;
+	}
+
+	case WM_MOUSEMOVE:
+	{
+		if (g_application)
+		{
+			g_application->OnMouseMove(LOWORD(lParam), HIWORD(lParam));
+		}
 		break;
 	}
 

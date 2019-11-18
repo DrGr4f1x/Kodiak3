@@ -46,8 +46,8 @@ void IndexBuffer::CreateDerivedViews()
 {
 	BufferViewDesc resDesc = GetDesc();
 	
-	m_srv.Create(m_resource, m_type, resDesc);
-	m_uav.Create(m_resource, m_type, resDesc);
+	//m_srv.Create(m_resource, m_type, resDesc);
+	//m_uav.Create(m_resource, m_type, resDesc);
 	m_ibv.Create(m_resource, resDesc);
 
 	m_indexSize16 = (m_elementSize == 2);
@@ -58,8 +58,8 @@ void VertexBuffer::CreateDerivedViews()
 {
 	BufferViewDesc resDesc = GetDesc();
 
-	m_srv.Create(m_resource, m_type, resDesc);
-	m_uav.Create(m_resource, m_type, resDesc);
+	//m_srv.Create(m_resource, m_type, resDesc);
+	//m_uav.Create(m_resource, m_type, resDesc);
 	m_vbv.Create(m_resource, resDesc);
 }
 
@@ -92,7 +92,7 @@ void StructuredBuffer::CreateDerivedViews()
 		m_vbv.Create(m_resource, resDesc);
 	}
 
-	m_counterBuffer.Create("Counter Buffer", 1, 4);
+	m_counterBuffer.Create("Counter Buffer", 1, 4, false);
 }
 
 

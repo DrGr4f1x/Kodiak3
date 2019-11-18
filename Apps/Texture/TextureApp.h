@@ -31,6 +31,7 @@ public:
 	void Shutdown() final;
 
 	bool Update() final;
+	void UpdateUI() final;
 	void Render() final;
 
 private:
@@ -74,8 +75,5 @@ private:
 	// Assets
 	Kodiak::TexturePtr		m_texture;
 
-	// Camera controls
-	float m_zoom{ -2.5f };
-	Math::Vector3 m_cameraPos{ Math::kZero };
 	Kodiak::CameraController m_controller;
 };

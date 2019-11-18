@@ -32,6 +32,7 @@ public:
 	void Shutdown() final;
 
 	bool Update() final;
+	void UpdateUI() final;
 	void Render() final;
 
 private:
@@ -44,6 +45,7 @@ private:
 	void LoadAssets();
 
 	void UpdateConstantBuffers();
+	void UpdateBlurConstants();
 
 private:
 	struct Vertex
@@ -105,4 +107,7 @@ private:
 	Kodiak::TexturePtr		m_skyboxTex;
 
 	Kodiak::CameraController	m_controller;
+
+	bool m_bloom{ true };
+	float m_blurScale{ 1.0f };
 };

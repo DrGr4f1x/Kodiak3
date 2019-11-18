@@ -14,20 +14,11 @@
 
 #include "CommonStates.h"
 #include "CommandContext.h"
-#include "Input.h"
 
 
 using namespace Kodiak;
 using namespace Math;
 using namespace std;
-
-
-void ComputeParticlesApp::Configure()
-{
-	Application::Configure();
-
-	g_input.SetCaptureMouse(false);
-}
 
 
 void ComputeParticlesApp::Startup()
@@ -52,22 +43,34 @@ void ComputeParticlesApp::Shutdown()
 
 bool ComputeParticlesApp::Update()
 {
-	if (m_animStart > 0.0f)
+	if (m_animate)
 	{
-		m_animStart -= m_frameTimer * 5.0f;
-	}
-	else if (m_animStart <= 0.0f)
-	{
-		m_localTimer += m_frameTimer * 0.04f;
-		if (m_localTimer > 1.0f)
+		if (m_animStart > 0.0f)
 		{
-			m_localTimer = 0.f;
+			m_animStart -= m_frameTimer * 5.0f;
+		}
+		else if (m_animStart <= 0.0f)
+		{
+			m_localTimer += m_frameTimer * 0.04f;
+			if (m_localTimer > 1.0f)
+			{
+				m_localTimer = 0.f;
+			}
 		}
 	}
 
 	UpdateConstantBuffers();
 
 	return true;
+}
+
+
+void ComputeParticlesApp::UpdateUI()
+{
+	if (m_uiOverlay->Header("Settings")) 
+	{
+		m_uiOverlay->CheckBox("Moving attractor", &m_animate);
+	}
 }
 
 
@@ -109,7 +112,10 @@ void ComputeParticlesApp::Render()
 
 	context.Draw(6 * m_particleCount);
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -189,7 +195,7 @@ void ComputeParticlesApp::InitParticles()
 		particle.gradientPos = Vector4(0.5f * particle.pos[0], 0.0f, 0.0f, 0.0f);
 	}
 
-	m_particleBuffer.Create("Particle SB", m_particleCount, sizeof(Particle), particles.data());
+	m_particleBuffer.Create("Particle SB", m_particleCount, sizeof(Particle), false, particles.data());
 }
 
 

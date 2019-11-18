@@ -14,11 +14,20 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
+#include "GraphicsDevice.h"
 
 
 using namespace Kodiak;
 using namespace Math;
 using namespace std;
+
+
+void MultisamplingApp::Configure()
+{
+	Application::Configure();
+
+	OptionalFeatures().sampleRateShading = true;
+}
 
 
 void MultisamplingApp::Startup()
@@ -37,7 +46,7 @@ void MultisamplingApp::Startup()
 
 	InitRenderTargets();
 	InitRootSig();
-	InitPSO();
+	InitPSOs();
 	InitConstantBuffer();
 
 	LoadAssets();
@@ -57,11 +66,23 @@ void MultisamplingApp::Shutdown()
 
 bool MultisamplingApp::Update()
 {
-	m_controller.Update(m_frameTimer);
+	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
 
 	UpdateConstantBuffer();
 
 	return true;
+}
+
+
+void MultisamplingApp::UpdateUI()
+{
+	if (EnabledFeatures().sampleRateShading) 
+	{
+		if (m_uiOverlay->Header("Settings")) 
+		{
+			m_uiOverlay->CheckBox("Sample rate shading", &m_sampleRateShading);
+		}
+	}
 }
 
 
@@ -80,7 +101,7 @@ void MultisamplingApp::Render()
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
 	context.SetRootSignature(m_rootSig);
-	context.SetPipelineState(m_pso);
+	context.SetPipelineState(m_sampleRateShading ? m_psoMsaaSampleRate : m_psoMsaa);
 
 	context.SetResources(m_resources);
 
@@ -95,6 +116,14 @@ void MultisamplingApp::Render()
 	context.TransitionResource(GetColorBuffer(), ResourceState::ResolveDest);
 
 	context.Resolve(*m_frameBuffer->GetColorBuffer(0), GetColorBuffer(), GetColorFormat());
+
+	// Render UI after MSAA resolve
+	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
+	context.BeginRenderPass(GetBackBuffer());
+	RenderUI(context);
+	context.EndRenderPass();
+
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -127,21 +156,21 @@ void MultisamplingApp::InitRootSig()
 }
 
 
-void MultisamplingApp::InitPSO()
+void MultisamplingApp::InitPSOs()
 {
-	m_pso.SetRootSignature(m_rootSig);
+	m_psoMsaa.SetRootSignature(m_rootSig);
 
 	// Render state
-	m_pso.SetRasterizerState(CommonStates::RasterizerDefaultCW());
-	m_pso.SetBlendState(CommonStates::BlendDisable());
-	m_pso.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
+	m_psoMsaa.SetRasterizerState(CommonStates::RasterizerDefaultCW());
+	m_psoMsaa.SetBlendState(CommonStates::BlendDisable());
+	m_psoMsaa.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 
-	m_pso.SetVertexShader("MeshVS");
-	m_pso.SetPixelShader("MeshPS");
+	m_psoMsaa.SetVertexShader("MeshVS");
+	m_psoMsaa.SetPixelShader("MeshPS");
 
-	m_pso.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat(), m_numSamples);
+	m_psoMsaa.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat(), m_numSamples, false);
 
-	m_pso.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
+	m_psoMsaa.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
 	// Vertex inputs
 	VertexStreamDesc vertexStream{ 0, sizeof(Vertex), InputClassification::PerVertexData };
@@ -152,9 +181,16 @@ void MultisamplingApp::InitPSO()
 		{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 },
 		{ "COLOR", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0}
 	};
-	m_pso.SetInputLayout(vertexStream, vertexElements);
+	m_psoMsaa.SetInputLayout(vertexStream, vertexElements);
 
-	m_pso.Finalize();
+	m_psoMsaaSampleRate = m_psoMsaa;
+	if (EnabledFeatures().sampleRateShading)
+	{
+		m_psoMsaaSampleRate.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat(), m_numSamples, true);
+	}
+
+	m_psoMsaa.Finalize();
+	m_psoMsaaSampleRate.Finalize();
 }
 
 

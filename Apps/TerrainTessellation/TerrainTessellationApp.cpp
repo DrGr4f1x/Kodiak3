@@ -101,11 +101,17 @@ void TerrainTessellationApp::Shutdown()
 
 bool TerrainTessellationApp::Update()
 {
-	m_controller.Update(m_frameTimer);
+	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
 
 	UpdateConstantBuffers();
 
 	return true;
+}
+
+
+void TerrainTessellationApp::UpdateUI()
+{
+	// TODO
 }
 
 
@@ -144,7 +150,10 @@ void TerrainTessellationApp::Render()
 
 	context.DrawIndexed((uint32_t)m_terrainIndices.GetElementCount());
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -329,8 +338,8 @@ void TerrainTessellationApp::InitTerrain()
 		}
 	}
 
-	m_terrainVertices.Create("Terrain Vertices", vertexCount, sizeof(Vertex), vertices.get());
-	m_terrainIndices.Create("Terrain Indices", indexCount, sizeof(uint32_t), indices.get());
+	m_terrainVertices.Create("Terrain Vertices", vertexCount, sizeof(Vertex), false, vertices.get());
+	m_terrainIndices.Create("Terrain Indices", indexCount, sizeof(uint32_t), false, indices.get());
 }
 
 

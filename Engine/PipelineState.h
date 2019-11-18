@@ -133,8 +133,8 @@ public:
 	void SetDepthStencilState(const DepthStencilStateDesc& depthStencilDesc);
 	void SetSampleMask(uint32_t sampleMask);
 	void SetPrimitiveTopology(PrimitiveTopology topology);
-	void SetRenderTargetFormat(Format rtvFormat, Format dsvFormat, uint32_t msaaCount = 1, uint32_t msaaQuality = 0);
-	void SetRenderTargetFormats(uint32_t numRtvs, const Format* rtvFormats, Format dsvFormat, uint32_t msaaCount = 1, uint32_t msaaQuality = 0);
+	void SetRenderTargetFormat(Format rtvFormat, Format dsvFormat, uint32_t msaaCount = 1, bool sampleRateShading = false);
+	void SetRenderTargetFormats(uint32_t numRtvs, const Format* rtvFormats, Format dsvFormat, uint32_t msaaCount = 1, bool sampleRateShading = false);
 	void SetInputLayout(const VertexStreamDesc& vertexStream, const std::vector<VertexElementDesc>& inputElementDescs);
 	void SetInputLayout(const std::vector<VertexStreamDesc>& vertexStreams, const std::vector<VertexElementDesc>& inputElementDescs);
 	void SetPrimitiveRestart(IndexBufferStripCutValue ibProps);
@@ -161,7 +161,7 @@ private:
 	Format						m_dsvFormat;
 	uint32_t					m_numRtvs{ 0 };
 	uint32_t					m_msaaCount{ 1 };
-	uint32_t					m_msaaQuality{ 0 };
+	bool						m_sampleRateShading{ false };
 
 	PrimitiveTopology			m_topology{ PrimitiveTopology::TriangleList };
 	IndexBufferStripCutValue	m_ibStripCut{ IndexBufferStripCutValue::Disabled };

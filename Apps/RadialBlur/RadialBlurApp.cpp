@@ -60,6 +60,16 @@ bool RadialBlurApp::Update()
 }
 
 
+void RadialBlurApp::UpdateUI()
+{
+	if (m_uiOverlay->Header("Settings")) 
+	{
+		m_uiOverlay->CheckBox("Radial blur", &m_blur);
+		m_uiOverlay->CheckBox("Display render target", &m_displayTexture);
+	}
+}
+
+
 void RadialBlurApp::Render()
 {
 	// Offscreen pass [offscreen render target]
@@ -117,14 +127,17 @@ void RadialBlurApp::Render()
 		if (m_blur)
 		{
 			context.SetRootSignature(m_radialBlurRootSig);
-			context.SetPipelineState(m_radialBlurPSO);
+			context.SetPipelineState(m_displayTexture ? m_displayTexPSO : m_radialBlurPSO);
 			
 			context.SetResources(m_blurResources);
 
 			context.Draw(3);
 		}
 
+		RenderUI(context);
+
 		context.EndRenderPass();
+		context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 		context.Finish();
 	}
@@ -181,9 +194,13 @@ void RadialBlurApp::InitPSOs()
 	m_colorPassPSO.SetVertexShader("ColorPassVS");
 	m_colorPassPSO.SetPixelShader("ColorPassPS");
 
+	m_displayTexPSO = m_radialBlurPSO;
+	m_displayTexPSO.SetBlendState(CommonStates::BlendDisable());
+
 	m_radialBlurPSO.Finalize();
 	m_phongPassPSO.Finalize();
 	m_colorPassPSO.Finalize();
+	m_displayTexPSO.Finalize();
 }
 
 

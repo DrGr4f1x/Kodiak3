@@ -107,7 +107,10 @@ void DirectConstantsApp::Render()
 
 	context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

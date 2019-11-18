@@ -14,9 +14,11 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
+#include "UIOverlay.h"
 
 
 using namespace Kodiak;
+using namespace Math;
 using namespace std;
 
 
@@ -30,19 +32,21 @@ void TextureApp::Startup()
 		{ { -1.0f, -1.0f,  0.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } },
 		{ {  1.0f, -1.0f,  0.0f }, { 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } }
 	};
-	m_vertexBuffer.Create("Vertex buffer", vertexData.size(), sizeof(Vertex), vertexData.data());
+	m_vertexBuffer.Create("Vertex buffer", vertexData.size(), sizeof(Vertex), false, vertexData.data());
 
 	vector<uint32_t> indexData = { 0,1,2, 2,3,0 };
-	m_indexBuffer.Create("Index buffer", indexData.size(), sizeof(uint32_t), indexData.data());
+	m_indexBuffer.Create("Index buffer", indexData.size(), sizeof(uint32_t), false, indexData.data());
 
 	m_camera.SetPerspectiveMatrix(DirectX::XMConvertToRadians(60.0f),
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.1f,
 		256.0f);
-	m_camera.SetPosition(Math::Vector3(0.0f, 0.0f, -m_zoom));
+	m_camera.SetPosition(Vector3(0.0f, 0.0f, -2.5f));
 	m_camera.Update();
 
 	m_controller.SetSpeedScale(0.025f);
+	m_controller.SetCameraMode(CameraMode::ArcBall);
+	m_controller.SetOrbitTarget(Vector3(0.0f, 0.0f, 0.0f), Length(m_camera.GetPosition()), 0.25f);
 	m_controller.RefreshFromCamera();
 
 	InitRootSig();
@@ -65,11 +69,20 @@ void TextureApp::Shutdown()
 
 bool TextureApp::Update()
 {
-	m_controller.Update(m_frameTimer);
+	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
 
 	UpdateConstantBuffer();
 
 	return true;
+}
+
+
+void TextureApp::UpdateUI()
+{
+	if (m_uiOverlay->Header("Settings")) 
+	{
+		m_uiOverlay->SliderFloat("LOD bias", &m_constants.lodBias, 0.0f, (float)m_texture->GetNumMips());
+	}
 }
 
 
@@ -96,7 +109,10 @@ void TextureApp::Render()
 
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

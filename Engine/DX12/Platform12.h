@@ -25,6 +25,8 @@
 #define D3D12_GPU_VIRTUAL_ADDRESS_NULL      ((D3D12_GPU_VIRTUAL_ADDRESS)0)
 #define D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN   ((D3D12_GPU_VIRTUAL_ADDRESS)-1)
 
+const std::string s_apiName = "DirectX 12";
+
 const std::string s_apiPrefixString = "[DirectX 12]";
 
 const std::string s_defaultShaderPath = "Shaders\\DXIL";

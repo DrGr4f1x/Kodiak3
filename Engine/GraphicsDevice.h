@@ -38,6 +38,8 @@ public:
 
 	uint32_t GetFrameNumber() const { return m_frameNumber; }
 
+	const std::string& GetDeviceName() const { return m_deviceName; }
+
 	void ReleaseResource(PlatformHandle handle);
 
 	const DeviceHandle& GetDevice();
@@ -65,6 +67,8 @@ private:
 
 	uint32_t m_width{ 0 };
 	uint32_t m_height{ 0 };
+
+	std::string m_deviceName{ "Unknown" };
 
 	std::array<ColorBufferPtr, NumSwapChainBuffers> m_swapChainBuffers;
 	uint32_t m_currentBuffer{ 0 };

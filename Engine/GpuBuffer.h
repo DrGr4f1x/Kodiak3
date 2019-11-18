@@ -36,7 +36,7 @@ public:
 	size_t GetElementSize() const { return m_elementSize; }
 
 	// Create a buffer.  If initial data is provided, it will be copied into the buffer using the default command context.
-	void Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData = nullptr);
+	void Create(const std::string& name, size_t numElements, size_t elementSize, bool allowCpuWrites, const void* initialData = nullptr);
 
 	uint64_t GetGpuAddress() const { return m_gpuAddress; }
 
@@ -111,7 +111,7 @@ public:
 #if DX12
 	void Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData = nullptr)
 	{
-		GpuBuffer::Create(name, numElements, elementSize);
+		GpuBuffer::Create(name, numElements, elementSize, true);
 		if (initialData)
 		{
 			Update(m_bufferSize, initialData);
@@ -168,7 +168,7 @@ public:
 	void CreateWithFlags(const std::string& name, size_t numElements, size_t elementSize, ResourceType flags, const void* initialData = nullptr)
 	{
 		m_type |= flags;
-		GpuBuffer::Create(name, numElements, elementSize, initialData);
+		GpuBuffer::Create(name, numElements, elementSize, false, initialData);
 	}
 
 protected:

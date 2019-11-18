@@ -21,6 +21,14 @@ using namespace Kodiak;
 using namespace std;
 
 
+void TriangleApp::Configure()
+{
+	Application::Configure();
+
+	m_showUI = false;
+}
+
+
 void TriangleApp::Startup()
 {
 	// Setup vertices
@@ -30,11 +38,11 @@ void TriangleApp::Startup()
 		{ {  1.0f, -1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
 		{ {  0.0f,  1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } }
 	};
-	m_vertexBuffer.Create("Vertex buffer", vertexData.size(), sizeof(Vertex), vertexData.data());
+	m_vertexBuffer.Create("Vertex buffer", vertexData.size(), sizeof(Vertex), false, vertexData.data());
 
 	// Setup indices
 	vector<uint32_t> indexData = { 0, 1, 2 };
-	m_indexBuffer.Create("Index buffer", indexData.size(), sizeof(uint32_t), indexData.data());
+	m_indexBuffer.Create("Index buffer", indexData.size(), sizeof(uint32_t), false, indexData.data());
 
 	// Setup constant buffer
 	m_constantBuffer.Create("Constant buffer", 1, sizeof(m_vsConstants));

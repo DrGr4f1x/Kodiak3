@@ -15,6 +15,7 @@
 #include "CommonStates.h"
 #include "CommandContext.h"
 #include "Input.h"
+#include "UIOverlay.h"
 
 
 using namespace Kodiak;
@@ -31,10 +32,10 @@ void ComputeShaderApp::Startup()
 		{ { -1.0f, -1.0f,  0.0f }, { 0.0f, 1.0f } },
 		{ {  1.0f, -1.0f,  0.0f }, { 1.0f, 1.0f } }
 	};
-	m_vertexBuffer.Create("Vertex buffer", vertexData.size(), sizeof(Vertex), vertexData.data());
+	m_vertexBuffer.Create("Vertex buffer", vertexData.size(), sizeof(Vertex), false, vertexData.data());
 
 	vector<uint32_t> indexData = { 0,1,2, 2,3,0 };
-	m_indexBuffer.Create("Index buffer", indexData.size(), sizeof(uint32_t), indexData.data());
+	m_indexBuffer.Create("Index buffer", indexData.size(), sizeof(uint32_t), false, indexData.data());
 
 	m_camera.SetPerspectiveMatrix(DirectX::XMConvertToRadians(60.0f),
 		(float)m_displayHeight / (float)(m_displayWidth / 2),
@@ -52,6 +53,10 @@ void ComputeShaderApp::Startup()
 	m_computeScratch.Create("Compute Scratch", m_texture->GetWidth(), m_texture->GetHeight(), 1, Format::R8G8B8A8_UNorm);
 
 	InitResourceSets();
+
+	m_shaderNames.push_back("Emboss");
+	m_shaderNames.push_back("Edge Detect");
+	m_shaderNames.push_back("Sharpen");
 }
 
 
@@ -86,6 +91,15 @@ bool ComputeShaderApp::Update()
 	}
 
 	return true;
+}
+
+
+void ComputeShaderApp::UpdateUI()
+{
+	if (m_uiOverlay->Header("Settings")) 
+	{
+		m_uiOverlay->ComboBox("Shader", &m_curComputeTechnique, m_shaderNames);
+	}
 }
 
 
@@ -149,7 +163,10 @@ void ComputeShaderApp::Render()
 
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

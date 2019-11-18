@@ -28,6 +28,8 @@
 // Default fence timeout in nanoseconds
 #define DEFAULT_FENCE_TIMEOUT 100000000000
 
+const std::string s_apiName = "Vulkan";
+
 const std::string s_apiPrefixString = "[Vulkan]";
 
 const std::string s_defaultShaderPath = "Shaders\\SPIR-V";

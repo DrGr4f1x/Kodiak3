@@ -137,8 +137,8 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 	}
 
 	uint32_t stride = layout.ComputeStride();
-	model->m_vertexBuffer.Create("Model|VertexBuffer", sizeof(float) * vertexData.size() / stride, stride, vertexData.data());
-	model->m_indexBuffer.Create("Model|IndexBuffer", indexData.size(), sizeof(uint32_t), indexData.data());
+	model->m_vertexBuffer.Create("Model|VertexBuffer", sizeof(float) * vertexData.size() / stride, stride, false, vertexData.data());
+	model->m_indexBuffer.Create("Model|IndexBuffer", indexData.size(), sizeof(uint32_t), false, indexData.data());
 
 	return model;
 }

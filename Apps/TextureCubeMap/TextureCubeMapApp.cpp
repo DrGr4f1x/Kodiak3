@@ -60,11 +60,22 @@ void TextureCubeMapApp::Shutdown()
 
 bool TextureCubeMapApp::Update()
 {
-	m_controller.Update(m_frameTimer);
+	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
 
 	UpdateConstantBuffers();
 
 	return true;
+}
+
+
+void TextureCubeMapApp::UpdateUI()
+{
+	if (m_uiOverlay->Header("Settings")) 
+	{
+		m_uiOverlay->SliderFloat("LOD bias", &m_psConstants.lodBias, 0.0f, (float)m_skyboxTex->GetNumMips());
+		m_uiOverlay->ComboBox("Object type", &m_curModel, m_modelNames);
+		m_uiOverlay->CheckBox("Skybox", &m_displaySkybox);
+	}
 }
 
 
@@ -82,6 +93,7 @@ void TextureCubeMapApp::Render()
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
 	// Skybox
+	if (m_displaySkybox)
 	{
 		context.SetRootSignature(m_skyboxRootSig);
 		context.SetPipelineState(m_skyboxPSO);
@@ -96,7 +108,7 @@ void TextureCubeMapApp::Render()
 
 	// Model
 	{
-		auto model = m_models[0];
+		auto model = m_models[m_curModel];
 
 		context.SetRootSignature(m_modelRootSig);
 		context.SetPipelineState(m_modelPSO);
@@ -109,7 +121,10 @@ void TextureCubeMapApp::Render()
 		context.DrawIndexed((uint32_t)model->GetIndexBuffer().GetElementCount());
 	}
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
@@ -248,4 +263,9 @@ void TextureCubeMapApp::LoadAssets()
 
 	model = Model::Load("venus.fbx", layout, 0.15f);
 	m_models.push_back(model);
+
+	m_modelNames.push_back("Sphere");
+	m_modelNames.push_back("Teapot");
+	m_modelNames.push_back("Torus knot");
+	m_modelNames.push_back("Venus");
 }

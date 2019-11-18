@@ -31,27 +31,28 @@ CameraController::CameraController(Camera& camera, Vector3 worldUp)
 }
 
 
-void CameraController::Update(float deltaTime)
+void CameraController::Update(float deltaTime, bool ignoreInput)
 {
-	(deltaTime);
-
-	if (g_input.IsFirstPressed(DigitalInput::kLThumbClick) || g_input.IsFirstPressed(DigitalInput::kKey_lshift))
+	if (!ignoreInput)
 	{
-		m_fineMovement = !m_fineMovement;
-	}
+		if (g_input.IsFirstPressed(DigitalInput::kLThumbClick) || g_input.IsFirstPressed(DigitalInput::kKey_lshift))
+		{
+			m_fineMovement = !m_fineMovement;
+		}
 
-	if (g_input.IsFirstPressed(DigitalInput::kRThumbClick))
-	{
-		m_fineRotation = !m_fineRotation;
+		if (g_input.IsFirstPressed(DigitalInput::kRThumbClick))
+		{
+			m_fineRotation = !m_fineRotation;
+		}
 	}
 
 	switch (m_mode)
 	{
 	case CameraMode::WASD:
-		UpdateWASD(deltaTime);
+		UpdateWASD(deltaTime, ignoreInput);
 		break;
 	case CameraMode::ArcBall:
-		UpdateArcBall(deltaTime);
+		UpdateArcBall(deltaTime, ignoreInput);
 		break;
 	}
 
@@ -120,7 +121,7 @@ void CameraController::ApplyMomentum(float& oldValue, float& newValue, float del
 }
 
 
-void CameraController::UpdateWASD(float deltaTime)
+void CameraController::UpdateWASD(float deltaTime, bool ignoreInput)
 {
 	(deltaTime);
 
@@ -130,37 +131,46 @@ void CameraController::UpdateWASD(float deltaTime)
 	float speedScale = (m_fineMovement ? 0.1f : 1.0f) * timeScale;
 	float panScale = (m_fineRotation ? 0.5f : 1.0f) * timeScale;
 
-	float yaw = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickX) * m_horizontalLookSensitivity * panScale;
-	float pitch = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickY) * m_verticalLookSensitivity * panScale;
+	float yaw = 0.0f;
+	float pitch = 0.0f;
+	float forward = 0.0f;
+	float strafe = 0.0f;
+	float ascent = 0.0f;
 
-	float forward = m_moveSpeed * speedScale * (
-		g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftStickY) +
-		(g_input.IsPressed(DigitalInput::kKey_w) ? deltaTime : 0.0f) +
-		(g_input.IsPressed(DigitalInput::kKey_s) ? -deltaTime : 0.0f));
-
-	float strafe = m_strafeSpeed * speedScale * (
-		g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftStickX) +
-		(g_input.IsPressed(DigitalInput::kKey_d) ? deltaTime : 0.0f) +
-		(g_input.IsPressed(DigitalInput::kKey_a) ? -deltaTime : 0.0f));
-
-	float ascent = m_strafeSpeed * speedScale * (
-		g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightTrigger) -
-		g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftTrigger) +
-		(g_input.IsPressed(DigitalInput::kKey_e) ? deltaTime : 0.0f) +
-		(g_input.IsPressed(DigitalInput::kKey_q) ? -deltaTime : 0.0f));
-
-	if (m_momentum)
+	if (!ignoreInput)
 	{
-		ApplyMomentum(m_lastYaw, yaw, deltaTime);
-		ApplyMomentum(m_lastPitch, pitch, deltaTime);
-		ApplyMomentum(m_lastForward, forward, deltaTime);
-		ApplyMomentum(m_lastStrafe, strafe, deltaTime);
-		ApplyMomentum(m_lastAscent, ascent, deltaTime);
-	}
+		yaw = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickX) * m_horizontalLookSensitivity * panScale;
+		pitch = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickY) * m_verticalLookSensitivity * panScale;
 
-	// don't apply momentum to mouse inputs
-	yaw += g_input.GetAnalogInput(AnalogInput::kAnalogMouseX) * m_mouseSensitivityX;
-	pitch += g_input.GetAnalogInput(AnalogInput::kAnalogMouseY) * m_mouseSensitivityY;
+		forward = m_moveSpeed * speedScale * (
+			g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftStickY) +
+			(g_input.IsPressed(DigitalInput::kKey_w) ? deltaTime : 0.0f) +
+			(g_input.IsPressed(DigitalInput::kKey_s) ? -deltaTime : 0.0f));
+
+		strafe = m_strafeSpeed * speedScale * (
+			g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftStickX) +
+			(g_input.IsPressed(DigitalInput::kKey_d) ? deltaTime : 0.0f) +
+			(g_input.IsPressed(DigitalInput::kKey_a) ? -deltaTime : 0.0f));
+
+		ascent = m_strafeSpeed * speedScale * (
+			g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightTrigger) -
+			g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogLeftTrigger) +
+			(g_input.IsPressed(DigitalInput::kKey_e) ? deltaTime : 0.0f) +
+			(g_input.IsPressed(DigitalInput::kKey_q) ? -deltaTime : 0.0f));
+
+		if (m_momentum)
+		{
+			ApplyMomentum(m_lastYaw, yaw, deltaTime);
+			ApplyMomentum(m_lastPitch, pitch, deltaTime);
+			ApplyMomentum(m_lastForward, forward, deltaTime);
+			ApplyMomentum(m_lastStrafe, strafe, deltaTime);
+			ApplyMomentum(m_lastAscent, ascent, deltaTime);
+		}
+
+		// don't apply momentum to mouse inputs
+		yaw += g_input.GetAnalogInput(AnalogInput::kAnalogMouseX) * m_mouseSensitivityX;
+		pitch += g_input.GetAnalogInput(AnalogInput::kAnalogMouseY) * m_mouseSensitivityY;
+	}
 
 	m_currentPitch += pitch;
 	m_currentPitch = DirectX::XMMin(XM_PIDIV2, m_currentPitch);
@@ -182,7 +192,7 @@ void CameraController::UpdateWASD(float deltaTime)
 }
 
 
-void CameraController::UpdateArcBall(float deltaTime)
+void CameraController::UpdateArcBall(float deltaTime, bool ignoreInput)
 {
 	(deltaTime);
 
@@ -194,20 +204,23 @@ void CameraController::UpdateArcBall(float deltaTime)
 	float yaw = 0.0f;
 	float pitch = 0.0f;
 
-	yaw = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickX) * m_horizontalLookSensitivity * panScale;
-	pitch = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickY) * m_verticalLookSensitivity * panScale;
-
-	if (m_momentum)
+	if (!ignoreInput)
 	{
-		ApplyMomentum(m_lastYaw, yaw, deltaTime);
-		ApplyMomentum(m_lastPitch, pitch, deltaTime);
-	}
+		yaw = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickX) * m_horizontalLookSensitivity * panScale;
+		pitch = g_input.GetTimeCorrectedAnalogInput(AnalogInput::kAnalogRightStickY) * m_verticalLookSensitivity * panScale;
 
-	// don't apply momentum to mouse inputs
-	if (g_input.GetCaptureMouse() || g_input.IsPressed(DigitalInput::kMouse0))
-	{
-		yaw += g_input.GetAnalogInput(AnalogInput::kAnalogMouseX) * m_mouseSensitivityX;
-		pitch += g_input.GetAnalogInput(AnalogInput::kAnalogMouseY) * m_mouseSensitivityY;
+		if (m_momentum)
+		{
+			ApplyMomentum(m_lastYaw, yaw, deltaTime);
+			ApplyMomentum(m_lastPitch, pitch, deltaTime);
+		}
+
+		// don't apply momentum to mouse inputs
+		if (g_input.GetCaptureMouse() || g_input.IsPressed(DigitalInput::kMouse0))
+		{
+			yaw += g_input.GetAnalogInput(AnalogInput::kAnalogMouseX) * m_mouseSensitivityX;
+			pitch += g_input.GetAnalogInput(AnalogInput::kAnalogMouseY) * m_mouseSensitivityY;
+		}
 	}
 
 	const float epsilon = 0.05f;
@@ -225,7 +238,7 @@ void CameraController::UpdateArcBall(float deltaTime)
 		m_currentHeading += XM_2PI;
 	}
 
-	float zoom = g_input.GetAnalogInput(AnalogInput::kAnalogMouseScroll);
+	float zoom = ignoreInput ? 0.0f : g_input.GetAnalogInput(AnalogInput::kAnalogMouseScroll);
 	m_zoom += zoom;
 	m_zoom = DirectX::XMMax(m_minDistance, m_zoom);
 

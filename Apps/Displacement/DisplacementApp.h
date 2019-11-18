@@ -32,6 +32,7 @@ public:
 	void Shutdown() final;
 
 	bool Update() final;
+	void UpdateUI() final;
 	void Render() final;
 
 private:
@@ -85,4 +86,5 @@ private:
 
 	// App features
 	bool m_split{ true };
+	bool m_displacement{ true };
 };

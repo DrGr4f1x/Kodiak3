@@ -27,6 +27,7 @@ public:
 	void Shutdown() final;
 
 	bool Update() final;
+	void UpdateUI() final;
 	void Render() final;
 
 private:
@@ -73,5 +74,6 @@ private:
 
 	Kodiak::TexturePtr		m_texture;
 
+	std::vector<std::string>	m_shaderNames;
 	int32_t				m_curComputeTechnique{ 0 };
 };

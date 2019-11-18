@@ -55,11 +55,20 @@ void StencilBufferApp::Shutdown()
 
 bool StencilBufferApp::Update()
 {
-	m_controller.Update(m_frameTimer);
+	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
 
 	UpdateConstantBuffer();
 
 	return true;
+}
+
+
+void StencilBufferApp::UpdateUI()
+{
+	if (m_uiOverlay->Header("Settings")) 
+	{
+		m_uiOverlay->InputFloat("Outline width", &m_constants.outlineWidth, 0.05f, 2);
+	}
 }
 
 
@@ -97,7 +106,10 @@ void StencilBufferApp::Render()
 		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
 	}
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }

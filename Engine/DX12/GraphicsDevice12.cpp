@@ -361,6 +361,7 @@ void GraphicsDevice::PlatformCreate()
 					Utility::Printf(L"D3D12-capable hardware found:  %s (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
 					maxSize = desc.DedicatedVideoMemory;
 					m_platformData->bestFeatureLevel = featureLevels[i];
+					m_deviceName = MakeStr(desc.Description);
 					break;
 				}
 			}
@@ -442,7 +443,7 @@ void GraphicsDevice::PlatformCreate()
 	}
 
 	g_device = m_platformData->device;
-
+	
 	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Create("User Descriptor Heap, CBV_SRV_UAV");
 	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER].Create("User Descriptor Heap, SAMPLER");
 

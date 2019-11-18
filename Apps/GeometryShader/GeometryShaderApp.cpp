@@ -65,11 +65,20 @@ void GeometryShaderApp::Shutdown()
 
 bool GeometryShaderApp::Update()
 {
-	m_controller.Update(m_frameTimer);
+	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
 
 	UpdateConstantBuffer();
 
 	return true;
+}
+
+
+void GeometryShaderApp::UpdateUI()
+{
+	if (m_uiOverlay->Header("Settings")) 
+	{
+		m_uiOverlay->CheckBox("Display normals", &m_showNormals);
+	}
 }
 
 
@@ -96,6 +105,7 @@ void GeometryShaderApp::Render()
 
 	context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
 
+	if(m_showNormals)
 	{
 		context.SetRootSignature(m_geomRootSig);
 		context.SetPipelineState(m_geomPSO);
@@ -105,7 +115,10 @@ void GeometryShaderApp::Render()
 		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
 	}
 
+	RenderUI(context);
+
 	context.EndRenderPass();
+	context.TransitionResource(GetColorBuffer(), ResourceState::Present);
 
 	context.Finish();
 }
