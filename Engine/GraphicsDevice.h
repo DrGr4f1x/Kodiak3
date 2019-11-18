@@ -89,11 +89,6 @@ extern GraphicsDevice* g_graphicsDevice;
 const DeviceHandle& GetDevice();
 
 
-GraphicsFeatureSet& RequiredFeatures();
-GraphicsFeatureSet& OptionalFeatures();
-const GraphicsFeatureSet& EnabledFeatures();
-
-
 #if VK
 uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound = nullptr);
 VkFormatProperties GetFormatProperties(Format format);

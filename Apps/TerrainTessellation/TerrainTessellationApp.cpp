@@ -15,7 +15,7 @@
 #include "CommandContext.h"
 #include "CommonStates.h"
 #include "Filesystem.h"
-#include "GraphicsDevice.h"
+#include "GraphicsFeatures.h"
 
 
 using namespace Kodiak;
@@ -58,8 +58,7 @@ void TerrainTessellationApp::Configure()
 	Application::Configure();
 
 	// Specify required graphics features 
-	auto& requiredFeatures = RequiredFeatures();
-	requiredFeatures.tessellationShader = true;
+	g_requiredFeatures.tessellationShader = true;
 }
 
 

@@ -130,8 +130,8 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	{
 		ReadCaps();
 
-		auto& requestedFeatures = optionalFeatures ? OptionalFeatures() : RequiredFeatures();
-		auto& enabledFeatures = const_cast<GraphicsFeatureSet&>(EnabledFeatures());
+		auto& requestedFeatures = optionalFeatures ? g_optionalFeatures : g_requiredFeatures;
+		auto& enabledFeatures = const_cast<GraphicsFeatureSet&>(g_enabledFeatures);
 
 		auto numFeatures = requestedFeatures.GetNumFeatures();
 		for (auto i = 0; i < numFeatures; ++i)

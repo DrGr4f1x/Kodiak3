@@ -17,6 +17,11 @@ using namespace Kodiak;
 using namespace std;
 
 
+GraphicsFeatureSet Kodiak::g_requiredFeatures;
+GraphicsFeatureSet Kodiak::g_optionalFeatures;
+const GraphicsFeatureSet Kodiak::g_enabledFeatures;
+
+
 GraphicsFeatureProxy::GraphicsFeatureProxy(GraphicsFeatureSet* featureSet, GraphicsFeature feature)
 	: m_feature(feature)
 {
@@ -38,25 +43,6 @@ void GraphicsFeatureSet::RegisterFeature(GraphicsFeatureProxy* featureProxy)
 
 namespace Kodiak
 {
-
-GraphicsFeatureSet& RequiredFeatures() 
-{ 
-	static GraphicsFeatureSet features;
-	return features; 
-}
-
-GraphicsFeatureSet& OptionalFeatures() 
-{ 
-	static GraphicsFeatureSet features;
-	return features; 
-}
-
-const GraphicsFeatureSet& EnabledFeatures() 
-{
-	static GraphicsFeatureSet features;
-	return features;
-}
-
 
 const string GraphicsFeatureToString(GraphicsFeature feature)
 {

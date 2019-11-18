@@ -14,7 +14,7 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "GraphicsDevice.h"
+#include "GraphicsFeatures.h"
 
 
 using namespace Kodiak;
@@ -26,7 +26,7 @@ void MultisamplingApp::Configure()
 {
 	Application::Configure();
 
-	OptionalFeatures().sampleRateShading = true;
+	g_optionalFeatures.sampleRateShading = true;
 }
 
 
@@ -76,7 +76,7 @@ bool MultisamplingApp::Update()
 
 void MultisamplingApp::UpdateUI()
 {
-	if (EnabledFeatures().sampleRateShading) 
+	if (g_enabledFeatures.sampleRateShading) 
 	{
 		if (m_uiOverlay->Header("Settings")) 
 		{
@@ -184,7 +184,7 @@ void MultisamplingApp::InitPSOs()
 	m_psoMsaa.SetInputLayout(vertexStream, vertexElements);
 
 	m_psoMsaaSampleRate = m_psoMsaa;
-	if (EnabledFeatures().sampleRateShading)
+	if (g_enabledFeatures.sampleRateShading)
 	{
 		m_psoMsaaSampleRate.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat(), m_numSamples, true);
 	}

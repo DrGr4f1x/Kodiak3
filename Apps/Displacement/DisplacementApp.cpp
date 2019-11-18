@@ -14,7 +14,7 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "GraphicsDevice.h"
+#include "GraphicsFEatures.h"
 
 
 using namespace Kodiak;
@@ -26,9 +26,8 @@ void DisplacementApp::Configure()
 	Application::Configure();
 
 	// Specify required graphics features 
-	auto& requiredFeatures = RequiredFeatures();
-	requiredFeatures.tessellationShader = true;
-	requiredFeatures.fillModeNonSolid = true;
+	g_requiredFeatures.tessellationShader = true;
+	g_requiredFeatures.fillModeNonSolid = true;
 }
 
 
@@ -86,7 +85,7 @@ void DisplacementApp::UpdateUI()
 		m_uiOverlay->InputFloat("Strength", &m_dsConstants.tessStrength, 0.025f, 3);
 		m_uiOverlay->InputFloat("Level", &m_hsConstants.tessLevel, 0.5f, 2);
 
-		if (EnabledFeatures().fillModeNonSolid) 
+		if (g_enabledFeatures.fillModeNonSolid) 
 		{
 			m_uiOverlay->CheckBox("Splitscreen", &m_split);
 		}

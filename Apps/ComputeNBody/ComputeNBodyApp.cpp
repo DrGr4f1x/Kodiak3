@@ -14,7 +14,7 @@
 
 #include "CommonStates.h"
 #include "CommandContext.h"
-#include "GraphicsDevice.h"
+#include "GraphicsFeatures.h"
 #include "UIOverlay.h"
 
 
@@ -31,8 +31,7 @@ void ComputeNBodyApp::Configure()
 	Application::Configure();
 
 	// Specify required graphics features 
-	auto& requiredFeatures = RequiredFeatures();
-	requiredFeatures.geometryShader = true;
+	g_requiredFeatures.geometryShader = true;
 }
 
 

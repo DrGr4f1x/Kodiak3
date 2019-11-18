@@ -14,7 +14,7 @@
 
 #include "CommandContext.h"
 #include "CommonStates.h"
-#include "GraphicsDevice.h"
+#include "GraphicsFeatures.h"
 
 
 using namespace Kodiak;
@@ -26,8 +26,7 @@ void GeometryShaderApp::Configure()
 	Application::Configure();
 
 	// Specify required graphics features 
-	auto& requiredFeatures = RequiredFeatures();
-	requiredFeatures.geometryShader = true;
+	g_requiredFeatures.geometryShader = true;
 }
 
 

@@ -119,8 +119,11 @@ private:
 	void RegisterFeature(GraphicsFeatureProxy* featureProxy);
 };
 
+extern GraphicsFeatureSet g_requiredFeatures;
+extern GraphicsFeatureSet g_optionalFeatures;
+extern const GraphicsFeatureSet g_enabledFeatures;
+
 
 const std::string GraphicsFeatureToString(GraphicsFeature feature);
-
 
 } // namespace Kodiak
