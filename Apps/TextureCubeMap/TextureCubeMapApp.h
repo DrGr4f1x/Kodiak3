@@ -61,7 +61,7 @@ private:
 
 	struct PSConstants
 	{
-		float lodBias;
+		float lodBias{ 0.0f };
 	};
 	Kodiak::RootSignature		m_modelRootSig;
 	Kodiak::RootSignature		m_skyboxRootSig;

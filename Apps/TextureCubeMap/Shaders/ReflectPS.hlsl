@@ -37,7 +37,7 @@ float4 main(PSInput input) : SV_Target
 	float3 cR = input.reflected;
 	cR.xy *= -1.0f;
 
-	float4 color = texCube.SampleLevel(samplerLinear, cR, lodBias);
+	float4 color = texCube.SampleBias(samplerLinear, cR, lodBias);
 
 	return color;
 }

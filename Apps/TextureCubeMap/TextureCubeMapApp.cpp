@@ -234,7 +234,6 @@ void TextureCubeMapApp::UpdateConstantBuffers()
 	m_vsModelConstants.eyePos = m_camera.GetPosition();
 	m_vsModelConstantBuffer.Update(sizeof(m_vsModelConstants), &m_vsModelConstants);
 
-	m_psConstants.lodBias = 0.0f;
 	m_psConstantBuffer.Update(sizeof(m_psConstants), &m_psConstants);
 }
 
