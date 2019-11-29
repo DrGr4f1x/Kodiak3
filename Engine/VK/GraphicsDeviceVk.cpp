@@ -308,8 +308,15 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		// Store properties (including limits), features and memory properties of the physical device (so that examples can check against them)
 		vkGetPhysicalDeviceProperties(physicalDevice, &physicalDeviceProperties);
-		vkGetPhysicalDeviceFeatures(physicalDevice, &physicalDeviceSupportedFeatures);
 		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &physicalDeviceMemoryProperties);
+
+		// Gather supported extensions, and record which extensions are required or optional, based on Application config
+		GatherSupportedExtensions();
+		GatherApplicationExtensions(false);
+		GatherApplicationExtensions(true);
+		ValidateApplicationExtensions();
+
+		vkGetPhysicalDeviceFeatures2(physicalDevice, &supportedDeviceFeatures);
 
 		// Enabled required and optional features, as requested by the application
 		EnableFeatures(false);
@@ -341,23 +348,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	void InitializeDebugMarkup()
 	{
 #if ENABLE_VULKAN_DEBUG_MARKUP
-		bool extensionPresent = false;
-
-		// Check if the debug marker extension is present (which is the case if run from a graphics debugger)
-		uint32_t extensionCount;
-		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
-		vector<VkExtensionProperties> extensions(extensionCount);
-		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, extensions.data());
-		for (auto extension : extensions)
-		{
-			if (strcmp(extension.extensionName, VK_EXT_DEBUG_MARKER_EXTENSION_NAME) == 0)
-			{
-				extensionPresent = true;
-				break;
-			}
-		}
-
-		if (extensionPresent)
+		if (IsExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
 		{
 			vkDebugMarkerSetObjectTag =
 				reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT>(vkGetInstanceProcAddr(instance, "vkDebugMarkerSetObjectTagEXT"));
@@ -396,21 +387,6 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		assert(queueFamilyCount > 0);
 		queueFamilyProperties.resize(queueFamilyCount);
 		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilyProperties.data());
-
-		// Get list of supported extensions
-		uint32_t extCount = 0;
-		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, nullptr);
-		if (extCount > 0)
-		{
-			vector<VkExtensionProperties> extensions(extCount);
-			if (vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, &extensions.front()) == VK_SUCCESS)
-			{
-				for (auto ext : extensions)
-				{
-					supportedExtensions.push_back(ext.extensionName);
-				}
-			}
-		}
 
 		// Get queue family indices for the requested queue family types
 		// Note that the indices may overlap depending on the implementation
@@ -453,29 +429,18 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		}
 
 		// Create the logical device representation
-		vector<const char*> deviceExtensions(enabledExtensions);
-		deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-		deviceExtensions.push_back(VK_KHR_MAINTENANCE1_EXTENSION_NAME);
-		//deviceExtensions.push_back(VK_KHR_MAINTENANCE2_EXTENSION_NAME);
-
+		vector<const char*> deviceExtensions;
+		for (const auto& extName : requestedExtensions)
+		{
+			deviceExtensions.push_back(extName.c_str());
+		}
+		
 		VkDeviceCreateInfo deviceCreateInfo = {};
 		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		deviceCreateInfo.pNext = &enabledDeviceFeatures;
 		deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());;
 		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-		deviceCreateInfo.pEnabledFeatures = &physicalDeviceEnabledFeatures;
-
-		// Enable the debug marker extension if it is present (likely meaning a debugging tool is present)
-		if (IsExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
-		{
-			deviceExtensions.push_back(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
-			//enableDebugMarkers = true;
-		}
-
-		// Enable push descriptors
-		if (IsExtensionSupported(VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME))
-		{
-			deviceExtensions.push_back(VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME);
-		}
+		deviceCreateInfo.pEnabledFeatures = nullptr;
 
 		if (deviceExtensions.size() > 0)
 		{
@@ -491,13 +456,6 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		// Get a graphics queue from the device
 		vkGetDeviceQueue(device, queueFamilyIndices.graphics, 0, &graphicsQueue);
-
-		// Extension function pointers
-		ext_vkCmdPushDescriptorSetKHR = reinterpret_cast<PFN_vkCmdPushDescriptorSetKHR>(vkGetDeviceProcAddr(device, "vkCmdPushDescriptorSetKHR"));
-		if (!ext_vkCmdPushDescriptorSetKHR)
-		{
-			error("Could not get a valid function pointer for vkCmdPushDescriptorSetKHR");
-		}
 	}
 
 	uint32_t GetQueueFamilyIndex(VkQueueFlagBits queueFlags)
@@ -549,7 +507,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 	bool IsExtensionSupported(const string& name) const
 	{
-		return find(begin(supportedExtensions), end(supportedExtensions), name) != end(supportedExtensions);
+		return supportedExtensions.find(name) != end(supportedExtensions);
 	}
 
 	void InitSurface(HINSTANCE hInstance, HWND hWnd)
@@ -830,6 +788,109 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		}
 	}
 
+	void GatherSupportedExtensions()
+	{
+		// Get list of supported extensions
+		uint32_t extCount = 0;
+		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, nullptr);
+		if (extCount > 0)
+		{
+			vector<VkExtensionProperties> extensions(extCount);
+			if (vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, &extensions.front()) == VK_SUCCESS)
+			{
+				for (auto ext : extensions)
+				{
+					supportedExtensions.insert(ext.extensionName);
+				}
+			}
+		}
+	}
+
+	void GatherApplicationExtensions(bool optionalFeatures)
+	{
+		auto& requestedExtensions = optionalFeatures ? optionalExtensions : requiredExtensions;
+		auto& requestedFeatures = optionalFeatures ? g_optionalFeatures : g_requiredFeatures;
+
+		// VK_KHR_shader_float16_int8
+		if (requestedFeatures.shaderFloat16 || requestedFeatures.shaderInt8)
+			requestedExtensions.insert(VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME);
+
+		// Add some required and optional extensions used by every Application
+		if (optionalFeatures)
+		{
+			requestedExtensions.insert(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
+		}
+		else
+		{
+			requestedExtensions.insert(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+		}
+	}
+
+	void ValidateApplicationExtensions()
+	{
+		vector<string> missingExtensions;
+
+		// Check required extensions
+		for (const auto& extName : requiredExtensions)
+		{
+			if (IsExtensionSupported(extName))
+			{
+				requestedExtensions.insert(extName);
+			}
+			else
+			{
+				missingExtensions.push_back(extName);
+			}
+		}
+
+		// Report missing extensions and exit
+		if (!missingExtensions.empty())
+		{
+			string errMsg;
+			string errDetails;
+			if (missingExtensions.size() > 1)
+			{
+				errMsg = "Required Vulkan Extensions Not Supported";
+				errDetails = "This Application requires:\n ";
+				for (size_t i = 0; i < missingExtensions.size(); ++i)
+					errDetails += missingExtensions[i] + "\n";
+				errDetails += "\n, which are unavailable.  You may need to update your GPU or graphics driver";
+			}
+			else
+			{
+				errMsg = "Required Vulkan Extension Not Supported";
+				errDetails = "This Application requires:\n " + missingExtensions[0] + "\n, which is unavailable.  You may need to update your GPU or graphics driver";
+
+			}
+			ExitFatal(errMsg, errDetails);
+		}
+
+		// Check optional extensions
+		for (const auto& extName : optionalExtensions)
+		{
+			if (IsExtensionSupported(extName))
+			{
+				requestedExtensions.insert(extName);
+			}
+		}
+
+		// Now, hook up pointers for all the per-extension device features
+		void** pNextSupported = &supportedDeviceFeatures.pNext;
+		void** pNextEnabled = &enabledDeviceFeatures.pNext;
+
+		for (const auto& extName : requestedExtensions)
+		{
+			if (extName == VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)
+			{
+				*pNextSupported = &supportedExtendedFeatures.khrShaderFloat16Int8Features;
+				pNextSupported = &supportedExtendedFeatures.khrShaderFloat16Int8Features.pNext;
+
+				*pNextEnabled = &enabledExtendedFeatures.khrShaderFloat16Int8Features;
+				pNextEnabled = &enabledExtendedFeatures.khrShaderFloat16Int8Features.pNext;
+			}
+		}
+	}
+
 	void EnableFeatures(bool optionalFeatures)
 	{
 		auto& requestedFeatures = optionalFeatures ? g_optionalFeatures : g_requiredFeatures;
@@ -852,224 +913,289 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.robustBufferAccess,
-					physicalDeviceEnabledFeatures.robustBufferAccess);
+					supportedDeviceFeatures.features.robustBufferAccess,
+					enabledDeviceFeatures.features.robustBufferAccess);
 				break;
 
 			case GraphicsFeature::FullDrawIndexUint32:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.fullDrawIndexUint32,
-					physicalDeviceEnabledFeatures.fullDrawIndexUint32);
+					supportedDeviceFeatures.features.fullDrawIndexUint32,
+					enabledDeviceFeatures.features.fullDrawIndexUint32);
 				break;
 
 			case GraphicsFeature::TextureCubeArray:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.imageCubeArray,
-					physicalDeviceEnabledFeatures.imageCubeArray);
+					supportedDeviceFeatures.features.imageCubeArray,
+					enabledDeviceFeatures.features.imageCubeArray);
 				break;
 
 			case GraphicsFeature::IndependentBlend:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.independentBlend,
-					physicalDeviceEnabledFeatures.independentBlend);
+					supportedDeviceFeatures.features.independentBlend,
+					enabledDeviceFeatures.features.independentBlend);
 				break;
 
 			case GraphicsFeature::GeometryShader:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.geometryShader,
-					physicalDeviceEnabledFeatures.geometryShader);
+					supportedDeviceFeatures.features.geometryShader,
+					enabledDeviceFeatures.features.geometryShader);
 				break;
 
 			case GraphicsFeature::TessellationShader:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.tessellationShader,
-					physicalDeviceEnabledFeatures.tessellationShader);
+					supportedDeviceFeatures.features.tessellationShader,
+					enabledDeviceFeatures.features.tessellationShader);
 				break;
 
 			case GraphicsFeature::SampleRateShading:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.sampleRateShading,
-					physicalDeviceEnabledFeatures.sampleRateShading);
+					supportedDeviceFeatures.features.sampleRateShading,
+					enabledDeviceFeatures.features.sampleRateShading);
 				break;
 
 			case GraphicsFeature::DualSrcBlend:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.dualSrcBlend,
-					physicalDeviceEnabledFeatures.dualSrcBlend);
+					supportedDeviceFeatures.features.dualSrcBlend,
+					enabledDeviceFeatures.features.dualSrcBlend);
 				break;
 
 			case GraphicsFeature::LogicOp:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.logicOp,
-					physicalDeviceEnabledFeatures.logicOp);
+					supportedDeviceFeatures.features.logicOp,
+					enabledDeviceFeatures.features.logicOp);
 				break;
 
 			case GraphicsFeature::DrawIndirectFirstInstance:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.drawIndirectFirstInstance,
-					physicalDeviceEnabledFeatures.drawIndirectFirstInstance);
+					supportedDeviceFeatures.features.drawIndirectFirstInstance,
+					enabledDeviceFeatures.features.drawIndirectFirstInstance);
 				break;
 
 			case GraphicsFeature::DepthClamp:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.depthClamp,
-					physicalDeviceEnabledFeatures.depthClamp);
+					supportedDeviceFeatures.features.depthClamp,
+					enabledDeviceFeatures.features.depthClamp);
 				break;
 
 			case GraphicsFeature::DepthBiasClamp:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.depthBiasClamp,
-					physicalDeviceEnabledFeatures.depthBiasClamp);
+					supportedDeviceFeatures.features.depthBiasClamp,
+					enabledDeviceFeatures.features.depthBiasClamp);
 				break;
 
 			case GraphicsFeature::FillModeNonSolid:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.fillModeNonSolid,
-					physicalDeviceEnabledFeatures.fillModeNonSolid);
+					supportedDeviceFeatures.features.fillModeNonSolid,
+					enabledDeviceFeatures.features.fillModeNonSolid);
 				break;
 
 			case GraphicsFeature::DepthBounds:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.depthBounds,
-					physicalDeviceEnabledFeatures.depthBounds);
+					supportedDeviceFeatures.features.depthBounds,
+					enabledDeviceFeatures.features.depthBounds);
 				break;
 
 			case GraphicsFeature::WideLines:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.wideLines,
-					physicalDeviceEnabledFeatures.wideLines);
+					supportedDeviceFeatures.features.wideLines,
+					enabledDeviceFeatures.features.wideLines);
 				break;
 
 			case GraphicsFeature::LargePoints:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.largePoints,
-					physicalDeviceEnabledFeatures.largePoints);
+					supportedDeviceFeatures.features.largePoints,
+					enabledDeviceFeatures.features.largePoints);
 				break;
 
 			case GraphicsFeature::AlphaToOne:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.alphaToOne,
-					physicalDeviceEnabledFeatures.alphaToOne);
+					supportedDeviceFeatures.features.alphaToOne,
+					enabledDeviceFeatures.features.alphaToOne);
 				break;
 
 			case GraphicsFeature::MultiViewport:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.multiViewport,
-					physicalDeviceEnabledFeatures.multiViewport);
+					supportedDeviceFeatures.features.multiViewport,
+					enabledDeviceFeatures.features.multiViewport);
 				break;
 
 			case GraphicsFeature::SamplerAnisotropy:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.samplerAnisotropy,
-					physicalDeviceEnabledFeatures.samplerAnisotropy);
+					supportedDeviceFeatures.features.samplerAnisotropy,
+					enabledDeviceFeatures.features.samplerAnisotropy);
 				break;
 
 			case GraphicsFeature::TextureCompressionETC2:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.textureCompressionETC2,
-					physicalDeviceEnabledFeatures.textureCompressionETC2);
+					supportedDeviceFeatures.features.textureCompressionETC2,
+					enabledDeviceFeatures.features.textureCompressionETC2);
 				break;
 
 			case GraphicsFeature::TextureCompressionASTC_LDR:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.textureCompressionASTC_LDR,
-					physicalDeviceEnabledFeatures.textureCompressionASTC_LDR);
+					supportedDeviceFeatures.features.textureCompressionASTC_LDR,
+					enabledDeviceFeatures.features.textureCompressionASTC_LDR);
 				break;
 
 			case GraphicsFeature::TextureCompressionBC:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.textureCompressionBC,
-					physicalDeviceEnabledFeatures.textureCompressionBC);
+					supportedDeviceFeatures.features.textureCompressionBC,
+					enabledDeviceFeatures.features.textureCompressionBC);
 				break;
 
 			case GraphicsFeature::OcclusionQueryPrecise:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.occlusionQueryPrecise,
-					physicalDeviceEnabledFeatures.occlusionQueryPrecise);
+					supportedDeviceFeatures.features.occlusionQueryPrecise,
+					enabledDeviceFeatures.features.occlusionQueryPrecise);
 				break;
 
 			case GraphicsFeature::PipelineStatisticsQuery:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.pipelineStatisticsQuery,
-					physicalDeviceEnabledFeatures.pipelineStatisticsQuery);
+					supportedDeviceFeatures.features.pipelineStatisticsQuery,
+					enabledDeviceFeatures.features.pipelineStatisticsQuery);
 				break;
 
 			case GraphicsFeature::VertexPipelineStoresAndAtomics:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.vertexPipelineStoresAndAtomics,
-					physicalDeviceEnabledFeatures.vertexPipelineStoresAndAtomics);
+					supportedDeviceFeatures.features.vertexPipelineStoresAndAtomics,
+					enabledDeviceFeatures.features.vertexPipelineStoresAndAtomics);
 				break;
 
 			case GraphicsFeature::PixelShaderStoresAndAtomics:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.fragmentStoresAndAtomics,
-					physicalDeviceEnabledFeatures.fragmentStoresAndAtomics);
+					supportedDeviceFeatures.features.fragmentStoresAndAtomics,
+					enabledDeviceFeatures.features.fragmentStoresAndAtomics);
 				break;
 
 			case GraphicsFeature::ShaderTessellationAndGeometryPointSize:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.shaderTessellationAndGeometryPointSize,
-					physicalDeviceEnabledFeatures.shaderTessellationAndGeometryPointSize);
+					supportedDeviceFeatures.features.shaderTessellationAndGeometryPointSize,
+					enabledDeviceFeatures.features.shaderTessellationAndGeometryPointSize);
 				break;
 
 			case GraphicsFeature::ShaderTextureGatherExtended:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					physicalDeviceSupportedFeatures.shaderImageGatherExtended,
-					physicalDeviceEnabledFeatures.shaderImageGatherExtended);
+					supportedDeviceFeatures.features.shaderImageGatherExtended,
+					enabledDeviceFeatures.features.shaderImageGatherExtended);
+				break;
+			case GraphicsFeature::ShaderUAVExtendedFormats:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					supportedDeviceFeatures.features.shaderStorageImageExtendedFormats,
+					enabledDeviceFeatures.features.shaderStorageImageExtendedFormats);
+				break;
+
+			case GraphicsFeature::ShaderClipDistance:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					supportedDeviceFeatures.features.shaderClipDistance,
+					enabledDeviceFeatures.features.shaderClipDistance);
+				break;
+			case GraphicsFeature::ShaderCullDistance:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					supportedDeviceFeatures.features.shaderCullDistance,
+					enabledDeviceFeatures.features.shaderCullDistance);
+				break;
+			case GraphicsFeature::ShaderFloat64:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					supportedDeviceFeatures.features.shaderFloat64,
+					enabledDeviceFeatures.features.shaderFloat64);
+				break;
+			case GraphicsFeature::ShaderFloat16:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					supportedExtendedFeatures.khrShaderFloat16Int8Features.shaderFloat16,
+					enabledExtendedFeatures.khrShaderFloat16Int8Features.shaderFloat16);
+				break;
+			case GraphicsFeature::ShaderInt64:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					supportedDeviceFeatures.features.shaderInt64,
+					enabledDeviceFeatures.features.shaderInt64);
+				break;
+			case GraphicsFeature::ShaderInt16:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					supportedDeviceFeatures.features.shaderInt16,
+					enabledDeviceFeatures.features.shaderInt16);
+				break;
+			case GraphicsFeature::ShaderInt8:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					supportedExtendedFeatures.khrShaderFloat16Int8Features.shaderInt8,
+					enabledExtendedFeatures.khrShaderFloat16Int8Features.shaderInt8);
+				break;
+
+			case GraphicsFeature::VariableMultisampleRate:
+				enabledFeature = TryEnableFeature(
+					optionalFeatures,
+					name,
+					supportedDeviceFeatures.features.variableMultisampleRate,
+					enabledDeviceFeatures.features.variableMultisampleRate);
 				break;
 			}
 		}
@@ -1093,8 +1219,6 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 	VkPhysicalDevice physicalDevice{ VK_NULL_HANDLE };
 	VkPhysicalDeviceProperties physicalDeviceProperties{};
-	VkPhysicalDeviceFeatures physicalDeviceSupportedFeatures{};
-	VkPhysicalDeviceFeatures physicalDeviceEnabledFeatures{};
 	VkPhysicalDeviceMemoryProperties physicalDeviceMemoryProperties{};
 
 	vector<string> unsupportedRequiredFeatures;
@@ -1111,8 +1235,11 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	vector<VkQueueFamilyProperties> queueFamilyProperties;
 	VkQueue graphicsQueue{ VK_NULL_HANDLE };
 
-	// TODO: handle this differently
-	vector<string> supportedExtensions;
+	// Required, optional, and enabled extensions
+	set<string> supportedExtensions;
+	set<string> requiredExtensions;
+	set<string> optionalExtensions;
+	set<string> requestedExtensions;
 	vector<const char*> enabledExtensions;
 
 	VkSurfaceKHR surface{ VK_NULL_HANDLE };
@@ -1124,6 +1251,15 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	
 	// Present and flip fences
 	array<VkFence, NumSwapChainBuffers> presentFences;
+
+	// Extended features
+	struct
+	{
+		VkPhysicalDeviceShaderFloat16Int8FeaturesKHR khrShaderFloat16Int8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, nullptr };
+	} supportedExtendedFeatures, enabledExtendedFeatures;
+
+	VkPhysicalDeviceFeatures2 supportedDeviceFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr };
+	VkPhysicalDeviceFeatures2 enabledDeviceFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr };
 };
 
 } // namespace Kodiak

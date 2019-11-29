@@ -59,11 +59,13 @@ inline void ThrowIfFailed(HRESULT hr)
 
 
 #include <array>
+#include <codecvt>
 #include <cstdint>
 #include <cstdio>
 #include <cstdarg>
 #include <exception>
 #include <functional>
+#include <locale>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -77,13 +79,19 @@ inline void ThrowIfFailed(HRESULT hr)
 
 inline std::wstring MakeWStr(const std::string& str)
 {
-	return std::wstring(str.begin(), str.end());
+	using convert_type = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_type, wchar_t> converter;
+
+	return converter.from_bytes(str);
 }
 
 
 inline std::string MakeStr(const std::wstring& wstr)
 {
-	return std::string(wstr.begin(), wstr.end());
+	using convert_type = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_type, wchar_t> converter;
+
+	return converter.to_bytes(wstr);
 }
 
 

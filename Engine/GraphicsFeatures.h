@@ -46,7 +46,17 @@ enum class GraphicsFeature
 	PixelShaderStoresAndAtomics,
 	ShaderTessellationAndGeometryPointSize,
 	ShaderTextureGatherExtended,
-	ShaderUAVExtendedFormats
+	ShaderUAVExtendedFormats,
+
+	ShaderClipDistance,
+	ShaderCullDistance,
+	ShaderFloat64,
+	ShaderFloat16,
+	ShaderInt64,
+	ShaderInt16,
+	ShaderInt8,
+
+	VariableMultisampleRate,
 };
 
 class GraphicsFeatureProxy
@@ -109,6 +119,17 @@ public:
 	GraphicsFeatureProxy pixelShaderStoresAndAtomics{ this, GraphicsFeature::PixelShaderStoresAndAtomics };
 	GraphicsFeatureProxy shaderTessellationAndGeometryPointSize{ this, GraphicsFeature::ShaderTessellationAndGeometryPointSize };
 	GraphicsFeatureProxy shaderTextureGatherExtended{ this, GraphicsFeature::ShaderTextureGatherExtended };
+	GraphicsFeatureProxy shaderUAVExtendedFormats{ this, GraphicsFeature::ShaderUAVExtendedFormats };
+
+	GraphicsFeatureProxy shaderClipDistance{ this, GraphicsFeature::ShaderClipDistance };
+	GraphicsFeatureProxy shaderCullDistance{ this, GraphicsFeature::ShaderCullDistance };
+	GraphicsFeatureProxy shaderFloat64{ this, GraphicsFeature::ShaderFloat64 };
+	GraphicsFeatureProxy shaderFloat16{ this, GraphicsFeature::ShaderFloat16 };
+	GraphicsFeatureProxy shaderInt64{ this, GraphicsFeature::ShaderInt64 };
+	GraphicsFeatureProxy shaderInt16{ this, GraphicsFeature::ShaderInt16 };
+	GraphicsFeatureProxy shaderInt8{ this, GraphicsFeature::ShaderInt8 };
+
+	GraphicsFeatureProxy variableMultisampleRate{ this, GraphicsFeature::VariableMultisampleRate };
 
 	const GraphicsFeatureProxy& operator[](size_t index) const { return *m_features[index]; }
 	GraphicsFeatureProxy& operator[](size_t index) { return *m_features[index]; }

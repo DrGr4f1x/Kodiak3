@@ -15,29 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\ColorPassVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\ColorPassPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\GaussBlurVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\GaussBlurPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\PhongPassVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\PhongPassPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\SkyBoxVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\SkyBoxPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
+    <CustomBuild Include="Shaders\ColorPassPS.hlsl" />
+    <CustomBuild Include="Shaders\ColorPassVS.hlsl" />
+    <CustomBuild Include="Shaders\GaussBlurPS.hlsl" />
+    <CustomBuild Include="Shaders\GaussBlurVS.hlsl" />
+    <CustomBuild Include="Shaders\PhongPassPS.hlsl" />
+    <CustomBuild Include="Shaders\PhongPassVS.hlsl" />
+    <CustomBuild Include="Shaders\SkyBoxPS.hlsl" />
+    <CustomBuild Include="Shaders\SkyBoxVS.hlsl" />
   </ItemGroup>
 </Project>

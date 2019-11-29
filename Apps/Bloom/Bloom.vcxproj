@@ -31,13 +31,13 @@
     <ProjectGuid>{6123593A-4311-42A0-ADB3-045CF1259B1C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Texture</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'" Label="Configuration">
@@ -49,34 +49,34 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release12|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -311,7 +311,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
     </CustomBuild>
-        <CustomBuild Include="Shaders\GaussBlurPS.hlsl">
+    <CustomBuild Include="Shaders\GaussBlurPS.hlsl">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
@@ -353,7 +353,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
     </CustomBuild>
-        <CustomBuild Include="Shaders\PhongPassPS.hlsl">
+    <CustomBuild Include="Shaders\PhongPassPS.hlsl">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
@@ -395,7 +395,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 -spirv %(Fullpath) -Fo $(ProjectDir)Data\Shaders\SPIR-V\%(Filename).spv</Command>
     </CustomBuild>
-        <CustomBuild Include="Shaders\SkyBoxPS.hlsl">
+    <CustomBuild Include="Shaders\SkyBoxPS.hlsl">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>

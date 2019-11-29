@@ -211,6 +211,33 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 			case GraphicsFeature::ShaderTextureGatherExtended:
 				enabledFeature = TryEnableFeature(optionalFeatures, name, bestShaderModel >= D3D_SHADER_MODEL_5_1);
 				break;
+			case GraphicsFeature::ShaderUAVExtendedFormats:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, dataOptions.TypedUAVLoadAdditionalFormats == TRUE);
+				break;
+
+			case GraphicsFeature::ShaderClipDistance:
+			case GraphicsFeature::ShaderCullDistance:
+				enabledFeature = true;
+				break;
+			case GraphicsFeature::ShaderFloat64:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, dataOptions.DoublePrecisionFloatShaderOps == TRUE);
+				break;
+			case GraphicsFeature::ShaderFloat16:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, (dataOptions.MinPrecisionSupport & D3D12_SHADER_MIN_PRECISION_SUPPORT_16_BIT) != 0);
+				break;
+			case GraphicsFeature::ShaderInt64:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, dataOptions1.Int64ShaderOps == TRUE);
+				break;
+			case GraphicsFeature::ShaderInt16:
+				enabledFeature = TryEnableFeature(optionalFeatures, name, (dataOptions.MinPrecisionSupport & D3D12_SHADER_MIN_PRECISION_SUPPORT_16_BIT) != 0);
+				break;
+			case GraphicsFeature::ShaderInt8:
+				enabledFeature = false;
+				break;
+
+			case GraphicsFeature::VariableMultisampleRate:
+				enabledFeature = true;
+				break;
 			}
 		}
 	}
@@ -232,6 +259,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &dataOptions, sizeof(dataOptions));
 		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS1, &dataOptions1, sizeof(dataOptions1));
 		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS2, &dataOptions2, sizeof(dataOptions2));
+		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &dataOptions5, sizeof(dataOptions5));
 
 		dataShaderModel.HighestShaderModel = bestShaderModel;
 		device->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &dataShaderModel, sizeof(dataShaderModel));
@@ -268,6 +296,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	D3D12_FEATURE_DATA_D3D12_OPTIONS dataOptions;
 	D3D12_FEATURE_DATA_D3D12_OPTIONS1 dataOptions1;
 	D3D12_FEATURE_DATA_D3D12_OPTIONS2 dataOptions2;
+	D3D12_FEATURE_DATA_D3D12_OPTIONS5 dataOptions5;
 	D3D12_FEATURE_DATA_SHADER_MODEL dataShaderModel;
 
 	vector<string> unsupportedRequiredFeatures;

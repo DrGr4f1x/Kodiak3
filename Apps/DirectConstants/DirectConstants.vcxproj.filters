@@ -21,13 +21,7 @@
     <CustomBuild Include="Shaders\LightsPS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\LightsVS.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\LightsPS.glsl">
-      <Filter>Shaders</Filter>
-    </None>
+    <CustomBuild Include="Shaders\LightsPS.glsl" />
+    <CustomBuild Include="Shaders\LightsVS.glsl" />
   </ItemGroup>
 </Project>
