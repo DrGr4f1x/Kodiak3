@@ -288,3 +288,11 @@ __pycache__/
 *.xsd.cs
 *.cso
 *.spv
+Extern/assimp/lib/assimp-vc141-mt.lib
+Extern/assimp/lib/assimp-vc141-mt_d.lib
+Extern/assimp/lib/IrrXML.lib
+Extern/assimp/lib/IrrXML_d.lib
+Extern/assimp/lib/zlib.dll
+Extern/assimp/lib/zlibd.dll
+Extern/assimp/lib/zlibstatic.lib
+Extern/assimp/lib/zlibstaticd.lib
