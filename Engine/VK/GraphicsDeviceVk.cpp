@@ -1327,6 +1327,7 @@ void GraphicsDevice::PlatformCreate()
 #endif
 
 	m_platformData->SelectPhysicalDevice();
+	m_deviceName = m_platformData->physicalDeviceProperties.deviceName;
 
 #if ENABLE_VULKAN_DEBUG_MARKUP
 	m_platformData->InitializeDebugMarkup();
