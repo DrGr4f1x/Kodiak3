@@ -39,6 +39,9 @@ void PSO::DestroyAll()
 }
 
 
+void GraphicsPSO::SetParent(GraphicsPSO* pso) {}
+
+
 void GraphicsPSO::Finalize()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};

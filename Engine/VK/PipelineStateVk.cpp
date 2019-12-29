@@ -87,6 +87,13 @@ void CreateShaderStageInfo(VkPipelineShaderStageCreateInfo& createInfo, const Sh
 } // anonymous namespace
 
 
+void GraphicsPSO::SetParent(GraphicsPSO* pso)
+{
+	m_parentPSO = pso;
+	m_parentPSO->m_isParent = true;
+}
+
+
 void GraphicsPSO::Finalize()
 {
 	vector<VkPipelineShaderStageCreateInfo> shaderStages;
@@ -420,6 +427,21 @@ void GraphicsPSO::Finalize()
 	createInfo.subpass = 0;
 	createInfo.basePipelineHandle = VK_NULL_HANDLE;
 	createInfo.basePipelineIndex = 0;
+
+	if (m_isParent)
+	{
+		createInfo.flags = VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT;
+	}
+
+	if (m_parentPSO != nullptr)
+	{
+		assert_msg(
+			m_parentPSO->GetHandle() != VK_NULL_HANDLE,
+			"Parent PSO has NULL handle.  Make sure to call Finalize() on the parent PSO before calling Finalize() on child PSOs!");
+
+		createInfo.basePipelineHandle = m_parentPSO->GetHandle();
+		createInfo.basePipelineIndex = -1;
+	}
 
 	VkPipelineDynamicStateCreateInfo dynamicStateInfo{ VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO };
 	dynamicStateInfo.pNext = nullptr;

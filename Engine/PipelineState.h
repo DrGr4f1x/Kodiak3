@@ -147,6 +147,9 @@ public:
 
 	PrimitiveTopology GetTopology() const { return m_topology; }
 
+	// Vulkan derivative PSOs
+	void SetParent(GraphicsPSO* pso);
+
 	// Perform validation and compute a hash value for fast state block comparisons
 	void Finalize();
 
@@ -174,6 +177,10 @@ private:
 
 	std::vector<VertexStreamDesc>	m_vertexStreams;
 	std::vector<VertexElementDesc>	m_vertexElements;
+
+	// For Vulkan derivative PSOs
+	GraphicsPSO*				m_parentPSO{ nullptr };
+	bool						m_isParent{ false };
 };
 
 

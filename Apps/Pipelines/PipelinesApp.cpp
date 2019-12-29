@@ -156,15 +156,15 @@ void PipelinesApp::InitPSOs()
 	if (g_enabledFeatures.fillModeNonSolid)
 	{
 		m_wireframePSO = m_phongPSO;
+		m_wireframePSO.SetParent(&m_phongPSO);
 
 		m_wireframePSO.SetRasterizerState(CommonStates::RasterizerWireframe());
 		m_wireframePSO.SetVertexShader("WireframeVS");
 		m_wireframePSO.SetPixelShader("WireframePS");
-
-		m_wireframePSO.Finalize();
 	}
 
 	m_toonPSO = m_phongPSO;
+	m_toonPSO.SetParent(&m_phongPSO);
 
 	m_phongPSO.SetVertexShader("PhongVS");
 	m_phongPSO.SetPixelShader("PhongPS");
@@ -174,6 +174,11 @@ void PipelinesApp::InitPSOs()
 
 	m_phongPSO.Finalize();
 	m_toonPSO.Finalize();
+
+	if (g_enabledFeatures.fillModeNonSolid)
+	{
+		m_wireframePSO.Finalize();
+	}
 }
 
 
@@ -195,9 +200,9 @@ void PipelinesApp::InitResourceSet()
 
 void PipelinesApp::UpdateConstantBuffer()
 {
-	m_vsConstants.projectionMatrix = m_camera.GetViewProjMatrix();
-	m_vsConstants.modelMatrix = Matrix4(kIdentity);
-	m_vsConstants.lightPos = Vector4(0.0f, 2.0f, 1.0f, 0.0f);
+	m_vsConstants.projectionMatrix = m_camera.GetProjMatrix();
+	m_vsConstants.modelMatrix = m_camera.GetViewMatrix();
+	m_vsConstants.lightPos = Vector4(0.0f, 2.0f, -1.0f, 0.0f);
 
 	m_constantBuffer.Update(sizeof(m_vsConstants), &m_vsConstants);
 }
