@@ -72,9 +72,16 @@ public:
 
 	std::string GetWindowTitle() const;
 
+	// Query external features/state
+	bool IsDeveloperModeEnabled() const { return m_isDeveloperModeEnabled; }
+	bool IsRenderDocAvailable() const { return m_isRenderDocAvailable; }
+
 protected:
 	void PrepareUI();
 	void RenderUI(GraphicsContext& context);
+
+	void CheckDeveloperMode();
+	void CheckRenderDoc();
 
 protected:
 	const std::string m_name;
@@ -109,6 +116,10 @@ protected:
 	DepthBufferPtr							m_defaultDepthBuffer;
 
 	std::unique_ptr<UIOverlay>				m_uiOverlay;
+
+	// External features/state
+	bool m_isDeveloperModeEnabled{ false };
+	bool m_isRenderDocAvailable{ false };
 
 private:
 	void Initialize();

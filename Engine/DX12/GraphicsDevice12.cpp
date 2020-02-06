@@ -12,6 +12,7 @@
 
 #include "GraphicsDevice.h"
 
+#include "Application.h"
 #include "GraphicsFeatures.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -69,6 +70,9 @@ void ConfigureInfoQueue(ID3D12Device* device)
 
 			D3D12_MESSAGE_ID_COPY_DESCRIPTORS_INVALID_RANGES,
 
+			// Silence complaints about shaders not being signed by DXIL.dll.  We don't care about this.
+			D3D12_MESSAGE_ID_NON_RETAIL_SHADER_MODEL_WONT_VALIDATE,
+
 			// RESOURCE_BARRIER_DUPLICATE_SUBRESOURCE_TRANSITIONS
 			(D3D12_MESSAGE_ID)1008,
 		};
@@ -85,21 +89,6 @@ void ConfigureInfoQueue(ID3D12Device* device)
 		pInfoQueue->Release();
 	}
 #endif
-}
-
-bool IsDeveloperModeEnabled() 
-{
-	HKEY hKey;
-	auto err = RegOpenKeyExW(HKEY_LOCAL_MACHINE, LR"(SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock)", 0, KEY_READ, &hKey);
-	if (err != ERROR_SUCCESS)
-		return false;
-	DWORD value{};
-	DWORD dwordSize = sizeof(DWORD);
-	err = RegQueryValueExW(hKey, L"AllowDevelopmentWithoutDevLicense", 0, NULL, reinterpret_cast<LPBYTE>(&value), &dwordSize);
-	RegCloseKey(hKey);
-	if (err != ERROR_SUCCESS)
-		return false;
-	return value != 0;
 }
 
 Microsoft::WRL::ComPtr<IDXGISwapChain3> CreateSwapChain(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height)
@@ -370,9 +359,10 @@ void GraphicsDevice::PlatformCreate()
 	}
 #endif
 
-	const bool bIsDeveloperModeEnabled = IsDeveloperModeEnabled();
+	const bool bIsDeveloperModeEnabled = GetApplication()->IsDeveloperModeEnabled();
+	const bool bIsRenderDocAvailable = GetApplication()->IsRenderDocAvailable();
 
-	if (bIsDeveloperModeEnabled)
+	if (bIsDeveloperModeEnabled && !bIsRenderDocAvailable)
 	{
 		ThrowIfFailed(D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModels, nullptr, nullptr));
 	}

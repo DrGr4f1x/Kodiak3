@@ -198,7 +198,8 @@ void GraphicsPSO::Finalize()
 
 	if (firstCompile)
 	{
-		assert_succeeded(GetDevice()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&m_handle)));
+		HRESULT res = GetDevice()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&m_handle));
+		ThrowIfFailed(res);
 		s_graphicsPSOHashMap[hashCode].Attach(m_handle);
 	}
 	else

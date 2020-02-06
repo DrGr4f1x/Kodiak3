@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include "imgui.h"
+#include "renderdoc_app.h"
 
 #pragma comment(lib, "runtimeobject.lib")
 
@@ -254,6 +255,36 @@ void Application::RenderUI(GraphicsContext& context)
 }
 
 
+void Application::CheckDeveloperMode()
+{
+	m_isDeveloperModeEnabled = false;
+
+	HKEY hKey;
+	auto err = RegOpenKeyExW(HKEY_LOCAL_MACHINE, LR"(SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock)", 0, KEY_READ, &hKey);
+	if (err != ERROR_SUCCESS)
+		return;
+	DWORD value{};
+	DWORD dwordSize = sizeof(DWORD);
+	err = RegQueryValueExW(hKey, L"AllowDevelopmentWithoutDevLicense", 0, NULL, reinterpret_cast<LPBYTE>(&value), &dwordSize);
+	RegCloseKey(hKey);
+	if (err != ERROR_SUCCESS)
+		return;
+
+	m_isDeveloperModeEnabled = (value != 0);
+}
+
+
+void Application::CheckRenderDoc()
+{
+	m_isRenderDocAvailable = false;
+
+	if (HMODULE hmod = GetModuleHandleA("renderdoc.dll"))
+	{
+		m_isRenderDocAvailable = true;
+	}
+}
+
+
 void Application::Initialize()
 {
 #if ENABLE_VULKAN_VALIDATION || (defined(DX12) && _DEBUG)
@@ -262,6 +293,11 @@ void Application::Initialize()
 
 	Configure();
 
+	// Check some system state before initializing the graphics device
+	CheckDeveloperMode();
+	CheckRenderDoc();
+
+	// Create and initialize the graphics device
 	m_graphicsDevice = make_unique<GraphicsDevice>();
 	m_graphicsDevice->Initialize(m_name, m_hinst, m_hwnd, m_displayWidth, m_displayHeight);
 
