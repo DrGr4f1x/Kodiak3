@@ -87,6 +87,20 @@ void ConfigureInfoQueue(ID3D12Device* device)
 #endif
 }
 
+bool IsDeveloperModeEnabled() 
+{
+	HKEY hKey;
+	auto err = RegOpenKeyExW(HKEY_LOCAL_MACHINE, LR"(SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock)", 0, KEY_READ, &hKey);
+	if (err != ERROR_SUCCESS)
+		return false;
+	DWORD value{};
+	DWORD dwordSize = sizeof(DWORD);
+	err = RegQueryValueExW(hKey, L"AllowDevelopmentWithoutDevLicense", 0, NULL, reinterpret_cast<LPBYTE>(&value), &dwordSize);
+	RegCloseKey(hKey);
+	if (err != ERROR_SUCCESS)
+		return false;
+	return value != 0;
+}
 
 Microsoft::WRL::ComPtr<IDXGISwapChain3> CreateSwapChain(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height)
 {
@@ -356,7 +370,12 @@ void GraphicsDevice::PlatformCreate()
 	}
 #endif
 
-	ThrowIfFailed(D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModels, nullptr, nullptr));
+	const bool bIsDeveloperModeEnabled = IsDeveloperModeEnabled();
+
+	if (bIsDeveloperModeEnabled)
+	{
+		ThrowIfFailed(D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModels, nullptr, nullptr));
+	}
 
 	// Obtain the DXGI factory
 	Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
@@ -420,26 +439,8 @@ void GraphicsDevice::PlatformCreate()
 #ifndef _RELEASE
 	else
 	{
-		bool bDeveloperModeEnabled = false;
-
-		// Look in the Windows Registry to determine if Developer Mode is enabled
-		HKEY hKey;
-		LSTATUS result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock", 0, KEY_READ, &hKey);
-		if (result == ERROR_SUCCESS)
-		{
-			DWORD keyValue, keySize = sizeof(DWORD);
-			result = RegQueryValueEx(hKey, "AllowDevelopmentWithoutDevLicense", 0, nullptr, (byte*)&keyValue, &keySize);
-			if (result == ERROR_SUCCESS && keyValue == 1)
-			{
-				bDeveloperModeEnabled = true;
-			}
-			RegCloseKey(hKey);
-		}
-
-		warn_once_if_not(bDeveloperModeEnabled, "Enable Developer Mode on Windows 10 to get consistent profiling results");
-
 		// Prevent the GPU from overclocking or underclocking to get consistent timings
-		if (bDeveloperModeEnabled)
+		if (bIsDeveloperModeEnabled)
 		{
 			m_platformData->device->SetStablePowerState(TRUE);
 		}
