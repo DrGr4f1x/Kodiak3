@@ -64,7 +64,9 @@ inline void ThrowIfFailed(HRESULT hr)
 #include <cstdio>
 #include <cstdarg>
 #include <exception>
+#include <fstream>
 #include <functional>
+#include <future>
 #include <locale>
 #include <map>
 #include <memory>
@@ -72,7 +74,9 @@ inline void ThrowIfFailed(HRESULT hr)
 #include <queue>
 #include <set>
 #include <shared_mutex>
+#include <sstream>
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 
@@ -99,6 +103,7 @@ inline std::string MakeStr(const std::wstring& wstr)
 #include "BitmaskEnum.h"
 #include "GraphicsEnums.h"
 #include "Math\CommonMath.h"
+#include "Log.h"
 #include "NonCopyable.h"
 #include "Utility.h"
 #include "VectorMath.h"

@@ -336,6 +336,7 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="InputLayout.h" />
     <ClInclude Include="KTXTextureLoader.h" />
+    <ClInclude Include="Log.h" />
     <ClInclude Include="Math\BoundingPlane.h" />
     <ClInclude Include="Math\BoundingSphere.h" />
     <ClInclude Include="Math\CommonMath.h" />
@@ -532,6 +533,7 @@
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="KTXTextureLoader.cpp" />
+    <ClCompile Include="Log.cpp" />
     <ClCompile Include="Math\Frustum.cpp" />
     <ClCompile Include="Math\Random.cpp" />
     <ClCompile Include="Model.cpp" />

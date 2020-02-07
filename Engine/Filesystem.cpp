@@ -55,6 +55,7 @@ void Filesystem::SetRootDir(const string& rootDir)
 	RemoveAllSearchPaths();
 
 	m_rootDir = rootDir;
+	m_logDir = rootDir + "Logs\\";
 }
 
 
@@ -264,6 +265,23 @@ string Filesystem::GetFileExtension(const std::string& filename)
 	transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
 	return extension;
+}
+
+
+bool Filesystem::EnsureDirectory(const std::string& path)
+{
+	shared_lock<shared_mutex> CS(m_mutex);
+
+	if (IsDirectory(path))
+		return true;
+
+	return (TRUE == CreateDirectoryA(path.c_str(), nullptr));
+}
+
+
+bool Filesystem::EnsureLogDirectory()
+{
+	return EnsureDirectory(m_logDir);
 }
 
 

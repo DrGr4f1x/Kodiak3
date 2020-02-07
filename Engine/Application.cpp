@@ -97,6 +97,8 @@ void Application::Run()
 
 	g_application = this;
 
+	LOG_INFO << appNameWithAPI;
+
 	Initialize();
 
 	ShowWindow(m_hwnd, SW_SHOWDEFAULT);
@@ -292,6 +294,7 @@ void Application::Initialize()
 #endif
 
 	Configure();
+	InitializeLogging();
 
 	// Check some system state before initializing the graphics device
 	CheckDeveloperMode();
@@ -334,6 +337,8 @@ void Application::Finalize()
 	g_input.Shutdown();
 
 	g_application = nullptr;
+
+	ShutdownLogging();
 }
 
 

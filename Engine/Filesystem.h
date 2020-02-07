@@ -42,6 +42,7 @@ public:
 
 	const std::string& GetBinaryDir() const { return m_binaryDir; }
 	const std::string& GetRootDir() const { return m_rootDir; }
+	const std::string& GetLogDir() const { return m_logDir; }
 
 	// Sets root dir to Bin\..
 	void SetDefaultRootDir();
@@ -60,6 +61,9 @@ public:
 	std::string GetFullPath(const std::string& path);
 	std::string GetFileExtension(const std::string& filename);
 
+	bool EnsureDirectory(const std::string& path);
+	bool EnsureLogDirectory();
+
 private:
 	Filesystem();
 	void Initialize();
@@ -70,6 +74,7 @@ private:
 	std::string m_binarySubpath;
 
 	std::string m_rootDir;
+	std::string m_logDir;
 
 	struct PathDesc
 	{

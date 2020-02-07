@@ -303,6 +303,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RaytracingShadows", "Apps\R
 		{8A5E7C54-F164-46A3-A649-886C037F66C5} = {8A5E7C54-F164-46A3-A649-886C037F66C5}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{E3004DC2-A8A4-4C07-9EA4-95134BAB530C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug12|x64 = Debug12|x64
