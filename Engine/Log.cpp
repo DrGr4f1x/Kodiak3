@@ -147,10 +147,11 @@ string LogLevelToString(LogLevel level)
 {
 	switch (level)
 	{
-	case LogLevel::Error:	return string("Error");		break;
+	case LogLevel::Error:	return string("  Error");	break;
 	case LogLevel::Warning:	return string("Warning");	break;
-	case LogLevel::Debug:	return string("Debug");		break;
-	default:				return string("Info");		break;
+	case LogLevel::Debug:	return string("  Debug");	break;
+	case LogLevel::Notice:	return string(" Notice");	break;
+	default:				return string("   Info");	break;
 	}
 }
 

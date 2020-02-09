@@ -52,6 +52,8 @@ float FilterAnalogInput(int val, int deadZone)
 
 void Input::Initialize(HWND hwnd)
 {
+	LOG_NOTICE << "  Initializing input device";
+
 	m_hwnd = hwnd;
 
 	KbmBuildKeyMapping();
@@ -110,6 +112,8 @@ void Input::Initialize(HWND hwnd)
 
 void Input::Shutdown()
 {
+	LOG_NOTICE << "  Shutting down input device";
+
 	if (m_keyboard)
 	{
 		m_keyboard->Unacquire();

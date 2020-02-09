@@ -97,11 +97,13 @@ void Application::Run()
 
 	g_application = this;
 
-	LOG_INFO << appNameWithAPI;
+	LOG_NOTICE << appNameWithAPI;
 
 	Initialize();
 
 	ShowWindow(m_hwnd, SW_SHOWDEFAULT);
+
+	LOG_NOTICE << "Beginning main loop";
 
 	do
 	{
@@ -114,6 +116,8 @@ void Application::Run()
 		if (msg.message == WM_QUIT)
 			break;
 	} while (Tick());	// Returns false to quit loop
+
+	LOG_NOTICE << "Terminating main loop" << endl;
 
 	m_graphicsDevice->WaitForGpuIdle();
 
@@ -263,16 +267,19 @@ void Application::CheckDeveloperMode()
 
 	HKEY hKey;
 	auto err = RegOpenKeyExW(HKEY_LOCAL_MACHINE, LR"(SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock)", 0, KEY_READ, &hKey);
-	if (err != ERROR_SUCCESS)
-		return;
-	DWORD value{};
-	DWORD dwordSize = sizeof(DWORD);
-	err = RegQueryValueExW(hKey, L"AllowDevelopmentWithoutDevLicense", 0, NULL, reinterpret_cast<LPBYTE>(&value), &dwordSize);
-	RegCloseKey(hKey);
-	if (err != ERROR_SUCCESS)
-		return;
-
-	m_isDeveloperModeEnabled = (value != 0);
+	if (err == ERROR_SUCCESS)
+	{
+		DWORD value{};
+		DWORD dwordSize = sizeof(DWORD);
+		err = RegQueryValueExW(hKey, L"AllowDevelopmentWithoutDevLicense", 0, NULL, reinterpret_cast<LPBYTE>(&value), &dwordSize);
+		RegCloseKey(hKey);
+		if (err == ERROR_SUCCESS)
+		{
+			m_isDeveloperModeEnabled = (value != 0);
+		}
+	}
+	
+	LOG_INFO << "  Developer mode is " << (m_isDeveloperModeEnabled ? "enabled" : "not enabled");
 }
 
 
@@ -284,6 +291,8 @@ void Application::CheckRenderDoc()
 	{
 		m_isRenderDocAvailable = true;
 	}
+
+	LOG_INFO << "  RenderDoc is " << (m_isRenderDocAvailable ? "attached" : "not attached");
 }
 
 
@@ -295,6 +304,8 @@ void Application::Initialize()
 
 	Configure();
 	InitializeLogging();
+
+	LOG_NOTICE << "Initializing application";
 
 	// Check some system state before initializing the graphics device
 	CheckDeveloperMode();
@@ -314,11 +325,15 @@ void Application::Initialize()
 	Startup();
 
 	m_isRunning = true;
+
+	LOG_NOTICE << "  Finished initialization" << endl;
 }
 
 
 void Application::Finalize()
 {
+	LOG_NOTICE << "Finalizing application";
+
 	Shutdown();
 
 	m_uiOverlay->Shutdown();
@@ -337,6 +352,8 @@ void Application::Finalize()
 	g_input.Shutdown();
 
 	g_application = nullptr;
+
+	LOG_NOTICE << "  Finished finalization";
 
 	ShutdownLogging();
 }
@@ -402,6 +419,8 @@ bool Application::Tick()
 
 void Application::InitFramebuffer()
 {
+	LOG_NOTICE << "  Initializing default framebuffer";
+
 	// Depth stencil buffer for swap chain
 	m_defaultDepthBuffer = make_shared<DepthBuffer>(1.0f);
 	m_defaultDepthBuffer->Create("Depth Buffer", m_displayWidth, m_displayHeight, m_graphicsDevice->GetDepthFormat());

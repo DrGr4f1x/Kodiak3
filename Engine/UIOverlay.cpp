@@ -27,6 +27,8 @@ using namespace std;
 
 void UIOverlay::Startup(uint32_t width, uint32_t height, Format format, Format depthFormat)
 {
+	LOG_NOTICE << "  Starting up UI overlay";
+
 	m_width = width;
 	m_height = height;
 	m_format = format;
@@ -43,6 +45,8 @@ void UIOverlay::Startup(uint32_t width, uint32_t height, Format format, Format d
 
 void UIOverlay::Shutdown()
 {
+	LOG_NOTICE << "  Shutting down UI overlay";
+
 	m_rootSig.Destroy();
 	m_fontTex.reset();
 }
