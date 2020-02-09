@@ -19,23 +19,13 @@
 
 #define _DISABLE_EXTENDED_ALIGNED_STORAGE
 
-// Windows
+// Windows headers
 #include <windows.h>
 #include <wrl.h>
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 #include <ppl.h>
 #include <ppltasks.h>
-
-#define USE_XINPUT
-#include <XInput.h>
-#pragma comment(lib, "xinput9_1_0.lib")
-
-#define USE_KEYBOARD_MOUSE
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "dxguid.lib")
 
 inline void ThrowIfFailed(HRESULT hr)
 {
@@ -45,7 +35,7 @@ inline void ThrowIfFailed(HRESULT hr)
 	}
 }
 
-// Graphics APIs
+// Graphics API headers
 #if defined(DX12)
 #include "DX12\Platform12.h"
 #elif defined(VK)
@@ -55,21 +45,10 @@ inline void ThrowIfFailed(HRESULT hr)
 #endif
 
 
+// Standard library headers
 #include <array>
-//#include <cstdint>
-//#include <cstdio>
-//#include <cstdarg>
-//#include <exception>
-//#include <functional>
-//#include <map>
-//#include <memory>
-//#include <mutex>
 #include <queue>
-//#include <set>
-//#include <shared_mutex>
 #include <string>
-//#include <unordered_map>
-//#include <vector>
 
 
 // Engine headers

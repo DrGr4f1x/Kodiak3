@@ -17,7 +17,7 @@
 #define NOMINMAX
 #endif
 
-// Windows
+// Windows headers
 #include <windows.h>
 #include <wrl.h>
 #include <DirectXMath.h>
@@ -43,7 +43,7 @@ inline void ThrowIfFailed(HRESULT hr)
 	}
 }
 
-// Graphics APIs
+// Graphics API headers
 #if defined(DX12)
 #include "DX12\Platform12.h"
 #elif defined(VK)
@@ -53,21 +53,10 @@ inline void ThrowIfFailed(HRESULT hr)
 #endif
 
 
+// Standard library headers
 #include <array>
-#include <cstdint>
-#include <cstdio>
-#include <cstdarg>
-#include <exception>
-#include <functional>
-#include <map>
-#include <memory>
-#include <mutex>
 #include <queue>
-#include <set>
-#include <shared_mutex>
 #include <string>
-#include <unordered_map>
-#include <vector>
 
 
 // Engine headers
