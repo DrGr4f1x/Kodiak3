@@ -20,13 +20,10 @@
 // Windows
 #include <windows.h>
 #include <wrl.h>
-#include <Shlwapi.h>
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 #include <ppl.h>
 #include <ppltasks.h>
-
-#pragma comment(lib, "shlwapi.lib")
 
 inline void ThrowIfFailed(HRESULT hr)
 {
@@ -35,15 +32,6 @@ inline void ThrowIfFailed(HRESULT hr)
 		throw;
 	}
 }
-
-// DirectX common
-#if defined(DX12)
-#include <D3Dcompiler.h>
-#include <dxgi1_4.h>
-#include <d2d1_3.h>
-#include <dwrite_2.h>
-#include <wincodec.h>
-#endif
 
 // Graphics APIs
 #if defined(DX12)
@@ -72,24 +60,6 @@ inline void ThrowIfFailed(HRESULT hr)
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-
-inline std::wstring MakeWStr(const std::string& str)
-{
-	using convert_type = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_type, wchar_t> converter;
-
-	return converter.from_bytes(str);
-}
-
-
-inline std::string MakeStr(const std::wstring& wstr)
-{
-	using convert_type = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_type, wchar_t> converter;
-
-	return converter.to_bytes(wstr);
-}
 
 
 // Engine headers

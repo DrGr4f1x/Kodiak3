@@ -142,27 +142,27 @@ void GraphicsPSO::Finalize()
 	// Shaders
 	if (m_vertexShader != nullptr)
 	{
-		desc.VS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(m_vertexShader->GetByteCode()), m_vertexShader->GetByteCodeSize());
+		desc.VS = CD3DX12_SHADER_BYTECODE(m_vertexShader->GetByteCode(), m_vertexShader->GetByteCodeSize());
 	}
 
 	if (m_pixelShader != nullptr)
 	{
-		desc.PS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(m_pixelShader->GetByteCode()), m_pixelShader->GetByteCodeSize());
+		desc.PS = CD3DX12_SHADER_BYTECODE(m_pixelShader->GetByteCode(), m_pixelShader->GetByteCodeSize());
 	}
 
 	if (m_geometryShader != nullptr)
 	{
-		desc.GS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(m_geometryShader->GetByteCode()), m_geometryShader->GetByteCodeSize());
+		desc.GS = CD3DX12_SHADER_BYTECODE(m_geometryShader->GetByteCode(), m_geometryShader->GetByteCodeSize());
 	}
 
 	if (m_hullShader != nullptr)
 	{
-		desc.HS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(m_hullShader->GetByteCode()), m_hullShader->GetByteCodeSize());
+		desc.HS = CD3DX12_SHADER_BYTECODE(m_hullShader->GetByteCode(), m_hullShader->GetByteCodeSize());
 	}
 
 	if (m_domainShader != nullptr)
 	{
-		desc.DS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(m_domainShader->GetByteCode()), m_domainShader->GetByteCodeSize());
+		desc.DS = CD3DX12_SHADER_BYTECODE(m_domainShader->GetByteCode(), m_domainShader->GetByteCodeSize());
 	}
 
 	// Make sure the root signature is finalized first
@@ -220,7 +220,7 @@ void ComputePSO::Finalize()
 	D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
 	desc.NodeMask = 1;
 
-	desc.CS = CD3DX12_SHADER_BYTECODE(const_cast<byte*>(m_computeShader->GetByteCode()), m_computeShader->GetByteCodeSize());
+	desc.CS = CD3DX12_SHADER_BYTECODE(m_computeShader->GetByteCode(), m_computeShader->GetByteCodeSize());
 	
 	// Make sure the root signature is finalized first
 	desc.pRootSignature = m_rootSignature->GetSignature();

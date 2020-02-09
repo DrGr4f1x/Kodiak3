@@ -15,10 +15,20 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="Shaders\ClothCS.hlsl" />
-    <CustomBuild Include="Shaders\ClothPS.hlsl" />
-    <CustomBuild Include="Shaders\ClothVS.hlsl" />
-    <CustomBuild Include="Shaders\SpherePS.hlsl" />
-    <CustomBuild Include="Shaders\SphereVS.hlsl" />
+    <CustomBuild Include="Shaders\ClothCS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ClothPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ClothVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\SpherePS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\SphereVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

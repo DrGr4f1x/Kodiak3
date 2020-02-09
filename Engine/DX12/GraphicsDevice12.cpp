@@ -262,7 +262,10 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &dataOptions, sizeof(dataOptions));
 		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS1, &dataOptions1, sizeof(dataOptions1));
 		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS2, &dataOptions2, sizeof(dataOptions2));
+		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS3, &dataOptions3, sizeof(dataOptions3));
+		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS4, &dataOptions4, sizeof(dataOptions4));
 		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &dataOptions5, sizeof(dataOptions5));
+		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS6, &dataOptions6, sizeof(dataOptions6));
 
 		dataShaderModel.HighestShaderModel = bestShaderModel;
 		device->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &dataShaderModel, sizeof(dataShaderModel));
@@ -293,13 +296,16 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	uint64_t fenceValues[NumSwapChainBuffers]{ 0, 0, 0 };
 
 	D3D_FEATURE_LEVEL bestFeatureLevel{ D3D_FEATURE_LEVEL_11_0 };
-	D3D_SHADER_MODEL bestShaderModel{ D3D_SHADER_MODEL_6_4 };
+	D3D_SHADER_MODEL bestShaderModel{ D3D_SHADER_MODEL_6_5 };
 
 	bool capsRead{ false };
 	D3D12_FEATURE_DATA_D3D12_OPTIONS dataOptions;
 	D3D12_FEATURE_DATA_D3D12_OPTIONS1 dataOptions1;
 	D3D12_FEATURE_DATA_D3D12_OPTIONS2 dataOptions2;
+	D3D12_FEATURE_DATA_D3D12_OPTIONS3 dataOptions3;
+	D3D12_FEATURE_DATA_D3D12_OPTIONS4 dataOptions4;
 	D3D12_FEATURE_DATA_D3D12_OPTIONS5 dataOptions5;
+	D3D12_FEATURE_DATA_D3D12_OPTIONS6 dataOptions6;
 	D3D12_FEATURE_DATA_SHADER_MODEL dataShaderModel;
 
 	vector<string> unsupportedRequiredFeatures;

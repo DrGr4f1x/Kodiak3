@@ -86,7 +86,7 @@ public:
 	void Create(TextureInitializer& init);
 
 	// Get pointer to retained data
-	const byte* GetData() const
+	const uint8_t* GetData() const
 	{
 		assert(m_retainData);
 		return m_data.get();
@@ -112,7 +112,7 @@ protected:
 protected:
 	ShaderResourceView m_srv;
 
-	std::unique_ptr<byte[]>		m_data;
+	std::unique_ptr<uint8_t[]>		m_data;
 	size_t						m_dataSize{ 0 };
 	bool						m_retainData{ false };
 };

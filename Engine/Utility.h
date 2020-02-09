@@ -132,7 +132,6 @@ void SIMDMemCopy(void* __restrict dest, const void* __restrict source, size_t nu
 void SIMDMemFill(void* __restrict dest, __m128 fillVector, size_t numQuadwords);
 
 
-
 // Smart pointer helpers
 struct HandleCloser
 {
@@ -144,4 +143,45 @@ typedef public std::unique_ptr<void, HandleCloser> ScopedHandle;
 inline HANDLE SafeHandle(HANDLE h)
 {
 	return (h == INVALID_HANDLE_VALUE) ? 0 : h;
+}
+
+
+// wstring-string and string-wstring converters
+inline std::wstring MakeWStr(const std::string& str)
+{
+	if (str.empty())
+	{
+		return std::wstring();
+	}
+	int numChars = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, str.c_str(), (int)str.size(), nullptr, 0);
+	std::wstring wstr;
+	if (numChars)
+	{
+		wstr.resize(numChars);
+		if (MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, str.c_str(), (int)str.size(), &wstr[0], numChars))
+		{
+			return wstr;
+		}
+	}
+	return std::wstring();
+}
+
+
+inline std::string MakeStr(const std::wstring& wstr)
+{
+	if (wstr.empty())
+	{
+		return std::string();
+	}
+	int numChars = WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS, wstr.c_str(), (int)wstr.size(), nullptr, 0, nullptr, nullptr);
+	std::string str;
+	if (numChars)
+	{
+		str.resize(numChars);
+		if (WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS, wstr.c_str(), (int)wstr.size(), &str[0], numChars, nullptr, nullptr))
+		{
+			return str;
+		}
+	}
+	return std::string();
 }

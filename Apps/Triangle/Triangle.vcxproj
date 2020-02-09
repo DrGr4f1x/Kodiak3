@@ -127,6 +127,7 @@
       <PreprocessorDefinitions>_MBCS;DX12;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\;</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\Engine\Bin;</AdditionalLibraryDirectories>
@@ -141,6 +142,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;VK;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;$(ProjectDir)..\..\Engine\Bin;</AdditionalLibraryDirectories>
@@ -157,6 +159,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;VK;_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -175,6 +178,7 @@
       <PreprocessorDefinitions>_MBCS;DX12;_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\;</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -194,6 +198,7 @@
       <PreprocessorDefinitions>_MBCS;DX12;_PROFILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\;</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -207,6 +212,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;VK;_PROFILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;$(ProjectDir)..\..\Engine\Bin;</AdditionalLibraryDirectories>

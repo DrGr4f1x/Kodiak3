@@ -29,7 +29,7 @@ BinaryReader::BinaryReader(const string& fileName)
 
 
 // Constructor reads from existing memory buffer
-BinaryReader::BinaryReader(const byte* dataBlob, size_t dataSize)
+BinaryReader::BinaryReader(const uint8_t* dataBlob, size_t dataSize)
 {
 	m_pos = dataBlob;
 	m_end = dataBlob + dataSize;
@@ -37,7 +37,7 @@ BinaryReader::BinaryReader(const byte* dataBlob, size_t dataSize)
 
 
 // Reads from the filesystem into memory
-HRESULT BinaryReader::ReadEntireFile(const string& fileName, unique_ptr<byte[]>& data, size_t* dataSize)
+HRESULT BinaryReader::ReadEntireFile(const string& fileName, unique_ptr<uint8_t[]>& data, size_t* dataSize)
 {
 	ScopedHandle hFile(SafeHandle(CreateFileA(fileName.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr)));
 
@@ -65,7 +65,7 @@ HRESULT BinaryReader::ReadEntireFile(const string& fileName, unique_ptr<byte[]>&
 	}
 
 	// Create enough space for the file data.
-	data.reset(new byte[fileSize.LowPart]);
+	data.reset(new uint8_t[fileSize.LowPart]);
 
 	if (!data)
 	{

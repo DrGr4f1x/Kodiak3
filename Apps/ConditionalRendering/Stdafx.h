@@ -36,15 +36,6 @@ inline void ThrowIfFailed(HRESULT hr)
 	}
 }
 
-// DirectX common
-#if defined(DX12)
-#include <D3Dcompiler.h>
-#include <dxgi1_4.h>
-#include <d2d1_3.h>
-#include <dwrite_2.h>
-#include <wincodec.h>
-#endif
-
 // Graphics APIs
 #if defined(DX12)
 #include "DX12\Platform12.h"
@@ -56,13 +47,11 @@ inline void ThrowIfFailed(HRESULT hr)
 
 
 #include <array>
-#include <codecvt>
 #include <cstdint>
 #include <cstdio>
 #include <cstdarg>
 #include <exception>
 #include <functional>
-#include <locale>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -72,24 +61,6 @@ inline void ThrowIfFailed(HRESULT hr)
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-
-inline std::wstring MakeWStr(const std::string& str)
-{
-	using convert_type = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_type, wchar_t> converter;
-
-	return converter.from_bytes(str);
-}
-
-
-inline std::string MakeStr(const std::wstring& wstr)
-{
-	using convert_type = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_type, wchar_t> converter;
-
-	return converter.to_bytes(wstr);
-}
 
 
 // Engine headers

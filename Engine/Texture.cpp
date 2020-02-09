@@ -167,7 +167,7 @@ void Texture::LoadTexture(const string& fullpath, Format format, bool sRgb)
 	if (m_retainData)
 	{
 		m_dataSize = x * y * n;
-		m_data.reset(new byte[m_dataSize]);
+		m_data.reset(new uint8_t[m_dataSize]);
 		memcpy(m_data.get(), data, m_dataSize);
 	}
 

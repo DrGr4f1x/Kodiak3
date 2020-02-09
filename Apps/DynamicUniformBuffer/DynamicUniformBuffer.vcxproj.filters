@@ -21,7 +21,11 @@
     <CustomBuild Include="Shaders\BaseVS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\BasePS.glsl" />
-    <CustomBuild Include="Shaders\BaseVS.glsl" />
+    <CustomBuild Include="Shaders\BaseVS.glsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\BasePS.glsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

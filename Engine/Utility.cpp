@@ -115,7 +115,7 @@ void SIMDMemFill(void* __restrict _dest, __m128 fillVector, size_t numQuadwords)
 {
 	assert(Math::IsAligned(_dest, 16));
 
-	register const __m128i source = _mm_castps_si128(fillVector);
+	const __m128i source = _mm_castps_si128(fillVector);
 	__m128i* __restrict dest = (__m128i* __restrict)_dest;
 
 	switch (((size_t)dest >> 4) & 3)

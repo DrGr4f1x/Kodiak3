@@ -26,8 +26,8 @@ struct Defaults
 	static const uint32_t DepthBias;
 	static const float DepthBiasClamp;
 	static const float SlopeScaledDepthBias;
-	static const byte StencilReadMask;
-	static const byte StencilWriteMask;
+	static const uint8_t StencilReadMask;
+	static const uint8_t StencilWriteMask;
 	static const float Float32Max;
 };
 
@@ -338,6 +338,51 @@ inline bool IsTextureResource(ResourceType type)
 inline bool IsBufferResource(ResourceType type)
 {
 	return (type > ResourceType::Texture3D);
+}
+
+
+enum class GpuVendor
+{
+	Unknown,
+	AMD,
+	Intel,
+	NVIDIA
+};
+
+inline std::string GpuVendorToString(GpuVendor vendor)
+{
+	switch (vendor)
+	{
+	case GpuVendor::AMD:	return std::string("AMD");			break;
+	case GpuVendor::Intel:	return std::string("Intel");		break;
+	case GpuVendor::NVIDIA:	return std::string("NVIDIA");		break;
+	default:				return std::string("<Unknown>");	break;
+	}
+}
+
+inline GpuVendor VendorIdToGpuVendor(uint32_t vendorId)
+{
+	switch (vendorId)
+	{
+	case 0x10de:	
+		return GpuVendor::NVIDIA;	
+		break;
+
+	case 0x1002:
+	case 0x1022:
+		return GpuVendor::AMD;		
+		break;
+
+	case 0x163c:
+	case 0x8086:
+	case 0x8087:
+		return GpuVendor::Intel;
+		break;
+
+	default:
+		return GpuVendor::Unknown;
+		break;
+	}
 }
 
 } // namespace Kodiak

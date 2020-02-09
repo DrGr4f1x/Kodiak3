@@ -269,8 +269,8 @@ void Texture3dApp::InitTexture()
 	uint32_t height = 256;
 	uint32_t depth = 256;
 
-	unique_ptr<byte[]> data;
-	data.reset(new byte[width * height * depth]);
+	unique_ptr<uint8_t[]> data;
+	data.reset(new uint8_t[width * height * depth]);
 
 	PerlinNoise<float> perlinNoise;
 	FractalNoise<float> fractalNoise(perlinNoise);

@@ -26,7 +26,7 @@ struct HSConstantOutput
 };
 
 
-[[vk::binding(0,0)]]
+//[[vk::binding(0,0)]]
 cbuffer HSConstants : register(b0)
 {
 	float tessLevel;
@@ -59,7 +59,7 @@ struct HSOutput
 [outputtopology("triangle_ccw")]
 [outputcontrolpoints(OUTPUT_PATCH_SIZE)]
 [patchconstantfunc("HSConstantMain")]
-HSOutput main(InputPatch<HSInput, INPUT_PATCH_SIZE> inputPatch, uint i : SV_OutputControlPointID, uint patchId : SV_PrimitiveID)
+HSOutput main(InputPatch<HSInput, INPUT_PATCH_SIZE> inputPatch, uint i : SV_OutputControlPointID)
 {
 	HSOutput output = (HSOutput)0;
 

@@ -663,7 +663,7 @@ inline ResourceType GetTarget(const KTXHeader10& header)
 
 
 HRESULT Kodiak::CreateKTXTextureFromMemory(
-	const byte* ktxData,
+	const uint8_t* ktxData,
 	size_t ktxDataSize,
 	size_t maxsize,
 	Format format,

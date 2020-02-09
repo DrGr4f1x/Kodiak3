@@ -156,10 +156,10 @@ struct TextureInitializer::PlatformData
 {
 	PlatformData(uint32_t numMips) : faceOffsets(numMips) {}
 
-	unique_ptr<byte[]>	data;
-	vector<size_t>		faceOffsets;
-	size_t				arraySliceSize{ 0 };
-	size_t				totalSize{ 0 };
+	unique_ptr<uint8_t[]>	data;
+	vector<size_t>			faceOffsets;
+	size_t					arraySliceSize{ 0 };
+	size_t					totalSize{ 0 };
 };
 
 } // namespace Kodiak
@@ -243,7 +243,7 @@ void TextureInitializer::PlatformCreate()
 		}
 	}
 
-	m_platformData->data.reset(new byte[sizeBytes]);
+	m_platformData->data.reset(new uint8_t[sizeBytes]);
 	m_platformData->totalSize = sizeBytes;
 }
 

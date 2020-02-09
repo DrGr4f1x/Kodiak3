@@ -22,8 +22,8 @@ namespace Kodiak
 const uint32_t Defaults::DepthBias = 0;
 const float Defaults::SlopeScaledDepthBias = 0.0f;
 const float Defaults::DepthBiasClamp = 0.0f;
-const byte Defaults::StencilReadMask = 0xFF;
-const byte Defaults::StencilWriteMask = 0xFF;
+const uint8_t Defaults::StencilReadMask = 0xFF;
+const uint8_t Defaults::StencilWriteMask = 0xFF;
 const float Defaults::Float32Max = FLT_MAX;
 
 const uint32_t Limits::ConstantBufferAlignment = 256;

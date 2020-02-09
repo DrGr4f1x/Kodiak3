@@ -22,8 +22,8 @@ namespace Kodiak
 const uint32_t Defaults::DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
 const float Defaults::SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
 const float Defaults::DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
-const byte Defaults::StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
-const byte Defaults::StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+const uint8_t Defaults::StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+const uint8_t Defaults::StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
 const float Defaults::Float32Max = D3D12_FLOAT32_MAX;
 
 const uint32_t Limits::ConstantBufferAlignment = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;

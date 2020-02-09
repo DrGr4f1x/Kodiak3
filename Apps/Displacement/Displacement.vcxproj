@@ -144,6 +144,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_RELEASE;VK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,6 +165,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_RELEASE;DX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -184,6 +186,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_PROFILE;DX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -204,6 +207,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_PROFILE;VK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -222,6 +226,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;DX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -238,6 +243,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;VK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\Engine\;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -265,9 +271,9 @@
   <ItemGroup>
     <CustomBuild Include="Shaders\BasePS.hlsl">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">fxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">fxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">fxc.exe -T ps_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Compiling HLSL to DXIL...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Compiling HLSL to DXIL...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Compiling HLSL to DXIL...</Message>
@@ -286,9 +292,9 @@
     </CustomBuild>
     <CustomBuild Include="Shaders\BaseVS.hlsl">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">fxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">fxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">fxc.exe -T vs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Compiling HLSL to DXIL...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Compiling HLSL to DXIL...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Compiling HLSL to DXIL...</Message>
@@ -307,9 +313,9 @@
     </CustomBuild>
     <CustomBuild Include="Shaders\DisplacementHS.hlsl">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T hs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T hs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T hs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">fxc.exe -T hs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">fxc.exe -T hs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">fxc.exe -T hs_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Compiling HLSL to DXIL...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Compiling HLSL to DXIL...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Compiling HLSL to DXIL...</Message>
@@ -328,9 +334,9 @@
     </CustomBuild>
     <CustomBuild Include="Shaders\DisplacementDS.hlsl">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ds_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ds_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(SolutionDir)Tools\DXC\dxc.exe -T ds_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">fxc.exe -T ds_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">fxc.exe -T ds_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">fxc.exe -T ds_5_0 %(Fullpath) -Fo $(ProjectDir)Data\Shaders\DXIL\%(Filename).cso</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Compiling HLSL to DXIL...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Compiling HLSL to DXIL...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Compiling HLSL to DXIL...</Message>

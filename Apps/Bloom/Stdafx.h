@@ -22,13 +22,10 @@
 // Windows
 #include <windows.h>
 #include <wrl.h>
-#include <Shlwapi.h>
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 #include <ppl.h>
 #include <ppltasks.h>
-
-#pragma comment(lib, "shlwapi.lib")
 
 #define USE_XINPUT
 #include <XInput.h>
@@ -47,15 +44,6 @@ inline void ThrowIfFailed(HRESULT hr)
 		throw;
 	}
 }
-
-// DirectX common
-#if defined(DX12)
-#include <D3Dcompiler.h>
-#include <dxgi1_4.h>
-#include <d2d1_3.h>
-#include <dwrite_2.h>
-#include <wincodec.h>
-#endif
 
 // Graphics APIs
 #if defined(DX12)

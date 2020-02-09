@@ -114,7 +114,7 @@ void IndexBuffer::Update(size_t sizeInBytes, size_t offset, const void* data)
 	CD3DX12_RANGE readRange(0, 0);
 
 	// Map uniform buffer and update it
-	byte* pData = nullptr;
+	uint8_t* pData = nullptr;
 	ThrowIfFailed(m_resource->Map(0, &readRange, reinterpret_cast<void**>(&pData)));
 	memcpy((void*)(pData + offset), data, sizeInBytes);
 	// Unmap after data has been copied
@@ -146,7 +146,7 @@ void VertexBuffer::Update(size_t sizeInBytes, size_t offset, const void* data)
 	CD3DX12_RANGE readRange(0, 0);
 
 	// Map uniform buffer and update it
-	byte* pData = nullptr;
+	uint8_t* pData = nullptr;
 	ThrowIfFailed(m_resource->Map(0, &readRange, reinterpret_cast<void**>(&pData)));
 	memcpy((void*)(pData + offset), data, sizeInBytes);
 	// Unmap after data has been copied
@@ -178,7 +178,7 @@ void ConstantBuffer::Update(size_t sizeInBytes, size_t offset, const void* data)
 	CD3DX12_RANGE readRange(0, 0);
 
 	// Map uniform buffer and update it
-	byte* pData = nullptr;
+	uint8_t* pData = nullptr;
 	ThrowIfFailed(m_resource->Map(0, &readRange, reinterpret_cast<void**>(&pData)));
 	memcpy((void*)(pData + offset), data, sizeInBytes);
 	// Unmap after data has been copied

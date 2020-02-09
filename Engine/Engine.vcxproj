@@ -135,6 +135,7 @@
       <PreprocessorDefinitions>_MBCS;DX12;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(ProjectDir)..\Extern\renderdoc;</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)12_d.pdb</ProgramDataBaseFileName>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>assimp-vc142-mtd.lib;IrrXMLd.lib;zlibstaticd.lib;ImGui_d.lib</AdditionalDependencies>
@@ -152,6 +153,7 @@
       <PreprocessorDefinitions>_MBCS;VK;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(ProjectDir)..\Extern\renderdoc;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)Vk_d.pdb</ProgramDataBaseFileName>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>assimp-vc142-mtd.lib;IrrXMLd.lib;zlibstaticd.lib;ImGui_d.lib</AdditionalDependencies>
@@ -171,6 +173,7 @@
       <PreprocessorDefinitions>_MBCS;DX12;_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(ProjectDir)..\Extern\renderdoc;</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)12.pdb</ProgramDataBaseFileName>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -194,6 +197,7 @@
       <PreprocessorDefinitions>_MBCS;DX12;_PROFILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(ProjectDir)..\Extern\renderdoc;</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)12_p.pdb</ProgramDataBaseFileName>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -217,6 +221,7 @@
       <PreprocessorDefinitions>_MBCS;VK;_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(ProjectDir)..\Extern\renderdoc;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)Vk.pdb</ProgramDataBaseFileName>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -240,6 +245,7 @@
       <PreprocessorDefinitions>_MBCS;VK;_PROFILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(ProjectDir)..\Extern\renderdoc;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)Vk_p.pdb</ProgramDataBaseFileName>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

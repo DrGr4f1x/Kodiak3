@@ -11,7 +11,6 @@
 
 #include "Filesystem.h"
 
-#include <Shlwapi.h>
 
 using namespace Kodiak;
 using namespace std;
@@ -288,6 +287,8 @@ bool Filesystem::EnsureLogDirectory()
 void Filesystem::Initialize()
 {
 	unique_lock<shared_mutex> CS(m_mutex);
+
+	LOG_INFO << "Current path: " << filesystem::current_path();
 
 	// Get Path
 	string path;

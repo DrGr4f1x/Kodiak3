@@ -83,7 +83,7 @@ void DynamicUniformBufferApp::Render()
 	{
 		uint32_t dynamicOffset = i * (uint32_t)m_dynamicAlignment;
 		
-		context.SetConstantArray(0, 16, (byte*)(m_vsModelConstants.modelMatrix) + dynamicOffset, 32);
+		context.SetConstantArray(0, 16, (uint8_t*)(m_vsModelConstants.modelMatrix) + dynamicOffset, 32);
 
 		context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 	}

@@ -18,7 +18,7 @@ public:
 	// Reads from a file on disk
 	explicit BinaryReader(const std::string& fileName);
 	// Reads from an existing memory buffer
-	BinaryReader(const byte* dataBlob, size_t size);
+	BinaryReader(const uint8_t* dataBlob, size_t size);
 
 	// Reads a single value
 	template<typename T> const T& Read()
@@ -45,14 +45,14 @@ public:
 	}
 
 	// Lower level helper reads directly from filesystem into memory
-	static HRESULT ReadEntireFile(const std::string& fileName, std::unique_ptr<byte[]>& data, size_t* dataSize);
+	static HRESULT ReadEntireFile(const std::string& fileName, std::unique_ptr<uint8_t[]>& data, size_t* dataSize);
 
 private:
 	// Data currently being read
-	const byte* m_pos{ nullptr };
-	const byte* m_end{ nullptr };
+	const uint8_t* m_pos{ nullptr };
+	const uint8_t* m_end{ nullptr };
 
-	std::unique_ptr<byte[]> m_ownedData;
+	std::unique_ptr<uint8_t[]> m_ownedData;
 
 	// Prevent copying 
 	BinaryReader(const BinaryReader&) = delete;

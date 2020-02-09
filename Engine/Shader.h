@@ -20,7 +20,7 @@ public:
 
 	Shader(const std::string& shaderPath);
 
-	const byte* GetByteCode() const { return m_byteCode.get(); }
+	const uint8_t* GetByteCode() const { return m_byteCode.get(); }
 	size_t GetByteCodeSize() const { return m_byteCodeSize; }
 
 	const std::string& GetPath() const { return m_shaderPath; }
@@ -29,7 +29,7 @@ private:
 	void WaitForLoad() const;
 
 private:
-	std::unique_ptr<byte[]>		m_byteCode;
+	std::unique_ptr<uint8_t[]>		m_byteCode;
 	size_t						m_byteCodeSize{ 0 };
 
 	bool						m_isLoaded{ false };
