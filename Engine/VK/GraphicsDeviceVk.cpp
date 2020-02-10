@@ -31,7 +31,11 @@ using namespace Utility;
 using namespace std;
 
 
-PFN_vkCmdPushDescriptorSetKHR ext_vkCmdPushDescriptorSetKHR = VK_NULL_HANDLE;
+// Extension methods
+PFN_vkCmdPushDescriptorSetKHR vkCmdPushDescriptorSet{ nullptr };
+PFN_vkCmdDebugMarkerBeginEXT vkCmdDebugMarkerBegin{ nullptr };
+PFN_vkCmdDebugMarkerEndEXT vkCmdDebugMarkerEnd{ nullptr };
+PFN_vkCmdDebugMarkerInsertEXT vkCmdDebugMarkerInsert{ nullptr };
 
 
 namespace
@@ -126,9 +130,6 @@ Format DepthFormat = Format::D32_Float_S8_UInt;
 #if ENABLE_VULKAN_DEBUG_MARKUP
 PFN_vkDebugMarkerSetObjectTagEXT vkDebugMarkerSetObjectTag{ nullptr };
 PFN_vkDebugMarkerSetObjectNameEXT vkDebugMarkerSetObjectName{ nullptr };
-PFN_vkCmdDebugMarkerBeginEXT vkCmdDebugMarkerBegin{ nullptr };
-PFN_vkCmdDebugMarkerEndEXT vkCmdDebugMarkerEnd{ nullptr };
-PFN_vkCmdDebugMarkerInsertEXT vkCmdDebugMarkerInsert{ nullptr };
 
 bool g_debugMarkupAvailable = false;
 

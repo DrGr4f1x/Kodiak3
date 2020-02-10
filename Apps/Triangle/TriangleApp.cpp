@@ -86,7 +86,7 @@ bool TriangleApp::Update()
 
 void TriangleApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Scene");
+	auto& context = GraphicsContext::Begin("Frame");
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(GetDepthBuffer(), ResourceState::DepthWrite);

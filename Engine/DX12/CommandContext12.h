@@ -87,6 +87,11 @@ public:
 	// Flush existing commands and release the current context
 	uint64_t Finish(bool waitForCompletion = false);
 
+	// Debug events and markers
+	void BeginEvent(const std::string& label);
+	void EndEvent();
+	void SetMarker(const std::string& label);
+
 	// Prepare to render by reserving a command list
 	void Initialize();
 
@@ -149,6 +154,8 @@ protected:
 	std::string m_id;
 
 	CommandListType m_type;
+
+	bool m_hasPendingDebugEvent{ false };
 
 private:
 	CommandContext(CommandListType type);

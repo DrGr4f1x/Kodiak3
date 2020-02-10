@@ -14,4 +14,7 @@
     <ClCompile Include="$(ProjectDir)imgui\imgui_draw.cpp" />
     <ClCompile Include="$(ProjectDir)imgui\imgui_widgets.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>

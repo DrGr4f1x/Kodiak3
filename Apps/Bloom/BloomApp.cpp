@@ -91,49 +91,64 @@ void BloomApp::UpdateUI()
 
 void BloomApp::Render()
 {
-	auto& context = GraphicsContext::Begin("Scene");
+	auto& context = GraphicsContext::Begin("Frame");
 
 	// Offscreen color pass
 
 	if (m_bloom)
 	{
+		context.BeginEvent("Offscreen pass");
+
 		context.TransitionResource(*m_offscreenFramebuffer[0]->GetColorBuffer(0), ResourceState::RenderTarget);
 		context.TransitionResource(*m_offscreenFramebuffer[0]->GetDepthBuffer(), ResourceState::DepthWrite);
 		context.ClearColor(*m_offscreenFramebuffer[0]->GetColorBuffer(0));
 		context.ClearDepth(*m_offscreenFramebuffer[0]->GetDepthBuffer());
 
-		context.BeginRenderPass(*m_offscreenFramebuffer[0]);
-
-		context.SetViewportAndScissor(0u, 0u, 256, 256);
-
 		// 3D scene (glow pass)
-		context.SetRootSignature(m_sceneRootSig);
-		context.SetPipelineState(m_colorPassPSO);
+		{
+			context.BeginEvent("Glow pass");
 
-		context.SetResources(m_sceneResources);
+			context.BeginRenderPass(*m_offscreenFramebuffer[0]);
 
-		context.SetIndexBuffer(m_ufoGlowModel->GetIndexBuffer());
-		context.SetVertexBuffer(0, m_ufoGlowModel->GetVertexBuffer());
+			context.SetViewportAndScissor(0u, 0u, 256, 256);
 
-		context.DrawIndexed((uint32_t)m_ufoGlowModel->GetIndexBuffer().GetElementCount());
+			context.SetRootSignature(m_sceneRootSig);
+			context.SetPipelineState(m_colorPassPSO);
 
-		context.EndRenderPass();
+			context.SetResources(m_sceneResources);
 
+			context.SetIndexBuffer(m_ufoGlowModel->GetIndexBuffer());
+			context.SetVertexBuffer(0, m_ufoGlowModel->GetVertexBuffer());
+
+			context.DrawIndexed((uint32_t)m_ufoGlowModel->GetIndexBuffer().GetElementCount());
+
+			context.EndRenderPass();
+
+			context.EndEvent();
+		}
+		
 		// Vertical blur pass
+		{
+			context.BeginEvent("Vertical blur");
 
-		context.TransitionResource(*m_offscreenFramebuffer[0]->GetColorBuffer(0), ResourceState::PixelShaderResource);
-		context.TransitionResource(*m_offscreenFramebuffer[1]->GetColorBuffer(0), ResourceState::RenderTarget);
-		context.ClearColor(*m_offscreenFramebuffer[1]->GetColorBuffer(0));
+			context.TransitionResource(*m_offscreenFramebuffer[0]->GetColorBuffer(0), ResourceState::PixelShaderResource);
+			context.TransitionResource(*m_offscreenFramebuffer[1]->GetColorBuffer(0), ResourceState::RenderTarget);
+			context.ClearColor(*m_offscreenFramebuffer[1]->GetColorBuffer(0));
 
-		context.BeginRenderPass(*m_offscreenFramebuffer[1]);
+			context.BeginRenderPass(*m_offscreenFramebuffer[1]);
 
-		context.SetRootSignature(m_blurRootSig);
-		context.SetPipelineState(m_blurVertPSO);
+			context.SetRootSignature(m_blurRootSig);
+			context.SetPipelineState(m_blurVertPSO);
 
-		context.SetResources(m_blurVertResources);
-		context.Draw(3);
+			context.SetResources(m_blurVertResources);
+			context.Draw(3);
 
-		context.EndRenderPass();
+			context.EndRenderPass();
+
+			context.EndEvent();
+		}
+
+		context.EndEvent();
 	}
 	else
 	{
@@ -142,6 +157,8 @@ void BloomApp::Render()
 	}
 
 	// Backbuffer color pass
+
+	context.BeginEvent("Color pass");
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);
 	context.TransitionResource(*m_offscreenFramebuffer[1]->GetColorBuffer(0), ResourceState::PixelShaderResource);
@@ -154,33 +171,51 @@ void BloomApp::Render()
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 	   
 	// Skybox
-	context.SetRootSignature(m_skyboxRootSig);
-	context.SetPipelineState(m_skyboxPSO);
+	{
+		context.BeginEvent("Skybox");
 
-	context.SetResources(m_skyboxResources);
+		context.SetRootSignature(m_skyboxRootSig);
+		context.SetPipelineState(m_skyboxPSO);
 
-	context.SetIndexBuffer(m_skyboxModel->GetIndexBuffer());
-	context.SetVertexBuffer(0, m_skyboxModel->GetVertexBuffer());
+		context.SetResources(m_skyboxResources);
 
-	context.DrawIndexed((uint32_t)m_skyboxModel->GetIndexBuffer().GetElementCount());
+		context.SetIndexBuffer(m_skyboxModel->GetIndexBuffer());
+		context.SetVertexBuffer(0, m_skyboxModel->GetVertexBuffer());
+
+		context.DrawIndexed((uint32_t)m_skyboxModel->GetIndexBuffer().GetElementCount());
+
+		context.EndEvent();
+	}
 
 	// 3D scene (phong pass)
-	context.SetRootSignature(m_sceneRootSig);
-	context.SetPipelineState(m_phongPassPSO);
+	{
+		context.BeginEvent("Phong pass");
 
-	context.SetResources(m_sceneResources);
+		context.SetRootSignature(m_sceneRootSig);
+		context.SetPipelineState(m_phongPassPSO);
 
-	context.SetIndexBuffer(m_ufoModel->GetIndexBuffer());
-	context.SetVertexBuffer(0, m_ufoModel->GetVertexBuffer());
+		context.SetResources(m_sceneResources);
 
-	context.DrawIndexed((uint32_t)m_ufoModel->GetIndexBuffer().GetElementCount());
+		context.SetIndexBuffer(m_ufoModel->GetIndexBuffer());
+		context.SetVertexBuffer(0, m_ufoModel->GetVertexBuffer());
+
+		context.DrawIndexed((uint32_t)m_ufoModel->GetIndexBuffer().GetElementCount());
+
+		context.EndEvent();
+	}
 
 	// Horizontal blur pass
-	context.SetRootSignature(m_blurRootSig);
-	context.SetPipelineState(m_blurHorizPSO);
+	{
+		context.BeginEvent("Horizontal blur");
 
-	context.SetResources(m_blurHorizResources);
-	context.Draw(3);
+		context.SetRootSignature(m_blurRootSig);
+		context.SetPipelineState(m_blurHorizPSO);
+
+		context.SetResources(m_blurHorizResources);
+		context.Draw(3);
+
+		context.EndEvent();
+	}
 
 	RenderUI(context);
 

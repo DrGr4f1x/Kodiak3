@@ -65,6 +65,11 @@ public:
 	// Flush existing commands and release the current context
 	void Finish(bool waitForCompletion = false);
 
+	// Debug events and markers
+	void BeginEvent(const std::string& label);
+	void EndEvent();
+	void SetMarker(const std::string& label);
+
 	// Prepare to render by reserving a command list
 	void Initialize();
 
@@ -98,6 +103,8 @@ protected:
 	VkShaderStageFlags m_shaderStages[8];
 
 	VkSemaphore m_signalSemaphore{ VK_NULL_HANDLE };
+
+	bool m_hasPendingDebugEvent{ false };
 
 private:
 	CommandContext(CommandListType type);

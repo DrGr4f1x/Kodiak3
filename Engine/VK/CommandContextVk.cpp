@@ -25,7 +25,11 @@ using namespace Kodiak;
 using namespace std;
 
 
-extern PFN_vkCmdPushDescriptorSetKHR ext_vkCmdPushDescriptorSetKHR;
+// Extension methods
+extern PFN_vkCmdPushDescriptorSetKHR vkCmdPushDescriptorSet;
+extern PFN_vkCmdDebugMarkerBeginEXT vkCmdDebugMarkerBegin;
+extern PFN_vkCmdDebugMarkerEndEXT vkCmdDebugMarkerEnd;
+extern PFN_vkCmdDebugMarkerInsertEXT vkCmdDebugMarkerInsert;
 
 
 ContextManager g_contextManager;
@@ -138,6 +142,14 @@ CommandContext& CommandContext::Begin(const string ID)
 
 	vkBeginCommandBuffer(newContext->m_commandList, &beginInfo);
 
+#if ENABLE_VULKAN_DEBUG_MARKUP
+	if (!ID.empty())
+	{
+		newContext->BeginEvent(ID);
+		newContext->m_hasPendingDebugEvent = true;
+	}
+#endif
+
 	return *newContext;
 }
 
@@ -153,6 +165,14 @@ void CommandContext::Finish(bool waitForCompletion)
 	if (m_ID.length() > 0)
 	{
 		EngineProfiling::EndBlock(this);
+	}
+#endif
+
+#if ENABLE_VULKAN_DEBUG_MARKUP
+	if (m_hasPendingDebugEvent)
+	{
+		EndEvent();
+		m_hasPendingDebugEvent = false;
 	}
 #endif
 
@@ -175,6 +195,53 @@ void CommandContext::Finish(bool waitForCompletion)
 	}
 
 	g_contextManager.FreeContext(this);
+}
+
+
+void CommandContext::BeginEvent(const string& label)
+{
+#if ENABLE_VULKAN_DEBUG_MARKUP
+	if (vkCmdDebugMarkerBegin)
+	{
+		VkDebugMarkerMarkerInfoEXT markerInfo = {};
+		markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
+		markerInfo.color[0] = 0.0f;
+		markerInfo.color[1] = 0.0f;
+		markerInfo.color[2] = 0.0f;
+		markerInfo.color[3] = 0.0f;
+		markerInfo.pMarkerName = label.c_str();
+		vkCmdDebugMarkerBegin(m_commandList, &markerInfo);
+	}
+#endif
+}
+
+
+void CommandContext::EndEvent()
+{
+#if ENABLE_VULKAN_DEBUG_MARKUP
+	if (vkCmdDebugMarkerEnd)
+	{
+		vkCmdDebugMarkerEnd(m_commandList);
+	}
+#endif
+}
+
+
+void CommandContext::SetMarker(const string& label)
+{
+#if ENABLE_VULKAN_DEBUG_MARKUP
+	if (vkCmdDebugMarkerBegin)
+	{
+		VkDebugMarkerMarkerInfoEXT markerInfo = {};
+		markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
+		markerInfo.color[0] = 0.0f;
+		markerInfo.color[1] = 0.0f;
+		markerInfo.color[2] = 0.0f;
+		markerInfo.color[3] = 0.0f;
+		markerInfo.pMarkerName = label.c_str();
+		vkCmdDebugMarkerInsert(m_commandList, &markerInfo);
+	}
+#endif
 }
 
 

@@ -14,7 +14,6 @@
 #include <d3dcompiler.h>
 #include <dxgi1_4.h>
 #include <dxgiformat.h>
-#include <pix.h>
 #include <wincodec.h>
 
 #include "d3dx12.h"

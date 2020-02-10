@@ -18,6 +18,10 @@
 #include "CommandListManager12.h"
 #include "Util12.h"
 
+#ifndef _RELEASE
+#include <pix3.h>
+#endif
+
 
 using namespace Kodiak;
 using namespace std;
@@ -105,7 +109,6 @@ CommandContext::~CommandContext()
 void CommandContext::DestroyAllContexts()
 {
 	LinearAllocator::DestroyAll();
-	DynamicDescriptorHeap::DestroyAll();
 	g_contextManager.DestroyAllContexts();
 }
 
@@ -119,6 +122,13 @@ CommandContext& CommandContext::Begin(const string id)
 	if (id.length() > 0)
 		EngineProfiling::BeginBlock(id, newContext);
 #endif
+
+	if (!id.empty())
+	{
+		newContext->BeginEvent(id);
+		newContext->m_hasPendingDebugEvent = true;
+	}
+
 	return *newContext;
 }
 
@@ -139,6 +149,11 @@ uint64_t CommandContext::Finish(bool waitForCompletion)
 
 	assert(m_currentAllocator != nullptr);
 
+	if (m_hasPendingDebugEvent)
+	{
+		EndEvent();
+		m_hasPendingDebugEvent = false;
+	}
 
 	CommandQueue& cmdQueue = g_commandManager.GetQueue(m_type);
 
@@ -157,6 +172,34 @@ uint64_t CommandContext::Finish(bool waitForCompletion)
 	g_contextManager.FreeContext(this);
 
 	return fenceValue;
+}
+
+
+void CommandContext::BeginEvent(const string& label)
+{
+#if _RELEASE
+	(label);
+#else
+	::PIXBeginEvent(m_commandList, 0, label.c_str());
+#endif
+}
+
+
+void CommandContext::EndEvent()
+{
+#ifndef _RELEASE
+	::PIXEndEvent(m_commandList);
+#endif
+}
+
+
+void CommandContext::SetMarker(const string& label)
+{
+#if _RELEASE
+	(label);
+#else
+	::PIXSetMarker(m_commandList, 0, label.c_str());
+#endif
 }
 
 

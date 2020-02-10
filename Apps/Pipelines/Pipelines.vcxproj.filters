@@ -22,4 +22,7 @@
     <CustomBuild Include="Shaders\WireframePS.hlsl" />
     <CustomBuild Include="Shaders\WireframeVS.hlsl" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>
