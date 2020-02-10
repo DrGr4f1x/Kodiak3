@@ -106,7 +106,7 @@ void BloomApp::Render()
 
 		// 3D scene (glow pass)
 		{
-			context.BeginEvent("Glow pass");
+			ScopedDrawEvent event(context, "Glow pass");
 
 			context.BeginRenderPass(*m_offscreenFramebuffer[0]);
 
@@ -123,13 +123,11 @@ void BloomApp::Render()
 			context.DrawIndexed((uint32_t)m_ufoGlowModel->GetIndexBuffer().GetElementCount());
 
 			context.EndRenderPass();
-
-			context.EndEvent();
 		}
 		
 		// Vertical blur pass
 		{
-			context.BeginEvent("Vertical blur");
+			ScopedDrawEvent event(context, "Vertical blur");
 
 			context.TransitionResource(*m_offscreenFramebuffer[0]->GetColorBuffer(0), ResourceState::PixelShaderResource);
 			context.TransitionResource(*m_offscreenFramebuffer[1]->GetColorBuffer(0), ResourceState::RenderTarget);
@@ -144,8 +142,6 @@ void BloomApp::Render()
 			context.Draw(3);
 
 			context.EndRenderPass();
-
-			context.EndEvent();
 		}
 
 		context.EndEvent();
@@ -172,7 +168,7 @@ void BloomApp::Render()
 	   
 	// Skybox
 	{
-		context.BeginEvent("Skybox");
+		ScopedDrawEvent event(context, "Skybox");
 
 		context.SetRootSignature(m_skyboxRootSig);
 		context.SetPipelineState(m_skyboxPSO);
@@ -183,13 +179,11 @@ void BloomApp::Render()
 		context.SetVertexBuffer(0, m_skyboxModel->GetVertexBuffer());
 
 		context.DrawIndexed((uint32_t)m_skyboxModel->GetIndexBuffer().GetElementCount());
-
-		context.EndEvent();
 	}
 
 	// 3D scene (phong pass)
 	{
-		context.BeginEvent("Phong pass");
+		ScopedDrawEvent event(context, "Phong pass");
 
 		context.SetRootSignature(m_sceneRootSig);
 		context.SetPipelineState(m_phongPassPSO);
@@ -200,21 +194,17 @@ void BloomApp::Render()
 		context.SetVertexBuffer(0, m_ufoModel->GetVertexBuffer());
 
 		context.DrawIndexed((uint32_t)m_ufoModel->GetIndexBuffer().GetElementCount());
-
-		context.EndEvent();
 	}
 
 	// Horizontal blur pass
 	{
-		context.BeginEvent("Horizontal blur");
+		ScopedDrawEvent event(context, "Horizontal blur");
 
 		context.SetRootSignature(m_blurRootSig);
 		context.SetPipelineState(m_blurHorizPSO);
 
 		context.SetResources(m_blurHorizResources);
 		context.Draw(3);
-
-		context.EndEvent();
 	}
 
 	RenderUI(context);

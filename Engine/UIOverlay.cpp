@@ -103,7 +103,7 @@ void UIOverlay::Render(GraphicsContext& context)
 	if (!imDrawData || imDrawData->CmdListsCount == 0)
 		return;
 
-	context.BeginEvent("UI Overlay");
+	ScopedDrawEvent event(context, "UI Overlay");
 
 	context.SetViewportAndScissor(0u, 0u, m_width, m_height);
 
@@ -135,8 +135,6 @@ void UIOverlay::Render(GraphicsContext& context)
 		}
 		vertexOffset += cmd_list->VtxBuffer.Size;
 	}
-
-	context.EndEvent();
 }
 
 

@@ -237,6 +237,25 @@ public:
 };
 
 
+class ScopedDrawEvent
+{
+public:
+	ScopedDrawEvent(CommandContext& context, const std::string& label)
+		: m_context(context)
+	{
+		context.BeginEvent(label);
+	}
+
+	~ScopedDrawEvent()
+	{
+		m_context.EndEvent();
+	}
+
+private:
+	CommandContext& m_context;
+};
+
+
 inline void CommandContext::FlushResourceBarriers()
 {
 	if (m_numBarriersToFlush > 0)
