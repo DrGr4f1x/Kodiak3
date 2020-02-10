@@ -45,6 +45,7 @@ inline void ThrowIfFailed(HRESULT hr)
 
 // Standard library headers
 #include <array>
+#include <filesystem>
 #include <queue>
 #include <shared_mutex>
 #include <string>

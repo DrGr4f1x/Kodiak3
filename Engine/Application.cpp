@@ -143,7 +143,7 @@ void Application::Configure()
 	// Setup file system
 	auto& filesystem = Filesystem::GetInstance();
 
-	filesystem.SetDefaultRootDir();
+	filesystem.SetDefaultRootPath();
 	filesystem.AddSearchPath("Data\\" + GetDefaultShaderPath());
 	filesystem.AddSearchPath("..\\Data");
 	filesystem.AddSearchPath("..\\Data\\" + GetDefaultShaderPath());

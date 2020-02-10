@@ -16,6 +16,13 @@ using namespace Kodiak;
 using namespace std;
 
 
+namespace
+{
+constexpr uint32_t s_maxPathLength = 4096;
+shared_mutex s_mutex;
+}
+
+
 Filesystem& Filesystem::GetInstance()
 {
 	static Filesystem instance;
@@ -29,46 +36,57 @@ Filesystem::Filesystem()
 }
 
 
-void Filesystem::SetDefaultRootDir()
+void Filesystem::SetDefaultRootPath()
 {
-	auto binDir = GetBinaryDir();
-	string rootDir = binDir;
-	auto pos = binDir.find("Bin");
-	if (pos != binDir.npos)
-	{
-		rootDir = binDir.substr(0, pos);
-	}
-	SetRootDir(rootDir);
+	SetRootPath(m_binaryPath.parent_path());
 }
 
 
-void Filesystem::SetRootDir(const string& rootDir)
+void Filesystem::SetRootPath(const string& rootPathStr)
 {
-	unique_lock<shared_mutex> CS(m_mutex);
+	unique_lock<shared_mutex> CS(s_mutex);
 
-	if (m_rootDir == rootDir)
+	if (m_rootPath == rootPathStr)
 	{
 		return;
 	}
 
 	RemoveAllSearchPaths();
 
-	m_rootDir = rootDir;
-	m_logDir = rootDir + "Logs\\";
+	m_rootPath = rootPathStr;
+	m_logPath = m_rootPath / "Logs";
 }
 
 
-void Filesystem::AddSearchPath(const string& path, bool appendPath)
+void Filesystem::SetRootPath(const filesystem::path& rootPath)
+{
+	unique_lock<shared_mutex> CS(s_mutex);
+
+	if (m_rootPath == rootPath)
+	{
+		return;
+	}
+
+	RemoveAllSearchPaths();
+
+	m_rootPath = rootPath;
+	m_logPath = m_rootPath / "Logs";
+}
+
+
+void Filesystem::AddSearchPath(const string& searchPathStr, bool appendPath)
 {
 	PathDesc* pathPtr = nullptr;
 	PathDesc* cur = m_searchPaths;
 	PathDesc* prev = nullptr;
 
-	unique_lock<shared_mutex> CS(m_mutex);
+	const filesystem::path searchPath{ searchPathStr };
+
+	unique_lock<shared_mutex> CS(s_mutex);
 
 	while (cur)
 	{
-		if (cur->localPath == path)
+		if (cur->localPath == searchPath)
 		{
 			pathPtr = cur;
 			break;
@@ -82,17 +100,17 @@ void Filesystem::AddSearchPath(const string& path, bool appendPath)
 		return;
 	}
 
-	string fullpath = m_rootDir + path;
-	FileStat stat;
-	if (!InternalGetFileStat(fullpath, stat))
+	filesystem::path fullSearchPath = m_rootPath / searchPath;
+
+	if (!filesystem::exists(fullSearchPath))
 	{
-		assert_msg(false, "Path %s is not a valid archive path beneath root.", fullpath.c_str());
+		assert_msg(false, "Path %s is not a valid path beneath root.", fullSearchPath.c_str());
 		return;
 	}
 
 	PathDesc* newPathDesc = new PathDesc;
-	newPathDesc->localPath = path;
-	newPathDesc->fullPath = fullpath;
+	newPathDesc->localPath = searchPath;
+	newPathDesc->fullPath = fullSearchPath;
 
 	if (appendPath)
 	{
@@ -113,11 +131,13 @@ void Filesystem::AddSearchPath(const string& path, bool appendPath)
 }
 
 
-void Filesystem::RemoveSearchPath(const string& path)
+void Filesystem::RemoveSearchPath(const string& searchPathStr)
 {
-	unique_lock<shared_mutex> CS(m_mutex);
+	const filesystem::path searchPath{ searchPathStr };
 
-	if (path == m_rootDir)
+	unique_lock<shared_mutex> CS(s_mutex);
+
+	if (searchPath == m_rootPath)
 	{
 		return;
 	}
@@ -126,7 +146,7 @@ void Filesystem::RemoveSearchPath(const string& path)
 	PathDesc* prev = nullptr;
 	while (cur)
 	{
-		if (cur->localPath == path)
+		if (cur->localPath == searchPath)
 		{
 			// Head
 			if (prev == nullptr)
@@ -146,24 +166,11 @@ void Filesystem::RemoveSearchPath(const string& path)
 }
 
 
-void Filesystem::RemoveAllSearchPaths()
+vector<filesystem::path> Filesystem::GetSearchPaths() const
 {
-	PathDesc* cur = m_searchPaths;
-	while (cur)
-	{
-		PathDesc* temp = cur->next;
-		delete cur;
-		cur = temp;
-	}
-	m_searchPaths = nullptr;
-}
+	shared_lock<shared_mutex> CS(s_mutex);
 
-
-vector<string> Filesystem::GetSearchPaths()
-{
-	shared_lock<shared_mutex> CS(m_mutex);
-
-	vector<string> paths;
+	vector<filesystem::path> paths;
 
 	PathDesc* cur = m_searchPaths;
 	while (cur)
@@ -176,15 +183,17 @@ vector<string> Filesystem::GetSearchPaths()
 }
 
 
-bool Filesystem::Exists(const string& fname)
+bool Filesystem::Exists(const string& fname) const
 {
-	shared_lock<shared_mutex> CS(m_mutex);
+	const filesystem::path filePath{ fname };
+
+	shared_lock<shared_mutex> CS(s_mutex);
 
 	PathDesc* cur = m_searchPaths;
 	while (cur)
 	{
-		string fullpath = cur->fullPath + "\\" + fname;
-		if (TRUE == PathFileExistsA(fullpath.c_str()))
+		auto fullPath = cur->fullPath / filePath;
+		if (filesystem::exists(fullPath))
 		{
 			return true;
 		}
@@ -194,62 +203,48 @@ bool Filesystem::Exists(const string& fname)
 }
 
 
-bool Filesystem::IsRegularFile(const string& fname)
+bool Filesystem::IsRegularFile(const string& fname) const
 {
-	shared_lock<shared_mutex> CS(m_mutex);
+	const filesystem::path filePath{ fname };
 
-	FileStat stat;
-	if (GetFileStat(fname, stat))
+	shared_lock<shared_mutex> CS(s_mutex);
+
+	if (filesystem::exists(filePath) && filesystem::is_regular_file(filePath))
 	{
-		return stat.filetype == EFileType::Regular;
+		return true;
 	}
+
 	return false;
 }
 
 
-bool Filesystem::IsDirectory(const string& fname)
+bool Filesystem::IsDirectory(const string& dname) const
 {
-	shared_lock<shared_mutex> CS(m_mutex);
+	const filesystem::path dirPath{ dname };
 
-	FileStat stat;
-	if (GetFileStat(fname, stat))
+	shared_lock<shared_mutex> CS(s_mutex);
+
+	if (filesystem::exists(dirPath) && filesystem::is_directory(dirPath))
 	{
-		return stat.filetype == EFileType::Directory;
+		return true;
 	}
+
 	return false;
 }
-
-
-bool Filesystem::GetFileStat(const string& fname, FileStat& stat)
-{
-	shared_lock<shared_mutex> CS(m_mutex);
-
-	PathDesc* cur = m_searchPaths;
-	while (cur)
-	{
-		string fullpath = cur->fullPath + "\\" + fname;
-		if (InternalGetFileStat(fullpath.c_str(), stat))
-		{
-			return true;
-		}
-		cur = cur->next;
-	}
-	return false;
-}
-
 
 string Filesystem::GetFullPath(const string& fname)
 {
-	shared_lock<shared_mutex> CS(m_mutex);
+	const filesystem::path filePath{ fname };
 
-	FileStat stat;
+	shared_lock<shared_mutex> CS(s_mutex);
+
 	PathDesc* cur = m_searchPaths;
 	while (cur)
 	{
-		string fullpath = cur->fullPath + "\\" + fname;
-		if (InternalGetFileStat(fullpath.c_str(), stat))
+		auto fullPath = cur->fullPath / filePath;
+		if (filesystem::exists(fullPath))
 		{
-			return fullpath;
+			return fullPath.string();
 		}
 		cur = cur->next;
 	}
@@ -257,9 +252,9 @@ string Filesystem::GetFullPath(const string& fname)
 }
 
 
-string Filesystem::GetFileExtension(const std::string& filename)
+string Filesystem::GetFileExtension(const string& fname)
 {
-	string extension = PathFindExtensionA(filename.c_str());
+	string extension = filesystem::path(fname).extension().string();
 
 	transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
@@ -267,114 +262,54 @@ string Filesystem::GetFileExtension(const std::string& filename)
 }
 
 
-bool Filesystem::EnsureDirectory(const std::string& path)
+bool Filesystem::EnsureDirectory(const string& pathStr)
 {
-	shared_lock<shared_mutex> CS(m_mutex);
+	shared_lock<shared_mutex> CS(s_mutex);
 
-	if (IsDirectory(path))
+	if (IsDirectory(pathStr))
 		return true;
 
-	return (TRUE == CreateDirectoryA(path.c_str(), nullptr));
+	const filesystem::path dirPath{ pathStr };
+
+	return filesystem::create_directory(pathStr);
 }
 
 
 bool Filesystem::EnsureLogDirectory()
 {
-	return EnsureDirectory(m_logDir);
+	return EnsureDirectory(m_logPath.string());
 }
 
 
 void Filesystem::Initialize()
 {
-	unique_lock<shared_mutex> CS(m_mutex);
-
-	LOG_INFO << "Current path: " << filesystem::current_path();
+	unique_lock<shared_mutex> CS(s_mutex);
 
 	// Get Path
-	string path;
-	path.resize(4096, 0);
-	GetModuleFileNameA(nullptr, &path[0], 4096);
+	string pathStr;
+	pathStr.resize(s_maxPathLength, 0);
+	GetModuleFileNameA(nullptr, &pathStr[0], s_maxPathLength);
 
-	// Change current working directory to that of the executable
-	char* lastSlash = strrchr(&path[0], '\\');
-	*lastSlash = 0;
+	filesystem::path binFilePath{ pathStr };
+	filesystem::path binPath = binFilePath.remove_filename().parent_path();
 
-	bool result = TRUE == SetCurrentDirectoryA(path.c_str());
+	filesystem::current_path(binPath);
 
-	m_binaryDir = path;
-	m_rootDir = m_binaryDir;
+	m_binaryPath = binPath;
+	m_rootPath = m_binaryPath;
 
 	assert(m_searchPaths == nullptr);
 }
 
 
-static __int64 PackFileTime(const FILETIME& ft)
+void Filesystem::RemoveAllSearchPaths()
 {
-	SYSTEMTIME st_utc;
-	SYSTEMTIME st_localtz;
-	TIME_ZONE_INFORMATION tzi;
-
-	if (TRUE != FileTimeToSystemTime(&ft, &st_utc))
+	PathDesc* cur = m_searchPaths;
+	while (cur)
 	{
-		return -1;
+		PathDesc* temp = cur->next;
+		delete cur;
+		cur = temp;
 	}
-
-	if (TIME_ZONE_ID_INVALID == GetTimeZoneInformation(&tzi))
-	{
-		return -1;
-	}
-
-	if (TRUE != SystemTimeToTzSpecificLocalTime(&tzi, &st_utc, &st_localtz))
-	{
-		return -1;
-	}
-
-	struct tm tm;
-	tm.tm_sec = st_localtz.wSecond;
-	tm.tm_min = st_localtz.wMinute;
-	tm.tm_hour = st_localtz.wHour;
-	tm.tm_mday = st_localtz.wDay;
-	tm.tm_mon = st_localtz.wMonth - 1;
-	tm.tm_year = st_localtz.wYear - 1900;
-	tm.tm_wday = -1 /*st_localtz.wDayOfWeek*/;
-	tm.tm_yday = -1;
-	tm.tm_isdst = -1;
-
-	return (__int64)mktime(&tm);
-}
-
-
-bool Filesystem::InternalGetFileStat(const string& fullpath, FileStat& stat)
-{
-	// Assume the caller has a shared_lock on m_mutex!!
-	WIN32_FILE_ATTRIBUTE_DATA winstat;
-
-	if (TRUE != GetFileAttributesExA(fullpath.c_str(), GetFileExInfoStandard, &winstat))
-	{
-		return false;
-	}
-
-	stat.modtime = PackFileTime(winstat.ftLastWriteTime);
-	stat.accesstime = PackFileTime(winstat.ftLastAccessTime);
-	stat.createtime = PackFileTime(winstat.ftCreationTime);
-
-	if (winstat.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-	{
-		stat.filetype = EFileType::Directory;
-		stat.filesize = 0;
-	}
-	else if (winstat.dwFileAttributes & (FILE_ATTRIBUTE_OFFLINE | FILE_ATTRIBUTE_DEVICE))
-	{
-		stat.filetype = EFileType::Other;
-		stat.filesize = 0;
-	}
-	else
-	{
-		stat.filetype = EFileType::Regular;
-		stat.filesize = (((__int64)winstat.nFileSizeHigh) << 32) | winstat.nFileSizeLow;
-	}
-
-	stat.readonly = ((winstat.dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0);
-
-	return true;
+	m_searchPaths = nullptr;
 }

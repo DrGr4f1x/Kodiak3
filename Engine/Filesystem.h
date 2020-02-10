@@ -14,77 +14,53 @@
 namespace Kodiak
 {
 
-
-enum class EFileType
-{
-	Regular,
-	Directory,
-	SymLink,
-	Other
-};
-
-
-struct FileStat
-{
-	__int64 filesize;
-	__int64 modtime;
-	__int64 createtime;
-	__int64 accesstime;
-	EFileType filetype;
-	int readonly;
-};
-
-
 class Filesystem
 {
 public:
 	static Filesystem& GetInstance();
 
-	const std::string& GetBinaryDir() const { return m_binaryDir; }
-	const std::string& GetRootDir() const { return m_rootDir; }
-	const std::string& GetLogDir() const { return m_logDir; }
+	const std::filesystem::path& GetBinaryPath() const { return m_binaryPath; }
+	const std::filesystem::path& GetRootPath() const { return m_rootPath; }
+	const std::filesystem::path& GetLogPath() const { return m_logPath; }
 
-	// Sets root dir to Bin\..
-	void SetDefaultRootDir();
-	void SetRootDir(const std::string& rootDir);
+	// Sets root path to Bin\..
+	void SetDefaultRootPath();
+	void SetRootPath(const std::string& rootPathStr);
+	void SetRootPath(const std::filesystem::path& rootPath);
 
-	void AddSearchPath(const std::string& fname, bool appendPath = false);
-	void RemoveSearchPath(const std::string& path);
-	void RemoveAllSearchPaths();
+	void AddSearchPath(const std::string& searchPathStr, bool appendPath = false);
+	void RemoveSearchPath(const std::string& searchPathStr);
 
-	std::vector<std::string> GetSearchPaths();
+	std::vector<std::filesystem::path> GetSearchPaths() const;
 
-	bool Exists(const std::string& fname);
-	bool IsRegularFile(const std::string& fname);
-	bool IsDirectory(const std::string& fname);
-	bool GetFileStat(const std::string& fname, FileStat& stat);
-	std::string GetFullPath(const std::string& path);
-	std::string GetFileExtension(const std::string& filename);
+	bool Exists(const std::string& fname) const;
+	bool IsRegularFile(const std::string& fname) const;
+	bool IsDirectory(const std::string& dname) const;
+	std::string GetFullPath(const std::string& pathStr);
+	std::string GetFileExtension(const std::string& fname);
 
-	bool EnsureDirectory(const std::string& path);
+	bool EnsureDirectory(const std::string& pathStr);
 	bool EnsureLogDirectory();
 
 private:
 	Filesystem();
 	void Initialize();
-	bool InternalGetFileStat(const std::string& fname, FileStat& stat);
+	void RemoveAllSearchPaths();
 
 private:
-	std::string m_binaryDir;
-	std::string m_binarySubpath;
+	std::filesystem::path m_binaryPath;
+	std::filesystem::path m_binarySubpath;
 
-	std::string m_rootDir;
-	std::string m_logDir;
+	std::filesystem::path m_rootPath;
+	std::filesystem::path m_logPath;
 
 	struct PathDesc
 	{
-		std::string localPath;
-		std::string fullPath;
+		std::filesystem::path localPath;
+		std::filesystem::path fullPath;
 		PathDesc* next{ nullptr };
 	};
 	PathDesc* m_searchPaths{ nullptr };
-
-	std::shared_mutex m_mutex;
 };
 
 

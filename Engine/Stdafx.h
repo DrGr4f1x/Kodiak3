@@ -17,9 +17,7 @@
 #define NOMINMAX
 #endif
 
-#define _ENABLE_EXTENDED_ALIGNED_STORAGE
-
-// Windows
+// Windows headers
 #include <windows.h>
 #include <wrl.h>
 #include <Shlwapi.h>
@@ -48,7 +46,7 @@ inline void ThrowIfFailed(HRESULT hr)
 	}
 }
 
-// Graphics APIs
+// Graphics API headers
 #if defined(DX12)
 #include "DX12\Platform12.h"
 #elif defined(VK)
@@ -58,6 +56,7 @@ inline void ThrowIfFailed(HRESULT hr)
 #endif
 
 
+// Standard library headers
 #include <array>
 #include <cstdint>
 #include <cstdio>

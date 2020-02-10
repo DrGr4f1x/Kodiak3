@@ -15,6 +15,7 @@
 #include "Filesystem.h"
 
 #include <concurrent_queue.h>
+#include <iostream>
 
 
 using namespace Kodiak;
@@ -80,6 +81,7 @@ public:
 		m_haltLogging = true;
 		m_workerLoop.get();
 
+		m_file.flush();
 		m_file.close();
 
 		m_initialized = false;
@@ -101,31 +103,37 @@ private:
 	{
 		// Get the log directory path
 		Filesystem::GetInstance().EnsureLogDirectory();
-		string fullPath = Filesystem::GetInstance().GetLogDir();
+		auto logPath = Filesystem::GetInstance().GetLogPath();
 
 		// Build the filename
 		SYSTEMTIME dateTime;
 		GetLocalTime(&dateTime);
 
 		// Append current date+time and extension to filename
-		string filenameBase = "Log";
-		string timestampStr;
-		char timestamp[256];
-		sprintf_s(timestamp, "-%04d%02d%02d%02d%02d%02d.txt\0", dateTime.wYear, dateTime.wMonth, dateTime.wDay, dateTime.wHour, dateTime.wMinute, dateTime.wSecond);
-		timestampStr = timestamp;
-		string sTSFilename = filenameBase + timestampStr;
+		ostringstream sstream;
+		sstream << "Log-";
+		sstream << dateTime.wYear << dateTime.wMonth << dateTime.wDay;
+		sstream << dateTime.wHour << dateTime.wMinute << dateTime.wSecond;
+		sstream << ".txt";
 
 		// Build the full path
-		string sTSFullPath = fullPath + sTSFilename;
+		auto fullPath = logPath / sstream.str();
 
 		// Open the file stream
-		m_file.open(sTSFullPath.c_str(), ios::out | ios::trunc);
+		m_file.open(fullPath.c_str(), ios::out | ios::trunc);
 		m_file << fixed;
 
 		// Create a hard link to the non-timestamped file
-		string filename = fullPath + filenameBase + ".txt";
-		DeleteFileA(filename.c_str());
-		CreateHardLinkA(filename.c_str(), sTSFullPath.c_str(), 0);
+		auto logFilePath = logPath / "Log.txt";
+		filesystem::remove(logFilePath);
+		try
+		{
+			filesystem::create_hard_link(fullPath, logFilePath);
+		}
+		catch (filesystem::filesystem_error e)
+		{
+			cerr << e.what() << " " << e.path1().string() << " " << e.path2().string() << endl;
+		}
 	}
 
 private:
