@@ -26,7 +26,7 @@ struct HSConstantOutput
 };
 
 
-//[[vk::binding(0,0)]]
+[[vk::binding(0,0)]]
 cbuffer HSConstants : register(b0)
 {
 	float tessLevel;
