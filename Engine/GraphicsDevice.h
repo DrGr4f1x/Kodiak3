@@ -47,6 +47,7 @@ public:
 #if VK
 	uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound);
 	VkFormatProperties GetFormatProperties(Format format);
+	uint32_t GetQueueFamilyIndex(CommandListType type) const;
 #endif
 
 private:

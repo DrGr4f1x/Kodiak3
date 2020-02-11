@@ -454,9 +454,6 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		ThrowIfFailed(result);
 
 		device = DeviceHandle::Create(logicalDevice);
-
-		// Get a graphics queue from the device
-		vkGetDeviceQueue(device, queueFamilyIndices.graphics, 0, &graphicsQueue);
 	}
 
 	uint32_t GetQueueFamilyIndex(VkQueueFlagBits queueFlags)
@@ -1234,7 +1231,6 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	} queueFamilyIndices;
 
 	vector<VkQueueFamilyProperties> queueFamilyProperties;
-	VkQueue graphicsQueue{ VK_NULL_HANDLE };
 
 	// Required, optional, and enabled extensions
 	set<string> supportedExtensions;
@@ -1353,10 +1349,7 @@ void GraphicsDevice::PlatformCreate()
 		m_swapChainBuffers[i]->CreateFromSwapChain("Primary SwapChain Buffer", handle, m_width, m_height, BackBufferColorFormat);
 	}
 
-	g_commandManager.Create(
-		m_platformData->queueFamilyIndices.graphics, m_platformData->graphicsQueue,
-		m_platformData->queueFamilyIndices.compute, m_platformData->graphicsQueue,
-		m_platformData->queueFamilyIndices.transfer, m_platformData->graphicsQueue);
+	g_commandManager.Create();
 
 	VkFence fence = m_platformData->presentFences[m_currentBuffer];
 	vkResetFences(m_platformData->device, 1, &fence);
@@ -1372,7 +1365,7 @@ void GraphicsDevice::PlatformPresent()
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = &m_platformData->swapChain;
 	presentInfo.pImageIndices = &m_currentBuffer;
-	vkQueuePresentKHR(m_platformData->graphicsQueue, &presentInfo);
+	vkQueuePresentKHR(g_commandManager.GetCommandQueue(), &presentInfo);
 
 	// Flip
 	VkDevice device = m_platformData->device;
@@ -1411,6 +1404,29 @@ VkFormatProperties GraphicsDevice::GetFormatProperties(Format format)
 	vkGetPhysicalDeviceFormatProperties(m_platformData->physicalDevice, vkFormat, &properties);
 
 	return properties;
+}
+
+
+uint32_t GraphicsDevice::GetQueueFamilyIndex(CommandListType type) const
+{
+	switch (type)
+	{
+	case CommandListType::Direct:
+		return m_platformData->queueFamilyIndices.graphics;
+		break;
+
+	case CommandListType::Compute:
+		return m_platformData->queueFamilyIndices.compute;
+		break;
+
+	case CommandListType::Copy:
+		return m_platformData->queueFamilyIndices.transfer;
+		break;
+
+	default:
+		return m_platformData->queueFamilyIndices.graphics;
+		break;
+	}
 }
 
 

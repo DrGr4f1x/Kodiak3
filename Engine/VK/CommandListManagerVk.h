@@ -51,7 +51,7 @@ public:
 	void SetWaitSemaphore(VkSemaphore waitSemaphore);
 	VkSemaphore GetWaitSemaphore() { return m_waitSemaphore; }
 
-	void Create(uint32_t queueFamilyIndex, VkQueue queue);
+	void Create();
 	void Destroy();
 
 	bool IsFenceComplete(std::shared_ptr<Fence> fence);
@@ -88,7 +88,7 @@ public:
 
 	void BeginFrame(VkSemaphore waitSemaphore);
 
-	void Create(uint32_t graphicsQueueIndex, VkQueue graphicsQueue, uint32_t computeQueueIndex, VkQueue computeQueue, uint32_t copyQueueIndex, VkQueue copyQueue);
+	void Create();
 	void Destroy();
 
 	CommandQueue& GetGraphicsQueue() { return m_graphicsQueue; }

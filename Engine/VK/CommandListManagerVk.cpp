@@ -17,6 +17,7 @@
 using namespace Kodiak;
 using namespace std;
 
+
 namespace Kodiak
 {
 CommandListManager g_commandManager;
@@ -58,11 +59,13 @@ void CommandQueue::SetWaitSemaphore(VkSemaphore waitSemaphore)
 }
 
 
-void CommandQueue::Create(uint32_t queueFamilyIndex, VkQueue queue)
+void CommandQueue::Create()
 {
 	assert(!IsReady());
 
-	m_queue = queue;
+	uint32_t queueFamilyIndex = g_graphicsDevice->GetQueueFamilyIndex(m_type);
+	
+	vkGetDeviceQueue(GetDevice(), queueFamilyIndex, 0, &m_queue);
 
 	m_commandBufferPool.Create(queueFamilyIndex);
 }
@@ -175,11 +178,11 @@ void CommandListManager::BeginFrame(VkSemaphore waitSemaphore)
 }
 
 
-void CommandListManager::Create(uint32_t graphicsQueueIndex, VkQueue graphicsQueue, uint32_t computeQueueIndex, VkQueue computeQueue, uint32_t copyQueueIndex, VkQueue copyQueue)
+void CommandListManager::Create()
 {
-	m_graphicsQueue.Create(graphicsQueueIndex, graphicsQueue);
-	m_computeQueue.Create(computeQueueIndex, computeQueue);
-	m_copyQueue.Create(copyQueueIndex, copyQueue);
+	m_graphicsQueue.Create();
+	m_computeQueue.Create();
+	m_copyQueue.Create();
 }
 
 

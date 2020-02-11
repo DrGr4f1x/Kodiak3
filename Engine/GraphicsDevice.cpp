@@ -36,6 +36,8 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 {
 	assert(!m_platformData);
 
+	g_graphicsDevice = this;
+
 	m_appName = appName;
 
 	m_hinst = hInstance;
@@ -45,8 +47,6 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 	m_height = height;
 
 	PlatformCreate();
-
-	g_graphicsDevice = this;
 }
 
 
