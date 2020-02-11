@@ -208,34 +208,52 @@ void GraphicsPSO::SetPrimitiveRestart(IndexBufferStripCutValue ibProps)
 void GraphicsPSO::SetVertexShader(const string& filename)
 {
 	m_vertexShader = Shader::Load(filename);
+#if _DEBUG
+	m_vertexShaderFile = filename;
+#endif
 }
 
 
 void GraphicsPSO::SetPixelShader(const string& filename)
 {
 	m_pixelShader = Shader::Load(filename);
+#if _DEBUG
+	m_pixelShaderFile = filename;
+#endif
 }
 
 
 void GraphicsPSO::SetGeometryShader(const string& filename)
 {
 	m_geometryShader = Shader::Load(filename);
+#if _DEBUG
+	m_geometryShaderFile = filename;
+#endif
 }
 
 
 void GraphicsPSO::SetHullShader(const string& filename)
 {
 	m_hullShader = Shader::Load(filename);
+#if _DEBUG
+	m_hullShaderFile = filename;
+#endif
 }
 
 
 void GraphicsPSO::SetDomainShader(const string& filename)
 {
 	m_domainShader = Shader::Load(filename);
+#if _DEBUG
+	m_domainShaderFile = filename;
+#endif
 }
 
 
 void ComputePSO::SetComputeShader(const string& filename)
 {
 	m_computeShader = Shader::Load(filename);
+#if _DEBUG
+	m_computeShaderFile = filename;
+#endif
 }

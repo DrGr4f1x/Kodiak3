@@ -181,6 +181,14 @@ private:
 	// For Vulkan derivative PSOs
 	GraphicsPSO*				m_parentPSO{ nullptr };
 	bool						m_isParent{ false };
+
+#if _DEBUG
+	std::string					m_vertexShaderFile;
+	std::string					m_pixelShaderFile;
+	std::string					m_geometryShaderFile;
+	std::string					m_hullShaderFile;
+	std::string					m_domainShaderFile;
+#endif
 };
 
 
@@ -195,6 +203,10 @@ public:
 
 private:
 	Shader* m_computeShader{ nullptr };
+
+#if _DEBUG
+	std::string				m_computeShaderFile;
+#endif
 };
 
 } // namespace Kodiak
