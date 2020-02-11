@@ -15,6 +15,8 @@
 
 #include "CommandAllocatorPool12.h"
 
+#include "GraphicsDevice.h"
+
 
 using namespace Kodiak;
 using namespace std;
@@ -31,12 +33,6 @@ CommandAllocatorPool::~CommandAllocatorPool()
 }
 
 
-void CommandAllocatorPool::Create(ID3D12Device* device)
-{
-	m_device = device;
-}
-
-
 void CommandAllocatorPool::Shutdown()
 {
 	for (size_t i = 0; i < m_allocatorPool.size(); ++i)
@@ -48,7 +44,7 @@ void CommandAllocatorPool::Shutdown()
 }
 
 
-ID3D12CommandAllocator * CommandAllocatorPool::RequestAllocator(uint64_t completedFenceValue)
+ID3D12CommandAllocator* CommandAllocatorPool::RequestAllocator(uint64_t completedFenceValue)
 {
 	lock_guard<mutex> lockGuard(m_allocatorMutex);
 
@@ -69,7 +65,7 @@ ID3D12CommandAllocator * CommandAllocatorPool::RequestAllocator(uint64_t complet
 	// If no allocator's were ready to be reused, create a new one
 	if (allocator == nullptr)
 	{
-		assert_succeeded(m_device->CreateCommandAllocator(m_commandListType, IID_PPV_ARGS(&allocator)));
+		assert_succeeded(GetDevice()->CreateCommandAllocator(m_commandListType, IID_PPV_ARGS(&allocator)));
 		wchar_t allocatorName[32];
 		swprintf(allocatorName, 32, L"CommandAllocator %zu", m_allocatorPool.size());
 		allocator->SetName(allocatorName);

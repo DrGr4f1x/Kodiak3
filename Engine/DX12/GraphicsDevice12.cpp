@@ -475,7 +475,7 @@ void GraphicsDevice::PlatformCreate()
 
 	ConfigureInfoQueue(m_platformData->device.Get());
 
-	g_commandManager.Create(m_platformData->device.Get());
+	g_commandManager.Create();
 
 	m_platformData->swapChain = CreateSwapChain(dxgiFactory.Get(), m_hwnd, m_width, m_height);
 	m_currentBuffer = m_platformData->swapChain->GetCurrentBackBufferIndex();

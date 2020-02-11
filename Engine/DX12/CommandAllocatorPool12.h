@@ -22,7 +22,6 @@ public:
 	CommandAllocatorPool(D3D12_COMMAND_LIST_TYPE type);
 	~CommandAllocatorPool();
 
-	void Create(ID3D12Device* device);
 	void Shutdown();
 
 	ID3D12CommandAllocator* RequestAllocator(uint64_t completedFenceValue);
@@ -33,7 +32,6 @@ public:
 private:
 	const D3D12_COMMAND_LIST_TYPE m_commandListType;
 
-	ID3D12Device* m_device{ nullptr };
 	std::vector<ID3D12CommandAllocator*> m_allocatorPool;
 	std::queue<std::pair<uint64_t, ID3D12CommandAllocator*>> m_readyAllocators;
 	std::mutex m_allocatorMutex;

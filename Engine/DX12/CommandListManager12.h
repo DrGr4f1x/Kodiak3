@@ -27,7 +27,7 @@ public:
 	CommandQueue(D3D12_COMMAND_LIST_TYPE type);
 	~CommandQueue();
 
-	void Create(ID3D12Device* device);
+	void Create();
 	void Shutdown();
 
 	inline bool IsReady()
@@ -72,7 +72,7 @@ private:
 	std::mutex m_eventMutex;
 
 	// Lifetime of these objects is managed by the descriptor cache
-	ID3D12Fence* m_fence;
+	ID3D12Fence* m_fence{ nullptr };
 	uint64_t m_nextFenceValue;
 	uint64_t m_lastCompletedFenceValue;
 	HANDLE m_fenceEventHandle;
@@ -87,7 +87,7 @@ public:
 	CommandListManager();
 	~CommandListManager();
 
-	void Create(ID3D12Device* device);
+	void Create();
 	void Shutdown();
 
 	CommandQueue& GetGraphicsQueue() { return m_graphicsQueue; }
@@ -133,8 +133,6 @@ public:
 
 
 private:
-	ID3D12Device* m_device;
-
 	CommandQueue m_graphicsQueue;
 	CommandQueue m_computeQueue;
 	CommandQueue m_copyQueue;
