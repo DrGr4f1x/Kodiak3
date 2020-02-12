@@ -18,6 +18,7 @@
 #include "PipelineState.h"
 #include "Texture.h"
 
+#include "CommandListManager12.h"
 #include "DynamicDescriptorHeap12.h"
 #include "LinearAllocator12.h"
 #include "ResourceSet12.h"

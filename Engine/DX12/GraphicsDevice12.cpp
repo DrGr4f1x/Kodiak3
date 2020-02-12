@@ -293,7 +293,6 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 	Microsoft::WRL::ComPtr<ID3D12Device> device;
 	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain;
-	uint64_t fenceValues[NumSwapChainBuffers]{ 0, 0, 0 };
 
 	D3D_FEATURE_LEVEL bestFeatureLevel{ D3D_FEATURE_LEVEL_11_0 };
 	D3D_SHADER_MODEL bestShaderModel{ D3D_SHADER_MODEL_6_5 };
@@ -490,9 +489,6 @@ void GraphicsDevice::PlatformCreate()
 
 		m_swapChainBuffers[i] = buffer;
 	}
-
-	// Setup fence
-	m_platformData->fenceValues[0] = g_commandManager.GetGraphicsQueue().GetNextFenceValue();
 }
 
 
@@ -502,9 +498,6 @@ void GraphicsDevice::PlatformPresent()
 	m_platformData->swapChain->Present(presentInterval, 0);
 
 	m_currentBuffer = m_platformData->swapChain->GetCurrentBackBufferIndex();
-
-	g_commandManager.WaitForFence(m_platformData->fenceValues[m_currentBuffer]);
-	m_platformData->fenceValues[m_currentBuffer] = g_commandManager.GetGraphicsQueue().GetNextFenceValue();
 }
 
 

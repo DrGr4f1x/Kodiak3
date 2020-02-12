@@ -42,17 +42,17 @@ public:
 	void WaitForFence(uint64_t fenceValue);
 	void WaitForIdle() 
 	{ 
-		WaitForFence(IncrementFence()); 
+		WaitForFence(IncrementFence());
 	}
 
 	ID3D12CommandQueue* GetCommandQueue() 
 	{ 
-		return m_commandQueue; 
+		return m_commandQueue;
 	}
 
 	uint64_t GetNextFenceValue() 
 	{ 
-		return m_nextFenceValue; 
+		return m_nextFenceValue;
 	}
 
 

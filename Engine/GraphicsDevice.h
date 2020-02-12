@@ -51,7 +51,7 @@ public:
 #endif
 
 private:
-	void ReleaseDeferredResources(uint32_t frameIndex);
+	void ReleaseDeferredResources();
 
 	// Platform-specific methods
 	void PlatformCreate();
@@ -77,7 +77,12 @@ private:
 	uint32_t m_frameNumber{ 0 };
 
 	// Deferred resource release
-	std::array<std::vector<PlatformHandle>, NumSwapChainBuffers> m_deferredReleasePages;
+	struct DeferredReleaseResource
+	{
+		uint64_t fenceValue;
+		PlatformHandle resourceHandle;
+	};
+	std::list<DeferredReleaseResource> m_deferredResources;
 
 	// Platform-specific implementation
 	struct PlatformData;

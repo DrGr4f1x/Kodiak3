@@ -28,6 +28,8 @@ namespace Kodiak
 GraphicsDevice* g_graphicsDevice = nullptr;
 } // namespace Kodiak
 
+extern Kodiak::CommandListManager g_commandManager;
+
 
 GraphicsDevice::GraphicsDevice() = default;
 
@@ -54,6 +56,10 @@ void GraphicsDevice::Destroy()
 {
 	WaitForGpuIdle();
 
+	// Flush pending deferred resources here
+	ReleaseDeferredResources();
+	assert(m_deferredResources.empty());
+
 	CommandContext::DestroyAllContexts();
 	
 	// TODO - get rid of this
@@ -74,12 +80,6 @@ void GraphicsDevice::Destroy()
 		m_swapChainBuffers[i] = nullptr;
 	}
 
-	// Flush pending deferred resources here
-	for (int i = 0; i < NumSwapChainBuffers; ++i)
-	{
-		ReleaseDeferredResources(i);
-	}
-
 	PlatformDestroyData();
 
 	g_graphicsDevice = nullptr;
@@ -90,7 +90,7 @@ void GraphicsDevice::SubmitFrame()
 {
 	PlatformPresent();
 
-	ReleaseDeferredResources(m_currentBuffer);
+	ReleaseDeferredResources();
 
 	++m_frameNumber;
 }
@@ -105,11 +105,25 @@ ColorBufferPtr GraphicsDevice::GetBackBuffer(uint32_t index) const
 
 void GraphicsDevice::ReleaseResource(PlatformHandle handle)
 {
-	m_deferredReleasePages[m_currentBuffer].push_back(handle);
+	uint64_t nextFence = g_commandManager.GetGraphicsQueue().GetNextFenceValue();
+
+	DeferredReleaseResource resource{ nextFence, handle };
+	m_deferredResources.emplace_back(resource);
 }
 
 
-void GraphicsDevice::ReleaseDeferredResources(uint32_t frameIndex)
+void GraphicsDevice::ReleaseDeferredResources()
 {
-	m_deferredReleasePages[frameIndex].clear();
+	auto resourceIt = m_deferredResources.begin();
+	while (resourceIt != m_deferredResources.end())
+	{
+		if (g_commandManager.IsFenceComplete(resourceIt->fenceValue))
+		{
+			resourceIt = m_deferredResources.erase(resourceIt);
+		}
+		else
+		{
+			++resourceIt;
+		}
+	}
 }
