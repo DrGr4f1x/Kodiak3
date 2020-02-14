@@ -26,8 +26,8 @@ public:
 	void Create(uint32_t queueFamilyIndex);
 	void Destroy();
 
-	VkCommandBuffer RequestCommandBuffer();
-	void DiscardCommandBuffer(std::shared_ptr<Fence> fence, VkCommandBuffer commandBuffer);
+	VkCommandBuffer RequestCommandBuffer(uint64_t completedFenceValue);
+	void DiscardCommandBuffer(uint64_t fenceValue, VkCommandBuffer commandBuffer);
 
 	inline size_t Size() { return m_commandBufferPool.size(); }
 
@@ -37,7 +37,7 @@ private:
 	VkCommandPool m_commandPool{ VK_NULL_HANDLE };
 
 	std::vector<VkCommandBuffer> m_commandBufferPool;
-	std::queue<std::pair<std::shared_ptr<Fence>, VkCommandBuffer>> m_readyCommandBuffers;
+	std::queue<std::pair<uint64_t, VkCommandBuffer>> m_readyCommandBuffers;
 	std::mutex m_commandBufferMutex;
 };
 

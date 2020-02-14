@@ -17,6 +17,7 @@
 #include "GpuBuffer.h"
 #include "Texture.h"
 
+#include "CommandListManagerVk.h"
 #include "ResourceSetVk.h"
 #include "UtilVk.h"
 
@@ -56,7 +57,7 @@ class CommandContext : NonCopyable
 	friend class DynamicDescriptorPool;
 
 public:
-	~CommandContext();
+	~CommandContext() = default;
 
 	static void DestroyAllContexts();
 
@@ -101,8 +102,6 @@ protected:
 
 	// Shader stages for the 8 descriptor set slots
 	VkShaderStageFlags m_shaderStages[8];
-
-	VkSemaphore m_signalSemaphore{ VK_NULL_HANDLE };
 
 	bool m_hasPendingDebugEvent{ false };
 

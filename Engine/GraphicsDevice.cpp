@@ -56,10 +56,6 @@ void GraphicsDevice::Destroy()
 {
 	WaitForGpuIdle();
 
-	// Flush pending deferred resources here
-	ReleaseDeferredResources();
-	assert(m_deferredResources.empty());
-
 	CommandContext::DestroyAllContexts();
 	
 	// TODO - get rid of this
@@ -79,6 +75,14 @@ void GraphicsDevice::Destroy()
 	{
 		m_swapChainBuffers[i] = nullptr;
 	}
+
+	WaitForGpuIdle();
+
+	// Flush pending deferred resources here
+	ReleaseDeferredResources();
+	assert(m_deferredResources.empty());
+
+	g_commandManager.Destroy();
 
 	PlatformDestroyData();
 

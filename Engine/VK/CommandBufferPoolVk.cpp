@@ -74,7 +74,7 @@ void CommandBufferPool::Destroy()
 }
 
 
-VkCommandBuffer CommandBufferPool::RequestCommandBuffer()
+VkCommandBuffer CommandBufferPool::RequestCommandBuffer(uint64_t completedFenceValue)
 {
 	lock_guard<mutex> CS(m_commandBufferMutex);
 
@@ -82,9 +82,9 @@ VkCommandBuffer CommandBufferPool::RequestCommandBuffer()
 
 	if (!m_readyCommandBuffers.empty())
 	{
-		pair<shared_ptr<Fence>, VkCommandBuffer>& commandBufferPair = m_readyCommandBuffers.front();
+		pair<uint64_t, VkCommandBuffer>& commandBufferPair = m_readyCommandBuffers.front();
 
-		if (commandBufferPair.first->IsComplete())
+		if (commandBufferPair.first <= completedFenceValue)
 		{
 			commandBuffer = commandBufferPair.second;
 			ThrowIfFailed(vkResetCommandBuffer(commandBuffer, 0));
@@ -115,10 +115,10 @@ VkCommandBuffer CommandBufferPool::RequestCommandBuffer()
 }
 
 
-void CommandBufferPool::DiscardCommandBuffer(shared_ptr<Fence> fence, VkCommandBuffer commandBuffer)
+void CommandBufferPool::DiscardCommandBuffer(uint64_t fenceValue, VkCommandBuffer commandBuffer)
 {
 	lock_guard<mutex> CS(m_commandBufferMutex);
 
 	// Fence indicates we are free to re-use the command buffer
-	m_readyCommandBuffers.push(make_pair(fence, commandBuffer));
+	m_readyCommandBuffers.push(make_pair(fenceValue, commandBuffer));
 }

@@ -12,32 +12,8 @@
 
 #include "CommandBufferPoolVk.h"
 
-#include <list>
-
 namespace Kodiak
 {
-
-class Fence
-{
-	friend class CommandQueue;
-	friend class CommandListManager;
-public:
-	Fence() = delete;
-	explicit Fence(VkFence fence, CommandListType type);
-	Fence(const Fence& other) = delete;
-	Fence(Fence&& other) = delete;
-	~Fence();
-
-	bool IsComplete() const;
-
-	Fence& operator=(const Fence& other) = delete;
-	Fence& operator=(Fence&& other) = delete;
-
-private:
-	VkFence m_fence;
-	CommandListType m_type;
-};
-
 
 class CommandQueue
 {
@@ -48,35 +24,45 @@ public:
 	CommandQueue(CommandListType type);
 	~CommandQueue();
 
-	void SetWaitSemaphore(VkSemaphore waitSemaphore);
-	VkSemaphore GetWaitSemaphore() { return m_waitSemaphore; }
-
-	void Create();
-	void Destroy();
-
-	bool IsFenceComplete(std::shared_ptr<Fence> fence);
-	void WaitForFence(std::shared_ptr<Fence> fence);
-	void WaitForIdle();
-
 	inline bool IsReady()
 	{
 		return m_queue != VK_NULL_HANDLE;
 	}
 
+	void Create();
+	void Destroy();
+
+	uint64_t IncrementFence();
+	bool IsFenceComplete(uint64_t fenceValue);
+	void StallForFence(uint64_t fenceValue);
+	void StallForProducer(CommandQueue& producer);
+	void WaitForFence(uint64_t fenceValue);
+	void WaitForIdle()
+	{
+		WaitForFence(IncrementFence());
+	}
+
 	VkQueue GetCommandQueue() { return m_queue; }
 
+	uint64_t GetNextFenceValue() const { return m_nextFenceValue; }
+
+	VkSemaphore GetTimelineSemaphore() { return m_timelineSemaphore; }
+
 private:
-	std::shared_ptr<Fence> ExecuteCommandList(VkCommandBuffer cmdList, VkSemaphore signalSemaphore);
+	uint64_t ExecuteCommandList(VkCommandBuffer cmdList);
 	VkCommandBuffer RequestCommandBuffer();
-	void DiscardCommandBuffer(std::shared_ptr<Fence> fence, VkCommandBuffer commandBuffer);
+	void DiscardCommandBuffer(uint64_t fenceValueForReset, VkCommandBuffer commandBuffer);
 
 private:
 	const CommandListType m_type;
 	VkQueue m_queue{ VK_NULL_HANDLE };
 
 	CommandBufferPool m_commandBufferPool;
+	std::mutex m_fenceMutex;
 
-	VkSemaphore m_waitSemaphore{ VK_NULL_HANDLE };
+	VkSemaphore m_timelineSemaphore{ VK_NULL_HANDLE };
+	uint64_t m_nextFenceValue;
+	uint64_t m_lastCompletedFenceValue;
 };
 
 
@@ -85,8 +71,6 @@ class CommandListManager
 public:
 	CommandListManager();
 	~CommandListManager();
-
-	void BeginFrame(VkSemaphore waitSemaphore);
 
 	void Create();
 	void Destroy();
@@ -110,21 +94,27 @@ public:
 		}
 	}
 
-	void WaitForFence(std::shared_ptr<Fence> fence);
+	// Test to see if a fence has already been reached
+	bool IsFenceComplete(uint64_t fenceValue)
+	{
+		return GetQueue(static_cast<CommandListType>(fenceValue >> 56)).IsFenceComplete(fenceValue);
+	}
+
+	// The CPU will wait for a fence to reach a specified value
+	void WaitForFence(uint64_t fenceValue);
 
 	// The CPU will wait for all command queues to empty (so that the GPU is idle)
-	void IdleGPU();
-
-	void RetireFence(VkFence fence);
-	void DestroyRetiredFences();
+	void IdleGPU()
+	{
+		m_graphicsQueue.WaitForIdle();
+		m_computeQueue.WaitForIdle();
+		m_copyQueue.WaitForIdle();
+	}
 
 private:
 	CommandQueue m_graphicsQueue;
 	CommandQueue m_computeQueue;
 	CommandQueue m_copyQueue;
-
-	std::mutex m_fenceMutex;
-	std::list<VkFence> m_retiredFences;
 };
 
 extern CommandListManager g_commandManager;

@@ -28,7 +28,7 @@ public:
 	~CommandQueue();
 
 	void Create();
-	void Shutdown();
+	void Destroy();
 
 	inline bool IsReady()
 	{
@@ -45,16 +45,9 @@ public:
 		WaitForFence(IncrementFence());
 	}
 
-	ID3D12CommandQueue* GetCommandQueue() 
-	{ 
-		return m_commandQueue;
-	}
+	ID3D12CommandQueue* GetCommandQueue() { return m_commandQueue; }
 
-	uint64_t GetNextFenceValue() 
-	{ 
-		return m_nextFenceValue;
-	}
-
+	uint64_t GetNextFenceValue() const { return m_nextFenceValue; }
 
 private:
 	uint64_t ExecuteCommandList(ID3D12CommandList* commandList);
@@ -88,7 +81,7 @@ public:
 	~CommandListManager();
 
 	void Create();
-	void Shutdown();
+	void Destroy();
 
 	CommandQueue& GetGraphicsQueue() { return m_graphicsQueue; }
 	CommandQueue& GetComputeQueue() { return m_computeQueue; }

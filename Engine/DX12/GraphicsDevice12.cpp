@@ -512,5 +512,4 @@ void GraphicsDevice::PlatformDestroy()
 {
 	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Destroy();
 	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER].Destroy();
-	g_commandManager.Shutdown();
 }

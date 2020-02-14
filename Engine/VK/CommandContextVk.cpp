@@ -98,19 +98,7 @@ void ContextManager::DestroyAllContexts()
 
 CommandContext::CommandContext(CommandListType type)
 	: m_type(type)
-{
-	VkSemaphoreCreateInfo semaphoreCreateInfo{};
-	semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-	semaphoreCreateInfo.pNext = nullptr;
-	
-	ThrowIfFailed(vkCreateSemaphore(GetDevice(), &semaphoreCreateInfo, nullptr, &m_signalSemaphore));
-}
-
-
-CommandContext::~CommandContext()
-{
-	vkDestroySemaphore(GetDevice(), m_signalSemaphore, nullptr);
-}
+{}
 
 
 void CommandContext::DestroyAllContexts()
@@ -180,8 +168,8 @@ void CommandContext::Finish(bool waitForCompletion)
 
 	CommandQueue& Queue = g_commandManager.GetQueue(m_type);
 
-	auto fence = Queue.ExecuteCommandList(m_commandList, waitForCompletion ? VK_NULL_HANDLE : m_signalSemaphore);
-	Queue.DiscardCommandBuffer(fence, m_commandList);
+	uint64_t fenceValue = Queue.ExecuteCommandList(m_commandList);
+	Queue.DiscardCommandBuffer(fenceValue, m_commandList);
 	m_commandList = VK_NULL_HANDLE;
 
 	// Recycle dynamic allocations
@@ -191,7 +179,7 @@ void CommandContext::Finish(bool waitForCompletion)
 
 	if (waitForCompletion)
 	{
-		g_commandManager.WaitForFence(fence);
+		g_commandManager.WaitForFence(fenceValue);
 	}
 
 	g_contextManager.FreeContext(this);

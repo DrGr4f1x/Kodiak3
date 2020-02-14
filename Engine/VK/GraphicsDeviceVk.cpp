@@ -155,7 +155,7 @@ InstanceHandle CreateInstance(const string& appName)
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.pApplicationName = appName.c_str();
 	appInfo.pEngineName = "Kodiak";
-	appInfo.apiVersion = VK_API_VERSION_1_1;
+	appInfo.apiVersion = VK_API_VERSION_1_2;
 
 	vector<const char*> instanceExtensions = 
 	{ 
@@ -263,19 +263,16 @@ namespace Kodiak
 
 struct GraphicsDevice::PlatformData : public NonCopyable
 {
-	PlatformData() = default;
+	PlatformData()
+	{
+		supportedDeviceFeatures2.pNext = &supportedDeviceFeatures1_2;
+		enabledDeviceFeatures2.pNext = &enabledDeviceFeatures1_2;
+	}
 	~PlatformData() { Destroy(); }
 
 	void Destroy()
 	{
-		g_device = nullptr;
-
-		for (int i = 0; i < NumSwapChainBuffers; ++i)
-		{
-			vkWaitForFences(device, 1, &presentFences[i], TRUE, UINT64_MAX);
-			vkDestroyFence(device, presentFences[i], nullptr);
-			presentFences[i] = VK_NULL_HANDLE;
-		}
+		DestroySemaphores();
 
 		vkDestroySwapchainKHR(device, swapChain, nullptr);
 		swapChain = VK_NULL_HANDLE;
@@ -285,6 +282,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		FreeDebugCallback(instance);
 
+		g_device = nullptr;
 		device = nullptr;
 		instance = nullptr;
 	}
@@ -317,12 +315,12 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		GatherApplicationExtensions(true);
 		ValidateApplicationExtensions();
 
-		vkGetPhysicalDeviceFeatures2(physicalDevice, &supportedDeviceFeatures);
+		vkGetPhysicalDeviceFeatures2(physicalDevice, &supportedDeviceFeatures2);
 
 		// Enabled required and optional features, as requested by the application
 		EnableFeatures(false);
 		EnableFeatures(true);
-
+		
 		// Report missing features and exit
 		if (!unsupportedRequiredFeatures.empty())
 		{
@@ -438,7 +436,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		
 		VkDeviceCreateInfo deviceCreateInfo = {};
 		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		deviceCreateInfo.pNext = &enabledDeviceFeatures;
+		deviceCreateInfo.pNext = &enabledDeviceFeatures2;
 		deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());;
 		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
 		deviceCreateInfo.pEnabledFeatures = nullptr;
@@ -454,6 +452,8 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		ThrowIfFailed(result);
 
 		device = DeviceHandle::Create(logicalDevice);
+
+		CreateSemaphores();
 	}
 
 	uint32_t GetQueueFamilyIndex(VkQueueFlagBits queueFlags)
@@ -774,16 +774,83 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		ThrowIfFailed(vkGetSwapchainImagesKHR(device, swapChain, &imageCount, images.data()));
 	}
 
-	void CreateFences()
+	void CreateSemaphores()
 	{
-		for (int i = 0; i < NumSwapChainBuffers; ++i)
-		{
-			VkFenceCreateInfo fenceInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
-			fenceInfo.pNext = nullptr;
-			fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-			
-			vkCreateFence(device, &fenceInfo, nullptr, &presentFences[i]);
-		}
+		VkSemaphoreTypeCreateInfo binaryCreateInfo;
+		binaryCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
+		binaryCreateInfo.pNext = nullptr;
+		binaryCreateInfo.semaphoreType = VK_SEMAPHORE_TYPE_BINARY;
+		binaryCreateInfo.initialValue = 0;
+
+		VkSemaphoreCreateInfo createInfo;
+		createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+		createInfo.pNext = &binaryCreateInfo;
+		createInfo.flags = 0;
+
+		ThrowIfFailed(vkCreateSemaphore(device, &createInfo, nullptr, &imageAcquireSemaphore));
+		ThrowIfFailed(vkCreateSemaphore(device, &createInfo, nullptr, &presentSemaphore));
+	}
+
+	void DestroySemaphores()
+	{
+		vkDestroySemaphore(device, imageAcquireSemaphore, nullptr);
+		imageAcquireSemaphore = VK_NULL_HANDLE;
+
+		vkDestroySemaphore(device, presentSemaphore, nullptr);
+		presentSemaphore = VK_NULL_HANDLE;
+	}
+
+	uint32_t AcquireNextImage()
+	{
+		uint32_t nextImageIndex = 0u;
+		vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAcquireSemaphore, VK_NULL_HANDLE, &nextImageIndex);
+		return nextImageIndex;
+	}
+
+	void WaitForImageAcquisition(VkQueue queue)
+	{
+		VkPipelineStageFlags waitFlag = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+
+		VkSubmitInfo submitInfo;
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.pNext = nullptr;
+		submitInfo.waitSemaphoreCount = 1;
+		submitInfo.pWaitSemaphores = &imageAcquireSemaphore;
+		submitInfo.pWaitDstStageMask = &waitFlag;
+		submitInfo.signalSemaphoreCount = 0;
+		submitInfo.pSignalSemaphores = nullptr;
+		submitInfo.commandBufferCount = 0;
+		submitInfo.pCommandBuffers = nullptr;
+
+		vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
+	}
+
+	void UnblockPresent(VkQueue queue, VkSemaphore timelineSemaphore, uint64_t fenceWaitValue)
+	{
+		uint64_t dummy = 0;
+
+		VkTimelineSemaphoreSubmitInfo timelineSubmitInfo;
+		timelineSubmitInfo.sType = VK_STRUCTURE_TYPE_TIMELINE_SEMAPHORE_SUBMIT_INFO;
+		timelineSubmitInfo.pNext = nullptr;
+		timelineSubmitInfo.waitSemaphoreValueCount = 1;
+		timelineSubmitInfo.pWaitSemaphoreValues = &fenceWaitValue;
+		timelineSubmitInfo.signalSemaphoreValueCount = 1;
+		timelineSubmitInfo.pSignalSemaphoreValues = &dummy;
+
+		VkPipelineStageFlags waitFlag = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+
+		VkSubmitInfo submitInfo;
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.pNext = &timelineSubmitInfo;
+		submitInfo.waitSemaphoreCount = 1;
+		submitInfo.pWaitSemaphores = &timelineSemaphore;
+		submitInfo.pWaitDstStageMask = &waitFlag;
+		submitInfo.signalSemaphoreCount = 1;
+		submitInfo.pSignalSemaphores = &presentSemaphore;
+		submitInfo.commandBufferCount = 0;
+		submitInfo.pCommandBuffers = nullptr;
+
+		vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
 	}
 
 	void GatherSupportedExtensions()
@@ -873,11 +940,12 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		}
 
 		// Now, hook up pointers for all the per-extension device features
-		void** pNextSupported = &supportedDeviceFeatures.pNext;
-		void** pNextEnabled = &enabledDeviceFeatures.pNext;
+		void** pNextSupported = &supportedDeviceFeatures1_2.pNext;
+		void** pNextEnabled = &enabledDeviceFeatures1_2.pNext;
 
 		for (const auto& extName : requestedExtensions)
 		{
+#if 0
 			if (extName == VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME)
 			{
 				*pNextSupported = &supportedExtendedFeatures.khrShaderFloat16Int8Features;
@@ -886,6 +954,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 				*pNextEnabled = &enabledExtendedFeatures.khrShaderFloat16Int8Features;
 				pNextEnabled = &enabledExtendedFeatures.khrShaderFloat16Int8Features.pNext;
 			}
+#endif
 		}
 	}
 
@@ -893,6 +962,16 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	{
 		auto& requestedFeatures = optionalFeatures ? g_optionalFeatures : g_requiredFeatures;
 		auto& enabledFeatures = const_cast<GraphicsFeatureSet&>(g_enabledFeatures);
+
+		// Require timeline semaphores always
+		if (!optionalFeatures)
+		{
+			TryEnableFeature(
+				false,
+				"Timeline Semaphore",
+				supportedDeviceFeatures1_2.timelineSemaphore,
+				enabledDeviceFeatures1_2.timelineSemaphore);
+		}
 
 		auto numFeatures = requestedFeatures.GetNumFeatures();
 		for (auto i = 0; i < numFeatures; ++i)
@@ -911,289 +990,289 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.robustBufferAccess,
-					enabledDeviceFeatures.features.robustBufferAccess);
+					supportedDeviceFeatures2.features.robustBufferAccess,
+					enabledDeviceFeatures2.features.robustBufferAccess);
 				break;
 
 			case GraphicsFeature::FullDrawIndexUint32:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.fullDrawIndexUint32,
-					enabledDeviceFeatures.features.fullDrawIndexUint32);
+					supportedDeviceFeatures2.features.fullDrawIndexUint32,
+					enabledDeviceFeatures2.features.fullDrawIndexUint32);
 				break;
 
 			case GraphicsFeature::TextureCubeArray:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.imageCubeArray,
-					enabledDeviceFeatures.features.imageCubeArray);
+					supportedDeviceFeatures2.features.imageCubeArray,
+					enabledDeviceFeatures2.features.imageCubeArray);
 				break;
 
 			case GraphicsFeature::IndependentBlend:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.independentBlend,
-					enabledDeviceFeatures.features.independentBlend);
+					supportedDeviceFeatures2.features.independentBlend,
+					enabledDeviceFeatures2.features.independentBlend);
 				break;
 
 			case GraphicsFeature::GeometryShader:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.geometryShader,
-					enabledDeviceFeatures.features.geometryShader);
+					supportedDeviceFeatures2.features.geometryShader,
+					enabledDeviceFeatures2.features.geometryShader);
 				break;
 
 			case GraphicsFeature::TessellationShader:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.tessellationShader,
-					enabledDeviceFeatures.features.tessellationShader);
+					supportedDeviceFeatures2.features.tessellationShader,
+					enabledDeviceFeatures2.features.tessellationShader);
 				break;
 
 			case GraphicsFeature::SampleRateShading:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.sampleRateShading,
-					enabledDeviceFeatures.features.sampleRateShading);
+					supportedDeviceFeatures2.features.sampleRateShading,
+					enabledDeviceFeatures2.features.sampleRateShading);
 				break;
 
 			case GraphicsFeature::DualSrcBlend:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.dualSrcBlend,
-					enabledDeviceFeatures.features.dualSrcBlend);
+					supportedDeviceFeatures2.features.dualSrcBlend,
+					enabledDeviceFeatures2.features.dualSrcBlend);
 				break;
 
 			case GraphicsFeature::LogicOp:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.logicOp,
-					enabledDeviceFeatures.features.logicOp);
+					supportedDeviceFeatures2.features.logicOp,
+					enabledDeviceFeatures2.features.logicOp);
 				break;
 
 			case GraphicsFeature::DrawIndirectFirstInstance:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.drawIndirectFirstInstance,
-					enabledDeviceFeatures.features.drawIndirectFirstInstance);
+					supportedDeviceFeatures2.features.drawIndirectFirstInstance,
+					enabledDeviceFeatures2.features.drawIndirectFirstInstance);
 				break;
 
 			case GraphicsFeature::DepthClamp:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.depthClamp,
-					enabledDeviceFeatures.features.depthClamp);
+					supportedDeviceFeatures2.features.depthClamp,
+					enabledDeviceFeatures2.features.depthClamp);
 				break;
 
 			case GraphicsFeature::DepthBiasClamp:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.depthBiasClamp,
-					enabledDeviceFeatures.features.depthBiasClamp);
+					supportedDeviceFeatures2.features.depthBiasClamp,
+					enabledDeviceFeatures2.features.depthBiasClamp);
 				break;
 
 			case GraphicsFeature::FillModeNonSolid:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.fillModeNonSolid,
-					enabledDeviceFeatures.features.fillModeNonSolid);
+					supportedDeviceFeatures2.features.fillModeNonSolid,
+					enabledDeviceFeatures2.features.fillModeNonSolid);
 				break;
 
 			case GraphicsFeature::DepthBounds:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.depthBounds,
-					enabledDeviceFeatures.features.depthBounds);
+					supportedDeviceFeatures2.features.depthBounds,
+					enabledDeviceFeatures2.features.depthBounds);
 				break;
 
 			case GraphicsFeature::WideLines:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.wideLines,
-					enabledDeviceFeatures.features.wideLines);
+					supportedDeviceFeatures2.features.wideLines,
+					enabledDeviceFeatures2.features.wideLines);
 				break;
 
 			case GraphicsFeature::LargePoints:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.largePoints,
-					enabledDeviceFeatures.features.largePoints);
+					supportedDeviceFeatures2.features.largePoints,
+					enabledDeviceFeatures2.features.largePoints);
 				break;
 
 			case GraphicsFeature::AlphaToOne:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.alphaToOne,
-					enabledDeviceFeatures.features.alphaToOne);
+					supportedDeviceFeatures2.features.alphaToOne,
+					enabledDeviceFeatures2.features.alphaToOne);
 				break;
 
 			case GraphicsFeature::MultiViewport:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.multiViewport,
-					enabledDeviceFeatures.features.multiViewport);
+					supportedDeviceFeatures2.features.multiViewport,
+					enabledDeviceFeatures2.features.multiViewport);
 				break;
 
 			case GraphicsFeature::SamplerAnisotropy:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.samplerAnisotropy,
-					enabledDeviceFeatures.features.samplerAnisotropy);
+					supportedDeviceFeatures2.features.samplerAnisotropy,
+					enabledDeviceFeatures2.features.samplerAnisotropy);
 				break;
 
 			case GraphicsFeature::TextureCompressionETC2:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.textureCompressionETC2,
-					enabledDeviceFeatures.features.textureCompressionETC2);
+					supportedDeviceFeatures2.features.textureCompressionETC2,
+					enabledDeviceFeatures2.features.textureCompressionETC2);
 				break;
 
 			case GraphicsFeature::TextureCompressionASTC_LDR:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.textureCompressionASTC_LDR,
-					enabledDeviceFeatures.features.textureCompressionASTC_LDR);
+					supportedDeviceFeatures2.features.textureCompressionASTC_LDR,
+					enabledDeviceFeatures2.features.textureCompressionASTC_LDR);
 				break;
 
 			case GraphicsFeature::TextureCompressionBC:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.textureCompressionBC,
-					enabledDeviceFeatures.features.textureCompressionBC);
+					supportedDeviceFeatures2.features.textureCompressionBC,
+					enabledDeviceFeatures2.features.textureCompressionBC);
 				break;
 
 			case GraphicsFeature::OcclusionQueryPrecise:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.occlusionQueryPrecise,
-					enabledDeviceFeatures.features.occlusionQueryPrecise);
+					supportedDeviceFeatures2.features.occlusionQueryPrecise,
+					enabledDeviceFeatures2.features.occlusionQueryPrecise);
 				break;
 
 			case GraphicsFeature::PipelineStatisticsQuery:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.pipelineStatisticsQuery,
-					enabledDeviceFeatures.features.pipelineStatisticsQuery);
+					supportedDeviceFeatures2.features.pipelineStatisticsQuery,
+					enabledDeviceFeatures2.features.pipelineStatisticsQuery);
 				break;
 
 			case GraphicsFeature::VertexPipelineStoresAndAtomics:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.vertexPipelineStoresAndAtomics,
-					enabledDeviceFeatures.features.vertexPipelineStoresAndAtomics);
+					supportedDeviceFeatures2.features.vertexPipelineStoresAndAtomics,
+					enabledDeviceFeatures2.features.vertexPipelineStoresAndAtomics);
 				break;
 
 			case GraphicsFeature::PixelShaderStoresAndAtomics:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.fragmentStoresAndAtomics,
-					enabledDeviceFeatures.features.fragmentStoresAndAtomics);
+					supportedDeviceFeatures2.features.fragmentStoresAndAtomics,
+					enabledDeviceFeatures2.features.fragmentStoresAndAtomics);
 				break;
 
 			case GraphicsFeature::ShaderTessellationAndGeometryPointSize:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.shaderTessellationAndGeometryPointSize,
-					enabledDeviceFeatures.features.shaderTessellationAndGeometryPointSize);
+					supportedDeviceFeatures2.features.shaderTessellationAndGeometryPointSize,
+					enabledDeviceFeatures2.features.shaderTessellationAndGeometryPointSize);
 				break;
 
 			case GraphicsFeature::ShaderTextureGatherExtended:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.shaderImageGatherExtended,
-					enabledDeviceFeatures.features.shaderImageGatherExtended);
+					supportedDeviceFeatures2.features.shaderImageGatherExtended,
+					enabledDeviceFeatures2.features.shaderImageGatherExtended);
 				break;
 			case GraphicsFeature::ShaderUAVExtendedFormats:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.shaderStorageImageExtendedFormats,
-					enabledDeviceFeatures.features.shaderStorageImageExtendedFormats);
+					supportedDeviceFeatures2.features.shaderStorageImageExtendedFormats,
+					enabledDeviceFeatures2.features.shaderStorageImageExtendedFormats);
 				break;
 
 			case GraphicsFeature::ShaderClipDistance:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.shaderClipDistance,
-					enabledDeviceFeatures.features.shaderClipDistance);
+					supportedDeviceFeatures2.features.shaderClipDistance,
+					enabledDeviceFeatures2.features.shaderClipDistance);
 				break;
 			case GraphicsFeature::ShaderCullDistance:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.shaderCullDistance,
-					enabledDeviceFeatures.features.shaderCullDistance);
+					supportedDeviceFeatures2.features.shaderCullDistance,
+					enabledDeviceFeatures2.features.shaderCullDistance);
 				break;
 			case GraphicsFeature::ShaderFloat64:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.shaderFloat64,
-					enabledDeviceFeatures.features.shaderFloat64);
+					supportedDeviceFeatures2.features.shaderFloat64,
+					enabledDeviceFeatures2.features.shaderFloat64);
 				break;
 			case GraphicsFeature::ShaderFloat16:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedExtendedFeatures.khrShaderFloat16Int8Features.shaderFloat16,
-					enabledExtendedFeatures.khrShaderFloat16Int8Features.shaderFloat16);
+					supportedDeviceFeatures1_2.shaderFloat16,
+					enabledDeviceFeatures1_2.shaderFloat16);
 				break;
 			case GraphicsFeature::ShaderInt64:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.shaderInt64,
-					enabledDeviceFeatures.features.shaderInt64);
+					supportedDeviceFeatures2.features.shaderInt64,
+					enabledDeviceFeatures2.features.shaderInt64);
 				break;
 			case GraphicsFeature::ShaderInt16:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.shaderInt16,
-					enabledDeviceFeatures.features.shaderInt16);
+					supportedDeviceFeatures2.features.shaderInt16,
+					enabledDeviceFeatures2.features.shaderInt16);
 				break;
 			case GraphicsFeature::ShaderInt8:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedExtendedFeatures.khrShaderFloat16Int8Features.shaderInt8,
-					enabledExtendedFeatures.khrShaderFloat16Int8Features.shaderInt8);
+					supportedDeviceFeatures1_2.shaderInt8,
+					enabledDeviceFeatures1_2.shaderInt8);
 				break;
 
 			case GraphicsFeature::VariableMultisampleRate:
 				enabledFeature = TryEnableFeature(
 					optionalFeatures,
 					name,
-					supportedDeviceFeatures.features.variableMultisampleRate,
-					enabledDeviceFeatures.features.variableMultisampleRate);
+					supportedDeviceFeatures2.features.variableMultisampleRate,
+					enabledDeviceFeatures2.features.variableMultisampleRate);
 				break;
 			}
 		}
@@ -1244,25 +1323,31 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	uint32_t presentQueueNodeIndex{ 0 };
 	VkColorSpaceKHR colorSpace;
 
+	VkSemaphore imageAcquireSemaphore{ VK_NULL_HANDLE };
+	VkSemaphore presentSemaphore{ VK_NULL_HANDLE };
+
 	array<VkImage, NumSwapChainBuffers> images;
-	
-	// Present and flip fences
-	array<VkFence, NumSwapChainBuffers> presentFences;
+
+	// Base features
+	VkPhysicalDeviceFeatures2			supportedDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr };
+	VkPhysicalDeviceFeatures2			enabledDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr };
+	VkPhysicalDeviceVulkan12Features	supportedDeviceFeatures1_2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, nullptr };
+	VkPhysicalDeviceVulkan12Features	enabledDeviceFeatures1_2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, nullptr };
 
 	// Extended features
+#if 0
 	struct
 	{
 		VkPhysicalDeviceShaderFloat16Int8FeaturesKHR khrShaderFloat16Int8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, nullptr };
 	} supportedExtendedFeatures, enabledExtendedFeatures;
-
-	VkPhysicalDeviceFeatures2 supportedDeviceFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr };
-	VkPhysicalDeviceFeatures2 enabledDeviceFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr };
+#endif
 };
 
 } // namespace Kodiak
 
 
-GraphicsDevice::~GraphicsDevice() = default;
+GraphicsDevice::~GraphicsDevice()
+{}
 
 
 Format GraphicsDevice::GetColorFormat() const
@@ -1339,8 +1424,6 @@ void GraphicsDevice::PlatformCreate()
 	m_platformData->InitSurface(m_hinst, m_hwnd);
 	m_platformData->CreateSwapChain(&m_width, &m_height, false /* vsync */);
 
-	m_platformData->CreateFences();
-
 	// Get ColorBuffers for swap chain images
 	for (uint32_t i = 0; i < NumSwapChainBuffers; ++i)
 	{
@@ -1351,34 +1434,33 @@ void GraphicsDevice::PlatformCreate()
 
 	g_commandManager.Create();
 
-	VkFence fence = m_platformData->presentFences[m_currentBuffer];
-	vkResetFences(m_platformData->device, 1, &fence);
-
-	vkAcquireNextImageKHR(m_platformData->device, m_platformData->swapChain, UINT64_MAX, nullptr, fence, &m_currentBuffer);
+	// Acquire the first image from the swapchain, and have the graphics queue wait on it.
+	m_currentBuffer = m_platformData->AcquireNextImage();
+	m_platformData->WaitForImageAcquisition(g_commandManager.GetCommandQueue());
 }
 
 
 void GraphicsDevice::PlatformPresent()
 {
+	// Unblock present
+	VkQueue commandQueue = g_commandManager.GetCommandQueue();
+	auto& graphicsQueue = g_commandManager.GetGraphicsQueue();
+	VkSemaphore timelineSemaphore = graphicsQueue.GetTimelineSemaphore();
+	uint64_t fenceWaitValue = graphicsQueue.GetNextFenceValue() - 1;
+
+	m_platformData->UnblockPresent(commandQueue, timelineSemaphore, fenceWaitValue);
+
 	// Present
 	VkPresentInfoKHR presentInfo = { VK_STRUCTURE_TYPE_PRESENT_INFO_KHR };
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = &m_platformData->swapChain;
 	presentInfo.pImageIndices = &m_currentBuffer;
+
 	vkQueuePresentKHR(g_commandManager.GetCommandQueue(), &presentInfo);
 
-	// Flip
-	VkDevice device = m_platformData->device;
-
-	vkWaitForFences(device, 1, &m_platformData->presentFences[m_currentBuffer], false, UINT64_MAX);
-	uint32_t nextBuffer = (m_currentBuffer + 1) % NumSwapChainBuffers;
-
-	VkFence fence = m_platformData->presentFences[nextBuffer];
-	vkResetFences(device, 1, &fence);
-
-	vkAcquireNextImageKHR(device, m_platformData->swapChain, UINT64_MAX, nullptr, fence, &m_currentBuffer);
-
-	g_commandManager.DestroyRetiredFences();
+	// Acquire the next image from the swapchain, and have the graphics queue wait on it.
+	m_currentBuffer = m_platformData->AcquireNextImage();
+	m_platformData->WaitForImageAcquisition(g_commandManager.GetCommandQueue());
 }
 
 
@@ -1392,7 +1474,6 @@ void GraphicsDevice::PlatformDestroyData()
 void GraphicsDevice::PlatformDestroy()
 {
 	g_descriptorSetAllocator.DestroyAll();
-	g_commandManager.Destroy();
 }
 
 

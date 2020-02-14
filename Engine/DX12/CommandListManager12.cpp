@@ -41,27 +41,7 @@ CommandQueue::CommandQueue(D3D12_COMMAND_LIST_TYPE type)
 
 CommandQueue::~CommandQueue()
 {
-	Shutdown();
-}
-
-
-void CommandQueue::Shutdown()
-{
-	if (m_commandQueue == nullptr)
-	{
-		return;
-	}
-
-	m_allocatorPool.Shutdown();
-
-	CloseHandle(m_fenceEventHandle);
-	m_fenceEventHandle = nullptr;
-
-	m_fence->Release();
-	m_fence = nullptr;
-
-	m_commandQueue->Release();
-	m_commandQueue = nullptr;
+	Destroy();
 }
 
 
@@ -89,20 +69,23 @@ void CommandQueue::Create()
 }
 
 
-uint64_t CommandQueue::ExecuteCommandList(ID3D12CommandList* commandList)
+void CommandQueue::Destroy()
 {
-	lock_guard<mutex> lockGuard(m_fenceMutex);
+	if (m_commandQueue == nullptr)
+	{
+		return;
+	}
 
-	assert_succeeded(((ID3D12GraphicsCommandList*)commandList)->Close());
+	m_allocatorPool.Shutdown();
 
-	// Kickoff the command list
-	m_commandQueue->ExecuteCommandLists(1, &commandList);
+	CloseHandle(m_fenceEventHandle);
+	m_fenceEventHandle = nullptr;
 
-	// Signal the next fence value (with the GPU)
-	m_commandQueue->Signal(m_fence, m_nextFenceValue);
+	m_fence->Release();
+	m_fence = nullptr;
 
-	// And increment the fence value.  
-	return m_nextFenceValue++;
+	m_commandQueue->Release();
+	m_commandQueue = nullptr;
 }
 
 
@@ -165,6 +148,23 @@ void CommandQueue::WaitForFence(uint64_t fenceValue)
 }
 
 
+uint64_t CommandQueue::ExecuteCommandList(ID3D12CommandList* commandList)
+{
+	lock_guard<mutex> lockGuard(m_fenceMutex);
+
+	assert_succeeded(((ID3D12GraphicsCommandList*)commandList)->Close());
+
+	// Kickoff the command list
+	m_commandQueue->ExecuteCommandLists(1, &commandList);
+
+	// Signal the next fence value (with the GPU)
+	m_commandQueue->Signal(m_fence, m_nextFenceValue);
+
+	// And increment the fence value.  
+	return m_nextFenceValue++;
+}
+
+
 ID3D12CommandAllocator* CommandQueue::RequestAllocator()
 {
 	uint64_t completedFence = m_fence->GetCompletedValue();
@@ -188,15 +188,15 @@ CommandListManager::CommandListManager()
 
 CommandListManager::~CommandListManager()
 {
-	Shutdown();
+	Destroy();
 }
 
 
-void CommandListManager::Shutdown()
+void CommandListManager::Destroy()
 {
-	m_graphicsQueue.Shutdown();
-	m_computeQueue.Shutdown();
-	m_copyQueue.Shutdown();
+	m_graphicsQueue.Destroy();
+	m_computeQueue.Destroy();
+	m_copyQueue.Destroy();
 }
 
 
