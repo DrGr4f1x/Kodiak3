@@ -1,10 +1,1 @@
-[submodule "External/DirectXShaderCompiler"]
-	path = External/DirectXShaderCompiler
-	url = https://github.com/Microsoft/DirectXShaderCompiler
-[submodule "Extern/stb"]
-	path = Extern/stb
-	url = https://github.com/nothings/stb
-	branch = master
-[submodule "Extern/imgui"]
-	path = Extern/imgui
-	url = https://github.com/ocornut/imgui
+
