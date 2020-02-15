@@ -79,21 +79,27 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="Engine.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="Engine.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release12|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="Engine.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="Engine.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="Engine.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="Engine.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">
@@ -133,7 +139,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>_MBCS;DX12;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(ProjectDir)..\Extern\renderdoc;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(EXTERN)assimp\include;$(EXTERN)stb;$(EXTERN)imgui;$(EXTERN)renderdoc;</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)12_d.pdb</ProgramDataBaseFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -143,7 +149,7 @@
       <AdditionalDependencies>assimp-vc142-mtd.lib;IrrXMLd.lib;zlibstaticd.lib;ImGui_d.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib;$(ProjectDir)..\Extern\Bin</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXTERN)assimp\lib;$(EXTERN)Bin</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">
@@ -153,7 +159,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>_MBCS;VK;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(ProjectDir)..\Extern\renderdoc;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(EXTERN)assimp\include;$(EXTERN)stb;$(EXTERN)imgui;$(EXTERN)renderdoc;$(VULKAN_SDK)\Include\vulkan</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)Vk_d.pdb</ProgramDataBaseFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -163,7 +169,7 @@
       <AdditionalDependencies>assimp-vc142-mtd.lib;IrrXMLd.lib;zlibstaticd.lib;ImGui_d.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib;$(ProjectDir)..\Extern\Bin</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXTERN)\assimp\lib;$(EXTERN)Bin</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">
@@ -175,7 +181,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>_MBCS;DX12;_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(ProjectDir)..\Extern\renderdoc;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(EXTERN)assimp\include;$(EXTERN)stb;$(EXTERN)imgui;$(EXTERN)renderdoc;</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)12.pdb</ProgramDataBaseFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -189,7 +195,7 @@
       <AdditionalDependencies>assimp-vc142-mt.lib;IrrXML.lib;zlibstatic.lib;ImGui.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib;$(ProjectDir)..\Extern\Bin</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXTERN)assimp\lib;$(EXTERN)Bin</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">
@@ -201,7 +207,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>_MBCS;DX12;_PROFILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(ProjectDir)..\Extern\renderdoc;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(EXTERN)assimp\include;$(EXTERN)stb;$(EXTERN)imgui;$(EXTERN)renderdoc;</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)12_p.pdb</ProgramDataBaseFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -215,7 +221,7 @@
       <AdditionalDependencies>assimp-vc142-mt.lib;IrrXML.lib;zlibstatic.lib;ImGui_p.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib;$(ProjectDir)..\Extern\Bin</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXTERN)assimp\lib;$(EXTERN)Bin</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">
@@ -227,7 +233,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>_MBCS;VK;_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(ProjectDir)..\Extern\renderdoc;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(EXTERN)assimp\include;$(EXTERN)stb;$(EXTERN)imgui;$(EXTERN)renderdoc;$(VULKAN_SDK)\Include\vulkan</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)Vk.pdb</ProgramDataBaseFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -241,7 +247,7 @@
       <AdditionalDependencies>assimp-vc142-mt.lib;IrrXML.lib;zlibstatic.lib;ImGui.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib;$(ProjectDir)..\Extern\Bin</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXTERN)assimp\lib;$(EXTERN)Bin</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">
@@ -253,7 +259,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>_MBCS;VK;_PROFILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Extern\assimp\include;$(ProjectDir)..\Extern\stb;$(ProjectDir)..\Extern\imgui;$(ProjectDir)..\Extern\renderdoc;$(VULKAN_SDK)\Include\vulkan;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(EXTERN)assimp\include;$(EXTERN)stb;$(EXTERN)imgui;$(EXTERN)renderdoc;$(VULKAN_SDK)\Include\vulkan</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)Vk_p.pdb</ProgramDataBaseFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -267,7 +273,7 @@
       <AdditionalDependencies>assimp-vc142-mt.lib;IrrXML.lib;zlibstatic.lib;ImGui_p.lib</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Extern\assimp\lib;$(ProjectDir)..\Extern\Bin</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXTERN)assimp\lib;$(EXTERN)Bin</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
