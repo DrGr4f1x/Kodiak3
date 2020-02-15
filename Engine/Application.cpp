@@ -19,8 +19,8 @@
 
 #include <iostream>
 
-#include "imgui.h"
-#include "renderdoc_app.h"
+#include <imgui.h>
+#include "Extern\renderdoc_app.h"
 
 #pragma comment(lib, "runtimeobject.lib")
 
