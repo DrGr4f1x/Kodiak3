@@ -8,6 +8,8 @@
 // Author:  David Elder
 //
 
+#include "Common.hlsli"
+
 struct VSInput
 {
 	float2 pos : POSITION;
@@ -24,11 +26,10 @@ struct VSOutput
 };
 
 
-[[vk::binding(0, 0)]]
+VK_BINDING(0, 0)
 cbuffer VSConstants : register(b0)
 {
-	float2 scale;
-	float2 translate;
+	float4x4 projectionMatrix;
 }
 
 
@@ -38,11 +39,7 @@ VSOutput main(VSInput input)
 
 	output.uv = input.uv;
 	output.color = input.color;
-	output.pos = float4(input.pos * scale + translate, 0.0, 1.0);
-
-#if !VK
-	output.pos.y = -output.pos.y;
-#endif
+	output.pos = mul(projectionMatrix, float4(input.pos.xy, 0.0, 1.0));
 
 	return output;
 }

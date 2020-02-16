@@ -348,12 +348,17 @@ void UIOverlay::InitResourceSet()
 
 void UIOverlay::UpdateConstantBuffer()
 {
-	ImGuiIO& io = ImGui::GetIO();
+	const ImDrawData* imDrawData = ImGui::GetDrawData();
 
-	m_vsConstants.scale[0] = 2.0f / io.DisplaySize.x;
-	m_vsConstants.scale[1] = 2.0f / io.DisplaySize.y;
-	m_vsConstants.translate[0] = -1.0f;
-	m_vsConstants.translate[1] = -1.0f;
+	const float L = imDrawData->DisplayPos.x;
+	const float R = L + imDrawData->DisplaySize.x;
+	const float T = imDrawData->DisplayPos.y;
+	const float B = T + imDrawData->DisplaySize.y;
+
+	m_vsConstants.projectionMatrix.SetX(Vector4(2.0f / (R - L), 0.0f, 0.0f, 0.0f));
+	m_vsConstants.projectionMatrix.SetY(Vector4(0.0f, 2.0f / (T - B), 0.0f, 0.0f));
+	m_vsConstants.projectionMatrix.SetZ(Vector4(0.0f, 0.0f, 0.5f, 0.0f));
+	m_vsConstants.projectionMatrix.SetW(Vector4((R + L) / (L - R), (T + B) / (B - T), 0.5f, 1.0f));
 
 	m_vsConstantBuffer.Update(sizeof(VSConstants), &m_vsConstants);
 }

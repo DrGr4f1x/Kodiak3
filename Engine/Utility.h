@@ -153,12 +153,12 @@ inline std::wstring MakeWStr(const std::string& str)
 	{
 		return std::wstring();
 	}
-	int numChars = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, str.c_str(), (int)str.size(), nullptr, 0);
+	int numChars = MultiByteToWideChar(CP_ACP, WC_ERR_INVALID_CHARS, str.c_str(), (int)str.size(), nullptr, 0);
 	std::wstring wstr;
 	if (numChars)
 	{
 		wstr.resize(numChars);
-		if (MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, str.c_str(), (int)str.size(), &wstr[0], numChars))
+		if (MultiByteToWideChar(CP_ACP, WC_ERR_INVALID_CHARS, str.c_str(), (int)str.size(), &wstr[0], numChars))
 		{
 			return wstr;
 		}
@@ -173,12 +173,12 @@ inline std::string MakeStr(const std::wstring& wstr)
 	{
 		return std::string();
 	}
-	int numChars = WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS, wstr.c_str(), (int)wstr.size(), nullptr, 0, nullptr, nullptr);
+	int numChars = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wstr.c_str(), (int)wstr.size(), nullptr, 0, nullptr, nullptr);
 	std::string str;
 	if (numChars)
 	{
 		str.resize(numChars);
-		if (WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS, wstr.c_str(), (int)wstr.size(), &str[0], numChars, nullptr, nullptr))
+		if (WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wstr.c_str(), (int)wstr.size(), &str[0], numChars, nullptr, nullptr))
 		{
 			return str;
 		}

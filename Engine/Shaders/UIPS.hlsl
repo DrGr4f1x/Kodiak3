@@ -8,6 +8,8 @@
 // Author:  David Elder
 //
 
+#include "Common.hlsli"
+
 struct PSInput
 {
 	float4 pos : SV_Position;
@@ -16,10 +18,10 @@ struct PSInput
 };
 
 
-[[vk::binding(0, 1)]]
+VK_BINDING(0, 1)
 Texture2D fontTex : register(t0);
 
-[[vk::binding(0, 2)]]
+VK_BINDING(0, 2)
 SamplerState linearSampler : register(s0);
 
 

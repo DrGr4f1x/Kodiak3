@@ -8,6 +8,8 @@
 // Author:  David Elder
 //
 
+#include "Common.hlsli"
+
 struct VSInput
 {
 	float3 pos : POSITION;

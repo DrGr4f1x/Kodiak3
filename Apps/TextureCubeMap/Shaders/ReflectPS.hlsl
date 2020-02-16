@@ -8,6 +8,8 @@
 // Author:  David Elder
 //
 
+#include "Common.hlsli"
+
 struct PSInput
 {
 	float4 pos : SV_Position;
@@ -18,14 +20,14 @@ struct PSInput
 };
 
 
-[[vk::binding(1, 1)]]
+VK_BINDING(1, 1)
 TextureCube texCube : register(t0);
 
-[[vk::binding(0, 2)]]
+VK_BINDING(0, 2)
 SamplerState samplerLinear : register(s0);
 
 
-[[vk::binding(0, 1)]]
+VK_BINDING(0, 1)
 cbuffer PSConstants : register(b0)
 {
 	float lodBias;

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <DXC_COMMAND>$(SolutionDir)Tools\DXC\dxc.exe</DXC_COMMAND>
+    <SHADER_OUTPUT>$(SHADER_OUTPUT_DIR)%(Filename)$(COMPILED_SHADER_SUFFIX)</SHADER_OUTPUT>
+    <DXC_COMPILE_VS>$(DXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -T vs_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</DXC_COMPILE_VS>
+    <DXC_COMPILE_PS>$(DXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -T ps_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</DXC_COMPILE_PS>
+    <DXC_COMPILE_GS>$(DXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -T gs_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</DXC_COMPILE_GS>
+    <DXC_COMPILE_HS>$(DXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -T hs_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</DXC_COMPILE_HS>
+    <DXC_COMPILE_DS>$(DXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -T ds_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</DXC_COMPILE_DS>
+    <DXC_COMPILE_CS>$(DXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -T cs_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</DXC_COMPILE_CS>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="DXC_COMMAND">
+      <Value>$(DXC_COMMAND)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="SHADER_OUTPUT">
+      <Value>$(SHADER_OUTPUT)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="DXC_COMPILE_VS">
+      <Value>$(DXC_COMPILE_VS)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="DXC_COMPILE_PS">
+      <Value>$(DXC_COMPILE_PS)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="DXC_COMPILE_GS">
+      <Value>$(DXC_COMPILE_GS)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="DXC_COMPILE_HS">
+      <Value>$(DXC_COMPILE_HS)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="DXC_COMPILE_DS">
+      <Value>$(DXC_COMPILE_DS)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="DXC_COMPILE_CS">
+      <Value>$(DXC_COMPILE_CS)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

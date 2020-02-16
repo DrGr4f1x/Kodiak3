@@ -65,8 +65,7 @@ protected:
 
 	struct VSConstants
 	{
-		float scale[2];
-		float translate[2];
+		Math::Matrix4 projectionMatrix;
 	};
 
 	IndexBuffer		m_indexBuffer;

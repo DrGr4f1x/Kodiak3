@@ -2,13 +2,48 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <EXTERN>$(ProjectDir)..\Extern\</EXTERN>
+  	<DefaultProfile>--profile 6.0</DefaultProfile>
+    <VertexShader>$(ShaderCompiler) --compiler dxc --shader_stage vertex $(DefaultProfile) $(SpirvFlag) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </VertexShader>
+    <PixelShader>$(ShaderCompiler) --compiler dxc --shader_stage pixel $(DefaultProfile) $(SpirvFlag) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </PixelShader>
+    <GeometryShader>$(ShaderCompiler) --compiler dxc --shader_stage geometry $(DefaultProfile) $(SpirvFlag) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </GeometryShader>
+    <HullShader>$(ShaderCompiler) --compiler dxc --shader_stage hull $(DefaultProfile) $(SpirvFlag) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </HullShader>
+    <DomainShader>$(ShaderCompiler) --compiler dxc --shader_stage domain $(DefaultProfile) $(SpirvFlag) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </DomainShader>
+    <ComputeShader>$(ShaderCompiler) --compiler dxc --shader_stage compute $(DefaultProfile) $(SpirvFlag) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </ComputeShader>
+    <ShaderOutputMsg>Compiling shader to $(ShaderOutputFormat)...</ShaderOutputMsg>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
   <ItemGroup>
-    <BuildMacro Include="EXTERN">
-      <Value>$(EXTERN)</Value>
+  	<BuildMacro Include="DefaultProfile">
+      <Value>$(DefaultProfile)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="VertexShader">
+      <Value>$(VertexShader)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PixelShader">
+      <Value>$(PixelShader)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="GeometryShader">
+      <Value>$(GeometryShader)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="HullShader">
+      <Value>$(HullShader)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="DomainShader">
+      <Value>$(DomainShader)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ComputeShader">
+      <Value>$(ComputeShader)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ShaderOutputMsg">
+      <Value>$(ShaderOutputMsg)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>

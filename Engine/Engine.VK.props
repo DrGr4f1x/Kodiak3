@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <ShaderOutputDir>$(ProjectDir)..\Apps\Data\Shaders\SPIR-V\</ShaderOutputDir>
+    <SpirvFlag>--spirv</SpirvFlag>
+    <ShaderOutputFormat>SPIR-V</ShaderOutputFormat>
+    <ShaderSuffix>.spv</ShaderSuffix>
+    <DefaultGlslcProfile>--profile 1.5</DefaultGlslcProfile>
+    <VertexShaderGlslc>$(ShaderCompiler) --compiler glslc --shader_stage vertex $(DefaultGlslcProfile) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </VertexShaderGlslc>
+    <PixelShaderGlslc>$(ShaderCompiler) --compiler glslc --shader_stage pixel $(DefaultGlslcProfile) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </PixelShaderGlslc>
+    <GeometryShaderGlslc>$(ShaderCompiler) --compiler glslc --shader_stage geometry $(DefaultGlslcProfile) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </GeometryShaderGlslc>
+    <HullShaderGlslc>$(ShaderCompiler) --compiler glslc --shader_stage hull $(DefaultGlslcProfile) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </HullShaderGlslc>
+    <DomainShaderGlslc>$(ShaderCompiler) --compiler glslc --shader_stage domain $(DefaultGlslcProfile) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </DomainShaderGlslc>
+    <ComputeShaderGlslc>$(ShaderCompiler) --compiler glslc --shader_stage compute $(DefaultGlslcProfile) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </ComputeShaderGlslc>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="ShaderOutputDir">
+      <Value>$(ShaderOutputDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="SpirvFlag">
+      <Value>$(SpirvFlag)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="DefaultGlslcProfile">
+      <Value>$(DefaultGlslcProfile)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ShaderOutputFormat">
+      <Value>$(ShaderOutputFormat)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ShaderSuffix">
+      <Value>$(ShaderSuffix)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="VertexShaderGlslc">
+      <Value>$(VertexShaderGlslc)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PixelShaderGlslc">
+      <Value>$(PixelShaderGlslc)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="GeometryShaderGlslc">
+      <Value>$(GeometryShaderGlslc)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="HullShaderGlslc">
+      <Value>$(HullShaderGlslc)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="DomainShaderGlslc">
+      <Value>$(DomainShaderGlslc)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ComputeShaderGlslc">
+      <Value>$(ComputeShaderGlslc)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

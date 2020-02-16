@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <GRAPHICS_API_DEFINE>VK</GRAPHICS_API_DEFINE>
+    <SHADER_OUTPUT_DIR>$(ProjectDir)Data\Shaders\SPIR-V\</SHADER_OUTPUT_DIR>
+    <COMPILED_SHADER_SUFFIX>.spv</COMPILED_SHADER_SUFFIX>
+    <SPIRV_FLAG>-spirv</SPIRV_FLAG>
+    <GLSLC_COMMAND>glslc.exe</GLSLC_COMMAND>
+    <GLSLC_COMPILE_VS>$(GLSLC_COMMAND) -DVK=1 -DGLSL=1 --target-env=vulkan1.2 -fshader-stage=vert %(Fullpath) -o $(SHADER_OUTPUT_DIR)%(Filename).spv -I $(SHADER_INCLUDE_PATH)</GLSLC_COMPILE_VS>
+    <GLSLC_COMPILE_PS>$(GLSLC_COMMAND) -DVK=1 -DGLSL=1 --target-env=vulkan1.2 -fshader-stage=frag %(Fullpath) -o $(SHADER_OUTPUT_DIR)%(Filename).spv -I $(SHADER_INCLUDE_PATH)</GLSLC_COMPILE_PS>
+    <GLSLC_COMPILE_GS>$(GLSLC_COMMAND) -DVK=1 -DGLSL=1 --target-env=vulkan1.2 -fshader-stage=geom %(Fullpath) -o $(SHADER_OUTPUT_DIR)%(Filename).spv -I $(SHADER_INCLUDE_PATH)</GLSLC_COMPILE_GS>
+    <GLSLC_COMPILE_HS>$(GLSLC_COMMAND) -DVK=1 -DGLSL=1 --target-env=vulkan1.2 -fshader-stage=tesc %(Fullpath) -o $(SHADER_OUTPUT_DIR)%(Filename).spv -I $(SHADER_INCLUDE_PATH)</GLSLC_COMPILE_HS>
+    <GLSLC_COMPILE_DS>$(GLSLC_COMMAND) -DVK=1 -DGLSL=1 --target-env=vulkan1.2 -fshader-stage=tese %(Fullpath) -o $(SHADER_OUTPUT_DIR)%(Filename).spv -I $(SHADER_INCLUDE_PATH)</GLSLC_COMPILE_DS>
+    <GLSLC_COMPILE_CS>$(GLSLC_COMMAND) -DVK=1 -DGLSL=1 --target-env=vulkan1.2 -fshader-stage=comp %(Fullpath) -o $(SHADER_OUTPUT_DIR)%(Filename).spv -I $(SHADER_INCLUDE_PATH)</GLSLC_COMPILE_CS>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="GRAPHICS_API_DEFINE">
+      <Value>$(GRAPHICS_API_DEFINE)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="SHADER_OUTPUT_DIR">
+      <Value>$(SHADER_OUTPUT_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="COMPILED_SHADER_SUFFIX">
+      <Value>$(COMPILED_SHADER_SUFFIX)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="SPIRV_FLAG">
+      <Value>$(SPIRV_FLAG)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="GLSLC_COMMAND">
+      <Value>$(GLSLC_COMMAND)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="GLSLC_COMPILE_VS">
+      <Value>$(GLSLC_COMPILE_VS)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="GLSLC_COMPILE_PS">
+      <Value>$(GLSLC_COMPILE_PS)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="GLSLC_COMPILE_GS">
+      <Value>$(GLSLC_COMPILE_GS)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="GLSLC_COMPILE_HS">
+      <Value>$(GLSLC_COMPILE_HS)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="GLSLC_COMPILE_DS">
+      <Value>$(GLSLC_COMPILE_DS)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="GLSLC_COMPILE_CS">
+      <Value>$(GLSLC_COMPILE_CS)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

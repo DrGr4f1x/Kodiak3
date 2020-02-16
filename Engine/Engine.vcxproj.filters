@@ -397,12 +397,18 @@
     <Filter Include="Graphics\Shaders\UI">
       <UniqueIdentifier>{23b14d49-0f2b-4293-8df5-c248809cf292}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics\Shaders\Common">
+      <UniqueIdentifier>{c56cfd45-2e8e-4414-8a17-ccaa76eedb2e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Math\Functions.inl">
       <Filter>Math</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="Shaders\Common\Common.hlsli">
+      <Filter>Graphics\Shaders\Common</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Shaders\UIPS.hlsl">
