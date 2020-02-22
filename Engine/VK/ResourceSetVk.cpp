@@ -29,10 +29,21 @@ void ResourceSet::Init(const RootSignature* rootSig)
 {
 	m_rootSig = rootSig;
 
+	for (uint32_t i = 0; i < m_dynamicOffsets.size(); ++i)
+	{
+		m_dynamicOffsets[i] = 0;
+	}
+
 	int rootIndex = 0;
 	for (uint32_t i = 0; i < m_rootSig->GetNumParameters(); ++i)
 	{
-		ResourceTable& resourceTable = m_resourceTables[i];
+		auto& resourceTable = m_resourceTables[i];
+
+		const auto& rootParameter = (*m_rootSig)[i];
+
+		if (rootParameter.GetType() == RootParameterType::DynamicRootCBV)
+			resourceTable.isDynamicCBV = true;
+
 		uint32_t numDescriptors = (*m_rootSig)[i].GetNumDescriptors();
 
 		if (numDescriptors == 0)
@@ -178,8 +189,16 @@ void ResourceSet::SetCBV(int rootIndex, int paramIndex, const ConstantBuffer& bu
 	VkWriteDescriptorSet& writeSet = m_resourceTables[rootIndex].writeDescriptorSets[paramIndex];
 
 	writeSet.descriptorCount = 1;
-	writeSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	writeSet.descriptorType = m_resourceTables[rootIndex].isDynamicCBV ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC : VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	writeSet.dstSet = m_resourceTables[rootIndex].descriptorSet;
 	writeSet.dstBinding = paramIndex;
 	writeSet.pBufferInfo = buffer.GetCBV().GetHandle();
+}
+
+
+void ResourceSet::SetDynamicOffset(int rootIndex, uint32_t offset)
+{
+	assert(m_resourceTables[rootIndex].isDynamicCBV);
+
+	m_dynamicOffsets[rootIndex] = offset;
 }

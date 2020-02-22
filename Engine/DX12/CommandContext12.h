@@ -364,9 +364,19 @@ inline void GraphicsContext::SetResources(const ResourceSet& resources)
 		if (rootIndex == -1)
 			break;
 
-		if (resources.m_resourceTables[i].gpuDescriptor.ptr != D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+		const auto& resourceTable = resources.m_resourceTables[i];
+
+		if (resourceTable.gpuDescriptor.ptr != D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
 		{
-			m_commandList->SetGraphicsRootDescriptorTable((UINT)rootIndex, resources.m_resourceTables[i].gpuDescriptor);
+			m_commandList->SetGraphicsRootDescriptorTable(
+				(UINT)rootIndex, 
+				resourceTable.gpuDescriptor);
+		}
+		else if (resourceTable.gpuAddress != D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+		{
+			m_commandList->SetGraphicsRootConstantBufferView(
+				(UINT)rootIndex, 
+				resourceTable.gpuAddress + resources.m_dynamicOffsets[rootIndex]);
 		}
 	}
 }

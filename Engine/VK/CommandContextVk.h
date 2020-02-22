@@ -381,8 +381,8 @@ inline void GraphicsContext::SetResources(const ResourceSet& resources)
 			(uint32_t)rootIndex, 
 			1, 
 			&resources.m_resourceTables[i].descriptorSet, 
-			0, 
-			nullptr);
+			resources.m_resourceTables[i].isDynamicCBV ? 1 : 0,
+			resources.m_resourceTables[i].isDynamicCBV ? &resources.m_dynamicOffsets[i] : nullptr);
 	}
 
 	if (resources.m_staticSamplers != VK_NULL_HANDLE)

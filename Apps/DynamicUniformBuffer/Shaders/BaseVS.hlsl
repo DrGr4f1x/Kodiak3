@@ -12,9 +12,13 @@ cbuffer VSConstants : register(b0)
 {
 	float4x4 projectionMatrix;
 	float4x4 viewMatrix;
-	float4x4 modelMatrix;
 };
 
+
+cbuffer VSModelConstants : register(b1)
+{
+	float4x4 modelMatrix;
+};
 
 struct VSInput
 {

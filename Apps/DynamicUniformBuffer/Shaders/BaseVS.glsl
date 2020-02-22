@@ -3,12 +3,16 @@
 layout(location = 0) in vec3 inPos;
 layout(location = 1) in vec3 inColor;
 
-layout(push_constant) uniform UboView
+layout(binding = 0) uniform UboView
 {
 	mat4 projection;
 	mat4 view;
-	mat4 model;
-} pushConsts;
+} uboView;
+
+layout(set = 1, binding = 0) uniform UboInstance
+{
+mat4 model;
+} uboInstance;
 
 layout(location = 0) out vec3 outColor;
 
@@ -20,7 +24,7 @@ out gl_PerVertex
 void main()
 {
 	outColor = inColor;
-	mat4 modelView = pushConsts.view * pushConsts.model;
+	mat4 modelView = uboView.view * uboInstance.model;
 	vec3 worldPos = vec3(modelView * vec4(inPos, 1.0));
-	gl_Position = pushConsts.projection * modelView * vec4(inPos.xyz, 1.0);
+	gl_Position = uboView.projection * modelView * vec4(inPos.xyz, 1.0);
 }

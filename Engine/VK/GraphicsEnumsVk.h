@@ -253,15 +253,6 @@ inline VkDescriptorType DescriptorTypeToVulkan(DescriptorType type)
 }
 
 
-enum class RootParameterType
-{
-	Invalid,
-	DescriptorTable,
-	RootCBV,
-	DynamicRootCBV
-};
-
-
 enum class RootSignatureFlags
 {
 	None,

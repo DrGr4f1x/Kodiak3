@@ -88,6 +88,16 @@ enum class QueryType
 };
 
 
+enum class RootParameterType
+{
+	Invalid,
+	DescriptorTable,
+	RootConstants,
+	RootCBV,
+	DynamicRootCBV
+};
+
+
 inline uint32_t BitsPerPixel(Format format)
 {
 	switch (format)

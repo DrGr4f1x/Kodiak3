@@ -40,6 +40,7 @@ void DynamicUniformBufferApp::Startup()
 	InitPSO();
 	InitConstantBuffers();
 	InitBox();
+	InitResourceSet();
 }
 
 
@@ -77,13 +78,12 @@ void DynamicUniformBufferApp::Render()
 	context.SetIndexBuffer(m_indexBuffer);
 	context.SetVertexBuffer(0, m_vertexBuffer);
 
-	context.SetConstantArray(0, 32, &m_vsConstants);
-
 	for (uint32_t i = 0; i < m_numCubes; ++i)
 	{
 		uint32_t dynamicOffset = i * (uint32_t)m_dynamicAlignment;
-		
-		context.SetConstantArray(0, 16, (uint8_t*)(m_vsModelConstants.modelMatrix) + dynamicOffset, 32);
+		m_resources.SetDynamicOffset(1, dynamicOffset);
+
+		context.SetResources(m_resources);
 
 		context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
 	}
@@ -99,8 +99,9 @@ void DynamicUniformBufferApp::Render()
 
 void DynamicUniformBufferApp::InitRootSig()
 {
-	m_rootSignature.Reset(1);
-	m_rootSignature[0].InitAsConstants(0, 48, ShaderVisibility::Vertex);
+	m_rootSignature.Reset(2);
+	m_rootSignature[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+	m_rootSignature[1].InitAsDynamicConstantBuffer(1, ShaderVisibility::Vertex);
 	m_rootSignature.Finalize("Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout | RootSignatureFlags::DenyPixelShaderRootAccess);
 }
 
@@ -139,6 +140,7 @@ void DynamicUniformBufferApp::InitConstantBuffers()
 	m_vsModelConstants.modelMatrix = (Matrix4*)_aligned_malloc(allocSize, m_dynamicAlignment);
 
 	m_vsConstantBuffer.Create("VS Constant Buffer", 1, sizeof(VSConstants));
+	m_vsModelConstantBuffer.Create("VS Model Constant Buffer", 1, allocSize);
 
 	UpdateConstantBuffers();
 
@@ -187,6 +189,15 @@ void DynamicUniformBufferApp::InitBox()
 }
 
 
+void DynamicUniformBufferApp::InitResourceSet()
+{
+	m_resources.Init(&m_rootSignature);
+	m_resources.SetCBV(0, 0, m_vsConstantBuffer);
+	m_resources.SetCBV(1, 0, m_vsModelConstantBuffer);
+	m_resources.Finalize();
+}
+
+
 void DynamicUniformBufferApp::UpdateConstantBuffers()
 {
 	using namespace Math;
@@ -229,6 +240,8 @@ void DynamicUniformBufferApp::UpdateConstantBuffers()
 			}
 		}
 	}
+
+	m_vsModelConstantBuffer.Update(m_dynamicAlignment * m_numCubes, m_vsModelConstants.modelMatrix);
 
 	m_animationTimer = 0.0f;
 }

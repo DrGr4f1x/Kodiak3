@@ -30,11 +30,18 @@ void ResourceSet::Init(const RootSignature* rootSig)
 {
 	m_rootSig = rootSig;
 
+	for (uint32_t i = 0; i < m_dynamicOffsets.size(); ++i)
+	{
+		m_dynamicOffsets[i] = 0;
+	}
+
 	for (uint32_t i = 0; i < m_rootSig->GetNumParameters(); ++i)
 	{
-		ResourceTable& resourceTable = m_resourceTables[i];
+		auto& resourceTable = m_resourceTables[i];
 
-		uint32_t numDescriptors = (*m_rootSig)[i].GetNumDescriptors();
+		const auto& rootParameter = (*m_rootSig)[i];
+
+		uint32_t numDescriptors = rootParameter.GetNumDescriptors();
 		resourceTable.descriptors.resize(numDescriptors);
 
 		for (uint32_t j = 0; j < numDescriptors; ++j)
@@ -45,6 +52,7 @@ void ResourceSet::Init(const RootSignature* rootSig)
 	
 		resourceTable.rootIndex = i;
 		resourceTable.isSamplerTable = false;
+		resourceTable.isRootCBV = rootParameter.IsRootCBV();
 	}
 }
 
@@ -146,5 +154,20 @@ void ResourceSet::SetUAV(int rootIndex, int paramIndex, const Texture& texture)
 
 void ResourceSet::SetCBV(int rootIndex, int paramIndex, const ConstantBuffer& buffer)
 {
-	m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetCBV().GetHandle();
+	if (m_resourceTables[rootIndex].isRootCBV)
+	{
+		m_resourceTables[rootIndex].gpuAddress = buffer.GetGpuAddress();
+	}
+	else
+	{
+		m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetCBV().GetHandle();
+	}
+}
+
+
+void ResourceSet::SetDynamicOffset(int rootIndex, uint32_t offset)
+{
+	assert(m_resourceTables[rootIndex].gpuAddress != D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN);
+
+	m_dynamicOffsets[rootIndex] = offset;
 }

@@ -321,7 +321,7 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 
 		VkDescriptorSetLayoutCreateInfo createInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
 		createInfo.pNext = nullptr;
-		createInfo.flags = usePushDescriptor ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR : 0;
+		createInfo.flags = 0; // usePushDescriptor ? VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR : 0;
 		createInfo.bindingCount = static_cast<uint32_t>(parameter.m_bindings.size());
 		createInfo.pBindings = parameter.m_bindings.empty() ? nullptr : parameter.m_bindings.data();
 

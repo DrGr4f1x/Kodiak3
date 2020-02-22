@@ -37,6 +37,7 @@ private:
 	void InitPSO();
 	void InitConstantBuffers();
 	void InitBox();
+	void InitResourceSet();
 
 	void UpdateConstantBuffers();
 
@@ -58,12 +59,15 @@ private:
 	};
 	size_t m_dynamicAlignment{ 0 };
 	VSModelConstants m_vsModelConstants;
+	Kodiak::ConstantBuffer m_vsModelConstantBuffer;
 
 	Kodiak::RootSignature m_rootSignature;
 	Kodiak::GraphicsPSO m_pso;
 
 	Kodiak::VertexBuffer m_vertexBuffer;
 	Kodiak::IndexBuffer m_indexBuffer;
+
+	Kodiak::ResourceSet m_resources;
 
 	Kodiak::CameraController m_controller;
 

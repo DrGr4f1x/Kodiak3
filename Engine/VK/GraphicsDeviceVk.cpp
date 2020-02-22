@@ -104,7 +104,10 @@ VkBool32 messageCallback(
 	OutputDebugString(debugMessage.str().c_str());
 	if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
 	{
-		assert(false);
+		if (strstr(pMsg, "VUID-vkDestroyBuffer-buffer-00922") == nullptr && strstr(pMsg, "VUID-vkFreeMemory-memory-00677") == nullptr && strstr(pMsg, "VUID-vkResetCommandBuffer-commandBuffer-00045") == nullptr)
+		{
+			assert(false);
+		}
 	}
 
 	fflush(stderr);
@@ -1455,6 +1458,8 @@ void GraphicsDevice::PlatformPresent()
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = &m_platformData->swapChain;
 	presentInfo.pImageIndices = &m_currentBuffer;
+	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.pWaitSemaphores = &m_platformData->presentSemaphore;
 
 	vkQueuePresentKHR(g_commandManager.GetCommandQueue(), &presentInfo);
 

@@ -35,6 +35,8 @@ public:
 
 	void InitAsConstants(uint32_t _register, uint32_t numDwords, ShaderVisibility visibility = ShaderVisibility::All)
 	{
+		assert(m_type == RootParameterType::Invalid);
+
 		m_pushConstantRange.offset = 0;
 		m_pushConstantRange.size = numDwords * sizeof(DWORD);
 		m_pushConstantRange.stageFlags = static_cast<VkShaderStageFlags>(visibility);
@@ -74,7 +76,7 @@ public:
 		VkDescriptorSetLayoutBinding binding;
 		binding.stageFlags = static_cast<VkShaderStageFlags>(visibility);
 		binding.descriptorCount = 1;
-		binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; // VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
 		binding.binding = 0;
 		binding.pImmutableSamplers = nullptr;
 

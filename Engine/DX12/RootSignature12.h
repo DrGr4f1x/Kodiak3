@@ -98,7 +98,7 @@ public:
 		range->OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 	}
 
-	//const D3D12_ROOT_PARAMETER& operator()() const { return m_rootParam; }
+	bool IsRootCBV() const { return m_rootParam.ParameterType == D3D12_ROOT_PARAMETER_TYPE_CBV; }
 
 	uint32_t GetNumDescriptors() const;
 
@@ -106,6 +106,8 @@ protected:
 	D3D12_ROOT_PARAMETER m_rootParam;
 };
 
+// We directly treat RootParameter as byte-equivalent to D3D12_ROOT_PARAMETER
+static_assert(sizeof(RootParameter) == sizeof(D3D12_ROOT_PARAMETER));
 
 // Maximum 64 DWORDS divied up amongst all root parameters.
 // Root constants = 1 DWORD * NumConstants
