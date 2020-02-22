@@ -8,13 +8,16 @@
 // Author:  David Elder
 //
 
+#include "Common.hlsli"
+
+VK_BINDING(0, 0)
 cbuffer VSConstants : register(b0)
 {
 	float4x4 projectionMatrix;
 	float4x4 viewMatrix;
 };
 
-
+VK_BINDING(0, 1)
 cbuffer VSModelConstants : register(b1)
 {
 	float4x4 modelMatrix;
