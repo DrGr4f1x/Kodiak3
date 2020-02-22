@@ -96,6 +96,12 @@ void ComputeClothApp::Render()
 			else
 				computeContext.SetResources(m_computeResources[m_readSet]);
 			computeContext.Dispatch2D(m_gridSize[0], m_gridSize[1]);
+
+			if (j != iterations - 1)
+			{
+				computeContext.InsertUAVBarrier(m_clothBuffer[0]);
+				computeContext.InsertUAVBarrier(m_clothBuffer[1]);
+			}
 		}
 	}
 
@@ -221,7 +227,7 @@ void ComputeClothApp::InitConstantBuffers()
 	m_csConstants.deltaT = 0.0f;
 	m_csConstants.particleMass = 0.1f;
 	m_csConstants.springStiffness = 2000.0f;
-	m_csConstants.damping = 0.25;
+	m_csConstants.damping = 0.25f;
 	m_csConstants.restDistH = dx;
 	m_csConstants.restDistV = dy;
 	m_csConstants.restDistD = sqrtf(dx * dx + dy * dy);
@@ -359,10 +365,8 @@ void ComputeClothApp::UpdateConstantBuffers()
 	m_csConstants.deltaT = m_frameTimer / 64.0f;
 	if (m_simulateWind)
 	{
-		float scale = (1.0f + g_rng.NextFloat(5.0f)) - (1.0f + g_rng.NextFloat(5.0f));
-		m_csConstants.gravity.SetX(cosf(XMConvertToRadians(m_timer * 360.0f)) * scale);
-		scale = (1.0f + g_rng.NextFloat(5.0f)) - (1.0f + g_rng.NextFloat(5.0f));
-		m_csConstants.gravity.SetZ(sinf(XMConvertToRadians(m_timer * 360.0f)) * scale);
+		m_csConstants.gravity.SetX(cosf(XMConvertToRadians(-m_timer * 360.0f)) * (g_rng.NextFloat(1.0f, 6.0f) - g_rng.NextFloat(1.0f, 6.0f)));
+		m_csConstants.gravity.SetZ(sinf(XMConvertToRadians(m_timer * 360.0f)) * (g_rng.NextFloat(1.0f, 6.0f) - g_rng.NextFloat(1.0f, 6.0f)));
 	}
 	else
 	{

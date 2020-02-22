@@ -432,6 +432,36 @@ void CommandContext::TransitionResource(GpuResource& resource, ResourceState new
 }
 
 
+void CommandContext::InsertUAVBarrier(GpuResource& resource, bool flushImmediate)
+{
+	//assert_msg(m_numBarriersToFlush < 16, "Exceeded arbitrary limit on buffered barriers");
+
+	GpuBuffer& buffer = dynamic_cast<GpuBuffer&>(resource);
+
+	VkBufferMemoryBarrier barrierDesc = {};
+
+	barrierDesc.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+	barrierDesc.pNext = nullptr;
+	barrierDesc.buffer = resource.m_resource;
+	barrierDesc.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+	barrierDesc.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+	barrierDesc.offset = 0;
+	barrierDesc.size = VK_WHOLE_SIZE;
+
+	vkCmdPipelineBarrier(
+		m_commandList,
+		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		0,
+		0,
+		nullptr,
+		1,
+		&barrierDesc,
+		0,
+		nullptr);
+}
+
+
 void CommandContext::Reset()
 {
 	assert(m_commandList == VK_NULL_HANDLE);

@@ -88,6 +88,8 @@ public:
 	static void InitializeBuffer(GpuBuffer& dest, const void* initialData, size_t numBytes, bool useOffset = false, size_t offset = 0);
 
 	void TransitionResource(GpuResource& resource, ResourceState newState, bool flushImmediate = false);
+	void InsertUAVBarrier(GpuResource& resource, bool flushImmediate = false);
+	//void InsertAliasBarrier(GpuResource& before, GpuResource& after, bool flushImmediate = false);
 	inline void FlushResourceBarriers() { /* TODO - see if we can cache and flush multiple barriers at once */ }
 
 protected:
