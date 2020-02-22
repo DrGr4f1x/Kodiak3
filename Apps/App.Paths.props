@@ -2,13 +2,18 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <SHADER_INCLUDE_PATH>$(SolutionDir)Engine\Shaders\Common</SHADER_INCLUDE_PATH>
+    <ShaderIncludePath>$(SolutionDir)Engine\Shaders\Common</ShaderIncludePath>
+    <ShaderCompiler>$(SolutionDir)Tools\ShaderCompiler\bin\netcoreapp3.1\ShaderCompiler.exe</ShaderCompiler>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
   <ItemGroup>
-    <BuildMacro Include="SHADER_INCLUDE_PATH">
-      <Value>$(SHADER_INCLUDE_PATH)</Value>
+    <BuildMacro Include="ShaderIncludePath">
+      <Value>$(ShaderIncludePath)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ShaderCompiler">
+      <Value>$(ShaderCompiler)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>

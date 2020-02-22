@@ -2,48 +2,48 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <DXC_COMMAND>$(SolutionDir)Tools\DXC\dxc.exe</DXC_COMMAND>
-    <SHADER_OUTPUT>$(SHADER_OUTPUT_DIR)%(Filename)$(COMPILED_SHADER_SUFFIX)</SHADER_OUTPUT>
-    <DXC_COMPILE_VS>$(DXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -T vs_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</DXC_COMPILE_VS>
-    <DXC_COMPILE_PS>$(DXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -T ps_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</DXC_COMPILE_PS>
-    <DXC_COMPILE_GS>$(DXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -T gs_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</DXC_COMPILE_GS>
-    <DXC_COMPILE_HS>$(DXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -T hs_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</DXC_COMPILE_HS>
-    <DXC_COMPILE_DS>$(DXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -T ds_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</DXC_COMPILE_DS>
-    <DXC_COMPILE_CS>$(DXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -T cs_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</DXC_COMPILE_CS>
+    <DefaultProfile>--profile 6.0</DefaultProfile>
+    <VertexShader>$(ShaderCompiler) --compiler dxc --shader_stage vertex $(DefaultProfile) $(SpirvFlag) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </VertexShader>
+    <PixelShader>$(ShaderCompiler) --compiler dxc --shader_stage pixel $(DefaultProfile) $(SpirvFlag) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </PixelShader>
+    <GeometryShader>$(ShaderCompiler) --compiler dxc --shader_stage geometry $(DefaultProfile) $(SpirvFlag) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </GeometryShader>
+    <HullShader>$(ShaderCompiler) --compiler dxc --shader_stage hull $(DefaultProfile) $(SpirvFlag) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </HullShader>
+    <DomainShader>$(ShaderCompiler) --compiler dxc --shader_stage domain $(DefaultProfile) $(SpirvFlag) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </DomainShader>
+    <ComputeShader>$(ShaderCompiler) --compiler dxc --shader_stage compute $(DefaultProfile) $(SpirvFlag) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </ComputeShader>
+    <ShaderOutputMsg>Compiling shader to $(ShaderOutputFormat)...</ShaderOutputMsg>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
   <ItemGroup>
-    <BuildMacro Include="DXC_COMMAND">
-      <Value>$(DXC_COMMAND)</Value>
+    <BuildMacro Include="DefaultProfile">
+      <Value>$(DefaultProfile)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="SHADER_OUTPUT">
-      <Value>$(SHADER_OUTPUT)</Value>
+    <BuildMacro Include="VertexShader">
+      <Value>$(VertexShader)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="DXC_COMPILE_VS">
-      <Value>$(DXC_COMPILE_VS)</Value>
+    <BuildMacro Include="PixelShader">
+      <Value>$(PixelShader)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="DXC_COMPILE_PS">
-      <Value>$(DXC_COMPILE_PS)</Value>
+    <BuildMacro Include="GeometryShader">
+      <Value>$(GeometryShader)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="DXC_COMPILE_GS">
-      <Value>$(DXC_COMPILE_GS)</Value>
+    <BuildMacro Include="HullShader">
+      <Value>$(HullShader)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="DXC_COMPILE_HS">
-      <Value>$(DXC_COMPILE_HS)</Value>
+    <BuildMacro Include="DomainShader">
+      <Value>$(DomainShader)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="DXC_COMPILE_DS">
-      <Value>$(DXC_COMPILE_DS)</Value>
+    <BuildMacro Include="ComputeShader">
+      <Value>$(ComputeShader)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="DXC_COMPILE_CS">
-      <Value>$(DXC_COMPILE_CS)</Value>
+    <BuildMacro Include="ShaderOutputMsg">
+      <Value>$(ShaderOutputMsg)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>

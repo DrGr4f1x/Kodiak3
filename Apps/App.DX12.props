@@ -2,63 +2,63 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <GRAPHICS_API_DEFINE>DX12</GRAPHICS_API_DEFINE>
-    <SHADER_OUTPUT_DIR>$(ProjectDir)Data\Shaders\DXIL\</SHADER_OUTPUT_DIR>
-    <COMPILED_SHADER_SUFFIX>.cso</COMPILED_SHADER_SUFFIX>
-    <SPIRV_FLAG />
-    <FXC_COMMAND>fxc.exe</FXC_COMMAND>
-    <FXC_COMPILE_VS>$(FXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -DHLSL -T vs_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</FXC_COMPILE_VS>
-    <FXC_COMPILE_PS>$(FXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -DHLSL -T ps_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</FXC_COMPILE_PS>
-    <FXC_COMPILE_GS>$(FXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -DHLSL -T gs_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</FXC_COMPILE_GS>
-    <FXC_COMPILE_HS>$(FXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -DHLSL -T hs_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</FXC_COMPILE_HS>
-    <FXC_COMPILE_DS>$(FXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -DHLSL -T ds_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</FXC_COMPILE_DS>
-    <FXC_COMPILE_CS>$(FXC_COMMAND) -D$(GRAPHICS_API_DEFINE) -DHLSL -T cs_5_0 %(Fullpath) -Fo $(SHADER_OUTPUT) -I$(SHADER_INCLUDE_PATH)</FXC_COMPILE_CS>
+    <ShaderOutputDir>$(ProjectDir)Data\Shaders\DXIL\</ShaderOutputDir>
+    <SpirvFlag />
+    <DefaultFxcProfile>--profile 5.1</DefaultFxcProfile>
+    <ShaderOutputFormat>DXIL</ShaderOutputFormat>
+    <ShaderSuffix>.cso</ShaderSuffix>
+    <VertexShaderFxc>$(ShaderCompiler) --compiler fxc --shader_stage vertex $(DefaultFxcProfile) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </VertexShaderFxc>
+    <PixelShaderFxc>$(ShaderCompiler) --compiler fxc --shader_stage pixel $(DefaultFxcProfile) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </PixelShaderFxc>
+    <GeometryShaderFxc>$(ShaderCompiler) --compiler fxc --shader_stage geometry $(DefaultFxcProfile) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </GeometryShaderFxc>
+    <HullShaderFxc>$(ShaderCompiler) --compiler fxc --shader_stage hull $(DefaultFxcProfile) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </HullShaderFxc>
+    <DomainShaderFxc>$(ShaderCompiler) --compiler fxc --shader_stage domain $(DefaultFxcProfile) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </DomainShaderFxc>
+    <ComputeShaderFxc>$(ShaderCompiler) --compiler fxc --shader_stage compute $(DefaultFxcProfile) --include_paths $(ShaderIncludePath) --output_dir $(ShaderOutputDir) --input_file </ComputeShaderFxc>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
   <ItemGroup>
-    <BuildMacro Include="GRAPHICS_API_DEFINE">
-      <Value>$(GRAPHICS_API_DEFINE)</Value>
+    <BuildMacro Include="ShaderOutputDir">
+      <Value>$(ShaderOutputDir)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="SHADER_OUTPUT_DIR">
-      <Value>$(SHADER_OUTPUT_DIR)</Value>
+    <BuildMacro Include="SpirvFlag">
+      <Value>$(SpirvFlag)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="COMPILED_SHADER_SUFFIX">
-      <Value>$(COMPILED_SHADER_SUFFIX)</Value>
+    <BuildMacro Include="DefaultFxcProfile">
+      <Value>$(DefaultFxcProfile)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="SPIRV_FLAG">
-      <Value>$(SPIRV_FLAG)</Value>
+    <BuildMacro Include="ShaderOutputFormat">
+      <Value>$(ShaderOutputFormat)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="FXC_COMMAND">
-      <Value>$(FXC_COMMAND)</Value>
+    <BuildMacro Include="ShaderSuffix">
+      <Value>$(ShaderSuffix)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="FXC_COMPILE_VS">
-      <Value>$(FXC_COMPILE_VS)</Value>
+    <BuildMacro Include="VertexShaderFxc">
+      <Value>$(VertexShaderFxc)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="FXC_COMPILE_PS">
-      <Value>$(FXC_COMPILE_PS)</Value>
+    <BuildMacro Include="PixelShaderFxc">
+      <Value>$(PixelShaderFxc)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="FXC_COMPILE_GS">
-      <Value>$(FXC_COMPILE_GS)</Value>
+    <BuildMacro Include="GeometryShaderFxc">
+      <Value>$(GeometryShaderFxc)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="FXC_COMPILE_HS">
-      <Value>$(FXC_COMPILE_HS)</Value>
+    <BuildMacro Include="HullShaderFxc">
+      <Value>$(HullShaderFxc)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="FXC_COMPILE_DS">
-      <Value>$(FXC_COMPILE_DS)</Value>
+    <BuildMacro Include="DomainShaderFxc">
+      <Value>$(DomainShaderFxc)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
-    <BuildMacro Include="FXC_COMPILE_CS">
-      <Value>$(FXC_COMPILE_CS)</Value>
+    <BuildMacro Include="ComputeShaderFxc">
+      <Value>$(ComputeShaderFxc)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>
