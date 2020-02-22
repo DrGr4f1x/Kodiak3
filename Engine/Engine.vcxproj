@@ -377,6 +377,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Extern\D3D12MemoryAllocator\D3D12MemAlloc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Extern\VulkanMemoryAllocator\vk_mem_alloc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Filesystem.h" />
     <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="GpuBuffer.h" />
@@ -577,6 +587,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Extern\D3D12MemoryAllocator\D3D12MemAlloc.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Filesystem.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="GpuBuffer.cpp" />
@@ -746,6 +761,10 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(VertexShader) %(FullPath)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(VertexShader) %(FullPath)</Command>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Extern\D3D12MemoryAllocator\D3D12MemAlloc.natvis" />
+    <Natvis Include="Extern\VulkanMemoryAllocator\vk_mem_alloc.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

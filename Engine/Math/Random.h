@@ -49,6 +49,16 @@ public:
 		return std::uniform_real_distribution<float>(MinVal, MaxVal)(m_gen);
 	}
 
+	float Normal()
+	{
+		return Normal(0.0f, 1.0f);
+	}
+
+	float Normal(float Mean, float Sigma)
+	{
+		return std::normal_distribution<float>(Mean, Sigma)(m_gen);
+	}
+
 	void SetSeed(uint32_t s)
 	{
 		m_gen.seed(s);

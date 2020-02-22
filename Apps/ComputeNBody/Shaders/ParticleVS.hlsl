@@ -48,7 +48,7 @@ VSOutput main(uint id : SV_VertexID)
 	float4 eyePos = mul(modelViewMatrix, float4(particle.pos.xyz, 1.0));
 	float4 projectedCorner = mul(projectionMatrix, float4(0.5 * spriteSize, 0.5 * spriteSize, eyePos.z, eyePos.w));
 
-	output.pos = particle.pos;
+	output.pos = mul(projectionMatrix, eyePos);
 	output.gradientPos = particle.vel.w;
 	output.pointSize = clamp(screenDim.x * projectedCorner.x / projectedCorner.w, 1.0, 128.0);
 

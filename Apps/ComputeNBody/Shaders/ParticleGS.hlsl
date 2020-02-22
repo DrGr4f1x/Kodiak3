@@ -39,29 +39,32 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> spriteStream)
 {
 	static float3 positions[4] =
 	{
-		float3(-1.0,  1.0,  0.0),
-		float3( 1.0,  1.0,  0.0),
-		float3(-1.0, -1.0,  0.0),
-		float3( 1.0, -1.0,  0.0),
+		float3( 0.5, -0.5,  0.0),
+		float3( 0.5,  0.5,  0.0),
+		float3(-0.5, -0.5,  0.0),
+		float3(-0.5,  0.5,  0.0),
 	};
 
 	static float2 texcoords[4] =
 	{
-		float2(0.0, 0.0),
+		float2(1.0, 1.0),
 		float2(1.0, 0.0),
 		float2(0.0, 1.0),
-		float2(1.0, 1.0),
+		float2(0.0, 0.0),
 	};
 
 	GSOutput output = (GSOutput)0;
+	float4 pos = input[0].pos;
+
+	float2 viewportScale = float2(1.0 / screenDim.x, 1.0 / screenDim.y) * pos.w;
+	float2 scale = viewportScale * input[0].pointSize;
 
 	// Emit two new triangles
 	for (int i = 0; i < 4; ++i)
 	{
-		float3 position = positions[i] * input[0].pointSize * 0.005;
-		position = mul((float3x3)invViewMatrix, position) + input[0].pos.xyz;
+		float3 position = float3(positions[i] * scale, 0.0) + pos.xyz;
 
-		output.pos = mul(projectionMatrix, mul(modelViewMatrix, float4(position, 1.0)));
+		output.pos = float4(position, pos.w);
 		output.uv = texcoords[i];
 		output.gradientPos = input[0].gradientPos;
 

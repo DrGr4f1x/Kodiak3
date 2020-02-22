@@ -194,6 +194,12 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Log.h" />
+    <ClInclude Include="Extern\VulkanMemoryAllocator\vk_mem_alloc.h">
+      <Filter>Graphics\VK\VulkanMemoryAllocator</Filter>
+    </ClInclude>
+    <ClInclude Include="Extern\D3D12MemoryAllocator\D3D12MemAlloc.h">
+      <Filter>Graphics\DX12\D3D12MemoryAllocator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -374,6 +380,9 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="Extern\D3D12MemoryAllocator\D3D12MemAlloc.cpp">
+      <Filter>Graphics\DX12\D3D12MemoryAllocator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -400,6 +409,12 @@
     <Filter Include="Graphics\Shaders\Common">
       <UniqueIdentifier>{c56cfd45-2e8e-4414-8a17-ccaa76eedb2e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics\VK\VulkanMemoryAllocator">
+      <UniqueIdentifier>{754fa133-4b0b-4073-9888-247834a05e8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\DX12\D3D12MemoryAllocator">
+      <UniqueIdentifier>{087ccbbe-b36b-4ec1-877d-7aec93736c42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Math\Functions.inl">
@@ -417,5 +432,13 @@
     <CustomBuild Include="Shaders\UIVS.hlsl">
       <Filter>Graphics\Shaders\UI</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Extern\VulkanMemoryAllocator\vk_mem_alloc.natvis">
+      <Filter>Graphics\VK\VulkanMemoryAllocator</Filter>
+    </Natvis>
+    <Natvis Include="Extern\D3D12MemoryAllocator\D3D12MemAlloc.natvis">
+      <Filter>Graphics\DX12\D3D12MemoryAllocator</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

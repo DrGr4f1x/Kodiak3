@@ -18,6 +18,9 @@
 
 #include "d3dx12.h"
 
+#define D3D12MA_D3D12_HEADERS_ALREADY_INCLUDED
+#include "Extern\D3D12MemoryAllocator\D3D12MemAlloc.h"
+
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 

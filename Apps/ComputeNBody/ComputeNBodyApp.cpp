@@ -42,7 +42,7 @@ void ComputeNBodyApp::Startup()
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.1f,
 		512.0f);
-	m_camera.SetPosition(Math::Vector3(-11.0f, -11.0f, -11.0f));
+	m_camera.SetPosition(Math::Vector3(-8.0f, -8.0f, -8.0f));
 
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);
@@ -234,15 +234,15 @@ void ComputeNBodyApp::InitParticles()
 			else
 			{
 				// Position					
-				Vector3 position(attractors[i] + 0.75f * Vector3(g_rng.NextFloat(), g_rng.NextFloat(), g_rng.NextFloat()));
+				Vector3 position(attractors[i] + 0.75f * Vector3(g_rng.Normal(), g_rng.Normal(), g_rng.Normal()));
 				float len = Length(Normalize(position - attractors[i]));
-				position.SetY(position.GetY() * 2.0f - (len * len));
+				position.SetY(position.GetY() * (2.0f - (len * len)));
 
 				// Velocity
 				Vector3 angular = (((i % 2) == 0) ? 1.0f : -1.0f) * Vector3(0.5f, 1.5f, 0.5f);
-				Vector3 velocity = Cross((position - attractors[i]), angular) + Vector3(g_rng.NextFloat(), g_rng.NextFloat(), g_rng.NextFloat() * 0.025f);
+				Vector3 velocity = Cross((position - attractors[i]), angular) + Vector3(g_rng.Normal(), g_rng.Normal(), g_rng.Normal() * 0.025f);
 
-				float mass = (g_rng.NextFloat() * 0.5f + 0.5f) * 75.0f;
+				float mass = (g_rng.Normal() * 0.5f + 0.5f) * 75.0f;
 				particle.pos = Vector4(position, mass);
 				particle.vel = Vector4(velocity, 0.0f);
 			}
