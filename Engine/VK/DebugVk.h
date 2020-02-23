@@ -13,22 +13,21 @@
 namespace Kodiak
 {
 
+// Forward declarations
+class Instance;
 
-template <typename T>
-class Reference
+
+class DebugReportCallback : public Reference<Instance>, public NonCopyable
 {
 public:
-	Reference(const std::shared_ptr<T>& ref)
-		: m_ref(ref)
-	{}
+	DebugReportCallback(const std::shared_ptr<Instance>& instance, VkDebugReportFlagsEXT flags);
+	virtual ~DebugReportCallback();
 
-	const std::shared_ptr<T>& Get() const
-	{
-		return m_ref;
-	}
+protected:
+	void Initialize(VkDebugReportFlagsEXT flags);
 
 private:
-	std::shared_ptr<T>	m_ref;
+	VkDebugReportCallbackEXT m_debugReportCallback{ VK_NULL_HANDLE };
 };
 
 } // namespace Kodiak

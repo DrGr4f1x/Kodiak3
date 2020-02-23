@@ -12,11 +12,30 @@
 
 #include "InstanceVk.h"
 
+#include "DebugVk.h"
 #include "PhysicalDeviceVk.h"
+#include "SurfaceVk.h"
 
 
 using namespace Kodiak;
 using namespace std;
+
+
+#if ENABLE_VULKAN_VALIDATION
+PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallback{ nullptr };
+PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallback{ nullptr };
+PFN_vkDebugReportMessageEXT vkDebugReportMessage{ nullptr };
+#endif
+
+#if ENABLE_VULKAN_DEBUG_MARKUP
+PFN_vkDebugMarkerSetObjectTagEXT vkDebugMarkerSetObjectTag{ nullptr };
+PFN_vkDebugMarkerSetObjectNameEXT vkDebugMarkerSetObjectName{ nullptr };
+PFN_vkCmdDebugMarkerBeginEXT vkCmdDebugMarkerBegin{ nullptr };
+PFN_vkCmdDebugMarkerEndEXT vkCmdDebugMarkerEnd{ nullptr };
+PFN_vkCmdDebugMarkerInsertEXT vkCmdDebugMarkerInsert{ nullptr };
+
+bool g_debugMarkupAvailable = false;
+#endif
 
 
 Instance::Instance(const VkInstanceCreateInfo& createInfo)
@@ -91,6 +110,53 @@ shared_ptr<PhysicalDevice> Instance::GetPhysicalDevice(size_t index)
 }
 
 
+shared_ptr<DebugReportCallback> Instance::CreateDebugReportCallback(VkDebugReportFlagsEXT flags)
+{
+	return make_shared<DebugReportCallback>(shared_from_this(), flags);
+}
+
+
+shared_ptr<Surface> Instance::CreateSurface(HINSTANCE hinst, HWND hwnd)
+{
+	VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
+	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	surfaceCreateInfo.pNext = nullptr;
+	surfaceCreateInfo.hinstance = hinst;
+	surfaceCreateInfo.hwnd = hwnd;
+
+	return make_shared<Surface>(shared_from_this(), surfaceCreateInfo);
+}
+
+
+void Instance::InitializeDebugMarkup(const shared_ptr<PhysicalDevice>& physicalDevice)
+{
+#if ENABLE_VULKAN_DEBUG_MARKUP
+	if (physicalDevice->IsExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
+	{
+		vkDebugMarkerSetObjectTag =
+			reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT>(vkGetInstanceProcAddr(m_instance, "vkDebugMarkerSetObjectTagEXT"));
+
+		vkDebugMarkerSetObjectName =
+			reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(vkGetInstanceProcAddr(m_instance, "vkDebugMarkerSetObjectNameEXT"));
+
+		vkCmdDebugMarkerBegin =
+			reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(vkGetInstanceProcAddr(m_instance, "vkCmdDebugMarkerBeginEXT"));
+
+		vkCmdDebugMarkerEnd =
+			reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(vkGetInstanceProcAddr(m_instance, "vkCmdDebugMarkerEndEXT"));
+
+		vkCmdDebugMarkerInsert =
+			reinterpret_cast<PFN_vkCmdDebugMarkerInsertEXT>(vkGetInstanceProcAddr(m_instance, "vkCmdDebugMarkerInsertEXT"));
+
+		if (vkDebugMarkerSetObjectName)
+		{
+			g_debugMarkupAvailable = true;
+		}
+	}
+#endif
+}
+
+
 void Instance::Initialize(const VkInstanceCreateInfo& createInfo)
 {
 	auto res = vkCreateInstance(&createInfo, nullptr, &m_instance);
@@ -101,6 +167,15 @@ void Instance::Initialize(const VkInstanceCreateInfo& createInfo)
 
 	EnumeratePhysicalDevices();
 	m_cachedPhysicalDevices.resize(GetPhysicalDeviceCount());
+
+#if ENABLE_VULKAN_VALIDATION
+	vkCreateDebugReportCallback = 
+		reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(m_instance, "vkCreateDebugReportCallbackEXT"));
+	vkDestroyDebugReportCallback = 
+		reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(m_instance, "vkDestroyDebugReportCallbackEXT"));
+	vkDebugReportMessage = 
+		reinterpret_cast<PFN_vkDebugReportMessageEXT>(vkGetInstanceProcAddr(m_instance, "vkDebugReportMessageEXT"));
+#endif
 }
 
 

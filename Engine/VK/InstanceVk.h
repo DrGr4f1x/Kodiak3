@@ -13,7 +13,11 @@
 namespace Kodiak
 {
 
+// Forward declarations
+class DebugReportCallback;
 class PhysicalDevice;
+class Surface;
+
 
 class Instance : public std::enable_shared_from_this<Instance>, public NonCopyable
 {
@@ -25,6 +29,11 @@ public:
 
 	size_t GetPhysicalDeviceCount() const { return m_physicalDevices.size(); }
 	std::shared_ptr<PhysicalDevice> GetPhysicalDevice(size_t index);
+
+	std::shared_ptr<DebugReportCallback> CreateDebugReportCallback(VkDebugReportFlagsEXT flags);
+	std::shared_ptr<Surface> CreateSurface(HINSTANCE hinst, HWND hwnd);
+
+	void InitializeDebugMarkup(const std::shared_ptr<PhysicalDevice>& physicalDevice);
 
 	operator VkInstance();
 

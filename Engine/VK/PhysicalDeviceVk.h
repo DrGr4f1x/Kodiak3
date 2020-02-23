@@ -13,7 +13,10 @@
 namespace Kodiak
 {
 
+// Forward declarations
 class Instance;
+class Surface;
+
 
 class PhysicalDevice : public Reference<Instance>, std::enable_shared_from_this<PhysicalDevice>
 {
@@ -29,6 +32,9 @@ public:
 	const VkPhysicalDeviceFeatures2& GetDeviceFeatures2() const { return m_deviceFeatures2; }
 	const VkPhysicalDeviceVulkan12Features& GetDeviceFeatures1_2() const { return m_deviceFeatures1_2; }
 
+	bool GetSurfaceSupport(uint32_t index, const std::shared_ptr<Surface>& surface) const;
+	const std::vector<VkQueueFamilyProperties>& GetQueueFamilyProperties() const { return m_queueFamilyProperties; }
+
 	uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound);
 
 	bool IsExtensionSupported(const std::string& name) const;
@@ -39,29 +45,30 @@ protected:
 	void Initialize();
 
 private:
-	VkPhysicalDevice					m_physicalDevice{ VK_NULL_HANDLE };
+	VkPhysicalDevice						m_physicalDevice{ VK_NULL_HANDLE };
 
-	VkPhysicalDeviceProperties			m_deviceProperties;
-	VkPhysicalDeviceMemoryProperties	m_memoryProperties;
+	VkPhysicalDeviceProperties				m_deviceProperties;
+	VkPhysicalDeviceMemoryProperties		m_memoryProperties;
 
-	std::vector<VkExtensionProperties>	m_extensions;
+	std::vector<VkExtensionProperties>		m_extensions;
 
-	// Base features
-	VkPhysicalDeviceFeatures2			m_deviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr };
-	VkPhysicalDeviceVulkan12Features	m_deviceFeatures1_2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, nullptr };
+	// Device features
+	VkPhysicalDeviceFeatures2				m_deviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr };
+	VkPhysicalDeviceVulkan12Features		m_deviceFeatures1_2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, nullptr };
 
-	// Extended features
-#if 0
-	struct
-	{
-		VkPhysicalDeviceShaderFloat16Int8FeaturesKHR khrShaderFloat16Int8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, nullptr };
-	} supportedExtendedFeatures, enabledExtendedFeatures;
-#endif
+	// Queue family properties
+	std::vector<VkQueueFamilyProperties>	m_queueFamilyProperties;
 };
+
 
 inline PhysicalDevice::operator VkPhysicalDevice()
 {
 	return m_physicalDevice;
 }
+
+
+std::vector<uint32_t> GetGraphicsPresentQueueFamilyIndices(const std::shared_ptr<PhysicalDevice>& physicalDevice, const std::shared_ptr<Surface>& surface);
+std::vector<uint32_t> GetQueueFamilyIndices(const std::shared_ptr<PhysicalDevice>& physicalDevice, VkQueueFlags queueFlags);
+uint32_t GetQueueFamilyIndex(const std::shared_ptr<PhysicalDevice>& physicalDevice, VkQueueFlags queueFlags);
 
 } // namespace Kodiak

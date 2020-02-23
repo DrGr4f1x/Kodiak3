@@ -209,6 +209,12 @@
     <ClInclude Include="VK\PhysicalDeviceVk.h">
       <Filter>Graphics\VK\LowLevel</Filter>
     </ClInclude>
+    <ClInclude Include="VK\SurfaceVk.h">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\DebugVk.h">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -396,6 +402,12 @@
       <Filter>Graphics\VK\LowLevel</Filter>
     </ClCompile>
     <ClCompile Include="VK\PhysicalDeviceVk.cpp">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\SurfaceVk.cpp">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\DebugVk.cpp">
       <Filter>Graphics\VK\LowLevel</Filter>
     </ClCompile>
   </ItemGroup>
