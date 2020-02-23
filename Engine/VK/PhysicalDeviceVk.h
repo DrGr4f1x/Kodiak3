@@ -15,14 +15,21 @@ namespace Kodiak
 
 // Forward declarations
 class Instance;
+class LogicalDevice;
 class Surface;
 
 
-class PhysicalDevice : public Reference<Instance>, std::enable_shared_from_this<PhysicalDevice>
+class PhysicalDevice : public Reference<Instance>, public std::enable_shared_from_this<PhysicalDevice>
 {
 public:
 	PhysicalDevice(const std::shared_ptr<Instance>& instance, VkPhysicalDevice physicalDevice);
 	virtual ~PhysicalDevice();
+
+	std::shared_ptr<LogicalDevice> CreateLogicalDevice(
+		const std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos,
+		const std::vector<std::string>& enabledLayerNames,
+		const std::vector<std::string>& enabledExtensionNames,
+		const VkPhysicalDeviceFeatures2& enabledFeatures);
 
 	const VkPhysicalDeviceProperties& GetDeviceProperties() const { return m_deviceProperties; }
 	const VkPhysicalDeviceMemoryProperties& GetMemoryProperties() const { return m_memoryProperties; }

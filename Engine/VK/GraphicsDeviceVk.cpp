@@ -22,6 +22,7 @@
 #include "DebugVk.h"
 #include "DescriptorHeapVk.h"
 #include "InstanceVk.h"
+#include "LogicalDeviceVk.h"
 #include "PhysicalDeviceVk.h"
 #include "RootSignatureVk.h"
 #include "SurfaceVk.h"
@@ -38,7 +39,8 @@ using namespace std;
 namespace
 {
 
-DeviceHandle g_device{ nullptr };
+// TODO - Delete me
+DeviceHandle g_device{ VK_NULL_HANDLE };
 
 Format BackBufferColorFormat = Format::R10G10B10A2_UNorm;
 Format DepthFormat = Format::D32_Float_S8_UInt;
@@ -88,11 +90,8 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	{
 		DestroySemaphores();
 
-		vkDestroySwapchainKHR(device, swapChain, nullptr);
+		vkDestroySwapchainKHR(GetLogicalDevice(), swapChain, nullptr);
 		swapChain = VK_NULL_HANDLE;
-
-		g_device = nullptr;
-		device = nullptr;
 	}
 
 	void SelectPhysicalDevice()
@@ -188,31 +187,11 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 			queueCreateInfos.push_back(queueInfo);
 		}
 
-		// Create the logical device representation
-		vector<const char*> deviceExtensions;
-		for (const auto& extName : requestedExtensions)
-		{
-			deviceExtensions.push_back(extName.c_str());
-		}
-		
-		VkDeviceCreateInfo deviceCreateInfo = {};
-		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		deviceCreateInfo.pNext = &enabledDeviceFeatures2;
-		deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());;
-		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-		deviceCreateInfo.pEnabledFeatures = nullptr;
+		vector<string> extensions(requestedExtensions.begin(), requestedExtensions.end());
+		device = physicalDevice->CreateLogicalDevice(queueCreateInfos, requestedLayers, extensions, enabledDeviceFeatures2);
 
-		if (deviceExtensions.size() > 0)
-		{
-			deviceCreateInfo.enabledExtensionCount = (uint32_t)deviceExtensions.size();
-			deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
-		}
-
-		VkDevice logicalDevice{ VK_NULL_HANDLE };
-		VkResult result = vkCreateDevice(GetPhysicalDevice(), &deviceCreateInfo, nullptr, &logicalDevice);
-		ThrowIfFailed(result);
-
-		device = DeviceHandle::Create(logicalDevice);
+		// TODO - Delete me
+		g_device = GetLogicalDevice();
 
 		CreateSemaphores();
 	}
@@ -394,22 +373,22 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 			swapchainCI.imageUsage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 		}
 
-		ThrowIfFailed(vkCreateSwapchainKHR(device, &swapchainCI, nullptr, &swapChain));
+		ThrowIfFailed(vkCreateSwapchainKHR(GetLogicalDevice(), &swapchainCI, nullptr, &swapChain));
 
 		// If an existing swap chain is re-created, destroy the old swap chain
 		// This also cleans up all the presentable images
 		if (oldSwapchain != VK_NULL_HANDLE)
 		{
-			vkDestroySwapchainKHR(device, oldSwapchain, nullptr);
+			vkDestroySwapchainKHR(GetLogicalDevice(), oldSwapchain, nullptr);
 		}
 
 		uint32_t imageCount{ 0 };
-		ThrowIfFailed(vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr));
+		ThrowIfFailed(vkGetSwapchainImagesKHR(GetLogicalDevice(), swapChain, &imageCount, nullptr));
 
 		assert(imageCount == NumSwapChainBuffers);
 
 		// Get the swap chain images
-		ThrowIfFailed(vkGetSwapchainImagesKHR(device, swapChain, &imageCount, images.data()));
+		ThrowIfFailed(vkGetSwapchainImagesKHR(GetLogicalDevice(), swapChain, &imageCount, images.data()));
 	}
 
 	void CreateSemaphores()
@@ -425,23 +404,23 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		createInfo.pNext = &binaryCreateInfo;
 		createInfo.flags = 0;
 
-		ThrowIfFailed(vkCreateSemaphore(device, &createInfo, nullptr, &imageAcquireSemaphore));
-		ThrowIfFailed(vkCreateSemaphore(device, &createInfo, nullptr, &presentSemaphore));
+		ThrowIfFailed(vkCreateSemaphore(GetLogicalDevice(), &createInfo, nullptr, &imageAcquireSemaphore));
+		ThrowIfFailed(vkCreateSemaphore(GetLogicalDevice(), &createInfo, nullptr, &presentSemaphore));
 	}
 
 	void DestroySemaphores()
 	{
-		vkDestroySemaphore(device, imageAcquireSemaphore, nullptr);
+		vkDestroySemaphore(GetLogicalDevice(), imageAcquireSemaphore, nullptr);
 		imageAcquireSemaphore = VK_NULL_HANDLE;
 
-		vkDestroySemaphore(device, presentSemaphore, nullptr);
+		vkDestroySemaphore(GetLogicalDevice(), presentSemaphore, nullptr);
 		presentSemaphore = VK_NULL_HANDLE;
 	}
 
 	uint32_t AcquireNextImage()
 	{
 		uint32_t nextImageIndex = 0u;
-		vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAcquireSemaphore, VK_NULL_HANDLE, &nextImageIndex);
+		vkAcquireNextImageKHR(GetLogicalDevice(), swapChain, UINT64_MAX, imageAcquireSemaphore, VK_NULL_HANDLE, &nextImageIndex);
 		return nextImageIndex;
 	}
 
@@ -916,19 +895,17 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 	VkInstance GetInstance() { return *instance.get(); }
 	VkPhysicalDevice GetPhysicalDevice() { return *physicalDevice.get(); }
+	VkDevice GetLogicalDevice() { return *device.get();	}
 	VkSurfaceKHR GetSurface() { return *surface.get(); }
 
+	// Shared pointers to core Vulkan objects
 	shared_ptr<Instance> instance;
-
 	shared_ptr<PhysicalDevice> physicalDevice;
-
+	shared_ptr<LogicalDevice> device;
 	shared_ptr<Surface> surface;
-
 	shared_ptr<DebugReportCallback> debugReportCallback;
 
 	vector<string> unsupportedRequiredFeatures;
-
-	DeviceHandle device;
 
 	struct
 	{
@@ -937,14 +914,12 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		uint32_t transfer;
 	} queueFamilyIndices;
 
-	vector<VkQueueFamilyProperties> queueFamilyProperties;
-
 	// Required, optional, and enabled extensions
 	set<string> supportedExtensions;
 	set<string> requiredExtensions;
 	set<string> optionalExtensions;
 	set<string> requestedExtensions;
-	vector<const char*> enabledExtensions;
+	vector<string> requestedLayers;
 
 	VkSwapchainKHR swapChain{ VK_NULL_HANDLE };
 	uint32_t presentQueueNodeIndex{ 0 };
@@ -1016,8 +991,6 @@ void GraphicsDevice::PlatformCreate()
 	m_deviceName = m_platformData->physicalDevice->GetDeviceProperties().deviceName;
 
 	m_platformData->CreateLogicalDevice();
-
-	g_device = m_platformData->device;
 
 	m_platformData->InitSurface(m_hinst, m_hwnd);
 	m_platformData->CreateSwapChain(&m_width, &m_height, false /* vsync */);

@@ -13,6 +13,7 @@
 #include "PhysicalDeviceVk.h"
 
 #include "GraphicsFeatures.h"
+#include "LogicalDeviceVk.h"
 #include "SurfaceVk.h"
 
 
@@ -37,6 +38,16 @@ PhysicalDevice::PhysicalDevice(const shared_ptr<Instance>& instance, VkPhysicalD
 PhysicalDevice::~PhysicalDevice()
 {
 	m_physicalDevice = VK_NULL_HANDLE;
+}
+
+
+shared_ptr<LogicalDevice> PhysicalDevice::CreateLogicalDevice(
+	const vector<VkDeviceQueueCreateInfo>& queueCreateInfos, 
+	const vector<string>& enabledLayerNames, 
+	const vector<string>& enabledExtensionNames, 
+	const VkPhysicalDeviceFeatures2& enabledFeatures)
+{
+	return LogicalDevice::Create(shared_from_this(), queueCreateInfos, enabledLayerNames, enabledExtensionNames, enabledFeatures);
 }
 
 
