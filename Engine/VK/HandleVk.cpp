@@ -20,6 +20,8 @@ namespace Kodiak
 
 VkResourceHandle::~VkResourceHandle()
 {
+	if (m_noDelete) return;
+
 	VkDevice device = GetDevice();
 
 	if (m_isImage)

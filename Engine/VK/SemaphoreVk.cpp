@@ -28,7 +28,7 @@ Semaphore::Semaphore(const shared_ptr<LogicalDevice>& device, SemaphoreType type
 
 Semaphore::~Semaphore()
 {
-	vkDestroySemaphore(*Get(), m_semaphore, nullptr);
+	vkDestroySemaphore(*Get<LogicalDevice>(), m_semaphore, nullptr);
 	m_semaphore = VK_NULL_HANDLE;
 }
 
@@ -46,5 +46,5 @@ void Semaphore::Initialize(SemaphoreType type)
 	createInfo.pNext = &binaryCreateInfo;
 	createInfo.flags = 0;
 
-	ThrowIfFailed(vkCreateSemaphore(*Get(), &createInfo, nullptr, &m_semaphore));
+	ThrowIfFailed(vkCreateSemaphore(*Get<LogicalDevice>(), &createInfo, nullptr, &m_semaphore));
 }

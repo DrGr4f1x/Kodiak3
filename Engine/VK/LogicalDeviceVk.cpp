@@ -15,6 +15,8 @@
 #include "InstanceVk.h"
 #include "PhysicalDeviceVk.h"
 #include "SemaphoreVk.h"
+#include "SurfaceVk.h"
+#include "SwapchainVk.h"
 
 
 using namespace Kodiak;
@@ -58,6 +60,39 @@ shared_ptr<Semaphore> LogicalDevice::CreateTimelineSemaphore()
 }
 
 
+shared_ptr<Swapchain> LogicalDevice::CreateSwapchain(
+	const shared_ptr<Surface>& surface,
+	uint32_t minImageCount,
+	VkFormat imageFormat,
+	const VkExtent2D& imageExtent,
+	uint32_t imageArrayLayers,
+	VkImageUsageFlags imageUsage,
+	VkSharingMode imageSharingMode,
+	const vector<uint32_t>& queueFamilyIndices,
+	VkSurfaceTransformFlagBitsKHR preTransform,
+	VkCompositeAlphaFlagBitsKHR compositeAlpha,
+	VkPresentModeKHR presentMode,
+	bool clipped,
+	const shared_ptr<Swapchain>& oldSwapchain)
+{
+	return make_shared<Swapchain>(
+		shared_from_this(),
+		surface,
+		minImageCount,
+		imageFormat,
+		imageExtent,
+		imageArrayLayers,
+		imageUsage,
+		imageSharingMode,
+		queueFamilyIndices,
+		preTransform,
+		compositeAlpha,
+		presentMode,
+		clipped,
+		oldSwapchain);
+}
+
+
 void LogicalDevice::Initialize(
 	const vector<VkDeviceQueueCreateInfo>& queueCreateInfos, 
 	const vector<string>& enabledLayerNames, 
@@ -89,5 +124,5 @@ void LogicalDevice::Initialize(
 	createInfo.enabledExtensionCount = (uint32_t)extensionNames.size();
 	createInfo.ppEnabledExtensionNames = extensionNames.data();
 
-	ThrowIfFailed(vkCreateDevice(*Get(), &createInfo, nullptr, &m_device));
+	ThrowIfFailed(vkCreateDevice(*Get<PhysicalDevice>(), &createInfo, nullptr, &m_device));
 }

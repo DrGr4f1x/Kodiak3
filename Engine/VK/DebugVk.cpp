@@ -115,7 +115,7 @@ DebugReportCallback::DebugReportCallback(const shared_ptr<Instance>& instance, V
 DebugReportCallback::~DebugReportCallback()
 {
 #if ENABLE_VULKAN_VALIDATION
-	vkDestroyDebugReportCallback(*Get(), m_debugReportCallback, nullptr);
+	vkDestroyDebugReportCallback(*Get<Instance>(), m_debugReportCallback, nullptr);
 	m_debugReportCallback = VK_NULL_HANDLE;
 #endif
 }
@@ -132,7 +132,7 @@ void DebugReportCallback::Initialize(VkDebugReportFlagsEXT flags)
 	createInfo.pfnCallback = (PFN_vkDebugReportCallbackEXT)messageCallback;
 	createInfo.flags = flags;
 
-	ThrowIfFailed(vkCreateDebugReportCallback(*Get(), &createInfo, nullptr,	&m_debugReportCallback));
+	ThrowIfFailed(vkCreateDebugReportCallback(*Get<Instance>(), &createInfo, nullptr,	&m_debugReportCallback));
 #endif
 }
 

@@ -55,11 +55,13 @@ Instance::~Instance()
 
 shared_ptr<Instance> Instance::Create(const string& appName)
 {
+	constexpr uint32_t version = VK_API_VERSION_1_2;
+
 	VkApplicationInfo appInfo = {};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.pApplicationName = appName.c_str();
 	appInfo.pEngineName = "Kodiak";
-	appInfo.apiVersion = VK_API_VERSION_1_2;
+	appInfo.apiVersion = version;
 
 	vector<const char*> instanceExtensions =
 	{
@@ -159,6 +161,8 @@ void Instance::InitializeDebugMarkup(const shared_ptr<PhysicalDevice>& physicalD
 
 void Instance::Initialize(const VkInstanceCreateInfo& createInfo)
 {
+	m_version = createInfo.pApplicationInfo->apiVersion;
+
 	auto res = vkCreateInstance(&createInfo, nullptr, &m_instance);
 	if (VK_SUCCESS != res)
 	{

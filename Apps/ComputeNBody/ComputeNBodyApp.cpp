@@ -93,9 +93,13 @@ void ComputeNBodyApp::Render()
 
 		computeContext.Dispatch1D(6 * PARTICLES_PER_ATTRACTOR, 256);
 
+		computeContext.InsertUAVBarrier(m_particleBuffer);
+
 		computeContext.SetPipelineState(m_computeIntegratePSO);
 
 		computeContext.Dispatch1D(6 * PARTICLES_PER_ATTRACTOR, 256);
+
+		computeContext.InsertUAVBarrier(m_particleBuffer);
 	}
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);

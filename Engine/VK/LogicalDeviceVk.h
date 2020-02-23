@@ -17,6 +17,9 @@ namespace Kodiak
 class Instance;
 class PhysicalDevice;
 class Semaphore;
+class Surface;
+class Swapchain;
+
 
 class LogicalDevice : public Reference<PhysicalDevice>, public std::enable_shared_from_this<LogicalDevice>, public NonCopyable
 {
@@ -30,8 +33,25 @@ public:
 		const std::vector<std::string>& enabledExtensionNames,
 		const VkPhysicalDeviceFeatures2& enabledFeatures);
 
+	// Create Semaphore
 	std::shared_ptr<Semaphore> CreateBinarySemaphore();
 	std::shared_ptr<Semaphore> CreateTimelineSemaphore();
+
+	// Create Swapchain
+	std::shared_ptr<Swapchain> CreateSwapchain(
+		const std::shared_ptr<Surface>& surface,
+		uint32_t minImageCount,
+		VkFormat imageFormat,
+		const VkExtent2D& imageExtent,
+		uint32_t imageArrayLayers,
+		VkImageUsageFlags imageUsage,
+		VkSharingMode imageSharingMode,
+		const std::vector<uint32_t>& queueFamilyIndices,
+		VkSurfaceTransformFlagBitsKHR preTransform,
+		VkCompositeAlphaFlagBitsKHR compositeAlpha,
+		VkPresentModeKHR presentMode,
+		bool clipped,
+		const std::shared_ptr<Swapchain>& oldSwapchain = nullptr);
 
 	operator VkDevice();
 

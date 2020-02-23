@@ -35,6 +35,8 @@ public:
 
 	void InitializeDebugMarkup(const std::shared_ptr<PhysicalDevice>& physicalDevice);
 
+	uint32_t GetVersion() const { return m_version; }
+
 	operator VkInstance();
 
 protected:
@@ -45,6 +47,7 @@ private:
 	VkInstance									m_instance{ VK_NULL_HANDLE };
 	std::vector<VkPhysicalDevice>				m_physicalDevices;
 	std::vector<std::weak_ptr<PhysicalDevice>>	m_cachedPhysicalDevices;
+	uint32_t									m_version{ 0 };
 };
 
 inline Instance::operator VkInstance()

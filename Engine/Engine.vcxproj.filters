@@ -221,6 +221,18 @@
     <ClInclude Include="VK\SemaphoreVk.h">
       <Filter>Graphics\VK\LowLevel</Filter>
     </ClInclude>
+    <ClInclude Include="VK\AllocatorVk.h">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\ImageVk.h">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\SwapchainVk.h">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\FenceVk.h">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -420,6 +432,18 @@
       <Filter>Graphics\VK\LowLevel</Filter>
     </ClCompile>
     <ClCompile Include="VK\SemaphoreVk.cpp">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\AllocatorVk.cpp">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\ImageVk.cpp">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\SwapchainVk.cpp">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\FenceVk.cpp">
       <Filter>Graphics\VK\LowLevel</Filter>
     </ClCompile>
   </ItemGroup>

@@ -17,16 +17,19 @@
 #include "Texture.h"
 #include "Utility.h"
 
+#include "AllocatorVk.h"
 #include "CommandContextVk.h"
 #include "CommandListManagerVk.h"
 #include "DebugVk.h"
 #include "DescriptorHeapVk.h"
+#include "ImageVk.h"
 #include "InstanceVk.h"
 #include "LogicalDeviceVk.h"
 #include "PhysicalDeviceVk.h"
 #include "RootSignatureVk.h"
 #include "SemaphoreVk.h"
 #include "SurfaceVk.h"
+#include "SwapchainVk.h"
 
 #include <iostream>
 #include <sstream>
@@ -85,13 +88,10 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	{
 		enabledDeviceFeatures2.pNext = &enabledDeviceFeatures1_2;
 	}
-	~PlatformData() { Destroy(); }
 
-	void Destroy()
-	{
-		vkDestroySwapchainKHR(GetLogicalDevice(), swapChain, nullptr);
-		swapChain = VK_NULL_HANDLE;
-	}
+
+	~PlatformData() = default;
+
 
 	void SelectPhysicalDevice()
 	{
@@ -105,15 +105,15 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		supportedDeviceFeatures2 = physicalDevice->GetDeviceFeatures2();
 		supportedDeviceFeatures1_2 = physicalDevice->GetDeviceFeatures1_2();
 
-        // Record which extensions are required or optional, based on Application config
+		// Record which extensions are required or optional, based on Application config
 		GatherApplicationExtensions(false);
 		GatherApplicationExtensions(true);
 		ValidateApplicationExtensions();
-		
+
 		// Enabled required and optional features, as requested by the application
 		EnableFeatures(false);
 		EnableFeatures(true);
-		
+
 		// Report missing features and exit
 		if (!unsupportedRequiredFeatures.empty())
 		{
@@ -192,6 +192,9 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		// TODO - Delete me
 		g_device = GetLogicalDevice();
 
+		// Create allocator
+		allocator = Allocator::Create(instance, physicalDevice, device);
+
 		// Create semaphores
 		presentSemaphore = device->CreateBinarySemaphore();
 		imageAcquireSemaphore = device->CreateBinarySemaphore();
@@ -250,7 +253,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 	void CreateSwapChain(uint32_t* width, uint32_t* height, bool vsync)
 	{
-		VkSwapchainKHR oldSwapchain = swapChain;
+		auto oldSwapchain = swapchain;
 
 		// Get physical device surface properties and formats
 		VkSurfaceCapabilitiesKHR surfCaps;
@@ -313,7 +316,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		}
 
 		// Find the transformation of the surface
-		VkSurfaceTransformFlagsKHR preTransform;
+		VkSurfaceTransformFlagBitsKHR preTransform;
 		if (surfCaps.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR)
 		{
 			// We prefer a non-rotated transform
@@ -346,57 +349,38 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		auto vkFormat = static_cast<VkFormat>(BackBufferColorFormat);
 
-		VkSwapchainCreateInfoKHR swapchainCI = {};
-		swapchainCI.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-		swapchainCI.pNext = nullptr;
-		swapchainCI.surface = GetSurface();
-		swapchainCI.minImageCount = desiredNumberOfSwapchainImages;
-		swapchainCI.imageFormat = vkFormat;
-		swapchainCI.imageColorSpace = colorSpace;
-		swapchainCI.imageExtent = { swapchainExtent.width, swapchainExtent.height };
-		swapchainCI.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-		swapchainCI.preTransform = (VkSurfaceTransformFlagBitsKHR)preTransform;
-		swapchainCI.imageArrayLayers = 1;
-		swapchainCI.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		swapchainCI.queueFamilyIndexCount = 0;
-		swapchainCI.pQueueFamilyIndices = nullptr;
-		swapchainCI.presentMode = swapchainPresentMode;
-		swapchainCI.oldSwapchain = oldSwapchain;
-		// Setting clipped to VK_TRUE allows the implementation to discard rendering outside of the surface area
-		swapchainCI.clipped = VK_TRUE;
-		swapchainCI.compositeAlpha = compositeAlpha;
+		VkImageUsageFlags usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
 		// Set additional usage flag for blitting from the swapchain images if supported
 		VkFormatProperties formatProps;
 		vkGetPhysicalDeviceFormatProperties(GetPhysicalDevice(), vkFormat, &formatProps);
 		if (formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT)
 		{
-			swapchainCI.imageUsage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+			usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 		}
 
-		ThrowIfFailed(vkCreateSwapchainKHR(GetLogicalDevice(), &swapchainCI, nullptr, &swapChain));
-
-		// If an existing swap chain is re-created, destroy the old swap chain
-		// This also cleans up all the presentable images
-		if (oldSwapchain != VK_NULL_HANDLE)
-		{
-			vkDestroySwapchainKHR(GetLogicalDevice(), oldSwapchain, nullptr);
-		}
-
-		uint32_t imageCount{ 0 };
-		ThrowIfFailed(vkGetSwapchainImagesKHR(GetLogicalDevice(), swapChain, &imageCount, nullptr));
-
-		assert(imageCount == NumSwapChainBuffers);
-
-		// Get the swap chain images
-		ThrowIfFailed(vkGetSwapchainImagesKHR(GetLogicalDevice(), swapChain, &imageCount, images.data()));
+		// Create the swapchain
+		swapchain = device->CreateSwapchain(
+			surface,
+			desiredNumberOfSwapchainImages,
+			vkFormat,
+			swapchainExtent,
+			1u, // imageArrayLayers
+			usage,
+			VK_SHARING_MODE_EXCLUSIVE,
+			{}, // queueFamilyIndices
+			preTransform,
+			compositeAlpha,
+			swapchainPresentMode,
+			true, // clipped
+			oldSwapchain);
 	}
 
 
 	uint32_t AcquireNextImage()
 	{
 		uint32_t nextImageIndex = 0u;
-		vkAcquireNextImageKHR(GetLogicalDevice(), swapChain, UINT64_MAX, *imageAcquireSemaphore.get(), VK_NULL_HANDLE, &nextImageIndex);
+		vkAcquireNextImageKHR(GetLogicalDevice(), GetSwapchain(), UINT64_MAX, *imageAcquireSemaphore.get(), VK_NULL_HANDLE, &nextImageIndex);
 		return nextImageIndex;
 	}
 
@@ -877,14 +861,18 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 	VkInstance GetInstance() { return *instance.get(); }
 	VkPhysicalDevice GetPhysicalDevice() { return *physicalDevice.get(); }
-	VkDevice GetLogicalDevice() { return *device.get();	}
+	VkDevice GetLogicalDevice() { return *device.get(); }
 	VkSurfaceKHR GetSurface() { return *surface.get(); }
+	VkSwapchainKHR GetSwapchain() { return *swapchain.get();
+}
 
 	// Shared pointers to core Vulkan objects
 	shared_ptr<Instance> instance;
 	shared_ptr<PhysicalDevice> physicalDevice;
 	shared_ptr<LogicalDevice> device;
+	shared_ptr<Allocator> allocator;
 	shared_ptr<Surface> surface;
+	shared_ptr<Swapchain> swapchain;
 	shared_ptr<DebugReportCallback> debugReportCallback;
 	shared_ptr<Semaphore> imageAcquireSemaphore;
 	shared_ptr<Semaphore> presentSemaphore;
@@ -905,11 +893,8 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	set<string> requestedExtensions;
 	vector<string> requestedLayers;
 
-	VkSwapchainKHR swapChain{ VK_NULL_HANDLE };
 	uint32_t presentQueueNodeIndex{ 0 };
 	VkColorSpaceKHR colorSpace;
-
-	array<VkImage, NumSwapChainBuffers> images;
 
 	// Base features
 	VkPhysicalDeviceFeatures2			supportedDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr };
@@ -980,7 +965,8 @@ void GraphicsDevice::PlatformCreate()
 	for (uint32_t i = 0; i < NumSwapChainBuffers; ++i)
 	{
 		m_swapChainBuffers[i] = make_shared<ColorBuffer>();
-		auto handle = ResourceHandle::Create(m_platformData->images[i], VK_NULL_HANDLE, false);
+		VkImage image = *m_platformData->swapchain->GetImages()[i];
+		auto handle = ResourceHandle::CreateNoDelete(image, VK_NULL_HANDLE, false);
 		m_swapChainBuffers[i]->CreateFromSwapChain("Primary SwapChain Buffer", handle, m_width, m_height, BackBufferColorFormat);
 	}
 
@@ -1004,10 +990,11 @@ void GraphicsDevice::PlatformPresent()
 
 	// Present
 	VkSemaphore waitSemaphore = *m_platformData->presentSemaphore.get();
+	VkSwapchainKHR swapchain = m_platformData->GetSwapchain();
 
 	VkPresentInfoKHR presentInfo = { VK_STRUCTURE_TYPE_PRESENT_INFO_KHR };
 	presentInfo.swapchainCount = 1;
-	presentInfo.pSwapchains = &m_platformData->swapChain;
+	presentInfo.pSwapchains = &swapchain;
 	presentInfo.pImageIndices = &m_currentBuffer;
 	presentInfo.waitSemaphoreCount = 1;
 	presentInfo.pWaitSemaphores = &waitSemaphore;

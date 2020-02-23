@@ -28,14 +28,14 @@ Surface::Surface(const shared_ptr<Instance>& instance, const VkWin32SurfaceCreat
 
 Surface::~Surface()
 {
-	vkDestroySurfaceKHR(*Get(), m_surface, nullptr);
+	vkDestroySurfaceKHR(*Get<Instance>(), m_surface, nullptr);
 	m_surface = VK_NULL_HANDLE;
 }
 
 
 void Surface::Initialize(const VkWin32SurfaceCreateInfoKHR& createInfo)
 {
-	VkResult res = vkCreateWin32SurfaceKHR(*Get(), &createInfo, nullptr, &m_surface);
+	VkResult res = vkCreateWin32SurfaceKHR(*Get<Instance>(), &createInfo, nullptr, &m_surface);
 
 	if (res != VK_SUCCESS)
 	{

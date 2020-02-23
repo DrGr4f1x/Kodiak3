@@ -65,12 +65,26 @@ public:
 
 		static VkPointer Create(VkImage image, VkDeviceMemory mem, bool ownsImage = true)
 		{
-			return VkPointer(new VkResourceHandle(image, mem, ownsImage));
+			constexpr bool noDelete{ false };
+			return VkPointer(new VkResourceHandle(image, mem, ownsImage, noDelete));
 		}
 
 		static VkPointer Create(VkBuffer buffer, VkDeviceMemory mem, bool ownsImage = true)
 		{
-			return VkPointer(new VkResourceHandle(buffer, mem, ownsImage));
+			constexpr bool noDelete{ false };
+			return VkPointer(new VkResourceHandle(buffer, mem, ownsImage, noDelete));
+		}
+
+		static VkPointer CreateNoDelete(VkImage image, VkDeviceMemory mem, bool ownsImage = true)
+		{
+			constexpr bool noDelete{ true };
+			return VkPointer(new VkResourceHandle(image, mem, ownsImage, noDelete));
+		}
+
+		static VkPointer CreateNoDelete(VkBuffer buffer, VkDeviceMemory mem, bool ownsImage = true)
+		{
+			constexpr bool noDelete{ true };
+			return VkPointer(new VkResourceHandle(buffer, mem, ownsImage, noDelete));
 		}
 
 		operator VkImage() const { return Get()->m_wrapped.image; }
@@ -85,17 +99,19 @@ public:
 
 private:
 	friend class VkPointer;
-	VkResourceHandle(VkImage image, VkDeviceMemory memory, bool ownsImage) 
+	VkResourceHandle(VkImage image, VkDeviceMemory memory, bool ownsImage, bool noDelete) 
 		: m_wrapped(image)
 		, m_wrappedMemory(memory)
 		, m_isImage(true)
-		, m_ownsImage(ownsImage) 
+		, m_ownsImage(ownsImage)
+		, m_noDelete(noDelete)
 	{}
-	VkResourceHandle(VkBuffer buffer, VkDeviceMemory memory, bool ownsImage)
+	VkResourceHandle(VkBuffer buffer, VkDeviceMemory memory, bool ownsImage, bool noDelete)
 		: m_wrapped(buffer)
 		, m_wrappedMemory(memory)
 		, m_isImage(false)
 		, m_ownsImage(ownsImage)
+		, m_noDelete(noDelete)
 	{}
 	
 	union WrappedData
@@ -110,6 +126,7 @@ private:
 
 	const bool m_isImage{ true };
 	const bool m_ownsImage{ true };
+	const bool m_noDelete{ false };
 };
 
 

@@ -22,7 +22,7 @@ using namespace std;
 
 
 PhysicalDevice::PhysicalDevice(const shared_ptr<Instance>& instance, VkPhysicalDevice physicalDevice)
-	: Reference<Instance>(instance)
+	: Reference(instance)
 	, m_physicalDevice(physicalDevice)
 	, m_deviceProperties()
 	, m_memoryProperties()

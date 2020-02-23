@@ -22,6 +22,8 @@
 
 #pragma comment(lib, "vulkan-1.lib")
 
+#include "Extern\VulkanMemoryAllocator\vk_mem_alloc.h"
+
 #include "HandleVk.h"
 #include "ReferenceVk.h"
 
