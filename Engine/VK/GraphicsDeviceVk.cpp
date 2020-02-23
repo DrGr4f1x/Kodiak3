@@ -25,6 +25,7 @@
 #include "LogicalDeviceVk.h"
 #include "PhysicalDeviceVk.h"
 #include "RootSignatureVk.h"
+#include "SemaphoreVk.h"
 #include "SurfaceVk.h"
 
 #include <iostream>
@@ -88,8 +89,6 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 	void Destroy()
 	{
-		DestroySemaphores();
-
 		vkDestroySwapchainKHR(GetLogicalDevice(), swapChain, nullptr);
 		swapChain = VK_NULL_HANDLE;
 	}
@@ -193,7 +192,9 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		// TODO - Delete me
 		g_device = GetLogicalDevice();
 
-		CreateSemaphores();
+		// Create semaphores
+		presentSemaphore = device->CreateBinarySemaphore();
+		imageAcquireSemaphore = device->CreateBinarySemaphore();
 	}
 
 
@@ -391,48 +392,26 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		ThrowIfFailed(vkGetSwapchainImagesKHR(GetLogicalDevice(), swapChain, &imageCount, images.data()));
 	}
 
-	void CreateSemaphores()
-	{
-		VkSemaphoreTypeCreateInfo binaryCreateInfo;
-		binaryCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
-		binaryCreateInfo.pNext = nullptr;
-		binaryCreateInfo.semaphoreType = VK_SEMAPHORE_TYPE_BINARY;
-		binaryCreateInfo.initialValue = 0;
-
-		VkSemaphoreCreateInfo createInfo;
-		createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-		createInfo.pNext = &binaryCreateInfo;
-		createInfo.flags = 0;
-
-		ThrowIfFailed(vkCreateSemaphore(GetLogicalDevice(), &createInfo, nullptr, &imageAcquireSemaphore));
-		ThrowIfFailed(vkCreateSemaphore(GetLogicalDevice(), &createInfo, nullptr, &presentSemaphore));
-	}
-
-	void DestroySemaphores()
-	{
-		vkDestroySemaphore(GetLogicalDevice(), imageAcquireSemaphore, nullptr);
-		imageAcquireSemaphore = VK_NULL_HANDLE;
-
-		vkDestroySemaphore(GetLogicalDevice(), presentSemaphore, nullptr);
-		presentSemaphore = VK_NULL_HANDLE;
-	}
 
 	uint32_t AcquireNextImage()
 	{
 		uint32_t nextImageIndex = 0u;
-		vkAcquireNextImageKHR(GetLogicalDevice(), swapChain, UINT64_MAX, imageAcquireSemaphore, VK_NULL_HANDLE, &nextImageIndex);
+		vkAcquireNextImageKHR(GetLogicalDevice(), swapChain, UINT64_MAX, *imageAcquireSemaphore.get(), VK_NULL_HANDLE, &nextImageIndex);
 		return nextImageIndex;
 	}
+
 
 	void WaitForImageAcquisition(VkQueue queue)
 	{
 		VkPipelineStageFlags waitFlag = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 
+		VkSemaphore waitSemaphore = *imageAcquireSemaphore.get();
+
 		VkSubmitInfo submitInfo;
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		submitInfo.pNext = nullptr;
 		submitInfo.waitSemaphoreCount = 1;
-		submitInfo.pWaitSemaphores = &imageAcquireSemaphore;
+		submitInfo.pWaitSemaphores = &waitSemaphore;
 		submitInfo.pWaitDstStageMask = &waitFlag;
 		submitInfo.signalSemaphoreCount = 0;
 		submitInfo.pSignalSemaphores = nullptr;
@@ -441,6 +420,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
 	}
+
 
 	void UnblockPresent(VkQueue queue, VkSemaphore timelineSemaphore, uint64_t fenceWaitValue)
 	{
@@ -456,6 +436,8 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		VkPipelineStageFlags waitFlag = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 
+		VkSemaphore signalSemaphore = *presentSemaphore.get();
+
 		VkSubmitInfo submitInfo;
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		submitInfo.pNext = &timelineSubmitInfo;
@@ -463,7 +445,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		submitInfo.pWaitSemaphores = &timelineSemaphore;
 		submitInfo.pWaitDstStageMask = &waitFlag;
 		submitInfo.signalSemaphoreCount = 1;
-		submitInfo.pSignalSemaphores = &presentSemaphore;
+		submitInfo.pSignalSemaphores = &signalSemaphore;
 		submitInfo.commandBufferCount = 0;
 		submitInfo.pCommandBuffers = nullptr;
 
@@ -904,6 +886,8 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	shared_ptr<LogicalDevice> device;
 	shared_ptr<Surface> surface;
 	shared_ptr<DebugReportCallback> debugReportCallback;
+	shared_ptr<Semaphore> imageAcquireSemaphore;
+	shared_ptr<Semaphore> presentSemaphore;
 
 	vector<string> unsupportedRequiredFeatures;
 
@@ -924,9 +908,6 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	VkSwapchainKHR swapChain{ VK_NULL_HANDLE };
 	uint32_t presentQueueNodeIndex{ 0 };
 	VkColorSpaceKHR colorSpace;
-
-	VkSemaphore imageAcquireSemaphore{ VK_NULL_HANDLE };
-	VkSemaphore presentSemaphore{ VK_NULL_HANDLE };
 
 	array<VkImage, NumSwapChainBuffers> images;
 
@@ -1022,12 +1003,14 @@ void GraphicsDevice::PlatformPresent()
 	m_platformData->UnblockPresent(commandQueue, timelineSemaphore, fenceWaitValue);
 
 	// Present
+	VkSemaphore waitSemaphore = *m_platformData->presentSemaphore.get();
+
 	VkPresentInfoKHR presentInfo = { VK_STRUCTURE_TYPE_PRESENT_INFO_KHR };
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = &m_platformData->swapChain;
 	presentInfo.pImageIndices = &m_currentBuffer;
 	presentInfo.waitSemaphoreCount = 1;
-	presentInfo.pWaitSemaphores = &m_platformData->presentSemaphore;
+	presentInfo.pWaitSemaphores = &waitSemaphore;
 
 	vkQueuePresentKHR(g_commandManager.GetCommandQueue(), &presentInfo);
 

@@ -14,6 +14,7 @@
 
 #include "InstanceVk.h"
 #include "PhysicalDeviceVk.h"
+#include "SemaphoreVk.h"
 
 
 using namespace Kodiak;
@@ -42,6 +43,18 @@ shared_ptr<LogicalDevice> LogicalDevice::Create(
 	shared_ptr<LogicalDevice> device(new LogicalDevice(physicalDevice));
 	device->Initialize(queueCreateInfos, enabledLayerNames, enabledExtensionNames, enabledFeatures);
 	return device;
+}
+
+
+shared_ptr<Semaphore> LogicalDevice::CreateBinarySemaphore()
+{
+	return make_shared<Semaphore>(shared_from_this(), SemaphoreType::Binary);
+}
+
+
+shared_ptr<Semaphore> LogicalDevice::CreateTimelineSemaphore()
+{
+	return make_shared<Semaphore>(shared_from_this(), SemaphoreType::Timeline);
 }
 
 

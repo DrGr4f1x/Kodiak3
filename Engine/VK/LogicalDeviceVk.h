@@ -16,7 +16,7 @@ namespace Kodiak
 // Forward declarations
 class Instance;
 class PhysicalDevice;
-
+class Semaphore;
 
 class LogicalDevice : public Reference<PhysicalDevice>, public std::enable_shared_from_this<LogicalDevice>, public NonCopyable
 {
@@ -29,6 +29,9 @@ public:
 		const std::vector<std::string>& enabledLayerNames,
 		const std::vector<std::string>& enabledExtensionNames,
 		const VkPhysicalDeviceFeatures2& enabledFeatures);
+
+	std::shared_ptr<Semaphore> CreateBinarySemaphore();
+	std::shared_ptr<Semaphore> CreateTimelineSemaphore();
 
 	operator VkDevice();
 
