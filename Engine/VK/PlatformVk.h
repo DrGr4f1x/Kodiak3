@@ -23,6 +23,7 @@
 #pragma comment(lib, "vulkan-1.lib")
 
 #include "HandleVk.h"
+#include "ReferenceVk.h"
 
 // Custom define for better code readability
 #define VK_FLAGS_NONE 0

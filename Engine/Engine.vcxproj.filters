@@ -200,6 +200,15 @@
     <ClInclude Include="Extern\D3D12MemoryAllocator\D3D12MemAlloc.h">
       <Filter>Graphics\DX12\D3D12MemoryAllocator</Filter>
     </ClInclude>
+    <ClInclude Include="VK\InstanceVk.h">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\ReferenceVk.h">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\PhysicalDeviceVk.h">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -383,6 +392,12 @@
     <ClCompile Include="Extern\D3D12MemoryAllocator\D3D12MemAlloc.cpp">
       <Filter>Graphics\DX12\D3D12MemoryAllocator</Filter>
     </ClCompile>
+    <ClCompile Include="VK\InstanceVk.cpp">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\PhysicalDeviceVk.cpp">
+      <Filter>Graphics\VK\LowLevel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -414,6 +429,9 @@
     </Filter>
     <Filter Include="Graphics\DX12\D3D12MemoryAllocator">
       <UniqueIdentifier>{087ccbbe-b36b-4ec1-877d-7aec93736c42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\VK\LowLevel">
+      <UniqueIdentifier>{1f515090-d4d7-4d92-9ae6-755b085f8c05}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -20,6 +20,8 @@
 #include "CommandContextVk.h"
 #include "CommandListManagerVk.h"
 #include "DescriptorHeapVk.h"
+#include "InstanceVk.h"
+#include "PhysicalDeviceVk.h"
 #include "RootSignatureVk.h"
 
 #include <iostream>
@@ -152,57 +154,7 @@ void SetDebugName(uint64_t obj, VkDebugReportObjectTypeEXT objType, const char* 
 #endif
 
 
-InstanceHandle CreateInstance(const string& appName)
-{
-	VkApplicationInfo appInfo = {};
-	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = appName.c_str();
-	appInfo.pEngineName = "Kodiak";
-	appInfo.apiVersion = VK_API_VERSION_1_2;
-
-	vector<const char*> instanceExtensions = 
-	{ 
-		VK_KHR_SURFACE_EXTENSION_NAME, 
-		VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
-		VK_KHR_WIN32_SURFACE_EXTENSION_NAME
-	};
-	
-	VkInstanceCreateInfo instanceCreateInfo = {};
-	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	instanceCreateInfo.pNext = nullptr;
-	instanceCreateInfo.pApplicationInfo = &appInfo;
-	if (!instanceExtensions.empty())
-	{
-#if ENABLE_VULKAN_VALIDATION
-		instanceExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-#endif
-		instanceCreateInfo.enabledExtensionCount = (uint32_t)instanceExtensions.size();
-		instanceCreateInfo.ppEnabledExtensionNames = instanceExtensions.data();
-	}
-
-#if ENABLE_VULKAN_VALIDATION
-	// On desktop the LunarG loaders exposes a meta layer that contains all layers
-	int32_t validationLayerCount = 1;
-	const char* validationLayerNames[] = {
-		"VK_LAYER_KHRONOS_validation"
-	};
-
-	instanceCreateInfo.enabledLayerCount = validationLayerCount;
-	instanceCreateInfo.ppEnabledLayerNames = validationLayerNames;
-#endif
-
-	VkInstance instance = VK_NULL_HANDLE;
-	auto res = vkCreateInstance(&instanceCreateInfo, nullptr, &instance);
-	if (VK_SUCCESS != res)
-	{
-		Utility::ExitFatal("Could not create Vulkan instance", "Fatal error");
-	}
-
-	return InstanceHandle::Create(instance);
-}
-
-
-void InitializeDebugging(const InstanceHandle& instance, VkDebugReportFlagsEXT flags, VkDebugReportCallbackEXT callBack)
+void InitializeDebugging(VkInstance instance, VkDebugReportFlagsEXT flags, VkDebugReportCallbackEXT callBack)
 {
 	CreateDebugReportCallback = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT"));
 	DestroyDebugReportCallback = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT"));
@@ -268,7 +220,6 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 {
 	PlatformData()
 	{
-		supportedDeviceFeatures2.pNext = &supportedDeviceFeatures1_2;
 		enabledDeviceFeatures2.pNext = &enabledDeviceFeatures1_2;
 	}
 	~PlatformData() { Destroy(); }
@@ -280,46 +231,29 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		vkDestroySwapchainKHR(device, swapChain, nullptr);
 		swapChain = VK_NULL_HANDLE;
 
-		vkDestroySurfaceKHR(instance, surface, nullptr);
+		vkDestroySurfaceKHR(GetInstance(), surface, nullptr);
 		surface = VK_NULL_HANDLE;
 
-		FreeDebugCallback(instance);
+		FreeDebugCallback(GetInstance());
 
 		g_device = nullptr;
 		device = nullptr;
-		instance = nullptr;
 	}
 
 	void SelectPhysicalDevice()
 	{
-		uint32_t gpuCount = 0;
-		// Get number of available physical devices
-		ThrowIfFailed(vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr));
-		assert(gpuCount > 0);
-		// Enumerate devices
-		vector<VkPhysicalDevice> physicalDevices(gpuCount);
-		auto res = vkEnumeratePhysicalDevices(instance, &gpuCount, physicalDevices.data());
-		if (res)
-		{
-			Utility::ExitFatal("Could not enumerate physical devices", "Fatal error");
-		}
-
 		// GPU selection
+		physicalDevice = instance->GetPhysicalDevice(0);
 
-		physicalDevice = physicalDevices[0];
+		// Get available physical device features
+		supportedDeviceFeatures2 = physicalDevice->GetDeviceFeatures2();
+		supportedDeviceFeatures1_2 = physicalDevice->GetDeviceFeatures1_2();
 
-		// Store properties (including limits), features and memory properties of the physical device (so that examples can check against them)
-		vkGetPhysicalDeviceProperties(physicalDevice, &physicalDeviceProperties);
-		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &physicalDeviceMemoryProperties);
-
-		// Gather supported extensions, and record which extensions are required or optional, based on Application config
-		GatherSupportedExtensions();
+        // Record which extensions are required or optional, based on Application config
 		GatherApplicationExtensions(false);
 		GatherApplicationExtensions(true);
 		ValidateApplicationExtensions();
-
-		vkGetPhysicalDeviceFeatures2(physicalDevice, &supportedDeviceFeatures2);
-
+		
 		// Enabled required and optional features, as requested by the application
 		EnableFeatures(false);
 		EnableFeatures(true);
@@ -350,22 +284,22 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	void InitializeDebugMarkup()
 	{
 #if ENABLE_VULKAN_DEBUG_MARKUP
-		if (IsExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
+		if (physicalDevice->IsExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
 		{
 			vkDebugMarkerSetObjectTag =
-				reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT>(vkGetInstanceProcAddr(instance, "vkDebugMarkerSetObjectTagEXT"));
+				reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT>(vkGetInstanceProcAddr(GetInstance(), "vkDebugMarkerSetObjectTagEXT"));
 
 			vkDebugMarkerSetObjectName =
-				reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(vkGetInstanceProcAddr(instance, "vkDebugMarkerSetObjectNameEXT"));
+				reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(vkGetInstanceProcAddr(GetInstance(), "vkDebugMarkerSetObjectNameEXT"));
 
 			vkCmdDebugMarkerBegin =
-				reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(vkGetInstanceProcAddr(instance, "vkCmdDebugMarkerBeginEXT"));
+				reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(vkGetInstanceProcAddr(GetInstance(), "vkCmdDebugMarkerBeginEXT"));
 
 			vkCmdDebugMarkerEnd =
-				reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(vkGetInstanceProcAddr(instance, "vkCmdDebugMarkerEndEXT"));
+				reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(vkGetInstanceProcAddr(GetInstance(), "vkCmdDebugMarkerEndEXT"));
 
 			vkCmdDebugMarkerInsert =
-				reinterpret_cast<PFN_vkCmdDebugMarkerInsertEXT>(vkGetInstanceProcAddr(instance, "vkCmdDebugMarkerInsertEXT"));
+				reinterpret_cast<PFN_vkCmdDebugMarkerInsertEXT>(vkGetInstanceProcAddr(GetInstance(), "vkCmdDebugMarkerInsertEXT"));
 
 			if (vkDebugMarkerSetObjectName)
 			{
@@ -385,10 +319,10 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		// Queue family properties, used for setting up requested queues upon device creation
 		uint32_t queueFamilyCount;
-		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
+		vkGetPhysicalDeviceQueueFamilyProperties(GetPhysicalDevice(), &queueFamilyCount, nullptr);
 		assert(queueFamilyCount > 0);
 		queueFamilyProperties.resize(queueFamilyCount);
-		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilyProperties.data());
+		vkGetPhysicalDeviceQueueFamilyProperties(GetPhysicalDevice(), &queueFamilyCount, queueFamilyProperties.data());
 
 		// Get queue family indices for the requested queue family types
 		// Note that the indices may overlap depending on the implementation
@@ -451,7 +385,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		}
 
 		VkDevice logicalDevice{ VK_NULL_HANDLE };
-		VkResult result = vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice);
+		VkResult result = vkCreateDevice(GetPhysicalDevice(), &deviceCreateInfo, nullptr, &logicalDevice);
 		ThrowIfFailed(result);
 
 		device = DeviceHandle::Create(logicalDevice);
@@ -506,10 +440,6 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		throw runtime_error("Could not find a matching queue family index");
 	}
 
-	bool IsExtensionSupported(const string& name) const
-	{
-		return supportedExtensions.find(name) != end(supportedExtensions);
-	}
 
 	void InitSurface(HINSTANCE hInstance, HWND hWnd)
 	{
@@ -519,7 +449,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 		surfaceCreateInfo.hinstance = hInstance;
 		surfaceCreateInfo.hwnd = hWnd;
-		err = vkCreateWin32SurfaceKHR(instance, &surfaceCreateInfo, nullptr, &surface);
+		err = vkCreateWin32SurfaceKHR(GetInstance(), &surfaceCreateInfo, nullptr, &surface);
 
 		if (err != VK_SUCCESS)
 		{
@@ -528,11 +458,11 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		// Get available queue family properties
 		uint32_t queueCount;
-		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueCount, nullptr);
+		vkGetPhysicalDeviceQueueFamilyProperties(GetPhysicalDevice(), &queueCount, nullptr);
 		assert(queueCount >= 1);
 
 		vector<VkQueueFamilyProperties> queueProps(queueCount);
-		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueCount, queueProps.data());
+		vkGetPhysicalDeviceQueueFamilyProperties(GetPhysicalDevice(), &queueCount, queueProps.data());
 
 		// Iterate over each queue to learn whether it supports presenting:
 		// Find a queue with present support
@@ -540,7 +470,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		vector<VkBool32> supportsPresent(queueCount);
 		for (uint32_t i = 0; i < queueCount; i++)
 		{
-			vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &supportsPresent[i]);
+			vkGetPhysicalDeviceSurfaceSupportKHR(GetPhysicalDevice(), i, surface, &supportsPresent[i]);
 		}
 
 		// Search for a graphics and a present queue in the array of queue
@@ -594,11 +524,11 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		// Get list of supported surface formats
 		uint32_t formatCount;
-		ThrowIfFailed(vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, nullptr));
+		ThrowIfFailed(vkGetPhysicalDeviceSurfaceFormatsKHR(GetPhysicalDevice(), surface, &formatCount, nullptr));
 		assert(formatCount > 0);
 
 		vector<VkSurfaceFormatKHR> surfaceFormats(formatCount);
-		ThrowIfFailed(vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, surfaceFormats.data()));
+		ThrowIfFailed(vkGetPhysicalDeviceSurfaceFormatsKHR(GetPhysicalDevice(), surface, &formatCount, surfaceFormats.data()));
 
 		// If the surface format list only includes one entry with VK_FORMAT_UNDEFINED,
 		// there is no preferred format, so we assume VK_FORMAT_B8G8R8A8_UNORM
@@ -639,15 +569,15 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		// Get physical device surface properties and formats
 		VkSurfaceCapabilitiesKHR surfCaps;
-		ThrowIfFailed(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &surfCaps));
+		ThrowIfFailed(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(GetPhysicalDevice(), surface, &surfCaps));
 
 		// Get available present modes
 		uint32_t presentModeCount;
-		ThrowIfFailed(vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount, nullptr));
+		ThrowIfFailed(vkGetPhysicalDeviceSurfacePresentModesKHR(GetPhysicalDevice(), surface, &presentModeCount, nullptr));
 		assert(presentModeCount > 0);
 
 		vector<VkPresentModeKHR> presentModes(presentModeCount);
-		ThrowIfFailed(vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount, presentModes.data()));
+		ThrowIfFailed(vkGetPhysicalDeviceSurfacePresentModesKHR(GetPhysicalDevice(), surface, &presentModeCount, presentModes.data()));
 
 		VkExtent2D swapchainExtent = {};
 		// If width (and height) equals the special value 0xFFFFFFFF, the size of the surface will be set by the swapchain
@@ -753,7 +683,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 
 		// Set additional usage flag for blitting from the swapchain images if supported
 		VkFormatProperties formatProps;
-		vkGetPhysicalDeviceFormatProperties(physicalDevice, vkFormat, &formatProps);
+		vkGetPhysicalDeviceFormatProperties(GetPhysicalDevice(), vkFormat, &formatProps);
 		if (formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT)
 		{
 			swapchainCI.imageUsage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
@@ -856,32 +786,16 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
 	}
 
-	void GatherSupportedExtensions()
-	{
-		// Get list of supported extensions
-		uint32_t extCount = 0;
-		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, nullptr);
-		if (extCount > 0)
-		{
-			vector<VkExtensionProperties> extensions(extCount);
-			if (vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, &extensions.front()) == VK_SUCCESS)
-			{
-				for (auto ext : extensions)
-				{
-					supportedExtensions.insert(ext.extensionName);
-				}
-			}
-		}
-	}
-
 	void GatherApplicationExtensions(bool optionalFeatures)
 	{
 		auto& requestedExtensions = optionalFeatures ? optionalExtensions : requiredExtensions;
 		auto& requestedFeatures = optionalFeatures ? g_optionalFeatures : g_requiredFeatures;
 
+#if 0
 		// VK_KHR_shader_float16_int8
 		if (requestedFeatures.shaderFloat16 || requestedFeatures.shaderInt8)
 			requestedExtensions.insert(VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME);
+#endif
 
 		// Add some required and optional extensions used by every Application
 		if (optionalFeatures)
@@ -901,7 +815,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		// Check required extensions
 		for (const auto& extName : requiredExtensions)
 		{
-			if (IsExtensionSupported(extName))
+			if (physicalDevice->IsExtensionSupported(extName))
 			{
 				requestedExtensions.insert(extName);
 			}
@@ -936,7 +850,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		// Check optional extensions
 		for (const auto& extName : optionalExtensions)
 		{
-			if (IsExtensionSupported(extName))
+			if (physicalDevice->IsExtensionSupported(extName))
 			{
 				requestedExtensions.insert(extName);
 			}
@@ -1295,11 +1209,12 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		return supported;
 	}
 
-	InstanceHandle instance;
+	VkInstance GetInstance() { return *instance.get(); }
+	VkPhysicalDevice GetPhysicalDevice() { return *physicalDevice.get(); }
 
-	VkPhysicalDevice physicalDevice{ VK_NULL_HANDLE };
-	VkPhysicalDeviceProperties physicalDeviceProperties{};
-	VkPhysicalDeviceMemoryProperties physicalDeviceMemoryProperties{};
+	shared_ptr<Instance> instance;
+
+	shared_ptr<PhysicalDevice> physicalDevice;
 
 	vector<string> unsupportedRequiredFeatures;
 
@@ -1367,31 +1282,7 @@ Format GraphicsDevice::GetDepthFormat() const
 
 uint32_t GraphicsDevice::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound)
 {
-	for (uint32_t i = 0; i < m_platformData->physicalDeviceMemoryProperties.memoryTypeCount; i++)
-	{
-		if ((typeBits & 1) == 1)
-		{
-			if ((m_platformData->physicalDeviceMemoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
-			{
-				if (memTypeFound)
-				{
-					*memTypeFound = true;
-				}
-				return i;
-			}
-		}
-		typeBits >>= 1;
-	}
-
-	if (memTypeFound)
-	{
-		*memTypeFound = false;
-		return 0;
-	}
-	else
-	{
-		throw runtime_error("Could not find a matching memory type");
-	}
+	return m_platformData->physicalDevice->GetMemoryTypeIndex(typeBits, properties, memTypeFound);
 }
 
 
@@ -1399,7 +1290,7 @@ void GraphicsDevice::PlatformCreate()
 {
 	m_platformData = new PlatformData;
 
-	m_platformData->instance = CreateInstance(m_appName);
+	m_platformData->instance = Instance::Create(m_appName);
 
 #if ENABLE_VULKAN_VALIDATION
 	// Enable validation for debugging
@@ -1408,11 +1299,11 @@ void GraphicsDevice::PlatformCreate()
 	// For validating (debugging) an application the error and warning bits should suffice
 	VkDebugReportFlagsEXT debugReportFlags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
 	// Additional flags include performance info, loader and layer debug messages, etc.
-	InitializeDebugging(m_platformData->instance, debugReportFlags, VK_NULL_HANDLE);
+	InitializeDebugging(m_platformData->GetInstance(), debugReportFlags, VK_NULL_HANDLE);
 #endif
 
 	m_platformData->SelectPhysicalDevice();
-	m_deviceName = m_platformData->physicalDeviceProperties.deviceName;
+	m_deviceName = m_platformData->physicalDevice->GetDeviceProperties().deviceName;
 
 #if ENABLE_VULKAN_DEBUG_MARKUP
 	m_platformData->InitializeDebugMarkup();
@@ -1487,7 +1378,7 @@ VkFormatProperties GraphicsDevice::GetFormatProperties(Format format)
 	VkFormat vkFormat = static_cast<VkFormat>(format);
 	VkFormatProperties properties{};
 
-	vkGetPhysicalDeviceFormatProperties(m_platformData->physicalDevice, vkFormat, &properties);
+	vkGetPhysicalDeviceFormatProperties(m_platformData->GetPhysicalDevice(), vkFormat, &properties);
 
 	return properties;
 }
