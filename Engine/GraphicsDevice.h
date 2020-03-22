@@ -42,8 +42,6 @@ public:
 
 	void ReleaseResource(PlatformHandle handle);
 
-	const DeviceHandle& GetDevice();
-
 #if VK
 	uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound);
 	VkFormatProperties GetFormatProperties(Format format);
@@ -92,7 +90,7 @@ private:
 extern GraphicsDevice* g_graphicsDevice;
 
 
-const DeviceHandle& GetDevice();
+const DeviceHandle GetDevice();
 
 
 #if VK

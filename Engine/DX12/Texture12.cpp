@@ -297,9 +297,7 @@ void Texture::LoadDDS(const string& fullpath, Format format, bool sRgb)
 
 	ThrowIfFailed(BinaryReader::ReadEntireFile(fullpath, m_data, &m_dataSize));
 
-	auto device = GetDevice();
-
-	ThrowIfFailed(CreateDDSTextureFromMemory(device.Get(), m_data.get(), m_dataSize, 0, format, sRgb, &m_resource, descriptorHandle));
+	ThrowIfFailed(CreateDDSTextureFromMemory(GetDevice(), m_data.get(), m_dataSize, 0, format, sRgb, &m_resource, descriptorHandle));
 
 	ClearRetainedData();
 }

@@ -272,8 +272,6 @@ private:
 };
 
 // Template specializations for destructors
-template<> VkHandle<VkInstance>::~VkHandle();
-template<> VkHandle<VkDevice>::~VkHandle();
 template<> VkHandle<VkImageView>::~VkHandle();
 template<> VkHandle<VkQueryPool>::~VkHandle();
 

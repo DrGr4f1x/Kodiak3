@@ -61,7 +61,7 @@ void ResourceSet::Finalize()
 {
 	assert(m_rootSig != nullptr);
 
-	auto device = g_graphicsDevice->GetDevice();
+	auto device = GetDevice();
 
 	for (uint32_t i = 0; i < 8; ++i)
 	{

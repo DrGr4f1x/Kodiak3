@@ -311,9 +311,9 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 };
 
 
-const DeviceHandle& GetDevice()
+const DeviceHandle GetDevice()
 {
-	return g_device;
+	return g_device.Get();
 }
 
 } // namespace Kodiak
@@ -337,14 +337,6 @@ Format GraphicsDevice::GetColorFormat() const
 Format GraphicsDevice::GetDepthFormat() const
 {
 	return DepthFormat;
-}
-
-
-const DeviceHandle& GraphicsDevice::GetDevice()
-{
-	assert(m_platformData);
-
-	return m_platformData->device;
 }
 
 

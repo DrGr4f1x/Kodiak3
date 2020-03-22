@@ -200,37 +200,7 @@
     <ClInclude Include="Extern\D3D12MemoryAllocator\D3D12MemAlloc.h">
       <Filter>Graphics\DX12\D3D12MemoryAllocator</Filter>
     </ClInclude>
-    <ClInclude Include="VK\InstanceVk.h">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClInclude>
     <ClInclude Include="VK\ReferenceVk.h">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\PhysicalDeviceVk.h">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\SurfaceVk.h">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\DebugVk.h">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\LogicalDeviceVk.h">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\SemaphoreVk.h">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\AllocatorVk.h">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\ImageVk.h">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\SwapchainVk.h">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\FenceVk.h">
       <Filter>Graphics\VK\LowLevel</Filter>
     </ClInclude>
   </ItemGroup>
@@ -416,34 +386,7 @@
     <ClCompile Include="Extern\D3D12MemoryAllocator\D3D12MemAlloc.cpp">
       <Filter>Graphics\DX12\D3D12MemoryAllocator</Filter>
     </ClCompile>
-    <ClCompile Include="VK\InstanceVk.cpp">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\PhysicalDeviceVk.cpp">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\SurfaceVk.cpp">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\DebugVk.cpp">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\LogicalDeviceVk.cpp">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\SemaphoreVk.cpp">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\AllocatorVk.cpp">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\ImageVk.cpp">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\SwapchainVk.cpp">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\FenceVk.cpp">
+    <ClCompile Include="VK\ReferenceVk.cpp">
       <Filter>Graphics\VK\LowLevel</Filter>
     </ClCompile>
   </ItemGroup>

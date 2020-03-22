@@ -84,7 +84,7 @@ void ComputeNBodyApp::Render()
 	{
 		auto& computeContext = context.GetComputeContext();
 
-		computeContext.TransitionResource(m_particleBuffer, ResourceState::NonPixelShaderResource);
+		computeContext.TransitionResource(m_particleBuffer, ResourceState::UnorderedAccess);
 
 		computeContext.SetRootSignature(m_computeRootSig);
 		computeContext.SetPipelineState(m_computeCalculatePSO);
@@ -99,7 +99,7 @@ void ComputeNBodyApp::Render()
 
 		computeContext.Dispatch1D(6 * PARTICLES_PER_ATTRACTOR, 256);
 
-		computeContext.InsertUAVBarrier(m_particleBuffer);
+		computeContext.TransitionResource(m_particleBuffer, ResourceState::NonPixelShaderResource);
 	}
 
 	context.TransitionResource(GetColorBuffer(), ResourceState::RenderTarget);

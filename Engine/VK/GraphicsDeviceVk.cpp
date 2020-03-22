@@ -17,34 +17,136 @@
 #include "Texture.h"
 #include "Utility.h"
 
-#include "AllocatorVk.h"
 #include "CommandContextVk.h"
 #include "CommandListManagerVk.h"
-#include "DebugVk.h"
 #include "DescriptorHeapVk.h"
-#include "ImageVk.h"
-#include "InstanceVk.h"
-#include "LogicalDeviceVk.h"
-#include "PhysicalDeviceVk.h"
 #include "RootSignatureVk.h"
-#include "SemaphoreVk.h"
-#include "SurfaceVk.h"
-#include "SwapchainVk.h"
 
 #include <iostream>
 #include <sstream>
 
+#define VMA_IMPLEMENTATION
+#include "Extern\VulkanMemoryAllocator\vk_mem_alloc.h"
 
 using namespace Kodiak;
 using namespace Utility;
 using namespace std;
 
 
+#if ENABLE_VULKAN_VALIDATION
+PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallback{ nullptr };
+PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallback{ nullptr };
+PFN_vkDebugReportMessageEXT vkDebugReportMessage{ nullptr };
+
+VkDebugReportCallbackEXT msgCallback = VK_NULL_HANDLE;
+
+VkBool32 messageCallback(
+	VkDebugReportFlagsEXT flags,
+	VkDebugReportObjectTypeEXT objType,
+	uint64_t srcObject,
+	size_t location,
+	int32_t msgCode,
+	const char* pLayerPrefix,
+	const char* pMsg,
+	void* pUserData)
+{
+	// Select prefix depending on flags passed to the callback
+	// Note that multiple flags may be set for a single validation message
+	string prefix("");
+
+	// Error that may result in undefined behavior
+	if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
+	{
+		prefix += "ERROR:";
+	};
+	// Warnings may hint at unexpected / non-spec API usage
+	if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
+	{
+		prefix += "WARNING:";
+	};
+	// May indicate sub-optimal usage of the API
+	if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)
+	{
+		prefix += "PERFORMANCE:";
+	};
+	// Informal messages that may become handy during debugging
+	if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)
+	{
+		prefix += "INFO:";
+	}
+	// Diagnostic info from the Vulkan loader and layers
+	// Usually not helpful in terms of API usage, but may help to debug layer and loader problems 
+	if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT)
+	{
+		prefix += "DEBUG:";
+	}
+
+	// Display message to default output (console/logcat)
+	stringstream debugMessage;
+	debugMessage << prefix << " [" << pLayerPrefix << "] Code " << msgCode << " : " << pMsg;
+
+	if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
+	{
+		cerr << debugMessage.str() << "\n";
+	}
+	else
+	{
+		cout << debugMessage.str() << "\n";
+	}
+
+	OutputDebugString(debugMessage.str().c_str());
+	if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
+	{
+		if (strstr(pMsg, "VUID-vkDestroyBuffer-buffer-00922") == nullptr &&
+			strstr(pMsg, "VUID-vkFreeMemory-memory-00677") == nullptr &&
+			strstr(pMsg, "VUID-vkResetCommandBuffer-commandBuffer-00045") == nullptr)
+		{
+			assert(false);
+		}
+	}
+
+	fflush(stderr);
+
+	// The return value of this callback controls whether the Vulkan call that caused
+	// the validation message will be aborted or not
+	// We return VK_FALSE as we DON'T want Vulkan calls that cause a validation message 
+	// (and return a VkResult) to abort
+	// If you instead want to have calls abort, pass in VK_TRUE and the function will 
+	// return VK_ERROR_VALIDATION_FAILED_EXT 
+	return VK_FALSE;
+}
+#endif
+
+#if ENABLE_VULKAN_DEBUG_MARKUP
+PFN_vkDebugMarkerSetObjectTagEXT vkDebugMarkerSetObjectTag{ nullptr };
+PFN_vkDebugMarkerSetObjectNameEXT vkDebugMarkerSetObjectName{ nullptr };
+PFN_vkCmdDebugMarkerBeginEXT vkCmdDebugMarkerBegin{ nullptr };
+PFN_vkCmdDebugMarkerEndEXT vkCmdDebugMarkerEnd{ nullptr };
+PFN_vkCmdDebugMarkerInsertEXT vkCmdDebugMarkerInsert{ nullptr };
+
+bool g_debugMarkupAvailable = false;
+
+void SetDebugName(uint64_t obj, VkDebugReportObjectTypeEXT objType, const char* name)
+{
+	if (g_debugMarkupAvailable)
+	{
+		VkDebugMarkerObjectNameInfoEXT nameInfo = {};
+		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
+		nameInfo.pNext = nullptr;
+		nameInfo.objectType = objType;
+		nameInfo.object = obj;
+		nameInfo.pObjectName = name;
+		vkDebugMarkerSetObjectName(GetDevice(), &nameInfo);
+	}
+}
+#endif
+
+
 namespace
 {
 
 // TODO - Delete me
-DeviceHandle g_device{ VK_NULL_HANDLE };
+shared_ptr<DeviceRef> g_device;
 
 Format BackBufferColorFormat = Format::R10G10B10A2_UNorm;
 Format DepthFormat = Format::D32_Float_S8_UInt;
@@ -86,24 +188,283 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 {
 	PlatformData()
 	{
+		supportedDeviceFeatures2.pNext = &supportedDeviceFeatures1_2;
 		enabledDeviceFeatures2.pNext = &enabledDeviceFeatures1_2;
 	}
 
 
-	~PlatformData() = default;
+	void CreateInstance(const string& appName)
+	{
+		VkApplicationInfo appInfo = {};
+		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+		appInfo.pApplicationName = appName.c_str();
+		appInfo.pEngineName = "Kodiak";
+		appInfo.apiVersion = VK_API_VERSION_1_2;
+
+		const vector<const char*> instanceExtensions =
+		{
+#if ENABLE_VULKAN_VALIDATION
+			VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
+#endif
+			VK_KHR_SURFACE_EXTENSION_NAME,
+			VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+			VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+		};
+
+		const vector<const char*> instanceLayers =
+		{
+#if ENABLE_VULKAN_VALIDATION
+			"VK_LAYER_KHRONOS_validation"
+#endif
+		};
+
+		VkInstanceCreateInfo createInfo = {};
+		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+		createInfo.pNext = nullptr;
+		createInfo.pApplicationInfo = &appInfo;
+		createInfo.enabledExtensionCount = (uint32_t)instanceExtensions.size();
+		createInfo.ppEnabledExtensionNames = instanceExtensions.data();
+		createInfo.enabledLayerCount = (uint32_t)instanceLayers.size();
+		createInfo.ppEnabledLayerNames = instanceLayers.data();
+
+		VkInstance vkInstance{ VK_NULL_HANDLE };
+		auto res = vkCreateInstance(&createInfo, nullptr, &vkInstance);
+		if (VK_SUCCESS != res)
+		{
+			Utility::ExitFatal("Could not create Vulkan instance", "Fatal error");
+		}
+
+		instance = InstanceRef::Create(vkInstance);
+	}
+	
+
+	void EnumeratePhysicalDevices()
+	{
+		uint32_t gpuCount = 0;
+		// Get number of available physical devices
+		ThrowIfFailed(vkEnumeratePhysicalDevices(*instance, &gpuCount, nullptr));
+		assert(gpuCount > 0);
+
+		// Enumerate devices
+		physicalDevices.resize(gpuCount);
+		auto res = vkEnumeratePhysicalDevices(*instance, &gpuCount, physicalDevices.data());
+		if (res)
+		{
+			Utility::ExitFatal("Could not enumerate physical devices", "Fatal error");
+		}
+	}
+
+
+	void InitializeDebugMarkup()
+	{
+#if ENABLE_VULKAN_DEBUG_MARKUP
+		if (IsExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
+		{
+			vkDebugMarkerSetObjectTag =
+				reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT>(vkGetInstanceProcAddr(GetInstance(), "vkDebugMarkerSetObjectTagEXT"));
+
+			vkDebugMarkerSetObjectName =
+				reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(vkGetInstanceProcAddr(GetInstance(), "vkDebugMarkerSetObjectNameEXT"));
+
+			vkCmdDebugMarkerBegin =
+				reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(vkGetInstanceProcAddr(GetInstance(), "vkCmdDebugMarkerBeginEXT"));
+
+			vkCmdDebugMarkerEnd =
+				reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(vkGetInstanceProcAddr(GetInstance(), "vkCmdDebugMarkerEndEXT"));
+
+			vkCmdDebugMarkerInsert =
+				reinterpret_cast<PFN_vkCmdDebugMarkerInsertEXT>(vkGetInstanceProcAddr(GetInstance(), "vkCmdDebugMarkerInsertEXT"));
+
+			if (vkDebugMarkerSetObjectName)
+			{
+				g_debugMarkupAvailable = true;
+			}
+		}
+#endif
+	}
+
+
+	void InitializeValidation()
+	{
+#if ENABLE_VULKAN_VALIDATION
+		vkCreateDebugReportCallback =
+			reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(GetInstance(), "vkCreateDebugReportCallbackEXT"));
+		vkDestroyDebugReportCallback =
+			reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(GetInstance(), "vkDestroyDebugReportCallbackEXT"));
+		vkDebugReportMessage =
+			reinterpret_cast<PFN_vkDebugReportMessageEXT>(vkGetInstanceProcAddr(GetInstance(), "vkDebugReportMessageEXT"));
+
+		assert(vkCreateDebugReportCallback);
+		assert(vkDestroyDebugReportCallback);
+
+		// The report flags determine what type of messages for the layers will be displayed
+		// For validating (debugging) an application the error and warning bits should suffice
+		VkDebugReportFlagsEXT debugReportFlags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
+
+		VkDebugReportCallbackCreateInfoEXT createInfo = {};
+		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
+		createInfo.pfnCallback = (PFN_vkDebugReportCallbackEXT)messageCallback;
+		createInfo.flags = debugReportFlags;
+
+		ThrowIfFailed(vkCreateDebugReportCallback(GetInstance(), &createInfo, nullptr, &msgCallback));
+#endif
+	}
+
+
+	void GetPhysicalDeviceProperties()
+	{
+		// Get device and memory properties
+		vkGetPhysicalDeviceProperties(*physicalDevice, &physicalDeviceProperties);
+		vkGetPhysicalDeviceMemoryProperties(*physicalDevice, &physicalDeviceMemoryProperties);
+
+		// Get device features
+		vkGetPhysicalDeviceFeatures2(*physicalDevice, &supportedDeviceFeatures2);
+
+		// Get list of supported extensions
+		uint32_t extCount = 0;
+		ThrowIfFailed(vkEnumerateDeviceExtensionProperties(*physicalDevice, nullptr, &extCount, nullptr));
+		if (extCount > 0)
+		{
+			deviceExtensions.resize(extCount);
+			ThrowIfFailed(vkEnumerateDeviceExtensionProperties(*physicalDevice, nullptr, &extCount, &deviceExtensions.front()));
+		}
+
+		// Get available queue family properties
+		uint32_t queueCount;
+		vkGetPhysicalDeviceQueueFamilyProperties(*physicalDevice, &queueCount, nullptr);
+		assert(queueCount >= 1);
+
+		queueFamilyProperties.resize(queueCount);
+		vkGetPhysicalDeviceQueueFamilyProperties(*physicalDevice, &queueCount, queueFamilyProperties.data());
+	}
+
+
+	bool GetSurfaceSupport(uint32_t index, VkSurfaceKHR surface) const
+	{
+		VkBool32 supported = VK_FALSE;
+		ThrowIfFailed(vkGetPhysicalDeviceSurfaceSupportKHR(*physicalDevice, index, surface, &supported));
+		return supported == VK_TRUE;
+	}
+
+
+	vector<uint32_t> GetGraphicsPresentQueueFamilyIndices(VkSurfaceKHR surface)
+	{
+		vector<uint32_t> indices;
+		for (size_t i = 0; i < queueFamilyProperties.size(); ++i)
+		{
+			if ((queueFamilyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && GetSurfaceSupport((uint32_t)i, surface))
+			{
+				indices.push_back((uint32_t)i);
+			}
+		}
+		return indices;
+	}
+
+
+	vector<uint32_t> GetQueueFamilyIndices(VkQueueFlags queueFlags)
+	{
+		vector<uint32_t> indices;
+		for (size_t i = 0; i < queueFamilyProperties.size(); ++i)
+		{
+			if ((queueFamilyProperties[i].queueFlags & queueFlags) == queueFlags)
+			{
+				indices.push_back((uint32_t)i);
+			}
+		}
+		return indices;
+	}
+
+
+	uint32_t GetQueueFamilyIndex(VkQueueFlags queueFlags)
+	{
+		uint32_t index = 0;
+
+		// Dedicated queue for compute
+		// Try to find a queue family index that supports compute but not graphics
+		if (queueFlags & VK_QUEUE_COMPUTE_BIT)
+		{
+			for (const auto& properties : queueFamilyProperties)
+			{
+				if ((properties.queueFlags & queueFlags) && ((properties.queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0))
+				{
+					return index;
+				}
+				++index;
+			}
+		}
+
+		// Dedicated queue for transfer
+		// Try to find a queue family index that supports transfer but not graphics and compute
+		if (queueFlags & VK_QUEUE_TRANSFER_BIT)
+		{
+			index = 0;
+			for (const auto& properties : queueFamilyProperties)
+			{
+				if ((properties.queueFlags & queueFlags) && ((properties.queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0) && ((properties.queueFlags & VK_QUEUE_COMPUTE_BIT) == 0))
+				{
+					return index;
+				}
+				++index;
+			}
+		}
+
+		// For other queue types or if no separate compute queue is present, return the first one to support the requested flags
+		index = 0;
+		for (const auto& properties : queueFamilyProperties)
+		{
+			if (properties.queueFlags & queueFlags)
+			{
+				return index;
+			}
+			++index;
+		}
+
+		throw runtime_error("Could not find a matching queue family index");
+	}
+
+
+	uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound)
+	{
+		for (uint32_t i = 0; i < physicalDeviceMemoryProperties.memoryTypeCount; i++)
+		{
+			if ((typeBits & 1) == 1)
+			{
+				if ((physicalDeviceMemoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
+				{
+					if (memTypeFound)
+					{
+						*memTypeFound = true;
+					}
+					return i;
+				}
+			}
+			typeBits >>= 1;
+		}
+
+		if (memTypeFound)
+		{
+			*memTypeFound = false;
+			return 0;
+		}
+		else
+		{
+			throw runtime_error("Could not find a matching memory type");
+		}
+	}
 
 
 	void SelectPhysicalDevice()
 	{
 		// GPU selection
-		physicalDevice = instance->GetPhysicalDevice(0);
+		EnumeratePhysicalDevices();
+		physicalDevice = PhysicalDeviceRef::Create(instance, physicalDevices[0]);
 
-		// Initialize debug markup
-		instance->InitializeDebugMarkup(physicalDevice);
+		// Initialize debug markup and validation callbacks
+		InitializeDebugMarkup();
+		InitializeValidation();
 
-		// Get available physical device features
-		supportedDeviceFeatures2 = physicalDevice->GetDeviceFeatures2();
-		supportedDeviceFeatures1_2 = physicalDevice->GetDeviceFeatures1_2();
+		// Get available physical device properties and features
+		GetPhysicalDeviceProperties();
 
 		// Record which extensions are required or optional, based on Application config
 		GatherApplicationExtensions(false);
@@ -138,6 +499,35 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	}
 
 
+	void CreateSemaphores()
+	{
+		VkSemaphoreTypeCreateInfo typeCreateInfo;
+		typeCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
+		typeCreateInfo.pNext = nullptr;
+		typeCreateInfo.semaphoreType = VK_SEMAPHORE_TYPE_BINARY;
+		typeCreateInfo.initialValue = 0;
+
+		VkSemaphoreCreateInfo createInfo;
+		createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+		createInfo.pNext = &typeCreateInfo;
+		createInfo.flags = 0;
+
+		// imageAcquireSemaphore
+		{
+			VkSemaphore vkSemaphore{ VK_NULL_HANDLE };
+			ThrowIfFailed(vkCreateSemaphore(*device, &createInfo, nullptr, &vkSemaphore));
+			imageAcquireSemaphore = SemaphoreRef::Create(device, vkSemaphore);
+		}
+
+		// presentSemaphore
+		{
+			VkSemaphore vkSemaphore{ VK_NULL_HANDLE };
+			ThrowIfFailed(vkCreateSemaphore(*device, &createInfo, nullptr, &vkSemaphore));
+			presentSemaphore = SemaphoreRef::Create(device, vkSemaphore);
+		}
+	}
+
+
 	void CreateLogicalDevice()
 	{
 		// Desired queues need to be requested upon logical device creation
@@ -152,7 +542,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		const float defaultQueuePriority = 0.0f;
 
 		// Graphics queue
-		queueFamilyIndices.graphics = ::GetQueueFamilyIndex(physicalDevice, VK_QUEUE_GRAPHICS_BIT);
+		queueFamilyIndices.graphics = GetQueueFamilyIndex(VK_QUEUE_GRAPHICS_BIT);
 		VkDeviceQueueCreateInfo queueInfo{};
 		queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 		queueInfo.queueFamilyIndex = queueFamilyIndices.graphics;
@@ -161,7 +551,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		queueCreateInfos.push_back(queueInfo);
 
 		// Dedicated compute queue
-		queueFamilyIndices.compute = ::GetQueueFamilyIndex(physicalDevice, VK_QUEUE_COMPUTE_BIT);
+		queueFamilyIndices.compute = GetQueueFamilyIndex(VK_QUEUE_COMPUTE_BIT);
 		if (queueFamilyIndices.compute != queueFamilyIndices.graphics)
 		{
 			// If compute family index differs, we need an additional queue create info for the compute queue
@@ -174,7 +564,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		}
 
 		// Dedicated transfer queue
-		queueFamilyIndices.transfer = ::GetQueueFamilyIndex(physicalDevice, VK_QUEUE_TRANSFER_BIT);
+		queueFamilyIndices.transfer = GetQueueFamilyIndex(VK_QUEUE_TRANSFER_BIT);
 		if ((queueFamilyIndices.transfer != queueFamilyIndices.graphics) && (queueFamilyIndices.transfer != queueFamilyIndices.compute))
 		{
 			// If compute family index differs, we need an additional queue create info for the transfer queue
@@ -186,28 +576,76 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 			queueCreateInfos.push_back(queueInfo);
 		}
 
-		vector<string> extensions(requestedExtensions.begin(), requestedExtensions.end());
-		device = physicalDevice->CreateLogicalDevice(queueCreateInfos, requestedLayers, extensions, enabledDeviceFeatures2);
+		vector<const char*> layerNames;
+		layerNames.reserve(requestedLayers.size());
+		for (const auto& name : requestedLayers)
+		{
+			layerNames.push_back(name.c_str());
+		}
+
+		vector<const char*> extensionNames;
+		extensionNames.reserve(requestedExtensions.size());
+		for (const auto& name : requestedExtensions)
+		{
+			extensionNames.push_back(name.c_str());
+		}
+
+		VkDeviceCreateInfo createInfo = {};
+		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		createInfo.pNext = &enabledDeviceFeatures2;
+		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());;
+		createInfo.pQueueCreateInfos = queueCreateInfos.data();
+		createInfo.pEnabledFeatures = nullptr;
+		createInfo.enabledLayerCount = (uint32_t)layerNames.size();
+		createInfo.ppEnabledLayerNames = layerNames.data();
+		createInfo.enabledExtensionCount = (uint32_t)extensionNames.size();
+		createInfo.ppEnabledExtensionNames = extensionNames.data();
+
+		VkDevice vkDevice{ VK_NULL_HANDLE };
+		ThrowIfFailed(vkCreateDevice(*physicalDevice, &createInfo, nullptr, &vkDevice));
+		device = DeviceRef::Create(physicalDevice, vkDevice);
 
 		// TODO - Delete me
-		g_device = GetLogicalDevice();
-
-		// Create allocator
-		allocator = Allocator::Create(instance, physicalDevice, device);
+		g_device = device;
 
 		// Create semaphores
-		presentSemaphore = device->CreateBinarySemaphore();
-		imageAcquireSemaphore = device->CreateBinarySemaphore();
+		CreateSemaphores();
+	}
+
+
+	void CreateVmaAllocator()
+	{
+		VmaAllocatorCreateInfo createInfo = {};
+		createInfo.physicalDevice = *physicalDevice;
+		createInfo.device = *device;
+		
+		VmaAllocator vmaAllocator{ VK_NULL_HANDLE };
+		ThrowIfFailed(vmaCreateAllocator(&createInfo, &vmaAllocator));
+
+		allocator = AllocatorRef::Create(instance, physicalDevice, device, vmaAllocator);
 	}
 
 
 	void InitSurface(HINSTANCE hInstance, HWND hWnd)
 	{
 		// Create surface
-		surface = instance->CreateSurface(hInstance, hWnd);
+		VkWin32SurfaceCreateInfoKHR surfaceCreateInfo = {};
+		surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+		surfaceCreateInfo.pNext = nullptr;
+		surfaceCreateInfo.hinstance = hInstance;
+		surfaceCreateInfo.hwnd = hWnd;
+
+		VkSurfaceKHR vkSurface{ VK_NULL_HANDLE };
+		VkResult res = vkCreateWin32SurfaceKHR(*instance, &surfaceCreateInfo, nullptr, &vkSurface);
+
+		if (res != VK_SUCCESS)
+		{
+			Utility::ExitFatal("Could not create surface!", "Fatal error");
+		}
+		surface = SurfaceRef::Create(instance, vkSurface);
 
 		// Find a graphics queue that supports present
-		const auto& queueFamilyIndices = GetGraphicsPresentQueueFamilyIndices(physicalDevice, surface);
+		const auto& queueFamilyIndices = GetGraphicsPresentQueueFamilyIndices(*surface);
 		assert(!queueFamilyIndices.empty());
 
 		// Get list of supported surface formats
@@ -360,20 +798,49 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		}
 
 		// Create the swapchain
-		swapchain = device->CreateSwapchain(
-			surface,
-			desiredNumberOfSwapchainImages,
-			vkFormat,
-			swapchainExtent,
-			1u, // imageArrayLayers
-			usage,
-			VK_SHARING_MODE_EXCLUSIVE,
-			{}, // queueFamilyIndices
-			preTransform,
-			compositeAlpha,
-			swapchainPresentMode,
-			true, // clipped
-			oldSwapchain);
+		VkSwapchainKHR oldsc = VK_NULL_HANDLE;
+		if (oldSwapchain)
+		{
+			oldsc = *oldSwapchain;
+		}
+
+		VkSwapchainCreateInfoKHR createInfo = {};
+		createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+		createInfo.pNext = nullptr;
+		createInfo.surface = *surface;
+		createInfo.minImageCount = desiredNumberOfSwapchainImages;
+		createInfo.imageFormat = vkFormat;
+		createInfo.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+		createInfo.imageExtent = swapchainExtent;
+		createInfo.imageUsage = usage;
+		createInfo.preTransform = preTransform;
+		createInfo.imageArrayLayers = 1u;
+		createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		createInfo.queueFamilyIndexCount = 0;
+		createInfo.pQueueFamilyIndices = nullptr;
+		createInfo.presentMode = swapchainPresentMode;
+		createInfo.oldSwapchain = oldsc;
+		// Setting clipped to VK_TRUE allows the implementation to discard rendering outside of the surface area
+		createInfo.clipped = VK_TRUE;
+		createInfo.compositeAlpha = compositeAlpha;
+
+		VkSwapchainKHR vkSwapchain{ VK_NULL_HANDLE };
+		ThrowIfFailed(vkCreateSwapchainKHR(*device, &createInfo, nullptr, &vkSwapchain));
+		swapchain = SwapchainRef::Create(device, vkSwapchain);
+
+		// Count actual swapchain images
+		uint32_t imageCount{ 0 };
+		ThrowIfFailed(vkGetSwapchainImagesKHR(*device, *swapchain, &imageCount, nullptr));
+
+		// Get the swap chain images
+		vector<VkImage> images(imageCount);
+		ThrowIfFailed(vkGetSwapchainImagesKHR(*device, *swapchain, &imageCount, images.data()));
+
+		swapchainImages.reserve(imageCount);
+		for (auto image : images)
+		{
+			swapchainImages.push_back(ImageRef::Create(device, image));
+		}
 	}
 
 
@@ -436,6 +903,17 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
 	}
 
+
+	bool IsExtensionSupported(const string& name) const
+	{
+		const char* c_str = name.c_str();
+		return find_if(
+			deviceExtensions.begin(),
+			deviceExtensions.end(),
+			[c_str](auto const& e) { return strcmp(e.extensionName, c_str) == 0; }) != deviceExtensions.end();
+	}
+
+
 	void GatherApplicationExtensions(bool optionalFeatures)
 	{
 		auto& requestedExtensions = optionalFeatures ? optionalExtensions : requiredExtensions;
@@ -465,7 +943,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		// Check required extensions
 		for (const auto& extName : requiredExtensions)
 		{
-			if (physicalDevice->IsExtensionSupported(extName))
+			if (IsExtensionSupported(extName))
 			{
 				requestedExtensions.insert(extName);
 			}
@@ -500,7 +978,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		// Check optional extensions
 		for (const auto& extName : optionalExtensions)
 		{
-			if (physicalDevice->IsExtensionSupported(extName))
+			if (IsExtensionSupported(extName))
 			{
 				requestedExtensions.insert(extName);
 			}
@@ -867,24 +1345,23 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 }
 
 	// Shared pointers to core Vulkan objects
-	shared_ptr<Instance> instance;
-	shared_ptr<PhysicalDevice> physicalDevice;
-	shared_ptr<LogicalDevice> device;
-	shared_ptr<Allocator> allocator;
-	shared_ptr<Surface> surface;
-	shared_ptr<Swapchain> swapchain;
-	shared_ptr<DebugReportCallback> debugReportCallback;
-	shared_ptr<Semaphore> imageAcquireSemaphore;
-	shared_ptr<Semaphore> presentSemaphore;
+	shared_ptr<InstanceRef> instance;
+	shared_ptr<PhysicalDeviceRef> physicalDevice;
+	shared_ptr<DeviceRef> device;
+	shared_ptr<AllocatorRef> allocator;
+	shared_ptr<SurfaceRef> surface;
+	shared_ptr<SwapchainRef> swapchain;
+	shared_ptr<DebugReportCallbackRef> debugReportCallback;
+	shared_ptr<SemaphoreRef> imageAcquireSemaphore;
+	shared_ptr<SemaphoreRef> presentSemaphore;
 
-	vector<string> unsupportedRequiredFeatures;
+	// Physical devices, properties, and extensions
+	vector<VkPhysicalDevice> physicalDevices;
 
-	struct
-	{
-		uint32_t graphics;
-		uint32_t compute;
-		uint32_t transfer;
-	} queueFamilyIndices;
+	VkPhysicalDeviceProperties				physicalDeviceProperties;
+	VkPhysicalDeviceMemoryProperties		physicalDeviceMemoryProperties;
+
+	std::vector<VkExtensionProperties>		deviceExtensions;	
 
 	// Required, optional, and enabled extensions
 	set<string> supportedExtensions;
@@ -893,8 +1370,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 	set<string> requestedExtensions;
 	vector<string> requestedLayers;
 
-	uint32_t presentQueueNodeIndex{ 0 };
-	VkColorSpaceKHR colorSpace;
+	vector<string> unsupportedRequiredFeatures;
 
 	// Base features
 	VkPhysicalDeviceFeatures2			supportedDeviceFeatures2{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, nullptr };
@@ -909,6 +1385,22 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 		VkPhysicalDeviceShaderFloat16Int8FeaturesKHR khrShaderFloat16Int8Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES_KHR, nullptr };
 	} supportedExtendedFeatures, enabledExtendedFeatures;
 #endif
+
+	// Queues and queue families
+	vector<VkQueueFamilyProperties> queueFamilyProperties;
+	struct
+	{
+		uint32_t graphics;
+		uint32_t compute;
+		uint32_t transfer;
+	} queueFamilyIndices;
+
+	uint32_t presentQueueNodeIndex{ 0 };
+
+	VkColorSpaceKHR colorSpace;
+	
+	// Swapchain images
+	vector<shared_ptr<ImageRef>> swapchainImages;
 };
 
 } // namespace Kodiak
@@ -932,7 +1424,7 @@ Format GraphicsDevice::GetDepthFormat() const
 
 uint32_t GraphicsDevice::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound)
 {
-	return m_platformData->physicalDevice->GetMemoryTypeIndex(typeBits, properties, memTypeFound);
+	return m_platformData->GetMemoryTypeIndex(typeBits, properties, memTypeFound);
 }
 
 
@@ -940,23 +1432,14 @@ void GraphicsDevice::PlatformCreate()
 {
 	m_platformData = new PlatformData;
 
-	m_platformData->instance = Instance::Create(m_appName);
-
-#if ENABLE_VULKAN_VALIDATION
-	// Enable validation for debugging
-
-	// The report flags determine what type of messages for the layers will be displayed
-	// For validating (debugging) an application the error and warning bits should suffice
-	VkDebugReportFlagsEXT debugReportFlags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
-	// Additional flags include performance info, loader and layer debug messages, etc.
-
-	m_platformData->debugReportCallback = m_platformData->instance->CreateDebugReportCallback(debugReportFlags);
-#endif
+	m_platformData->CreateInstance(m_appName);
 
 	m_platformData->SelectPhysicalDevice();
-	m_deviceName = m_platformData->physicalDevice->GetDeviceProperties().deviceName;
+	m_deviceName = m_platformData->physicalDeviceProperties.deviceName;
 
 	m_platformData->CreateLogicalDevice();
+
+	m_platformData->CreateVmaAllocator();
 
 	m_platformData->InitSurface(m_hinst, m_hwnd);
 	m_platformData->CreateSwapChain(&m_width, &m_height, false /* vsync */);
@@ -965,7 +1448,7 @@ void GraphicsDevice::PlatformCreate()
 	for (uint32_t i = 0; i < NumSwapChainBuffers; ++i)
 	{
 		m_swapChainBuffers[i] = make_shared<ColorBuffer>();
-		VkImage image = *m_platformData->swapchain->GetImages()[i];
+		VkImage image = *m_platformData->swapchainImages[i];
 		auto handle = ResourceHandle::CreateNoDelete(image, VK_NULL_HANDLE, false);
 		m_swapChainBuffers[i]->CreateFromSwapChain("Primary SwapChain Buffer", handle, m_width, m_height, BackBufferColorFormat);
 	}
@@ -1060,9 +1543,9 @@ void GraphicsDevice::WaitForGpuIdle()
 }
 
 
-const DeviceHandle& Kodiak::GetDevice()
+const DeviceHandle Kodiak::GetDevice()
 {
-	return g_device;
+	return *g_device.get();
 }
 
 
@@ -1076,3 +1559,208 @@ uint32_t Kodiak::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags pro
 {
 	return g_graphicsDevice->GetMemoryTypeIndex(typeBits, properties, memTypeFound);
 }
+
+
+#if ENABLE_VULKAN_DEBUG_MARKUP
+
+void Kodiak::SetDebugName(VkInstance obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_INSTANCE_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkPhysicalDevice obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_PHYSICAL_DEVICE_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkDevice obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DEVICE_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkQueue obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_QUEUE_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkSemaphore obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SEMAPHORE_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkCommandBuffer obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkFence obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_FENCE_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkDeviceMemory obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DEVICE_MEMORY_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkBuffer obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkImage obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkEvent obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_EVENT_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkQueryPool obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_QUERY_POOL_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkBufferView obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkImageView obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkShaderModule obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkPipelineCache obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_CACHE_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkPipelineLayout obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_LAYOUT_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkRenderPass obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_RENDER_PASS_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkPipeline obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkDescriptorSetLayout obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkSampler obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkDescriptorPool obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_POOL_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkDescriptorSet obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkFramebuffer obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_FRAMEBUFFER_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkCommandPool obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_POOL_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkSurfaceKHR obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SURFACE_KHR_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkSwapchainKHR obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SWAPCHAIN_KHR_EXT, name.c_str());
+}
+
+
+void Kodiak::SetDebugName(VkDebugReportCallbackEXT obj, const string& name)
+{
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DEBUG_REPORT_EXT, name.c_str());
+}
+
+
+#else
+
+
+void Kodiak::SetDebugName(VkInstance obj, const string& name) {}
+void Kodiak::SetDebugName(VkPhysicalDevice obj, const string& name) {}
+void Kodiak::SetDebugName(VkDevice obj, const string& name) {}
+void Kodiak::SetDebugName(VkQueue obj, const string& name) {}
+void Kodiak::SetDebugName(VkSemaphore obj, const string& name) {}
+void Kodiak::SetDebugName(VkCommandBuffer obj, const string& name) {}
+void Kodiak::SetDebugName(VkFence obj, const string& name) {}
+void Kodiak::SetDebugName(VkDeviceMemory obj, const string& name) {}
+void Kodiak::SetDebugName(VkBuffer obj, const string& name) {}
+void Kodiak::SetDebugName(VkImage obj, const string& name) {}
+void Kodiak::SetDebugName(VkEvent obj, const string& name) {}
+void Kodiak::SetDebugName(VkQueryPool obj, const string& name) {}
+void Kodiak::SetDebugName(VkBufferView obj, const string& name) {}
+void Kodiak::SetDebugName(VkImageView obj, const string& name) {}
+void Kodiak::SetDebugName(VkShaderModule obj, const string& name) {}
+void Kodiak::SetDebugName(VkPipelineCache obj, const string& name) {}
+void Kodiak::SetDebugName(VkPipelineLayout obj, const string& name) {}
+void Kodiak::SetDebugName(VkRenderPass obj, const string& name) {}
+void Kodiak::SetDebugName(VkPipeline obj, const string& name) {}
+void Kodiak::SetDebugName(VkDescriptorSetLayout obj, const string& name) {}
+void Kodiak::SetDebugName(VkSampler obj, const string& name) {}
+void Kodiak::SetDebugName(VkDescriptorPool obj, const string& name) {}
+void Kodiak::SetDebugName(VkDescriptorSet obj, const string& name) {}
+void Kodiak::SetDebugName(VkFramebuffer obj, const string& name) {}
+void Kodiak::SetDebugName(VkCommandPool obj, const string& name) {}
+void Kodiak::SetDebugName(VkSurfaceKHR obj, const string& name) {}
+void Kodiak::SetDebugName(VkSwapchainKHR obj, const string& name) {}
+void Kodiak::SetDebugName(VkDebugReportCallbackEXT obj, const string& name) {}
+
+#endif

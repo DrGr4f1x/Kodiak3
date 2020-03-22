@@ -38,7 +38,7 @@ namespace Kodiak
 
 using PlatformHandle = Microsoft::WRL::ComPtr<IUnknown>;
 using ResourceHandle = Microsoft::WRL::ComPtr<ID3D12Resource>;
-using DeviceHandle = Microsoft::WRL::ComPtr<ID3D12Device>;
+using DeviceHandle = ID3D12Device*;
 using SwapChainHandle = Microsoft::WRL::ComPtr<IDXGISwapChain1>;
 using PsoHandle = ID3D12PipelineState*;
 using QueryHeapHandle = Microsoft::WRL::ComPtr<ID3D12QueryHeap>;

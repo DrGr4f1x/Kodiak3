@@ -88,26 +88,6 @@ VkFramebufferHandle::~VkFramebufferHandle()
 }
 
 
-template<> VkHandle<VkInstance>::~VkHandle()
-{
-	if (m_wrapped != VK_NULL_HANDLE)
-	{
-		vkDestroyInstance(m_wrapped, nullptr);
-		m_wrapped = VK_NULL_HANDLE;
-	}
-}
-
-
-template<> VkHandle<VkDevice>::~VkHandle()
-{
-	if (m_wrapped != VK_NULL_HANDLE)
-	{
-		vkDestroyDevice(m_wrapped, nullptr);
-		m_wrapped = VK_NULL_HANDLE;
-	}
-}
-
-
 template<> VkHandle<VkImageView>::~VkHandle()
 {
 	if (m_wrapped != VK_NULL_HANDLE)
@@ -129,8 +109,6 @@ template<> VkHandle<VkQueryPool>::~VkHandle()
 
 
 // Instantiate templates to avoid linker issues
-template VkHandle<VkInstance>::~VkHandle();
-template VkHandle<VkDevice>::~VkHandle();
 template VkHandle<VkImageView>::~VkHandle();
 template VkHandle<VkQueryPool>::~VkHandle();
 
