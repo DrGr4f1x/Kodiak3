@@ -215,6 +215,7 @@
     <ClInclude Include="DX12\GraphicsDevice12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
+    <ClInclude Include="EnginePch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
