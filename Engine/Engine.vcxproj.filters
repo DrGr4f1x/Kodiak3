@@ -85,9 +85,6 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Color.h" />
-    <ClInclude Include="Framebuffer.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="GraphicsEnums.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -99,9 +96,6 @@
     </ClInclude>
     <ClInclude Include="BitmaskEnum.h" />
     <ClInclude Include="InputLayout.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="DescriptorHeap.h">
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="VK\DescriptorHeapVk.h">
@@ -214,6 +208,12 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\DepthBuffer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DescriptorHeap.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Framebuffer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -353,9 +353,6 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Framebuffer.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="PipelineState.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -400,6 +397,9 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\DepthBuffer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Framebuffer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>

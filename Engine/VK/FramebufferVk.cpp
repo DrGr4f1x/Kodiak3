@@ -10,7 +10,7 @@
 
 #include "Stdafx.h"
 
-#include "Framebuffer.h"
+#include "Graphics\Framebuffer.h"
 
 #include "GraphicsDevice.h"
 

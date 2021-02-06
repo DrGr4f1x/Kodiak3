@@ -11,7 +11,7 @@
 #pragma once
 
 #include "Color.h"
-#include "Framebuffer.h"
+#include "Graphics\Framebuffer.h"
 #include "GpuBuffer.h"
 #include "Texture.h"
 

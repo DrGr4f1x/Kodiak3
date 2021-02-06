@@ -12,7 +12,7 @@
 
 #include "RootSignatureVk.h"
 
-#include "DescriptorHeap.h"
+#include "Graphics\DescriptorHeap.h"
 #include "Hash.h"
 #include "SamplerState.h"
 

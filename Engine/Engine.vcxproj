@@ -316,7 +316,6 @@
     <ClInclude Include="BitmaskEnum.h" />
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="Color.h" />
-    <ClInclude Include="DescriptorHeap.h" />
     <ClInclude Include="DX12\CommandAllocatorPool12.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
@@ -390,7 +389,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Filesystem.h" />
-    <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="GpuBuffer.h" />
     <ClInclude Include="GpuImage.h" />
     <ClInclude Include="GpuResource.h" />
@@ -403,6 +401,8 @@
     <ClInclude Include="Graphics\CommonStates.h" />
     <ClInclude Include="Graphics\dds.h" />
     <ClInclude Include="Graphics\DepthBuffer.h" />
+    <ClInclude Include="Graphics\DescriptorHeap.h" />
+    <ClInclude Include="Graphics\Framebuffer.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="InputLayout.h" />
@@ -609,13 +609,13 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Filesystem.cpp" />
-    <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="GpuBuffer.cpp" />
     <ClCompile Include="GraphicsFeatures.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
     <ClCompile Include="Graphics\ColorBuffer.cpp" />
     <ClCompile Include="Graphics\CommonStates.cpp" />
     <ClCompile Include="Graphics\DepthBuffer.cpp" />
+    <ClCompile Include="Graphics\Framebuffer.cpp" />
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="KTXTextureLoader.cpp" />
