@@ -38,9 +38,6 @@ namespace
 
 Microsoft::WRL::ComPtr<ID3D12Device> g_device;
 
-const Format BackBufferColorFormat = Format::R10G10B10A2_UNorm;
-const Format DepthFormat = Format::D32_Float_S8_UInt;
-
 
 void ConfigureInfoQueue(ID3D12Device* device)
 {
@@ -97,7 +94,7 @@ void ConfigureInfoQueue(ID3D12Device* device)
 #endif
 }
 
-Microsoft::WRL::ComPtr<IDXGISwapChain3> CreateSwapChain(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height)
+Microsoft::WRL::ComPtr<IDXGISwapChain3> CreateSwapChain(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height, Format colorFormat)
 {
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain;
 	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain3;
@@ -105,7 +102,7 @@ Microsoft::WRL::ComPtr<IDXGISwapChain3> CreateSwapChain(IDXGIFactory4* dxgiFacto
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 	swapChainDesc.Width = width;
 	swapChainDesc.Height = height;
-	swapChainDesc.Format = static_cast<DXGI_FORMAT>(BackBufferColorFormat);
+	swapChainDesc.Format = static_cast<DXGI_FORMAT>(colorFormat);
 	swapChainDesc.Scaling = DXGI_SCALING_NONE;
 	swapChainDesc.SampleDesc.Quality = 0;
 	swapChainDesc.SampleDesc.Count = 1;
@@ -223,7 +220,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 			case GraphicsFeature::ShaderUAVExtendedFormats:
 				enabledFeature = TryEnableFeature(optionalFeatures, name, dataOptions.TypedUAVLoadAdditionalFormats == TRUE);
 				break;
-
+			//case
 			case GraphicsFeature::ShaderClipDistance:
 			case GraphicsFeature::ShaderCullDistance:
 				enabledFeature = true;
@@ -329,7 +326,7 @@ GraphicsDevice::GraphicsDevice() = default;
 GraphicsDevice::~GraphicsDevice() = default;
 
 
-void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND hWnd, uint32_t width, uint32_t height)
+void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND hWnd, uint32_t width, uint32_t height, Format colorFormat, Format depthFormat)
 {
 	assert(!m_platformData);
 
@@ -342,6 +339,8 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 
 	m_width = width;
 	m_height = height;
+	m_colorFormat = colorFormat;
+	m_depthFormat = depthFormat;
 
 	PlatformCreate();
 }
@@ -398,18 +397,6 @@ void GraphicsDevice::SubmitFrame()
 void GraphicsDevice::WaitForGpuIdle()
 {
 	g_commandManager.IdleGPU();
-}
-
-
-Format GraphicsDevice::GetColorFormat() const
-{
-	return BackBufferColorFormat;
-}
-
-
-Format GraphicsDevice::GetDepthFormat() const
-{
-	return DepthFormat;
 }
 
 
@@ -574,7 +561,7 @@ void GraphicsDevice::PlatformCreate()
 
 	g_commandManager.Create();
 
-	m_platformData->swapChain = CreateSwapChain(dxgiFactory.Get(), m_hwnd, m_width, m_height);
+	m_platformData->swapChain = CreateSwapChain(dxgiFactory.Get(), m_hwnd, m_width, m_height, m_colorFormat);
 	m_currentBuffer = m_platformData->swapChain->GetCurrentBackBufferIndex();
 
 	for (int i = 0; i < NumSwapChainBuffers; ++i)
@@ -583,7 +570,7 @@ void GraphicsDevice::PlatformCreate()
 		assert_succeeded(m_platformData->swapChain->GetBuffer(i, IID_PPV_ARGS(&displayPlane)));
 
 		ColorBufferPtr buffer = make_shared<ColorBuffer>();
-		buffer->CreateFromSwapChain("Primary SwapChain Buffer", displayPlane.Detach(), m_width, m_height, BackBufferColorFormat);
+		buffer->CreateFromSwapChain("Primary SwapChain Buffer", displayPlane.Detach(), m_width, m_height, m_colorFormat);
 
 		m_swapChainBuffers[i] = buffer;
 	}

@@ -23,15 +23,15 @@ public:
 	GraphicsDevice();
 	~GraphicsDevice();
 
-	void Initialize(const std::string& appName, HINSTANCE hInstance, HWND hWnd, uint32_t width, uint32_t height);
+	void Initialize(const std::string& appName, HINSTANCE hInstance, HWND hWnd, uint32_t width, uint32_t height, Format colorFormat, Format depthFormat);
 	void Destroy();
 
 	void SubmitFrame();
 
 	void WaitForGpuIdle();
 
-	Format GetColorFormat() const;
-	Format GetDepthFormat() const;
+	Format GetColorFormat() const { return m_colorFormat; }
+	Format GetDepthFormat() const { return m_depthFormat; }
 
 	ColorBufferPtr GetBackBuffer(uint32_t index) const;
 	uint32_t GetCurrentBuffer() const { return m_currentBuffer; }
@@ -60,6 +60,9 @@ private:
 
 	uint32_t m_width{ 0 };
 	uint32_t m_height{ 0 };
+	bool m_vsync{ false };
+	Format m_colorFormat{ Format::Unknown };
+	Format m_depthFormat{ Format::Unknown };
 
 	std::string m_deviceName{ "Unknown" };
 
