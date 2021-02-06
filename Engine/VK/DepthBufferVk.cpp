@@ -10,7 +10,7 @@
 
 #include "Stdafx.h"
 
-#include "DepthBuffer.h"
+#include "Graphics\DepthBuffer.h"
 
 #include "GraphicsDevice.h"
 

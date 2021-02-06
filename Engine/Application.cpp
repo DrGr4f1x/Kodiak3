@@ -12,7 +12,7 @@
 
 #include "Application.h"
 
-#include "CommandContext.h"
+#include "Graphics\CommandContext.h"
 #include "Filesystem.h"
 #include "GraphicsDevice.h"
 #include "Input.h"

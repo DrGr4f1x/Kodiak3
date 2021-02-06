@@ -14,7 +14,7 @@
 #include "GpuBuffer.h"
 
 #include "Graphics\ColorBuffer.h"
-#include "DepthBuffer.h"
+#include "Graphics\DepthBuffer.h"
 #include "PipelineState.h"
 #include "Texture.h"
 

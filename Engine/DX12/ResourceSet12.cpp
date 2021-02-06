@@ -13,7 +13,7 @@
 #include "ResourceSet.h"
 
 #include "Graphics\ColorBuffer.h"
-#include "DepthBuffer.h"
+#include "Graphics\DepthBuffer.h"
 #include "GpuBuffer.h"
 #include "GraphicsDevice.h"
 #include "RootSignature.h"

@@ -12,8 +12,8 @@
 
 #include "ComputeNBodyApp.h"
 
-#include "CommonStates.h"
-#include "CommandContext.h"
+#include "Graphics\CommonStates.h"
+#include "Graphics\CommandContext.h"
 #include "GraphicsFeatures.h"
 #include "UIOverlay.h"
 

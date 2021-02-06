@@ -12,8 +12,8 @@
 
 #include "ComputeShaderApp.h"
 
-#include "CommonStates.h"
-#include "CommandContext.h"
+#include "Graphics\CommonStates.h"
+#include "Graphics\CommandContext.h"
 #include "Input.h"
 #include "UIOverlay.h"
 

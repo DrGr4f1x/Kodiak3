@@ -12,8 +12,8 @@
 
 #include "ComputeParticlesApp.h"
 
-#include "CommonStates.h"
-#include "CommandContext.h"
+#include "Graphics\CommonStates.h"
+#include "Graphics\CommandContext.h"
 
 
 using namespace Kodiak;

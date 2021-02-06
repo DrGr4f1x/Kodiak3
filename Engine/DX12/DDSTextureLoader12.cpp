@@ -12,7 +12,7 @@
 
 #include "DDSTextureLoader12.h"
 
-#include "dds.h"
+#include "Graphics\dds.h"
 
 #include "CommandContext12.h"
 #include "GpuResource.h"

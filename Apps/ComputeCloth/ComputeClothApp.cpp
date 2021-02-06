@@ -12,8 +12,8 @@
 
 #include "ComputeClothApp.h"
 
-#include "CommonStates.h"
-#include "CommandContext.h"
+#include "Graphics\CommonStates.h"
+#include "Graphics\CommandContext.h"
 #include "UIOverlay.h"
 
 

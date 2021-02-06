@@ -12,8 +12,8 @@
 
 #include "Texture3dApp.h"
 
-#include "CommandContext.h"
-#include "CommonStates.h"
+#include "Graphics\CommandContext.h"
+#include "Graphics\CommonStates.h"
 
 #include <numeric>
 #include <random>

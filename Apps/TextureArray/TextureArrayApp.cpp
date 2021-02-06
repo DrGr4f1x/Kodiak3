@@ -12,8 +12,8 @@
 
 #include "TextureArrayApp.h"
 
-#include "CommandContext.h"
-#include "CommonStates.h"
+#include "Graphics\CommandContext.h"
+#include "Graphics\CommonStates.h"
 
 
 using namespace Kodiak;

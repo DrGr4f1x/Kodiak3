@@ -11,7 +11,6 @@
 #pragma once
 
 #include "Graphics\Camera.h"
-#include "DepthBuffer.h"
 #include "Framebuffer.h"
 #include "UIOverlay.h"
 

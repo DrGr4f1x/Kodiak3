@@ -12,7 +12,7 @@
 
 
 #include "Graphics\ColorBuffer.h"
-#include "DepthBuffer.h"
+#include "Graphics\DepthBuffer.h"
 
 
 namespace Kodiak

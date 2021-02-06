@@ -50,9 +50,6 @@
     <ClInclude Include="GpuBuffer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="CommandContext.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="VK\CommandContextVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
@@ -88,9 +85,6 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Color.h" />
-    <ClInclude Include="DepthBuffer.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Framebuffer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -104,9 +98,6 @@
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
     <ClInclude Include="BitmaskEnum.h" />
-    <ClInclude Include="CommonStates.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="InputLayout.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -127,9 +118,6 @@
     </ClInclude>
     <ClInclude Include="DX12\DDSTextureLoader12.h">
       <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="dds.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Graphics</Filter>
@@ -216,6 +204,18 @@
     <ClInclude Include="Graphics\ColorBuffer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\CommandContext.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\CommonStates.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\dds.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DepthBuffer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -296,9 +296,6 @@
     <ClCompile Include="DX12\GraphicsEnums12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="CommonStates.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="VK\DescriptorHeapVk.cpp">
       <Filter>Graphics\VK</Filter>
@@ -350,9 +347,6 @@
     <ClCompile Include="VK\UtilVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
-    <ClCompile Include="DepthBuffer.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="DX12\DepthBuffer12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
@@ -400,6 +394,12 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\ColorBuffer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\CommonStates.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DepthBuffer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
