@@ -12,7 +12,7 @@
 
 #include "PipelineState.h"
 
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 #include "Hash.h"
 #include "PixelBuffer.h"
 #include "Shader.h"

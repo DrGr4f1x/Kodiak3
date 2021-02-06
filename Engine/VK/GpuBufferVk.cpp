@@ -13,7 +13,7 @@
 #include "Graphics\GpuBuffer.h"
 
 #include "CommandContextVk.h"
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 
 
 using namespace Kodiak;

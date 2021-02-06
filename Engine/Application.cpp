@@ -12,10 +12,10 @@
 
 #include "Application.h"
 
-#include "Graphics\CommandContext.h"
 #include "Filesystem.h"
-#include "GraphicsDevice.h"
 #include "Input.h"
+#include "Graphics\CommandContext.h"
+#include "Graphics\GraphicsDevice.h"
 
 #include <iostream>
 

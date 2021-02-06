@@ -15,7 +15,7 @@
 #include "Graphics\dds.h"
 
 #include "CommandContext12.h"
-#include "GpuResource.h"
+#include "Graphics\GpuResource.h"
 
 
 using namespace Kodiak;

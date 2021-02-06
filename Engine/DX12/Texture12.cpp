@@ -14,7 +14,7 @@
 
 #include "BinaryReader.h"
 #include "Filesystem.h"
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 #include "KTXTextureLoader.h"
 
 #include "CommandContext12.h"

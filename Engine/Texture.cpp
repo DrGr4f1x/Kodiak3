@@ -13,7 +13,7 @@
 #include "Texture.h"
 
 #include "Filesystem.h"
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>

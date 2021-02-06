@@ -10,7 +10,7 @@
 
 #include "Stdafx.h"
 
-#include "GpuResource.h"
+#include "Graphics\GpuResource.h"
 
 
 using namespace Kodiak;

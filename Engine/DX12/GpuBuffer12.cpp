@@ -12,7 +12,7 @@
 
 #include "Graphics\GpuBuffer.h"
 
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 
 #include "CommandContext12.h"
 #include "Util12.h"

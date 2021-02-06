@@ -12,7 +12,7 @@
 
 #include "Graphics\ColorBuffer.h"
 
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 
 #include "UtilVk.h"
 

@@ -17,7 +17,7 @@
 
 #include "CommandContext12.h"
 #include "CommandListManager12.h"
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 #include "RootSignature12.h"
 
 

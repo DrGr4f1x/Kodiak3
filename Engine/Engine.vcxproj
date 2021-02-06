@@ -389,8 +389,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Filesystem.h" />
-    <ClInclude Include="GpuResource.h" />
-    <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="GraphicsEnums.h" />
     <ClInclude Include="GraphicsFeatures.h" />
     <ClInclude Include="Graphics\Camera.h" />
@@ -403,6 +401,8 @@
     <ClInclude Include="Graphics\Framebuffer.h" />
     <ClInclude Include="Graphics\GpuBuffer.h" />
     <ClInclude Include="Graphics\GpuImage.h" />
+    <ClInclude Include="Graphics\GpuResource.h" />
+    <ClInclude Include="Graphics\GraphicsDevice.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="InputLayout.h" />

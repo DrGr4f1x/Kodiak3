@@ -15,7 +15,7 @@
 #include "ResourceView.h"
 
 #include "Graphics\DescriptorHeap.h"
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 
 #include "Util12.h"
 

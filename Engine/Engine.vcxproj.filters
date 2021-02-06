@@ -4,9 +4,6 @@
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Utility.h" />
-    <ClInclude Include="GraphicsDevice.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="DX12\CommandListManager12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
@@ -43,9 +40,6 @@
     </ClInclude>
     <ClInclude Include="Math\Frustum.h">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="GpuResource.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="VK\CommandContextVk.h">
       <Filter>Graphics\VK</Filter>
@@ -214,6 +208,12 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\GpuImage.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GpuResource.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsDevice.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>

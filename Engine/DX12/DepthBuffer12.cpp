@@ -15,7 +15,7 @@
 
 #include "Graphics\DepthBuffer.h"
 
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 
 #include "DescriptorHeap12.h"
 #include "Util12.h"

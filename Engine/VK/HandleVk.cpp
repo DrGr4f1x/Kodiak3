@@ -12,7 +12,7 @@
 
 #include "HandleVk.h"
 
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 
 
 namespace Kodiak

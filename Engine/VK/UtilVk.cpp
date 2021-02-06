@@ -12,7 +12,7 @@
 
 #include "UtilVk.h"
 
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 
 #include <unordered_map>
 

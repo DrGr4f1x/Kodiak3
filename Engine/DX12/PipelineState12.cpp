@@ -14,7 +14,7 @@
 
 #include "PipelineState.h"
 
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 #include "Hash.h"
 #include "Shader.h"
 

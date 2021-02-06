@@ -13,7 +13,7 @@
 #include "CommandBufferPoolVk.h"
 
 #include "CommandListManagerVk.h"
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 
 #include <sstream>
 

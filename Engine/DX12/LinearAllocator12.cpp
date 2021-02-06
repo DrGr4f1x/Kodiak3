@@ -16,7 +16,7 @@
 
 #include "LinearAllocator12.h"
 
-#include "GraphicsDevice.h"
+#include "Graphics\GraphicsDevice.h"
 
 #include "CommandListManager12.h"
 #include "Util12.h"
