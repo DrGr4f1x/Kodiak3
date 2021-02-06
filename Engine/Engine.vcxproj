@@ -316,7 +316,6 @@
     <ClInclude Include="BitmaskEnum.h" />
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="Color.h" />
-    <ClInclude Include="ColorBuffer.h" />
     <ClInclude Include="CommandContext.h" />
     <ClInclude Include="CommonStates.h" />
     <ClInclude Include="dds.h" />
@@ -403,6 +402,7 @@
     <ClInclude Include="GraphicsEnums.h" />
     <ClInclude Include="GraphicsFeatures.h" />
     <ClInclude Include="Graphics\Camera.h" />
+    <ClInclude Include="Graphics\ColorBuffer.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="InputLayout.h" />
@@ -502,7 +502,6 @@
     <ClCompile Include="BinaryReader.cpp" />
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="Color.cpp" />
-    <ClCompile Include="ColorBuffer.cpp" />
     <ClCompile Include="CommonStates.cpp" />
     <ClCompile Include="DepthBuffer.cpp" />
     <ClCompile Include="DX12\ColorBuffer12.cpp">
@@ -616,6 +615,7 @@
     <ClCompile Include="GpuBuffer.cpp" />
     <ClCompile Include="GraphicsFeatures.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
+    <ClCompile Include="Graphics\ColorBuffer.cpp" />
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="KTXTextureLoader.cpp" />

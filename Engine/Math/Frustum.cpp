@@ -15,7 +15,7 @@
 
 #include "Frustum.h"
 
-#include "Camera.h"
+#include "Graphics\Camera.h"
 
 
 using namespace Math;

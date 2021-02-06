@@ -12,7 +12,7 @@
 
 #include "ResourceSetVk.h"
 
-#include "ColorBuffer.h"
+#include "Graphics\ColorBuffer.h"
 #include "DepthBuffer.h"
 #include "DescriptorHeap.h"
 #include "GpuBuffer.h"

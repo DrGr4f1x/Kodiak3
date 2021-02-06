@@ -12,7 +12,7 @@
 
 #include "Application.h"
 #include "CameraController.h"
-#include "ColorBuffer.h"
+#include "Graphics\ColorBuffer.h"
 #include "GpuBuffer.h"
 #include "PipelineState.h"
 #include "ResourceSet.h"

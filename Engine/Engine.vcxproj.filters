@@ -145,9 +145,6 @@
     </ClInclude>
     <ClInclude Include="Input.h" />
     <ClInclude Include="CameraController.h" />
-    <ClInclude Include="ColorBuffer.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="VK\PlatformVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
@@ -214,6 +211,9 @@
     </ClInclude>
     <ClInclude Include="EnginePch.h" />
     <ClInclude Include="Graphics\Camera.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\ColorBuffer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -356,9 +356,6 @@
     <ClCompile Include="DX12\DepthBuffer12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="ColorBuffer.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -400,6 +397,9 @@
       <Filter>Graphics\VK</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\Camera.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\ColorBuffer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>

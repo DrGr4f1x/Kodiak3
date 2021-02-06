@@ -11,7 +11,7 @@
 #pragma once
 
 
-#include "ColorBuffer.h"
+#include "Graphics\ColorBuffer.h"
 #include "DepthBuffer.h"
 
 

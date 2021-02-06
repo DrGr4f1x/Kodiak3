@@ -10,7 +10,7 @@
 
 #include "Stdafx.h"
 
-#include "ColorBuffer.h"
+#include "Graphics\ColorBuffer.h"
 
 #include "GraphicsDevice.h"
 
