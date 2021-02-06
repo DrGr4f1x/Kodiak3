@@ -12,6 +12,8 @@
 
 #include "GraphicsEnumsVk.h"
 
+#include <unordered_map>
+
 
 using namespace Kodiak;
 using namespace std;
@@ -40,15 +42,10 @@ const uint32_t Limits::MaxTextureMipLevels = 15;
 Format Kodiak::MapVulkanFormatToEngine(VkFormat format)
 {
 	static bool initialized = false;
-	static array<Format, VK_FORMAT_RANGE_SIZE> remapTable;
+	static unordered_map<VkFormat, Format> remapTable;
 
 	if (!initialized)
 	{
-		for (uint32_t i = 0; i < VK_FORMAT_RANGE_SIZE; ++i)
-		{
-			remapTable[i] = Format::Unknown;
-		}
-
 		// Map known types
 		remapTable[VK_FORMAT_B4G4R4A4_UNORM_PACK16] = Format::B4G4R4A4_UNorm;
 		remapTable[VK_FORMAT_B5G6R5_UNORM_PACK16] = Format::B5G6R5_UNorm;
@@ -120,7 +117,13 @@ Format Kodiak::MapVulkanFormatToEngine(VkFormat format)
 		initialized = true;
 	}
 
-	return remapTable[format];
+	auto res = remapTable.find(format);
+	if (res != remapTable.end())
+	{
+		return res->second;
+	}
+
+	return Format::Unknown;
 }
 
 

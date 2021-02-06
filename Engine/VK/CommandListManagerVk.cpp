@@ -53,7 +53,7 @@ void CommandQueue::Create()
 	timelineCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
 	timelineCreateInfo.pNext = nullptr;
 	timelineCreateInfo.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE;
-	timelineCreateInfo.initialValue = 0;
+	timelineCreateInfo.initialValue = m_lastCompletedFenceValue;
 
 	VkSemaphoreCreateInfo createInfo;
 	createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;

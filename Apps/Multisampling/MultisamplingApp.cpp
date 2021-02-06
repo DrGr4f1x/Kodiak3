@@ -26,6 +26,7 @@ void MultisamplingApp::Configure()
 {
 	Application::Configure();
 
+	g_requiredFeatures.shaderUAVMultisample = true;
 	g_optionalFeatures.sampleRateShading = true;
 }
 

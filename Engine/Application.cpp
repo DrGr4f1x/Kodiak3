@@ -313,7 +313,7 @@ void Application::Initialize()
 
 	// Create and initialize the graphics device
 	m_graphicsDevice = make_unique<GraphicsDevice>();
-	m_graphicsDevice->Initialize(m_name, m_hinst, m_hwnd, m_displayWidth, m_displayHeight);
+	m_graphicsDevice->Initialize(m_name, m_hinst, m_hwnd, m_displayWidth, m_displayHeight, Format::R8G8B8A8_UNorm, Format::D32_Float_S8_UInt);
 
 	InitFramebuffer();
 

@@ -8,12 +8,12 @@
 // Author:  David Elder
 //
 
-#pragma once
+#include "Stdafx.h"
 
-#if DX12
-#include "DX12\GraphicsDevice12.h"
-#elif VK
-#include "VK\GraphicsDeviceVk.h"
-#else
-#error "No graphics API specified!"
-#endif
+#include "GpuImageVk.h"
+
+
+using namespace Kodiak;
+using namespace std;
+
+

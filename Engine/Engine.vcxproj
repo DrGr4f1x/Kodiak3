@@ -353,6 +353,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="DX12\GraphicsDevice12.h" />
     <ClInclude Include="DX12\GraphicsEnums12.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
@@ -396,6 +397,7 @@
     <ClInclude Include="Filesystem.h" />
     <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="GpuBuffer.h" />
+    <ClInclude Include="GpuImage.h" />
     <ClInclude Include="GpuResource.h" />
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="GraphicsEnums.h" />
@@ -456,6 +458,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="VK\GpuImageVk.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="VK\GraphicsDeviceVk.h" />
     <ClInclude Include="VK\GraphicsEnumsVk.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
@@ -606,7 +614,6 @@
     <ClCompile Include="Filesystem.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="GpuBuffer.cpp" />
-    <ClCompile Include="GraphicsDevice.cpp" />
     <ClCompile Include="GraphicsFeatures.cpp" />
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="Input.cpp" />
@@ -672,6 +679,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="VK\GpuImageVk.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="VK\GraphicsDeviceVk.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>

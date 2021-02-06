@@ -10,10 +10,19 @@
 
 #pragma once
 
-#if DX12
-#include "DX12\GraphicsDevice12.h"
-#elif VK
-#include "VK\GraphicsDeviceVk.h"
-#else
-#error "No graphics API specified!"
-#endif
+namespace Kodiak
+{
+
+class GpuImage
+{
+	friend class CommandContext;
+	friend class GraphicsContext;
+	friend class ComputeContext;
+
+public:
+
+protected:
+	std::shared_ptr<ImageRef>	m_image;
+};
+
+} // namespace Kodiak

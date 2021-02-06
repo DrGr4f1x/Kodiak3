@@ -11,9 +11,9 @@
 #pragma once
 
 #if DX12
-#include "DX12\GraphicsDevice12.h"
+#include "DX12\GpuImage12.h"
 #elif VK
-#include "VK\GraphicsDeviceVk.h"
+#include "VK\GpuImageVk.h"
 #else
 #error "No graphics API specified!"
 #endif

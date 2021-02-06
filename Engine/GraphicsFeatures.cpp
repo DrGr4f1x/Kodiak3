@@ -78,6 +78,7 @@ const string GraphicsFeatureToString(GraphicsFeature feature)
 	case GraphicsFeature::ShaderTessellationAndGeometryPointSize: return "Shader Tessellation And Geometry Point Size"; break;
 	case GraphicsFeature::ShaderTextureGatherExtended: return "Shader Texture Gather Extended"; break;
 	case GraphicsFeature::ShaderUAVExtendedFormats: return "Shader UAV Extended Formats"; break;
+	case GraphicsFeature::ShaderUAVMultisample: return "Shader UAV Multisample"; break;
 
 	case GraphicsFeature::ShaderClipDistance: return "Shader Clip Distance"; break;
 	case GraphicsFeature::ShaderCullDistance: return "Shader Cull Distance"; break;

@@ -203,6 +203,18 @@
     <ClInclude Include="VK\ReferenceVk.h">
       <Filter>Graphics\VK\LowLevel</Filter>
     </ClInclude>
+    <ClInclude Include="GpuImage.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\GpuImageVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="VK\GraphicsDeviceVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\GraphicsDevice12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -325,9 +337,6 @@
     <ClCompile Include="VK\HandleVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsDevice.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="DX12\ResourceView12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
@@ -388,6 +397,9 @@
     </ClCompile>
     <ClCompile Include="VK\ReferenceVk.cpp">
       <Filter>Graphics\VK\LowLevel</Filter>
+    </ClCompile>
+    <ClCompile Include="VK\GpuImageVk.cpp">
+      <Filter>Graphics\VK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

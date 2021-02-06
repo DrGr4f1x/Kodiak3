@@ -47,6 +47,7 @@ enum class GraphicsFeature
 	ShaderTessellationAndGeometryPointSize,
 	ShaderTextureGatherExtended,
 	ShaderUAVExtendedFormats,
+	ShaderUAVMultisample,
 
 	ShaderClipDistance,
 	ShaderCullDistance,
@@ -120,6 +121,7 @@ public:
 	GraphicsFeatureProxy shaderTessellationAndGeometryPointSize{ this, GraphicsFeature::ShaderTessellationAndGeometryPointSize };
 	GraphicsFeatureProxy shaderTextureGatherExtended{ this, GraphicsFeature::ShaderTextureGatherExtended };
 	GraphicsFeatureProxy shaderUAVExtendedFormats{ this, GraphicsFeature::ShaderUAVExtendedFormats };
+	GraphicsFeatureProxy shaderUAVMultisample{ this, GraphicsFeature::ShaderUAVMultisample };
 
 	GraphicsFeatureProxy shaderClipDistance{ this, GraphicsFeature::ShaderClipDistance };
 	GraphicsFeatureProxy shaderCullDistance{ this, GraphicsFeature::ShaderCullDistance };
