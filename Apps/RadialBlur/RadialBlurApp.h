@@ -11,7 +11,7 @@
 #pragma once
 
 #include "Application.h"
-#include "GpuBuffer.h"
+#include "Graphics\GpuBuffer.h"
 #include "Model.h"
 #include "PipelineState.h"
 #include "ResourceSet.h"

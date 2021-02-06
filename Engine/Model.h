@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "GpuBuffer.h"
+#include "Graphics\GpuBuffer.h"
 
 namespace Kodiak
 {

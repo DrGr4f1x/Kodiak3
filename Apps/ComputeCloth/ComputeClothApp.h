@@ -13,7 +13,7 @@
 #include "Application.h"
 #include "CameraController.h"
 #include "Graphics\ColorBuffer.h"
-#include "GpuBuffer.h"
+#include "Graphics\GpuBuffer.h"
 #include "Model.h"
 #include "PipelineState.h"
 #include "ResourceSet.h"

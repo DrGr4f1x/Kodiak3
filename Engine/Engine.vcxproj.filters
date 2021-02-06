@@ -47,9 +47,6 @@
     <ClInclude Include="GpuResource.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="GpuBuffer.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="VK\CommandContextVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
@@ -179,9 +176,6 @@
     <ClInclude Include="VK\ReferenceVk.h">
       <Filter>Graphics\VK\LowLevel</Filter>
     </ClInclude>
-    <ClInclude Include="GpuImage.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="VK\GpuImageVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
@@ -214,6 +208,12 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Framebuffer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GpuBuffer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GpuImage.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -338,9 +338,6 @@
     <ClCompile Include="DX12\Util12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="GpuBuffer.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="VK\ResourceViewVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
@@ -400,6 +397,9 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\Framebuffer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GpuBuffer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>

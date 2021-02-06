@@ -12,7 +12,7 @@
 
 #include "Color.h"
 #include "Graphics\Framebuffer.h"
-#include "GpuBuffer.h"
+#include "Graphics\GpuBuffer.h"
 #include "Texture.h"
 
 #include "CommandListManagerVk.h"
