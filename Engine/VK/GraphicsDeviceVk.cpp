@@ -42,57 +42,69 @@ GraphicsDevice* g_graphicsDevice = nullptr;
 extern Kodiak::CommandListManager g_commandManager;
 
 
-#if ENABLE_VULKAN_VALIDATION
-PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallback{ nullptr };
-PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallback{ nullptr };
-PFN_vkDebugReportMessageEXT vkDebugReportMessage{ nullptr };
+#if USE_VALIDATION_LAYER
+PFN_vkCmdBeginDebugUtilsLabelEXT vkCmdBeginDebugUtilsLabel{ nullptr };
+PFN_vkCmdEndDebugUtilsLabelEXT vkCmdEndDebugUtilsLabel{ nullptr };
+PFN_vkCmdInsertDebugUtilsLabelEXT vkCmdInsertDebugUtilsLabel{ nullptr };
+PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessenger{ nullptr };
+PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger{ nullptr };
+PFN_vkQueueBeginDebugUtilsLabelEXT vkQueueBeginDebugUtilsLabel{ nullptr };
+PFN_vkQueueEndDebugUtilsLabelEXT vkQueueEndDebugUtilsLabel{ nullptr };
+PFN_vkQueueInsertDebugUtilsLabelEXT vkQueueInsertDebugUtilsLabel{ nullptr };
+PFN_vkSetDebugUtilsObjectNameEXT vkSetDebugUtilsObjectName{ nullptr };
+PFN_vkSetDebugUtilsObjectTagEXT vkSetDebugUtilsObjectTag{ nullptr };
+PFN_vkSubmitDebugUtilsMessageEXT vkSubmitDebugUtilsMessage{ nullptr };
 
+#if ENABLE_VULKAN_VALIDATION
 VkBool32 messageCallback(
-	VkDebugReportFlagsEXT flags,
-	VkDebugReportObjectTypeEXT objType,
-	uint64_t srcObject,
-	size_t location,
-	int32_t msgCode,
-	const char* pLayerPrefix,
-	const char* pMsg,
+	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+	VkDebugUtilsMessageTypeFlagsEXT messageTypes,
+	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 	void* pUserData)
 {
 	// Select prefix depending on flags passed to the callback
 	// Note that multiple flags may be set for a single validation message
 	string prefix("");
 
-	// Error that may result in undefined behavior
-	if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
+	// Message severity
+	if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
-		prefix += "ERROR:";
-	};
-	// Warnings may hint at unexpected / non-spec API usage
-	if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
-	{
-		prefix += "WARNING:";
-	};
-	// May indicate sub-optimal usage of the API
-	if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)
-	{
-		prefix += "PERFORMANCE:";
-	};
-	// Informal messages that may become handy during debugging
-	if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)
-	{
-		prefix += "INFO:";
+		prefix += "ERROR";
 	}
-	// Diagnostic info from the Vulkan loader and layers
-	// Usually not helpful in terms of API usage, but may help to debug layer and loader problems 
-	if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT)
+	else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
 	{
-		prefix += "DEBUG:";
+		prefix += "WARNING";
 	}
+	else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
+	{
+		prefix += "INFO";
+	}
+	else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
+	{
+		prefix += "VERBOSE";
+	}
+
+	// Message type
+	if (messageTypes & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT)
+	{
+		prefix += " [PERFORMANCE]";
+	}
+	else if (messageTypes & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
+	{
+		prefix += " [VALIDATION]";
+	}
+	else if (messageTypes & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT)
+	{
+		prefix += " [GENERAL]";
+	}
+
+	prefix += ":";
 
 	// Display message to default output (console/logcat)
 	stringstream debugMessage;
-	debugMessage << prefix << " [" << pLayerPrefix << "] Code " << msgCode << " : " << pMsg;
+	debugMessage << prefix << " [" << pCallbackData->pMessageIdName << "] Code " << pCallbackData->messageIdNumber << " : " << pCallbackData->pMessage;
 
-	if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
+	if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
 		cerr << debugMessage.str() << "\n";
 	}
@@ -102,11 +114,11 @@ VkBool32 messageCallback(
 	}
 
 	OutputDebugString(debugMessage.str().c_str());
-	if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
+	if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
-		if (strstr(pMsg, "VUID-vkDestroyBuffer-buffer-00922") == nullptr &&
-			strstr(pMsg, "VUID-vkFreeMemory-memory-00677") == nullptr &&
-			strstr(pMsg, "VUID-vkResetCommandBuffer-commandBuffer-00045") == nullptr)
+		if (strstr(pCallbackData->pMessage, "VUID-vkDestroyBuffer-buffer-00922") == nullptr &&
+			strstr(pCallbackData->pMessage, "VUID-vkFreeMemory-memory-00677") == nullptr &&
+			strstr(pCallbackData->pMessage, "VUID-vkResetCommandBuffer-commandBuffer-00045") == nullptr)
 		{
 			assert(false);
 		}
@@ -122,28 +134,25 @@ VkBool32 messageCallback(
 	// return VK_ERROR_VALIDATION_FAILED_EXT 
 	return VK_FALSE;
 }
-#endif
+#endif // ENABLE_VULKAN_VALIDATION
+
+#endif // USE_VALIDATION_LAYER
+
 
 #if ENABLE_VULKAN_DEBUG_MARKUP
-PFN_vkDebugMarkerSetObjectTagEXT vkDebugMarkerSetObjectTag{ nullptr };
-PFN_vkDebugMarkerSetObjectNameEXT vkDebugMarkerSetObjectName{ nullptr };
-PFN_vkCmdDebugMarkerBeginEXT vkCmdDebugMarkerBegin{ nullptr };
-PFN_vkCmdDebugMarkerEndEXT vkCmdDebugMarkerEnd{ nullptr };
-PFN_vkCmdDebugMarkerInsertEXT vkCmdDebugMarkerInsert{ nullptr };
-
 bool g_debugMarkupAvailable = false;
 
-void SetDebugName(uint64_t obj, VkDebugReportObjectTypeEXT objType, const char* name)
+void SetDebugName(uint64_t obj, VkObjectType objType, const char* name)
 {
 	if (g_debugMarkupAvailable)
 	{
-		VkDebugMarkerObjectNameInfoEXT nameInfo = {};
-		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
+		VkDebugUtilsObjectNameInfoEXT nameInfo = {};
+		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
 		nameInfo.pNext = nullptr;
 		nameInfo.objectType = objType;
-		nameInfo.object = obj;
+		nameInfo.objectHandle = obj;
 		nameInfo.pObjectName = name;
-		vkDebugMarkerSetObjectName(GetDevice(), &nameInfo);
+		vkSetDebugUtilsObjectName(GetDevice(), &nameInfo);
 	}
 }
 #endif
@@ -488,8 +497,11 @@ void GraphicsDevice::CreateInstance()
 
 	const vector<const char*> instanceExtensions =
 	{
+#if USE_VALIDATION_LAYER
+			VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+#endif
 #if ENABLE_VULKAN_VALIDATION
-			VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
+			VK_EXT_VALIDATION_FEATURES_EXTENSION_NAME,
 #endif
 			VK_KHR_SURFACE_EXTENSION_NAME,
 			VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
@@ -498,7 +510,7 @@ void GraphicsDevice::CreateInstance()
 
 	const vector<const char*> instanceLayers =
 	{
-#if ENABLE_VULKAN_VALIDATION
+#if USE_VALIDATION_LAYER
 			"VK_LAYER_KHRONOS_validation"
 #endif
 	};
@@ -533,8 +545,7 @@ void GraphicsDevice::SelectPhysicalDevice()
 	// Get available physical device properties and features
 	GetPhysicalDeviceProperties();
 
-	// Initialize debug markup and validation callbacks
-	InitializeDebugMarkup();
+	// Initialize validation callbacks
 	InitializeValidation();
 
 	// Record which extensions are required or optional, based on Application config
@@ -969,66 +980,56 @@ void GraphicsDevice::GetPhysicalDeviceProperties()
 }
 
 
-void GraphicsDevice::InitializeDebugMarkup()
-{
-#if ENABLE_VULKAN_DEBUG_MARKUP
-	if (IsExtensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME))
-	{
-		VkInstance instance = *m_instance;
-
-		vkDebugMarkerSetObjectTag =
-			reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT>(vkGetInstanceProcAddr(instance, "vkDebugMarkerSetObjectTagEXT"));
-
-		vkDebugMarkerSetObjectName =
-			reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT>(vkGetInstanceProcAddr(instance, "vkDebugMarkerSetObjectNameEXT"));
-
-		vkCmdDebugMarkerBegin =
-			reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT>(vkGetInstanceProcAddr(instance, "vkCmdDebugMarkerBeginEXT"));
-
-		vkCmdDebugMarkerEnd =
-			reinterpret_cast<PFN_vkCmdDebugMarkerEndEXT>(vkGetInstanceProcAddr(instance, "vkCmdDebugMarkerEndEXT"));
-
-		vkCmdDebugMarkerInsert =
-			reinterpret_cast<PFN_vkCmdDebugMarkerInsertEXT>(vkGetInstanceProcAddr(instance, "vkCmdDebugMarkerInsertEXT"));
-
-		if (vkDebugMarkerSetObjectName)
-		{
-			g_debugMarkupAvailable = true;
-		}
-	}
-#endif
-}
-
-
 void GraphicsDevice::InitializeValidation()
 {
-#if ENABLE_VULKAN_VALIDATION
+#if USE_VALIDATION_LAYER
 	VkInstance instance = *m_instance;
 
-	vkCreateDebugReportCallback =
-		reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT"));
-	vkDestroyDebugReportCallback =
-		reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT"));
-	vkDebugReportMessage =
-		reinterpret_cast<PFN_vkDebugReportMessageEXT>(vkGetInstanceProcAddr(instance, "vkDebugReportMessageEXT"));
+	vkCmdBeginDebugUtilsLabel = reinterpret_cast<PFN_vkCmdBeginDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdBeginDebugUtilsLabelEXT"));
+	vkCmdEndDebugUtilsLabel = reinterpret_cast<PFN_vkCmdEndDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdEndDebugUtilsLabelEXT"));
+	vkCmdInsertDebugUtilsLabel = reinterpret_cast<PFN_vkCmdInsertDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdInsertDebugUtilsLabelEXT"));
+	vkCreateDebugUtilsMessenger = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
+	vkDestroyDebugUtilsMessenger = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
+	vkQueueBeginDebugUtilsLabel = reinterpret_cast<PFN_vkQueueBeginDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkQueueBeginDebugUtilsLabelEXT"));
+	vkQueueEndDebugUtilsLabel = reinterpret_cast<PFN_vkQueueEndDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkQueueEndDebugUtilsLabelEXT"));
+	vkQueueInsertDebugUtilsLabel = reinterpret_cast<PFN_vkQueueInsertDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkQueueInsertDebugUtilsLabelEXT"));
+	vkSetDebugUtilsObjectName = reinterpret_cast<PFN_vkSetDebugUtilsObjectNameEXT>(vkGetInstanceProcAddr(instance, "vkSetDebugUtilsObjectNameEXT"));
+	vkSetDebugUtilsObjectTag = reinterpret_cast<PFN_vkSetDebugUtilsObjectTagEXT>(vkGetInstanceProcAddr(instance, "vkSetDebugUtilsObjectTagEXT"));
+	vkSubmitDebugUtilsMessage = reinterpret_cast<PFN_vkSubmitDebugUtilsMessageEXT>(vkGetInstanceProcAddr(instance, "vkSubmitDebugUtilsMessageEXT"));
 
-	assert(vkCreateDebugReportCallback);
-	assert(vkDestroyDebugReportCallback);
+	assert(vkCmdBeginDebugUtilsLabel);
+	assert(vkCmdEndDebugUtilsLabel);
+	assert(vkCmdInsertDebugUtilsLabel);
+	assert(vkCreateDebugUtilsMessenger);
+	assert(vkDestroyDebugUtilsMessenger);
+	assert(vkQueueBeginDebugUtilsLabel);
+	assert(vkQueueEndDebugUtilsLabel);
+	assert(vkQueueInsertDebugUtilsLabel);
+	assert(vkSetDebugUtilsObjectName);
+	assert(vkSetDebugUtilsObjectTag);
+	assert(vkSubmitDebugUtilsMessage);
 
-	// The report flags determine what type of messages for the layers will be displayed
-	// For validating (debugging) an application the error and warning bits should suffice
-	VkDebugReportFlagsEXT debugReportFlags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
+	g_debugMarkupAvailable = true;
 
-	VkDebugReportCallbackCreateInfoEXT createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
-	createInfo.pfnCallback = (PFN_vkDebugReportCallbackEXT)messageCallback;
-	createInfo.flags = debugReportFlags;
+#if ENABLE_VULKAN_VALIDATION
+	VkDebugUtilsMessengerCreateInfoEXT createInfo = 
+	{
+		VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+		nullptr,
+		0,
+		VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT,
+		VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT,
+		messageCallback,
+		nullptr
+	};
 
-	VkDebugReportCallbackEXT msgCallback = VK_NULL_HANDLE;
-	ThrowIfFailed(vkCreateDebugReportCallback(instance, &createInfo, nullptr, &msgCallback));
+	VkDebugUtilsMessengerEXT messenger{ VK_NULL_HANDLE };
+	ThrowIfFailed(vkCreateDebugUtilsMessenger(instance, &createInfo, nullptr, &messenger));
 
-	m_debugReportCallback = DebugReportCallbackRef::Create(m_instance, msgCallback);
+	m_debugUtilsMessenger = DebugUtilsMessengerRef::Create(m_instance, messenger);
 #endif
+
+#endif // USE_VALIDATION_LAYER
 }
 
 
@@ -1056,7 +1057,7 @@ void GraphicsDevice::GatherApplicationExtensions(bool optionalFeatures)
 	// Add some required and optional extensions used by every Application
 	if (optionalFeatures)
 	{
-		m_requestedExtensions.insert(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
+		//m_requestedExtensions.insert(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
 	}
 	else
 	{
@@ -1398,6 +1399,7 @@ void GraphicsDevice::EnableFeatures(bool optionalFeatures)
 				name,
 				m_supportedDeviceFeatures2.features.shaderStorageImageMultisample,
 				m_enabledDeviceFeatures2.features.shaderStorageImageMultisample);
+			break;
 
 		case GraphicsFeature::ShaderClipDistance:
 			enabledFeature = TryEnableFeature(
@@ -1582,169 +1584,163 @@ uint32_t Kodiak::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags pro
 
 void Kodiak::SetDebugName(VkInstance obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_INSTANCE_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_INSTANCE, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkPhysicalDevice obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_PHYSICAL_DEVICE_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_PHYSICAL_DEVICE, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkDevice obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DEVICE_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_DEVICE, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkQueue obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_QUEUE_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_QUEUE, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkSemaphore obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SEMAPHORE_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_SEMAPHORE, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkCommandBuffer obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_COMMAND_BUFFER, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkFence obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_FENCE_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_FENCE, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkDeviceMemory obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DEVICE_MEMORY_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_DEVICE_MEMORY, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkBuffer obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_BUFFER, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkImage obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_IMAGE, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkEvent obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_EVENT_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_EVENT, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkQueryPool obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_QUERY_POOL_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_QUERY_POOL, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkBufferView obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_BUFFER_VIEW, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkImageView obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_IMAGE_VIEW, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkShaderModule obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_SHADER_MODULE, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkPipelineCache obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_CACHE_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_PIPELINE_CACHE, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkPipelineLayout obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_LAYOUT_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_PIPELINE_LAYOUT, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkRenderPass obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_RENDER_PASS_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_RENDER_PASS, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkPipeline obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_PIPELINE, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkDescriptorSetLayout obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkSampler obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_SAMPLER, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkDescriptorPool obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_POOL_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_DESCRIPTOR_POOL, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkDescriptorSet obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_DESCRIPTOR_SET, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkFramebuffer obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_FRAMEBUFFER_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_FRAMEBUFFER, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkCommandPool obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_POOL_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_COMMAND_POOL, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkSurfaceKHR obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SURFACE_KHR_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_SURFACE_KHR, name.c_str());
 }
 
 
 void Kodiak::SetDebugName(VkSwapchainKHR obj, const string& name)
 {
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_SWAPCHAIN_KHR_EXT, name.c_str());
-}
-
-
-void Kodiak::SetDebugName(VkDebugReportCallbackEXT obj, const string& name)
-{
-	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_DEBUG_REPORT_OBJECT_TYPE_DEBUG_REPORT_EXT, name.c_str());
+	::SetDebugName(reinterpret_cast<uint64_t>(obj), VK_OBJECT_TYPE_SWAPCHAIN_KHR, name.c_str());
 }
 
 
@@ -1778,6 +1774,5 @@ void Kodiak::SetDebugName(VkFramebuffer obj, const string& name) {}
 void Kodiak::SetDebugName(VkCommandPool obj, const string& name) {}
 void Kodiak::SetDebugName(VkSurfaceKHR obj, const string& name) {}
 void Kodiak::SetDebugName(VkSwapchainKHR obj, const string& name) {}
-void Kodiak::SetDebugName(VkDebugReportCallbackEXT obj, const string& name) {}
 
 #endif

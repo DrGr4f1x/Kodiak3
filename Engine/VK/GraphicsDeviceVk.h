@@ -67,7 +67,6 @@ private:
 	void UnblockPresent(VkQueue queue, VkSemaphore timelineSemaphore, uint64_t fenceWaitValue);
 
 	void GetPhysicalDeviceProperties();
-	void InitializeDebugMarkup();
 	void InitializeValidation();
 
 	bool IsExtensionSupported(const std::string& extension) const;
@@ -121,7 +120,7 @@ private:
 	std::shared_ptr<AllocatorRef> m_allocator;
 	std::shared_ptr<SurfaceRef> m_surface;
 	std::shared_ptr<SwapchainRef> m_swapchain;
-	std::shared_ptr<DebugReportCallbackRef> m_debugReportCallback;
+	std::shared_ptr<DebugUtilsMessengerRef> m_debugUtilsMessenger;
 
 	// Swapchain images
 	std::vector<std::shared_ptr<ImageRef>> m_swapchainImages;

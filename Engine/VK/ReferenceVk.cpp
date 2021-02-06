@@ -118,19 +118,19 @@ shared_ptr<SemaphoreRef> SemaphoreRef::Create(const shared_ptr<DeviceRef>& devic
 }
 
 
-DebugReportCallbackRef::~DebugReportCallbackRef()
+DebugUtilsMessengerRef::~DebugUtilsMessengerRef()
 {
-#if ENABLE_VULKAN_VALIDATION
-	extern PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallback;
-	vkDestroyDebugReportCallback(*Get<InstanceRef>(), m_callback, nullptr);
+#if USE_VALIDATION_LAYER
+	extern PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger;
+	vkDestroyDebugUtilsMessenger(*Get<InstanceRef>(), m_messenger, nullptr);
 #endif
-	m_callback = VK_NULL_HANDLE;
+	m_messenger = VK_NULL_HANDLE;
 }
 
 
-shared_ptr<DebugReportCallbackRef> DebugReportCallbackRef::Create(const shared_ptr<InstanceRef>& instance, VkDebugReportCallbackEXT callback)
+shared_ptr<DebugUtilsMessengerRef> DebugUtilsMessengerRef::Create(const shared_ptr<InstanceRef>& instance, VkDebugUtilsMessengerEXT messenger)
 {
-	shared_ptr<DebugReportCallbackRef> ptr(new DebugReportCallbackRef(instance, callback));
+	shared_ptr<DebugUtilsMessengerRef> ptr(new DebugUtilsMessengerRef(instance, messenger));
 	return ptr;
 }
 

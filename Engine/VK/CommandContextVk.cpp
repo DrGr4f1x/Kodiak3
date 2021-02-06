@@ -27,9 +27,9 @@ using namespace std;
 
 // Extension methods
 extern PFN_vkCmdPushDescriptorSetKHR vkCmdPushDescriptorSet;
-extern PFN_vkCmdDebugMarkerBeginEXT vkCmdDebugMarkerBegin;
-extern PFN_vkCmdDebugMarkerEndEXT vkCmdDebugMarkerEnd;
-extern PFN_vkCmdDebugMarkerInsertEXT vkCmdDebugMarkerInsert;
+extern PFN_vkCmdBeginDebugUtilsLabelEXT vkCmdBeginDebugUtilsLabel;
+extern PFN_vkCmdEndDebugUtilsLabelEXT vkCmdEndDebugUtilsLabel;
+extern PFN_vkCmdInsertDebugUtilsLabelEXT vkCmdInsertDebugUtilsLabel;
 
 
 ContextManager g_contextManager;
@@ -189,16 +189,16 @@ void CommandContext::Finish(bool waitForCompletion)
 void CommandContext::BeginEvent(const string& label)
 {
 #if ENABLE_VULKAN_DEBUG_MARKUP
-	if (vkCmdDebugMarkerBegin)
+	if (vkCmdBeginDebugUtilsLabel)
 	{
-		VkDebugMarkerMarkerInfoEXT markerInfo = {};
-		markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
-		markerInfo.color[0] = 0.0f;
-		markerInfo.color[1] = 0.0f;
-		markerInfo.color[2] = 0.0f;
-		markerInfo.color[3] = 0.0f;
-		markerInfo.pMarkerName = label.c_str();
-		vkCmdDebugMarkerBegin(m_commandList, &markerInfo);
+		VkDebugUtilsLabelEXT labelInfo = {};
+		labelInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+		labelInfo.color[0] = 0.0f;
+		labelInfo.color[1] = 0.0f;
+		labelInfo.color[2] = 0.0f;
+		labelInfo.color[3] = 0.0f;
+		labelInfo.pLabelName = label.c_str();
+		vkCmdBeginDebugUtilsLabel(m_commandList, &labelInfo);
 	}
 #endif
 }
@@ -207,9 +207,9 @@ void CommandContext::BeginEvent(const string& label)
 void CommandContext::EndEvent()
 {
 #if ENABLE_VULKAN_DEBUG_MARKUP
-	if (vkCmdDebugMarkerEnd)
+	if (vkCmdEndDebugUtilsLabel)
 	{
-		vkCmdDebugMarkerEnd(m_commandList);
+		vkCmdEndDebugUtilsLabel(m_commandList);
 	}
 #endif
 }
@@ -218,16 +218,16 @@ void CommandContext::EndEvent()
 void CommandContext::SetMarker(const string& label)
 {
 #if ENABLE_VULKAN_DEBUG_MARKUP
-	if (vkCmdDebugMarkerBegin)
+	if (vkCmdInsertDebugUtilsLabel)
 	{
-		VkDebugMarkerMarkerInfoEXT markerInfo = {};
-		markerInfo.sType = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
-		markerInfo.color[0] = 0.0f;
-		markerInfo.color[1] = 0.0f;
-		markerInfo.color[2] = 0.0f;
-		markerInfo.color[3] = 0.0f;
-		markerInfo.pMarkerName = label.c_str();
-		vkCmdDebugMarkerInsert(m_commandList, &markerInfo);
+		VkDebugUtilsLabelEXT labelInfo = {};
+		labelInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+		labelInfo.color[0] = 0.0f;
+		labelInfo.color[1] = 0.0f;
+		labelInfo.color[2] = 0.0f;
+		labelInfo.color[3] = 0.0f;
+		labelInfo.pLabelName = label.c_str();
+		vkCmdInsertDebugUtilsLabel(m_commandList, &labelInfo);
 	}
 #endif
 }

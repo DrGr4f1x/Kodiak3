@@ -231,23 +231,23 @@ private:
 };
 
 
-class DebugReportCallbackRef : public Reference<InstanceRef>, public NonCopyable
+class DebugUtilsMessengerRef : public Reference<InstanceRef>, public NonCopyable
 {
-public:
-	virtual ~DebugReportCallbackRef();
+	public:
+	virtual ~DebugUtilsMessengerRef();
 
-	static std::shared_ptr<DebugReportCallbackRef> Create(const std::shared_ptr<InstanceRef>& instance, VkDebugReportCallbackEXT callback);
+	static std::shared_ptr<DebugUtilsMessengerRef> Create(const std::shared_ptr<InstanceRef>& instance, VkDebugUtilsMessengerEXT messenger);
 
-	operator VkDebugReportCallbackEXT() { return m_callback; }
+	operator VkDebugUtilsMessengerEXT() const { return m_messenger; }
 
 private:
-	DebugReportCallbackRef(const std::shared_ptr<InstanceRef>& instance, VkDebugReportCallbackEXT callback)
+	DebugUtilsMessengerRef(const std::shared_ptr<InstanceRef>& instance, VkDebugUtilsMessengerEXT messenger)
 		: Reference(instance)
-		, m_callback(callback)
+		, m_messenger(messenger)
 	{}
 
 private:
-	VkDebugReportCallbackEXT m_callback{ VK_NULL_HANDLE };
+	VkDebugUtilsMessengerEXT m_messenger{ VK_NULL_HANDLE };
 };
 
 
