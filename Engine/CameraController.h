@@ -10,7 +10,9 @@
 
 #pragma once
 
-#include "Camera.h"
+// Forward declarations
+namespace Math { class Camera; }
+
 
 namespace Kodiak
 {

@@ -44,9 +44,6 @@
     <ClInclude Include="Math\Frustum.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="GpuResource.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -216,6 +213,9 @@
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
     <ClInclude Include="EnginePch.h" />
+    <ClInclude Include="Graphics\Camera.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -235,9 +235,6 @@
     </ClCompile>
     <ClCompile Include="Math\Frustum.cpp">
       <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="VK\GpuBufferVk.cpp">
       <Filter>Graphics\VK</Filter>
@@ -401,6 +398,9 @@
     </ClCompile>
     <ClCompile Include="VK\GpuImageVk.cpp">
       <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Camera.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

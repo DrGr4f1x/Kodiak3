@@ -314,7 +314,6 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="BinaryReader.h" />
     <ClInclude Include="BitmaskEnum.h" />
-    <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="ColorBuffer.h" />
@@ -403,6 +402,7 @@
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="GraphicsEnums.h" />
     <ClInclude Include="GraphicsFeatures.h" />
+    <ClInclude Include="Graphics\Camera.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="InputLayout.h" />
@@ -500,7 +500,6 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="BinaryReader.cpp" />
-    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="ColorBuffer.cpp" />
@@ -616,6 +615,7 @@
     <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="GpuBuffer.cpp" />
     <ClCompile Include="GraphicsFeatures.cpp" />
+    <ClCompile Include="Graphics\Camera.cpp" />
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="KTXTextureLoader.cpp" />

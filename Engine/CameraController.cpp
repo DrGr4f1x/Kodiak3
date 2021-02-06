@@ -12,8 +12,8 @@
 
 #include "CameraController.h"
 
-#include "Camera.h"
 #include "Input.h"
+#include "Graphics\Camera.h"
 
 
 using namespace Kodiak;

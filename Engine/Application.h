@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "Camera.h"
+#include "Graphics\Camera.h"
 #include "DepthBuffer.h"
 #include "Framebuffer.h"
 #include "UIOverlay.h"
