@@ -124,7 +124,7 @@ inline void ThrowIfFailed(HRESULT hr)
 #define KODIAK_VERSION_MINOR(version) (((uint32_t)(version) >> 12) & 0x3ff)
 #define KODIAK_VERSION_PATCH(version) ((uint32_t)(version) & 0xfff)
 
-constexpr uint32_t s_engineMajorVersion = 4;
+constexpr uint32_t s_engineMajorVersion = 3;
 constexpr uint32_t s_engineMinorVersion = 0;
 constexpr uint32_t s_enginePatchVersion = 0;
 
