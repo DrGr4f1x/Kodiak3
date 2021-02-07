@@ -222,6 +222,12 @@
     <ClInclude Include="Graphics\DX12\QueryHeap12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\VK\GpuResourceVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\GpuResource12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -345,9 +351,6 @@
     <ClCompile Include="Graphics\DX12\Util12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\GpuResource.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\VK\ColorBufferVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
@@ -410,6 +413,12 @@
     </ClCompile>
     <ClCompile Include="Graphics\VK\RefCountingVk.cpp">
       <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\GpuResourceVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\GpuResource12.cpp">
+      <Filter>Graphics\DX12</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

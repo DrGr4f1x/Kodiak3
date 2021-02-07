@@ -11,28 +11,10 @@
 #pragma once
 
 
-namespace Kodiak
-{
-
-class GpuResource
-{
-	friend class CommandContext;
-	friend class GraphicsContext;
-	friend class ComputeContext;
-
-public:
-	GpuResource();
-	GpuResource(const ResourceHandle& resource, ResourceState initialState);
-	virtual ~GpuResource() = 0;
-
-	const ResourceType GetType() const { return m_type; }
-	const ResourceHandle& GetHandle() const { return m_resource; }
-
-protected:
-	ResourceHandle	m_resource;
-	ResourceState	m_usageState;
-	ResourceState	m_transitioningState;
-	ResourceType	m_type;
-};
-
-} // namespace Kodiak
+#if defined(DX12)
+#include "Graphics\DX12\GpuResource12.h"
+#elif defined(VK)
+#include "Graphics\VK\GpuResourceVk.h"
+#else
+#error No graphics API defined!
+#endif
