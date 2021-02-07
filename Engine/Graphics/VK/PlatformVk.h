@@ -49,7 +49,6 @@ inline void ThrowIfFailed(VkResult res)
 namespace Kodiak
 {
 
-using DeviceHandle = VkDevice;
 using PlatformHandle = std::shared_ptr<VkBaseHandle>;
 using ResourceHandle = VkResourceHandle::VkPointer;
 using PsoHandle = VkPipeline;

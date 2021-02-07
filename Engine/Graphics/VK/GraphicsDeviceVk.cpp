@@ -1562,7 +1562,7 @@ vector<uint32_t> GraphicsDevice::GetQueueFamilyIndices(VkQueueFlags queueFlags) 
 }
 
 
-const DeviceHandle Kodiak::GetDevice()
+VkDevice Kodiak::GetDevice()
 {
 	return g_device->Get();
 }

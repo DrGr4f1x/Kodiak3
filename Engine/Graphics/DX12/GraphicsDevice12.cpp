@@ -314,7 +314,7 @@ struct GraphicsDevice::PlatformData : public NonCopyable
 };
 
 
-const DeviceHandle GetDevice()
+ID3D12Device* GetDevice()
 {
 	return g_device.Get();
 }

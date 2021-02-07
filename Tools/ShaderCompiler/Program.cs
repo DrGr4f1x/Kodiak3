@@ -85,7 +85,20 @@ namespace ShaderCompiler
         {
             switch(m_compiler)
             {
-                case ShaderCompiler.DXC: return "..\\..\\..\\DXC\\dxc.exe";
+                case ShaderCompiler.DXC:
+                    if (m_spirv)
+                    {
+                        string vkSdkPath = System.Environment.GetEnvironmentVariable("VULKAN_SDK");
+                        if (vkSdkPath != null)
+                        {
+                            return vkSdkPath + "\\bin\\dxc.exe";
+                        }
+                        return "..\\..\\..\\DXC\\dxc.exe";
+                    }
+                    else
+                    {
+                        return "dxc.exe";
+                    }
                 case ShaderCompiler.FXC: return "fxc.exe";
                 case ShaderCompiler.GLSLC: return "glslc.exe";
             }

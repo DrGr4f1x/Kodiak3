@@ -87,7 +87,7 @@ private:
 extern GraphicsDevice* g_graphicsDevice;
 
 
-const DeviceHandle GetDevice();
+ID3D12Device* GetDevice();
 
 
 } // namespace Kodiak

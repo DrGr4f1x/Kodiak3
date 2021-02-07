@@ -172,7 +172,7 @@ private:
 extern GraphicsDevice* g_graphicsDevice;
 
 
-const DeviceHandle GetDevice();
+VkDevice GetDevice();
 
 
 uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound = nullptr);
