@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "CommandAllocatorPool12.h"
+#include "Graphics\DX12\CommandAllocatorPool12.h"
 
 namespace Kodiak
 {

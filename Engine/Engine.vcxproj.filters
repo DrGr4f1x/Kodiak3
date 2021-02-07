@@ -4,12 +4,6 @@
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Utility.h" />
-    <ClInclude Include="DX12\CommandListManager12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\CommandAllocatorPool12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="Math\CommonMath.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -41,79 +35,16 @@
     <ClInclude Include="Math\Frustum.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="VK\CommandContextVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\CommandContext12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="NonCopyable.h" />
-    <ClInclude Include="VK\CommandBufferPoolVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\DescriptorHeap12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\LinearAllocator12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="Filesystem.h" />
-    <ClInclude Include="DX12\RootSignature12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="Hash.h" />
-    <ClInclude Include="VK\RootSignatureVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
     <ClInclude Include="BinaryReader.h" />
     <ClInclude Include="Color.h" />
-    <ClInclude Include="VK\GraphicsEnumsVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\GraphicsEnums12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="BitmaskEnum.h" />
-    <ClInclude Include="VK\DescriptorHeapVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\CommandListManagerVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\DDSTextureLoader12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\DynamicDescriptorHeap12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\DDSTextureLoaderVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
     <ClInclude Include="Input.h" />
     <ClInclude Include="CameraController.h" />
-    <ClInclude Include="VK\PlatformVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\Platform12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\HandleVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\Util12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\UtilVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
     <ClInclude Include="Math\Random.h">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\ResourceSet12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\ResourceSetVk.h">
-      <Filter>Graphics\VK</Filter>
     </ClInclude>
     <ClInclude Include="Log.h" />
     <ClInclude Include="Extern\VulkanMemoryAllocator\vk_mem_alloc.h">
@@ -121,18 +52,6 @@
     </ClInclude>
     <ClInclude Include="Extern\D3D12MemoryAllocator\D3D12MemAlloc.h">
       <Filter>Graphics\DX12\D3D12MemoryAllocator</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\ReferenceVk.h">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\GpuImageVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="VK\GraphicsDeviceVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\GraphicsDevice12.h">
-      <Filter>Graphics\DX12</Filter>
     </ClInclude>
     <ClInclude Include="EnginePch.h" />
     <ClInclude Include="Graphics\Camera.h">
@@ -216,152 +135,107 @@
     <ClInclude Include="Graphics\UIOverlay.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\DX12\CommandAllocatorPool12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\CommandContext12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\CommandListManager12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\DDSTextureLoader12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\DescriptorHeap12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\DynamicDescriptorHeap12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\GraphicsDevice12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\GraphicsEnums12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\LinearAllocator12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\Platform12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\ResourceSet12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\RootSignature12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\Util12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\CommandBufferPoolVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\CommandContextVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\CommandListManagerVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\DDSTextureLoaderVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\DescriptorHeapVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\GpuImageVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\GraphicsDeviceVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\GraphicsEnumsVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\HandleVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\PlatformVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\ReferenceVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\ResourceSetVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\RootSignatureVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\UtilVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Utility.cpp" />
-    <ClCompile Include="DX12\GraphicsDevice12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\GraphicsDeviceVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\CommandListManager12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\CommandAllocatorPool12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
     <ClCompile Include="Math\Frustum.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="VK\GpuBufferVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\GpuBuffer12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\CommandContextVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\CommandContext12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\CommandBufferPoolVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\DescriptorHeap12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\LinearAllocator12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
     <ClCompile Include="Filesystem.cpp" />
-    <ClCompile Include="DX12\RootSignature12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\RootSignatureVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\PipelineState12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\PipelineStateVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
     <ClCompile Include="BinaryReader.cpp" />
-    <ClCompile Include="DX12\ColorBuffer12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\ColorBufferVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
     <ClCompile Include="Color.cpp" />
-    <ClCompile Include="VK\DepthBufferVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\Framebuffer12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\FramebufferVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\GraphicsEnumsVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\GraphicsEnums12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
     <ClCompile Include="Hash.cpp" />
-    <ClCompile Include="VK\DescriptorHeapVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\CommandListManagerVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\Texture12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\TextureVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\DDSTextureLoader12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\DynamicDescriptorHeap12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\DDSTextureLoaderVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="CameraController.cpp" />
-    <ClCompile Include="DX12\GpuResource.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\HandleVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\ResourceView12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\Util12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\ResourceViewVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\UtilVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\DepthBuffer12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
     <ClCompile Include="Math\Random.cpp">
       <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\QueryHeap12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\QueryHeapVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\ResourceSet12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\ResourceSetVk.cpp">
-      <Filter>Graphics\VK</Filter>
     </ClCompile>
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Extern\D3D12MemoryAllocator\D3D12MemAlloc.cpp">
       <Filter>Graphics\DX12\D3D12MemoryAllocator</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\ReferenceVk.cpp">
-      <Filter>Graphics\VK\LowLevel</Filter>
-    </ClCompile>
-    <ClCompile Include="VK\GpuImageVk.cpp">
-      <Filter>Graphics\VK</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\Camera.cpp">
       <Filter>Graphics</Filter>
@@ -405,6 +279,132 @@
     <ClCompile Include="Graphics\UIOverlay.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\DX12\ColorBuffer12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\CommandAllocatorPool12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\CommandContext12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\CommandListManager12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\DDSTextureLoader12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\DepthBuffer12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\DescriptorHeap12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\DynamicDescriptorHeap12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\Framebuffer12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\GpuBuffer12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\GraphicsDevice12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\GraphicsEnums12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\LinearAllocator12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\PipelineState12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\QueryHeap12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\ResourceSet12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\ResourceView12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\RootSignature12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\Texture12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\Util12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GpuResource.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\ColorBufferVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\CommandBufferPoolVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\CommandContextVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\CommandListManagerVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\DDSTextureLoaderVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\DepthBufferVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\DescriptorHeapVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\FramebufferVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\GpuBufferVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\GpuImageVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\GraphicsDeviceVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\GraphicsEnumsVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\HandleVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\PipelineStateVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\QueryHeapVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\ReferenceVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\ResourceSetVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\ResourceViewVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\RootSignatureVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\TextureVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\UtilVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -436,9 +436,6 @@
     </Filter>
     <Filter Include="Graphics\DX12\D3D12MemoryAllocator">
       <UniqueIdentifier>{087ccbbe-b36b-4ec1-877d-7aec93736c42}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Graphics\VK\LowLevel">
-      <UniqueIdentifier>{1f515090-d4d7-4d92-9ae6-755b085f8c05}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

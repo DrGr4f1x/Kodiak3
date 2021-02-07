@@ -105,9 +105,9 @@ inline void ThrowIfFailed(HRESULT hr)
 
 // Graphics API headers
 #if defined(DX12)
-#include "DX12\Platform12.h"
+#include "Graphics\DX12\Platform12.h"
 #elif defined(VK)
-#include "VK\PlatformVk.h"
+#include "Graphics\VK\PlatformVk.h"
 #else
 #error No graphics API defined!
 #endif
