@@ -10,7 +10,7 @@
 
 #include "Stdafx.h"
 
-#include "QueryHeap.h"
+#include "Graphics\QueryHeap.h"
 
 #include "Graphics\GraphicsDevice.h"
 

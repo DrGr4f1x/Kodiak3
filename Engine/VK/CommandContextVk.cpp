@@ -14,7 +14,7 @@
 
 #include "Graphics\GraphicsDevice.h"
 #include "Graphics\PipelineState.h"
-#include "QueryHeap.h"
+#include "Graphics\QueryHeap.h"
 
 #include "CommandListManagerVk.h"
 #include "RootSignatureVk.h"

@@ -407,7 +407,10 @@
     <ClInclude Include="Graphics\Model.h" />
     <ClInclude Include="Graphics\PipelineState.h" />
     <ClInclude Include="Graphics\PixelBuffer.h" />
+    <ClInclude Include="Graphics\QueryHeap.h" />
+    <ClInclude Include="Graphics\ResourceSet.h" />
     <ClInclude Include="Graphics\Resources\KTXTextureLoader.h" />
+    <ClInclude Include="Graphics\ResourceView.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Log.h" />
@@ -423,9 +426,6 @@
     <ClInclude Include="Math\Transform.h" />
     <ClInclude Include="Math\Vector.h" />
     <ClInclude Include="NonCopyable.h" />
-    <ClInclude Include="QueryHeap.h" />
-    <ClInclude Include="ResourceSet.h" />
-    <ClInclude Include="ResourceView.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="SamplerState.h" />
     <ClInclude Include="Shader.h" />
@@ -619,6 +619,7 @@
     <ClCompile Include="Graphics\Model.cpp" />
     <ClCompile Include="Graphics\PipelineState.cpp" />
     <ClCompile Include="Graphics\Resources\KTXTextureLoader.cpp" />
+    <ClCompile Include="Graphics\ResourceView.cpp" />
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Log.cpp" />

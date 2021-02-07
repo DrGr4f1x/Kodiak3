@@ -12,7 +12,7 @@
 
 
 #include "Graphics\PixelBuffer.h"
-#include "ResourceView.h"
+#include "Graphics\ResourceView.h"
 
 
 namespace Kodiak

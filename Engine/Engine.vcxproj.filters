@@ -112,9 +112,6 @@
     <ClInclude Include="VK\HandleVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceView.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="DX12\Util12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
@@ -123,12 +120,6 @@
     </ClInclude>
     <ClInclude Include="Math\Random.h">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="QueryHeap.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceSet.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="DX12\ResourceSet12.h">
       <Filter>Graphics\DX12</Filter>
@@ -214,6 +205,15 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\PixelBuffer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\ResourceSet.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\ResourceView.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\QueryHeap.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -400,6 +400,9 @@
       <Filter>Graphics\Resources</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\PipelineState.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\ResourceView.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>

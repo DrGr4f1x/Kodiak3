@@ -12,7 +12,7 @@
 
 #include "Stdafx.h"
 
-#include "ResourceView.h"
+#include "Graphics\ResourceView.h"
 
 #include "Graphics\DescriptorHeap.h"
 #include "Graphics\GraphicsDevice.h"

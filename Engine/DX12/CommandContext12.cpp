@@ -13,7 +13,7 @@
 #include "CommandContext12.h"
 
 #include "Graphics\Framebuffer.h"
-#include "QueryHeap.h"
+#include "Graphics\QueryHeap.h"
 
 #include "CommandListManager12.h"
 #include "Util12.h"

@@ -15,7 +15,7 @@
 
 using namespace Kodiak;
 
-
+#if 0
 ResourceViewDesc Kodiak::DescribeIndexBuffer(size_t elementSize, size_t bufferSize)
 {
 	ResourceViewDesc resDesc = {};
@@ -54,3 +54,4 @@ ResourceViewDesc Kodiak::DescribeDepthStencil(Format format)
 
 	return resDesc;
 }
+#endif

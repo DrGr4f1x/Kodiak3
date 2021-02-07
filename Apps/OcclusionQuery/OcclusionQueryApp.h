@@ -15,8 +15,8 @@
 #include "Graphics\GpuBuffer.h"
 #include "Graphics\Model.h"
 #include "Graphics\PipelineState.h"
-#include "QueryHeap.h"
-#include "ResourceSet.h"
+#include "Graphics\QueryHeap.h"
+#include "Graphics\ResourceSet.h"
 #include "RootSignature.h"
 
 
