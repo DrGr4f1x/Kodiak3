@@ -15,7 +15,7 @@
 #include "Graphics\GraphicsFeatures.h"
 #include "Graphics\PipelineState.h"
 #include "Graphics\Shader.h"
-#include "Texture.h"
+#include "Graphics\Texture.h"
 #include "Utility.h"
 
 #include "CommandContextVk.h"

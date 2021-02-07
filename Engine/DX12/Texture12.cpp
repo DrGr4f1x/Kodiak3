@@ -10,7 +10,7 @@
 
 #include "Stdafx.h"
 
-#include "Texture.h"
+#include "Graphics\Texture.h"
 
 #include "BinaryReader.h"
 #include "Filesystem.h"

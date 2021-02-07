@@ -16,7 +16,7 @@
 #include "Graphics\PipelineState.h"
 #include "Graphics\ResourceSet.h"
 #include "Graphics\RootSignature.h"
-#include "Texture.h"
+#include "Graphics\Texture.h"
 
 class TextureArrayApp : public Kodiak::Application
 {

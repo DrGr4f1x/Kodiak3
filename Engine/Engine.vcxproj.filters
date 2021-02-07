@@ -80,9 +80,6 @@
     <ClInclude Include="VK\CommandListManagerVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="DX12\DDSTextureLoader12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
@@ -117,9 +114,6 @@
     </ClInclude>
     <ClInclude Include="VK\ResourceSetVk.h">
       <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="UIOverlay.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Log.h" />
     <ClInclude Include="Extern\VulkanMemoryAllocator\vk_mem_alloc.h">
@@ -214,6 +208,12 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Shader.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Texture.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\UIOverlay.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -338,9 +338,6 @@
     <ClCompile Include="DX12\DepthBuffer12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Math\Random.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -355,9 +352,6 @@
     </ClCompile>
     <ClCompile Include="VK\ResourceSetVk.cpp">
       <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="UIOverlay.cpp">
-      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Extern\D3D12MemoryAllocator\D3D12MemAlloc.cpp">
@@ -403,6 +397,12 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\Shader.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Texture.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\UIOverlay.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>

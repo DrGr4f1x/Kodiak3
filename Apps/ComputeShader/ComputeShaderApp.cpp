@@ -12,10 +12,9 @@
 
 #include "ComputeShaderApp.h"
 
+#include "Input.h"
 #include "Graphics\CommonStates.h"
 #include "Graphics\CommandContext.h"
-#include "Input.h"
-#include "UIOverlay.h"
 
 
 using namespace Kodiak;

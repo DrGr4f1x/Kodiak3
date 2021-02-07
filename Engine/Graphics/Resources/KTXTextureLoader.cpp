@@ -12,7 +12,7 @@
 
 #include "KTXTextureLoader.h"
 
-#include "Texture.h"
+#include "Graphics\Texture.h"
 
 
 using namespace Kodiak;

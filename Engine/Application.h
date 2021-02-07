@@ -12,7 +12,7 @@
 
 #include "Graphics\Camera.h"
 #include "Graphics\Framebuffer.h"
-#include "UIOverlay.h"
+#include "Graphics\UIOverlay.h"
 
 
 namespace Kodiak

@@ -15,7 +15,7 @@
 #include "Application.h"
 #include "Graphics\GraphicsFeatures.h"
 #include "Graphics\Shader.h"
-#include "Texture.h"
+#include "Graphics\Texture.h"
 
 #include "CommandContext12.h"
 #include "CommandListManager12.h"

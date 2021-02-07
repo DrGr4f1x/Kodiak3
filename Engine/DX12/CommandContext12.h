@@ -16,7 +16,7 @@
 #include "Graphics\DepthBuffer.h"
 #include "Graphics\GpuBuffer.h"
 #include "Graphics\PipelineState.h"
-#include "Texture.h"
+#include "Graphics\Texture.h"
 
 #include "CommandListManager12.h"
 #include "DynamicDescriptorHeap12.h"

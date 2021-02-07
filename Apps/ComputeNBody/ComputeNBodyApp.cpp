@@ -15,7 +15,6 @@
 #include "Graphics\CommonStates.h"
 #include "Graphics\CommandContext.h"
 #include "Graphics\GraphicsFeatures.h"
-#include "UIOverlay.h"
 
 
 using namespace Kodiak;

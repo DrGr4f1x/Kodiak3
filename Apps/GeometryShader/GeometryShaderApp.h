@@ -17,7 +17,6 @@
 #include "Graphics\PipelineState.h"
 #include "Graphics\ResourceSet.h"
 #include "Graphics\RootSignature.h"
-#include "Texture.h"
 
 
 class GeometryShaderApp : public Kodiak::Application
