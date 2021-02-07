@@ -16,9 +16,8 @@
 #include "RootSignature12.h"
 
 #include "Hash.h"
-#include "SamplerState.h"
-
 #include "Graphics\GraphicsDevice.h"
+#include "Graphics\SamplerState.h"
 
 
 using namespace Kodiak;

@@ -12,9 +12,9 @@
 
 #include "RootSignatureVk.h"
 
-#include "Graphics\DescriptorHeap.h"
 #include "Hash.h"
-#include "SamplerState.h"
+#include "Graphics\DescriptorHeap.h"
+#include "Graphics\SamplerState.h"
 
 #include "Graphics\GraphicsDevice.h"
 

@@ -17,7 +17,7 @@
 #include "Graphics\PipelineState.h"
 #include "Graphics\QueryHeap.h"
 #include "Graphics\ResourceSet.h"
-#include "RootSignature.h"
+#include "Graphics\RootSignature.h"
 
 
 class OcclusionQueryApp : public Kodiak::Application

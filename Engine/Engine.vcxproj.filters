@@ -62,14 +62,8 @@
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
     <ClInclude Include="Hash.h" />
-    <ClInclude Include="RootSignature.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="VK\RootSignatureVk.h">
       <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="BinaryReader.h" />
     <ClInclude Include="Color.h" />
@@ -85,9 +79,6 @@
     </ClInclude>
     <ClInclude Include="VK\CommandListManagerVk.h">
       <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="SamplerState.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Graphics</Filter>
@@ -216,6 +207,15 @@
     <ClInclude Include="Graphics\QueryHeap.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\RootSignature.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\SamplerState.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Shader.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -269,9 +269,6 @@
     </ClCompile>
     <ClCompile Include="VK\PipelineStateVk.cpp">
       <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="BinaryReader.cpp" />
     <ClCompile Include="DX12\ColorBuffer12.cpp">
@@ -403,6 +400,9 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\ResourceView.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Shader.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>

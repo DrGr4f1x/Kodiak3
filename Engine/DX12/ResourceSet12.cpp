@@ -16,7 +16,7 @@
 #include "Graphics\DepthBuffer.h"
 #include "Graphics\GpuBuffer.h"
 #include "Graphics\GraphicsDevice.h"
-#include "RootSignature.h"
+#include "Graphics\RootSignature.h"
 #include "Texture.h"
 
 #include "DescriptorHeap12.h"

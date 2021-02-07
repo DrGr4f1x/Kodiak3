@@ -15,7 +15,7 @@
 #include "Hash.h"
 #include "Graphics\GraphicsDevice.h"
 #include "Graphics\PixelBuffer.h"
-#include "Shader.h"
+#include "Graphics\Shader.h"
 
 #include "RootSignatureVk.h"
 #include "UtilVk.h"

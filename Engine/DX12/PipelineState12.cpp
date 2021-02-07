@@ -14,9 +14,9 @@
 
 #include "Graphics\PipelineState.h"
 
-#include "Graphics\GraphicsDevice.h"
 #include "Hash.h"
-#include "Shader.h"
+#include "Graphics\GraphicsDevice.h"
+#include "Graphics\Shader.h"
 
 #include "RootSignature12.h"
 

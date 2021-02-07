@@ -411,6 +411,9 @@
     <ClInclude Include="Graphics\ResourceSet.h" />
     <ClInclude Include="Graphics\Resources\KTXTextureLoader.h" />
     <ClInclude Include="Graphics\ResourceView.h" />
+    <ClInclude Include="Graphics\RootSignature.h" />
+    <ClInclude Include="Graphics\SamplerState.h" />
+    <ClInclude Include="Graphics\Shader.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Log.h" />
@@ -426,9 +429,6 @@
     <ClInclude Include="Math\Transform.h" />
     <ClInclude Include="Math\Vector.h" />
     <ClInclude Include="NonCopyable.h" />
-    <ClInclude Include="RootSignature.h" />
-    <ClInclude Include="SamplerState.h" />
-    <ClInclude Include="Shader.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="UIOverlay.h" />
@@ -620,12 +620,12 @@
     <ClCompile Include="Graphics\PipelineState.cpp" />
     <ClCompile Include="Graphics\Resources\KTXTextureLoader.cpp" />
     <ClCompile Include="Graphics\ResourceView.cpp" />
+    <ClCompile Include="Graphics\Shader.cpp" />
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Math\Frustum.cpp" />
     <ClCompile Include="Math\Random.cpp" />
-    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Create</PrecompiledHeader>

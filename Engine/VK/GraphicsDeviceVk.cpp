@@ -14,7 +14,7 @@
 
 #include "Graphics\GraphicsFeatures.h"
 #include "Graphics\PipelineState.h"
-#include "Shader.h"
+#include "Graphics\Shader.h"
 #include "Texture.h"
 #include "Utility.h"
 
