@@ -15,7 +15,7 @@
 #include "BinaryReader.h"
 #include "Filesystem.h"
 #include "Graphics\GraphicsDevice.h"
-#include "KTXTextureLoader.h"
+#include "Graphics\Resources\KTXTextureLoader.h"
 
 #include "CommandContextVk.h"
 #include "UtilVk.h"

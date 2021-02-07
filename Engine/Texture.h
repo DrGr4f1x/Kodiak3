@@ -11,7 +11,7 @@
 #pragma once
 
 
-#include "PixelBuffer.h"
+#include "Graphics\PixelBuffer.h"
 #include "ResourceView.h"
 
 

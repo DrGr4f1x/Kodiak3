@@ -11,7 +11,7 @@
 #pragma once
 
 
-#include "InputLayout.h"
+#include "Graphics\InputLayout.h"
 
 
 namespace Kodiak

@@ -12,8 +12,8 @@
 
 #include "Application.h"
 #include "CameraController.h"
-#include "Model.h"
-#include "PipelineState.h"
+#include "Graphics\Model.h"
+#include "Graphics\PipelineState.h"
 #include "ResourceSet.h"
 #include "RootSignature.h"
 

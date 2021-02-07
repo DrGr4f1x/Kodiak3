@@ -403,10 +403,13 @@
     <ClInclude Include="Graphics\GraphicsDevice.h" />
     <ClInclude Include="Graphics\GraphicsEnums.h" />
     <ClInclude Include="Graphics\GraphicsFeatures.h" />
+    <ClInclude Include="Graphics\InputLayout.h" />
+    <ClInclude Include="Graphics\Model.h" />
+    <ClInclude Include="Graphics\PipelineState.h" />
+    <ClInclude Include="Graphics\PixelBuffer.h" />
+    <ClInclude Include="Graphics\Resources\KTXTextureLoader.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="Input.h" />
-    <ClInclude Include="InputLayout.h" />
-    <ClInclude Include="KTXTextureLoader.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Math\BoundingPlane.h" />
     <ClInclude Include="Math\BoundingSphere.h" />
@@ -419,10 +422,7 @@
     <ClInclude Include="Math\Scalar.h" />
     <ClInclude Include="Math\Transform.h" />
     <ClInclude Include="Math\Vector.h" />
-    <ClInclude Include="Model.h" />
     <ClInclude Include="NonCopyable.h" />
-    <ClInclude Include="PipelineState.h" />
-    <ClInclude Include="PixelBuffer.h" />
     <ClInclude Include="QueryHeap.h" />
     <ClInclude Include="ResourceSet.h" />
     <ClInclude Include="ResourceView.h" />
@@ -616,14 +616,14 @@
     <ClCompile Include="Graphics\Framebuffer.cpp" />
     <ClCompile Include="Graphics\GpuBuffer.cpp" />
     <ClCompile Include="Graphics\GraphicsFeatures.cpp" />
+    <ClCompile Include="Graphics\Model.cpp" />
+    <ClCompile Include="Graphics\PipelineState.cpp" />
+    <ClCompile Include="Graphics\Resources\KTXTextureLoader.cpp" />
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="Input.cpp" />
-    <ClCompile Include="KTXTextureLoader.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Math\Frustum.cpp" />
     <ClCompile Include="Math\Random.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Create</PrecompiledHeader>

@@ -12,7 +12,7 @@
 
 #include "Stdafx.h"
 
-#include "PipelineState.h"
+#include "Graphics\PipelineState.h"
 
 #include "Graphics\GraphicsDevice.h"
 #include "Hash.h"

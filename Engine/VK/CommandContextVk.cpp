@@ -13,7 +13,7 @@
 #include "CommandContextVk.h"
 
 #include "Graphics\GraphicsDevice.h"
-#include "PipelineState.h"
+#include "Graphics\PipelineState.h"
 #include "QueryHeap.h"
 
 #include "CommandListManagerVk.h"

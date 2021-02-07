@@ -72,9 +72,6 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="BinaryReader.h" />
-    <ClInclude Include="PixelBuffer.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Color.h" />
     <ClInclude Include="VK\GraphicsEnumsVk.h">
       <Filter>Graphics\VK</Filter>
@@ -83,9 +80,6 @@
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
     <ClInclude Include="BitmaskEnum.h" />
-    <ClInclude Include="InputLayout.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="VK\DescriptorHeapVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
@@ -101,17 +95,11 @@
     <ClInclude Include="DX12\DDSTextureLoader12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="DX12\DynamicDescriptorHeap12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
     <ClInclude Include="VK\DDSTextureLoaderVk.h">
       <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="KTXTextureLoader.h">
-      <Filter>Graphics\Resources</Filter>
     </ClInclude>
     <ClInclude Include="Input.h" />
     <ClInclude Include="CameraController.h" />
@@ -132,9 +120,6 @@
     </ClInclude>
     <ClInclude Include="VK\UtilVk.h">
       <Filter>Graphics\VK</Filter>
-    </ClInclude>
-    <ClInclude Include="PipelineState.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Math\Random.h">
       <Filter>Math</Filter>
@@ -214,6 +199,21 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\GraphicsFeatures.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\InputLayout.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Model.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Resources\KTXTextureLoader.h">
+      <Filter>Graphics\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\PipelineState.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\PixelBuffer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -312,17 +312,11 @@
     <ClCompile Include="DX12\DDSTextureLoader12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="DX12\DynamicDescriptorHeap12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
     <ClCompile Include="VK\DDSTextureLoaderVk.cpp">
       <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="KTXTextureLoader.cpp">
-      <Filter>Graphics\Resources</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="CameraController.cpp" />
@@ -348,9 +342,6 @@
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="PipelineState.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Math\Random.cpp">
@@ -400,6 +391,15 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\GraphicsFeatures.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Model.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Resources\KTXTextureLoader.cpp">
+      <Filter>Graphics\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\PipelineState.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>

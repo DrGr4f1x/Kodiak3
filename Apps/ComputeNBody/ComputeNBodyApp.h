@@ -14,7 +14,7 @@
 #include "CameraController.h"
 #include "Graphics\ColorBuffer.h"
 #include "Graphics\GpuBuffer.h"
-#include "PipelineState.h"
+#include "Graphics\PipelineState.h"
 #include "ResourceSet.h"
 #include "RootSignature.h"
 #include "Texture.h"
