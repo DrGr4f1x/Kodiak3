@@ -20,6 +20,7 @@
 #include "CommandContext12.h"
 #include "CommandListManager12.h"
 #include "RootSignature12.h"
+#include "Util12.h"
 
 
 using namespace Kodiak;
@@ -397,6 +398,20 @@ void GraphicsDevice::SubmitFrame()
 void GraphicsDevice::WaitForGpuIdle()
 {
 	g_commandManager.IdleGPU();
+}
+
+
+HRESULT GraphicsDevice::CreateQueryHeap(QueryHeapType type, uint32_t queryCount, ID3D12QueryHeap** ppHeap)
+{
+	D3D12_QUERY_HEAP_DESC desc = {};
+	desc.Count = queryCount;
+	desc.NodeMask = 0;
+	desc.Type = GetQueryHeapType(type);
+
+	// TODO This is what I want, after getting rid of PlatformData
+	//return m_device->CreateQueryHeap(&desc, IID_PPV_ARGS(ppHeap));
+
+	return GetDevice()->CreateQueryHeap(&desc, IID_PPV_ARGS(ppHeap));
 }
 
 

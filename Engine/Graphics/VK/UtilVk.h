@@ -28,4 +28,43 @@ VkAccessFlagBits GetAccessMask(ResourceState state);
 VkPipelineStageFlags GetShaderStageMask(ResourceState state, bool isSrc);
 VkImageAspectFlags GetAspectFlagsFromFormat(Format format, bool ignoreStencil = false);
 
+inline VkQueryType QueryHeapTypeToVulkan(QueryHeapType type)
+{
+	switch (type)
+	{
+	case QueryHeapType::Occlusion:
+		return VK_QUERY_TYPE_OCCLUSION;
+
+	case QueryHeapType::PipelineStats:
+		return VK_QUERY_TYPE_PIPELINE_STATISTICS;
+
+	case QueryHeapType::Timestamp:
+		return VK_QUERY_TYPE_TIMESTAMP;
+
+	default:
+		assert(false);
+		return VK_QUERY_TYPE_OCCLUSION;
+	}
+}
+
+
+inline VkQueryType QueryTypeToVulkan(QueryType type)
+{
+	switch (type)
+	{
+	case QueryType::Occlusion:
+		return VK_QUERY_TYPE_OCCLUSION;
+
+	case QueryType::PipelineStats:
+		return VK_QUERY_TYPE_PIPELINE_STATISTICS;
+
+	case QueryType::Timestamp:
+		return VK_QUERY_TYPE_TIMESTAMP;
+
+	default:
+		assert(false);
+		return VK_QUERY_TYPE_OCCLUSION;
+	}
+}
+
 } // namespace Kodiak

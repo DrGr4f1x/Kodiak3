@@ -40,6 +40,9 @@ DEFINE_GUID(IID_UVkBuffer, 0xd879f552, 0x9f96, 0x4fa3, 0xbc, 0x4c, 0x6f, 0x56, 0
 DEFINE_GUID(IID_UVkImageView, 0x559e7409, 0xd5df, 0x4e19, 0x9e, 0xb7, 0x21, 0xa2, 0x7b, 0x24, 0x31, 0x4b);
 // {2CFDBEF9-69AF-43A1-9B43-75B95C17F8B9}
 DEFINE_GUID(IID_UVkBufferView, 0x2cfdbef9, 0x69af, 0x43a1, 0x9b, 0x43, 0x75, 0xb9, 0x5c, 0x17, 0xf8, 0xb9);
+// {CD51D2FF-E501-4CF4-BD97-7050AB4E2636}
+DEFINE_GUID(IID_UVkQueryPool, 0xcd51d2ff, 0xe501, 0x4cf4, 0xbd, 0x97, 0x70, 0x50, 0xab, 0x4e, 0x26, 0x36);
+
 
 
 
@@ -496,6 +499,36 @@ private:
 	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
 	Microsoft::WRL::ComPtr<UVkBuffer> m_buffer{ nullptr };
 	VkBufferView m_bufferView{ VK_NULL_HANDLE };
+};
+
+
+//
+// VkQueryPool
+//
+class UVkQueryPool : public IUnknown, public NonCopyable
+{
+public:
+	UVkQueryPool(UVkDevice* udevice, VkQueryPool queryPool)
+		: m_device(udevice)
+		, m_queryPool(queryPool)
+	{}
+	~UVkQueryPool()
+	{
+		if (m_queryPool)
+		{
+			vkDestroyQueryPool(m_device->Get(), m_queryPool, nullptr);
+			m_queryPool = VK_NULL_HANDLE;
+		}
+	}
+
+	VkQueryPool Get() const { return m_queryPool; }
+	operator VkQueryPool() const { return m_queryPool; }
+
+	IMPLEMENT_IUNKNOWN(IID_UVkQueryPool)
+
+private:
+	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
+	VkQueryPool m_queryPool{ VK_NULL_HANDLE };
 };
 
 } // namespace Kodiak

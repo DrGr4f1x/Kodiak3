@@ -40,7 +40,6 @@ using PlatformHandle = Microsoft::WRL::ComPtr<IUnknown>;
 using ResourceHandle = Microsoft::WRL::ComPtr<ID3D12Resource>;
 using SwapChainHandle = Microsoft::WRL::ComPtr<IDXGISwapChain1>;
 using PsoHandle = ID3D12PipelineState*;
-using QueryHeapHandle = Microsoft::WRL::ComPtr<ID3D12QueryHeap>;
 
 using SrvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
 using UavHandle = D3D12_CPU_DESCRIPTOR_HANDLE;

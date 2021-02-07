@@ -342,6 +342,30 @@ VkResult GraphicsDevice::CreateAllocator(UVmaAllocator** ppAllocator) const
 }
 
 
+VkResult GraphicsDevice::CreateQueryPool(QueryHeapType type, uint32_t queryCount, UVkQueryPool** ppPool) const
+{
+	VkQueryPoolCreateInfo info = {};
+	info.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
+	info.pNext = nullptr;
+	info.flags = 0;
+	info.queryCount = queryCount;
+	info.queryType = QueryHeapTypeToVulkan(type);
+	info.pipelineStatistics = VK_QUERY_PIPELINE_STATISTIC_FLAG_BITS_MAX_ENUM;
+
+	VkQueryPool vkPool = VK_NULL_HANDLE;
+	auto res = vkCreateQueryPool(m_device->Get(), &info, nullptr, &vkPool);
+
+	*ppPool = nullptr;
+	if (res == VK_SUCCESS)
+	{
+		*ppPool = new UVkQueryPool(m_device.Get(), vkPool);
+		(*ppPool)->AddRef();
+	}
+
+	return res;
+}
+
+
 ColorBufferPtr GraphicsDevice::GetBackBuffer(uint32_t index) const
 {
 	assert(index < NumSwapChainBuffers);

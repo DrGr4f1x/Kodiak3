@@ -52,7 +52,6 @@ namespace Kodiak
 using PlatformHandle = std::shared_ptr<VkBaseHandle>;
 using ResourceHandle = VkResourceHandle::VkPointer;
 using PsoHandle = VkPipeline;
-using QueryHeapHandle = VkHandle<VkQueryPool>::VkPointer;
 
 using SrvHandle = VkDescriptorHandle::VkPointer;
 using UavHandle = VkDescriptorHandle::VkPointer;

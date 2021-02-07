@@ -216,6 +216,12 @@
     <ClInclude Include="Graphics\VK\RefCountingVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\VK\QueryHeapVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\QueryHeap12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />

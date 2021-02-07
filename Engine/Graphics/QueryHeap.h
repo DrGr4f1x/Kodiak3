@@ -10,25 +10,10 @@
 
 #pragma once
 
-namespace Kodiak
-{
-
-class OcclusionQueryHeap
-{
-public:
-
-	void Create(uint32_t queryCount);
-
-	QueryHeapType GetType() const { return m_type; }
-	uint32_t GetQueryCount() const { return m_queryCount; }
-
-	const QueryHeapHandle& GetHandle() const { return m_handle; }
-
-private:
-	QueryHeapType m_type;
-	uint32_t m_queryCount{ 0 };
-
-	QueryHeapHandle m_handle;
-};
-
-} // namespace Kodiak
+#if defined(DX12)
+#include "Graphics\DX12\QueryHeap12.h"
+#elif defined(VK)
+#include "Graphics\VK\QueryHeapVk.h"
+#else
+#error No graphics API defined!
+#endif

@@ -497,13 +497,13 @@ void GraphicsContext::BeginRenderPass(FrameBuffer& framebuffer)
 
 void GraphicsContext::BeginOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex)
 {
-	vkCmdBeginQuery(m_commandList, queryHeap.GetHandle(), heapIndex, VK_FLAGS_NONE);
+	vkCmdBeginQuery(m_commandList, queryHeap.GetQueryPool(), heapIndex, VK_FLAGS_NONE);
 }
 
 
 void GraphicsContext::EndOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex)
 {
-	vkCmdEndQuery(m_commandList, queryHeap.GetHandle(), heapIndex);
+	vkCmdEndQuery(m_commandList, queryHeap.GetQueryPool(), heapIndex);
 }
 
 
@@ -513,7 +513,7 @@ void GraphicsContext::ResolveOcclusionQueries(OcclusionQueryHeap& queryHeap, uin
 
 	vkCmdCopyQueryPoolResults(
 		m_commandList,
-		queryHeap.GetHandle(),
+		queryHeap.GetQueryPool(),
 		startIndex,
 		numQueries,
 		destBuffer.GetHandle(),
@@ -527,7 +527,7 @@ void GraphicsContext::ResetOcclusionQueries(OcclusionQueryHeap& queryHeap, uint3
 {
 	assert(!m_isRenderPassActive);
 
-	vkCmdResetQueryPool(m_commandList, queryHeap.GetHandle(), startIndex, numQueries);
+	vkCmdResetQueryPool(m_commandList, queryHeap.GetQueryPool(), startIndex, numQueries);
 }
 
 

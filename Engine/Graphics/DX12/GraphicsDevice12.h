@@ -30,6 +30,9 @@ public:
 
 	void WaitForGpuIdle();
 
+	// Create methods
+	HRESULT CreateQueryHeap(QueryHeapType type, uint32_t queryCount, ID3D12QueryHeap** ppHeap);
+
 	Format GetColorFormat() const { return m_colorFormat; }
 	Format GetDepthFormat() const { return m_depthFormat; }
 
