@@ -31,8 +31,8 @@ public:
 	void WaitForGpuIdle();
 
 	// Create methods
-	Microsoft::WRL::ComPtr<UVkSemaphore> CreateSemaphore(VkSemaphoreType semaphoreType) const;
-	Microsoft::WRL::ComPtr<UVmaAllocator> CreateAllocator() const;
+	KODIAK_NODISCARD VkResult CreateSemaphore(VkSemaphoreType semaphoreType, UVkSemaphore** ppSemaphore) const;
+	KODIAK_NODISCARD VkResult CreateAllocator(UVmaAllocator** ppAllocator) const;
 
 	Format GetColorFormat() const { return m_colorFormat; }
 	Format GetDepthFormat() const { return m_depthFormat; }

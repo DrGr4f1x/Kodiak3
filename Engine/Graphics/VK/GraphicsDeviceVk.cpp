@@ -295,7 +295,7 @@ void GraphicsDevice::WaitForGpuIdle()
 }
 
 
-Microsoft::WRL::ComPtr<UVkSemaphore> GraphicsDevice::CreateSemaphore(VkSemaphoreType semaphoreType) const
+VkResult GraphicsDevice::CreateSemaphore(VkSemaphoreType semaphoreType, UVkSemaphore** ppSemaphore) const
 {
 	VkSemaphoreTypeCreateInfo typeCreateInfo;
 	typeCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
@@ -309,24 +309,36 @@ Microsoft::WRL::ComPtr<UVkSemaphore> GraphicsDevice::CreateSemaphore(VkSemaphore
 	createInfo.flags = 0;
 
 	VkSemaphore vkSemaphore{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateSemaphore(m_device->Get(), &createInfo, nullptr, &vkSemaphore));
+	auto res = vkCreateSemaphore(m_device->Get(), &createInfo, nullptr, &vkSemaphore);
 	
-	Microsoft::WRL::ComPtr<UVkSemaphore> semaphore = new UVkSemaphore(m_device.Get(), vkSemaphore);
-	return semaphore;
+	*ppSemaphore = nullptr;
+	if (res == VK_SUCCESS)
+	{
+		*ppSemaphore = new UVkSemaphore(m_device.Get(), vkSemaphore);
+		(*ppSemaphore)->AddRef();
+	}
+
+	return res;
 }
 
 
-Microsoft::WRL::ComPtr<UVmaAllocator> GraphicsDevice::CreateAllocator() const
+VkResult GraphicsDevice::CreateAllocator(UVmaAllocator** ppAllocator) const
 {
 	VmaAllocatorCreateInfo createInfo = {};
 	createInfo.physicalDevice = m_physicalDevice->Get();
 	createInfo.device = m_device->Get();
 
 	VmaAllocator vmaAllocator{ VK_NULL_HANDLE };
-	ThrowIfFailed(vmaCreateAllocator(&createInfo, &vmaAllocator));
+	auto res = vmaCreateAllocator(&createInfo, &vmaAllocator);
 
-	Microsoft::WRL::ComPtr<UVmaAllocator> allocator = new UVmaAllocator(m_device.Get(), vmaAllocator);
-	return allocator;
+	*ppAllocator = nullptr;
+	if (res == VK_SUCCESS)
+	{
+		*ppAllocator = new UVmaAllocator(m_device.Get(), vmaAllocator);
+		(*ppAllocator)->AddRef();
+	}
+
+	return res;
 }
 
 
@@ -436,7 +448,7 @@ void GraphicsDevice::InitializeInternal()
 
 	CreateLogicalDevice();
 
-	m_allocator = CreateAllocator();
+	ThrowIfFailed(CreateAllocator(&m_allocator));
 
 	InitSurface();
 	CreateSwapChain();
@@ -662,8 +674,8 @@ void GraphicsDevice::CreateLogicalDevice()
 	g_device = m_device;
 
 	// Create semaphores
-	m_imageAcquireSemaphore = CreateSemaphore(VK_SEMAPHORE_TYPE_BINARY);
-	m_presentSemaphore = CreateSemaphore(VK_SEMAPHORE_TYPE_BINARY);
+	ThrowIfFailed(CreateSemaphore(VK_SEMAPHORE_TYPE_BINARY, &m_imageAcquireSemaphore));
+	ThrowIfFailed(CreateSemaphore(VK_SEMAPHORE_TYPE_BINARY, &m_presentSemaphore));
 }
 
 

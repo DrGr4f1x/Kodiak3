@@ -34,6 +34,14 @@ DEFINE_GUID(IID_UVkDebugUtilsMessenger, 0x100f605a, 0x2b, 0x48d0, 0x80, 0x9c, 0x
 DEFINE_GUID(IID_UVkImage, 0xd12387cd, 0x9e8, 0x42ef, 0xaa, 0x25, 0xe9, 0xfc, 0x5e, 0x29, 0x29, 0x2c);
 // {2062E1BA-E3B9-4E43-A9BF-1F72AE5B0A6F}
 DEFINE_GUID(IID_UVkSwapchain, 0x2062e1ba, 0xe3b9, 0x4e43, 0xa9, 0xbf, 0x1f, 0x72, 0xae, 0x5b, 0xa, 0x6f);
+// {D879F552-9F96-4FA3-BC4C-6F568E4D1ED6}
+DEFINE_GUID(IID_UVkBuffer, 0xd879f552, 0x9f96, 0x4fa3, 0xbc, 0x4c, 0x6f, 0x56, 0x8e, 0x4d, 0x1e, 0xd6);
+// {559E7409-D5DF-4E19-9EB7-21A27B24314B}
+DEFINE_GUID(IID_UVkImageView, 0x559e7409, 0xd5df, 0x4e19, 0x9e, 0xb7, 0x21, 0xa2, 0x7b, 0x24, 0x31, 0x4b);
+// {2CFDBEF9-69AF-43A1-9B43-75B95C17F8B9}
+DEFINE_GUID(IID_UVkBufferView, 0x2cfdbef9, 0x69af, 0x43a1, 0x9b, 0x43, 0x75, 0xb9, 0x5c, 0x17, 0xf8, 0xb9);
+
+
 
 
 // Macro to define the IUnknown interface
@@ -93,11 +101,7 @@ public:
 	}
 
 	VkInstance Get() const { return m_instance; }
-
-	operator VkInstance() const
-	{
-		return m_instance;
-	}
+	operator VkInstance() const { return m_instance; }
 
 	IMPLEMENT_IUNKNOWN(IID_UVkInstance)
 
@@ -122,11 +126,7 @@ public:
 	}
 
 	VkPhysicalDevice Get() const { return m_physicalDevice; }
-
-	operator VkPhysicalDevice() const
-	{
-		return m_physicalDevice;
-	}
+	operator VkPhysicalDevice() const {	return m_physicalDevice; }
 
 	IMPLEMENT_IUNKNOWN(IID_UVkPhysicalDevice)
 
@@ -156,11 +156,7 @@ public:
 	}
 
 	VkSurfaceKHR Get() const { return m_surfaceKHR; }
-
-	operator VkSurfaceKHR() const
-	{
-		return m_surfaceKHR;
-	}
+	operator VkSurfaceKHR() const {	return m_surfaceKHR; }
 
 	IMPLEMENT_IUNKNOWN(IID_UVkSurface)
 
@@ -190,11 +186,7 @@ public:
 	}
 
 	VkDevice Get() const { return m_device; }
-
-	operator VkDevice() const
-	{
-		return m_device;
-	}
+	operator VkDevice() const {	return m_device; }
 
 	IMPLEMENT_IUNKNOWN(IID_UVkDevice)
 
@@ -224,11 +216,7 @@ public:
 	}
 
 	VmaAllocator Get() const { return m_allocator; }
-
-	operator VmaAllocator() const
-	{
-		return m_allocator;
-	}
+	operator VmaAllocator() const {	return m_allocator;	}
 
 	IMPLEMENT_IUNKNOWN(IID_UVmaAllocator)
 
@@ -258,11 +246,7 @@ public:
 	}
 
 	VkFence Get() const { return m_fence; }
-
-	operator VkFence() const
-	{
-		return m_fence;
-	}
+	operator VkFence() const { return m_fence; }
 
 	IMPLEMENT_IUNKNOWN(IID_UVkFence)
 
@@ -292,11 +276,7 @@ public:
 	}
 
 	VkSemaphore Get() const { return m_semaphore; }
-
-	operator VkSemaphore() const
-	{
-		return m_semaphore;
-	}
+	operator VkSemaphore() const { return m_semaphore; }
 
 	IMPLEMENT_IUNKNOWN(IID_UVkSemaphore)
 
@@ -329,11 +309,7 @@ public:
 	}
 
 	VkDebugUtilsMessengerEXT Get() const { return m_messenger; }
-
-	operator VkDebugUtilsMessengerEXT() const
-	{
-		return m_messenger;
-	}
+	operator VkDebugUtilsMessengerEXT() const {	return m_messenger;	}
 
 	IMPLEMENT_IUNKNOWN(IID_UVkDebugUtilsMessenger)
 
@@ -360,10 +336,11 @@ public:
 		, m_allocator(uallocator)
 		, m_image(image)
 		, m_allocation(allocation)
+		, m_ownsImage(true)
 	{}
 	~UVkImage()
 	{
-		if (m_allocation)
+		if(m_ownsImage)
 		{
 			vmaDestroyImage(m_allocator->Get(), m_image, m_allocation);
 			m_allocation = VK_NULL_HANDLE;
@@ -381,6 +358,7 @@ private:
 	Microsoft::WRL::ComPtr<UVmaAllocator> m_allocator{ nullptr };
 	VkImage m_image{ VK_NULL_HANDLE };
 	VmaAllocation m_allocation{ VK_NULL_HANDLE };
+	bool m_ownsImage{ false };
 };
 
 
@@ -411,6 +389,113 @@ public:
 private:
 	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
 	VkSwapchainKHR m_swapchain{ VK_NULL_HANDLE };
+};
+
+
+//
+// VkBuffer
+//
+class UVkBuffer : public IUnknown, public NonCopyable
+{
+public:
+	UVkBuffer(UVkDevice* udevice, VkBuffer buffer)
+		: m_device(udevice)
+		, m_allocator(nullptr)
+		, m_buffer(buffer)
+		, m_allocation(VK_NULL_HANDLE)
+	{}
+	UVkBuffer(UVkDevice* udevice, UVmaAllocator* uallocator, VkBuffer buffer, VmaAllocation allocation)
+		: m_device(udevice)
+		, m_allocator(uallocator)
+		, m_buffer(buffer)
+		, m_allocation(allocation)
+		, m_ownsBuffer(true)
+	{}
+	~UVkBuffer()
+	{
+		if (m_ownsBuffer)
+		{
+			vmaDestroyBuffer(m_allocator->Get(), m_buffer, m_allocation);
+			m_allocation = VK_NULL_HANDLE;
+		}
+		m_buffer = VK_NULL_HANDLE;
+	}
+
+	VkBuffer Get() const { return m_buffer; }
+	operator VkBuffer() const { return m_buffer; }
+
+	IMPLEMENT_IUNKNOWN(IID_UVkBuffer)
+
+private:
+	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
+	Microsoft::WRL::ComPtr<UVmaAllocator> m_allocator{ nullptr };
+	VkBuffer m_buffer{ VK_NULL_HANDLE };
+	VmaAllocation m_allocation{ VK_NULL_HANDLE };
+	bool m_ownsBuffer{ false };
+};
+
+
+//
+// VkImageView
+//
+class UVkImageView : public IUnknown, public NonCopyable
+{
+public:
+	UVkImageView(UVkDevice* udevice, UVkImage* uimage, VkImageView imageView)
+		: m_device(udevice)
+		, m_image(uimage)
+		, m_imageView(imageView)
+	{}
+	~UVkImageView()
+	{
+		if (m_imageView)
+		{
+			vkDestroyImageView(m_device->Get(), m_imageView, nullptr);
+			m_imageView = VK_NULL_HANDLE;
+		}
+	}
+
+	VkImageView Get() const { return m_imageView; }
+	operator VkImageView() const { return m_imageView; }
+
+	IMPLEMENT_IUNKNOWN(IID_UVkImageView)
+
+private:
+	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
+	Microsoft::WRL::ComPtr<UVkImage> m_image{ nullptr };
+	VkImageView m_imageView { VK_NULL_HANDLE };
+};
+
+
+//
+// VkBufferView
+//
+class UVkBufferView : public IUnknown, public NonCopyable
+{
+public:
+	UVkBufferView(UVkDevice* udevice, UVkBuffer* ubuffer, VkBufferView bufferView)
+		: m_device(udevice)
+		, m_buffer(ubuffer)
+		, m_bufferView(bufferView)
+	{}
+	~UVkBufferView()
+	{
+		if (m_bufferView)
+		{
+			vkDestroyBufferView(m_device->Get(), m_bufferView, nullptr);
+			m_bufferView = VK_NULL_HANDLE;
+		}
+	}
+
+	VkBufferView Get() const { return m_bufferView; }
+	operator VkBufferView() const { return m_bufferView; }
+
+	IMPLEMENT_IUNKNOWN(IID_UVkBufferView)
+
+private:
+	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
+	Microsoft::WRL::ComPtr<UVkBuffer> m_buffer{ nullptr };
+	VkBufferView m_bufferView{ VK_NULL_HANDLE };
 };
 
 } // namespace Kodiak
