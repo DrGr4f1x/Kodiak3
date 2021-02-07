@@ -13,10 +13,6 @@
 namespace Kodiak
 {
 
-// Forward declarations
-class GraphicsContext;
-
-
 class OcclusionQueryHeap
 {
 public:
