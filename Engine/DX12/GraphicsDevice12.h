@@ -11,7 +11,7 @@
 #pragma once
 
 #include "Graphics\ColorBuffer.h"
-#include "GraphicsFeatures.h"
+#include "Graphics\GraphicsFeatures.h"
 
 
 namespace Kodiak

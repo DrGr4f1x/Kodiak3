@@ -12,7 +12,7 @@
 
 #include "GraphicsDeviceVk.h"
 
-#include "GraphicsFeatures.h"
+#include "Graphics\GraphicsFeatures.h"
 #include "PipelineState.h"
 #include "Shader.h"
 #include "Texture.h"

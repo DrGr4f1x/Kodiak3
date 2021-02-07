@@ -114,7 +114,7 @@ inline void ThrowIfFailed(HRESULT hr)
 
 
 // Engine\Graphics headers
-#include "GraphicsEnums.h"
+#include "Graphics\GraphicsEnums.h"
 
 
 // Engine info

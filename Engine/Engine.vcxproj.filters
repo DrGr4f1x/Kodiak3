@@ -76,9 +76,6 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Color.h" />
-    <ClInclude Include="GraphicsEnums.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="VK\GraphicsEnumsVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
@@ -154,9 +151,6 @@
     <ClInclude Include="VK\ResourceSetVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicsFeatures.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="UIOverlay.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -214,6 +208,12 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\GraphicsDevice.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsEnums.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsFeatures.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -368,9 +368,6 @@
     <ClCompile Include="VK\ResourceSetVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsFeatures.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="UIOverlay.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -400,6 +397,9 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\GpuBuffer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GraphicsFeatures.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>

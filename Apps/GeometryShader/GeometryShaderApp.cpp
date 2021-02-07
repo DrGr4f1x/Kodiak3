@@ -14,7 +14,7 @@
 
 #include "Graphics\CommandContext.h"
 #include "Graphics\CommonStates.h"
-#include "GraphicsFeatures.h"
+#include "Graphics\GraphicsFeatures.h"
 
 
 using namespace Kodiak;
