@@ -17,3 +17,20 @@ using namespace Kodiak;
 using namespace std;
 
 
+GpuImage::GpuImage()
+	: m_image(nullptr)
+	, m_usageState(ResourceState::Undefined)
+	, m_transitioningState(ResourceState::Undefined)
+	, m_type(ResourceType::Unknown)
+{}
+
+
+GpuImage::GpuImage(UVkImage* uimage, ResourceState initialState)
+	: m_image(uimage)
+	, m_usageState(initialState)
+	, m_transitioningState(ResourceState::Undefined)
+	, m_type(ResourceType::Unknown)
+{}
+
+
+GpuImage::~GpuImage() = default;
