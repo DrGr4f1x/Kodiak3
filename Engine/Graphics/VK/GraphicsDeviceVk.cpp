@@ -162,7 +162,7 @@ namespace
 {
 
 // TODO - Delete me
-shared_ptr<DeviceRef> g_device;
+Microsoft::WRL::ComPtr<UVkDevice> g_device;
 
 Format BackBufferColorFormat = Format::R8G8B8A8_UNorm;
 Format DepthFormat = Format::D32_Float_S8_UInt;
@@ -295,7 +295,7 @@ void GraphicsDevice::WaitForGpuIdle()
 }
 
 
-shared_ptr<SemaphoreRef> GraphicsDevice::CreateSemaphore(VkSemaphoreType semaphoreType) const
+Microsoft::WRL::ComPtr<UVkSemaphore> GraphicsDevice::CreateSemaphore(VkSemaphoreType semaphoreType) const
 {
 	VkSemaphoreTypeCreateInfo typeCreateInfo;
 	typeCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
@@ -309,23 +309,23 @@ shared_ptr<SemaphoreRef> GraphicsDevice::CreateSemaphore(VkSemaphoreType semapho
 	createInfo.flags = 0;
 
 	VkSemaphore vkSemaphore{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateSemaphore(*m_device, &createInfo, nullptr, &vkSemaphore));
-	auto semaphore = SemaphoreRef::Create(m_device, vkSemaphore);
+	ThrowIfFailed(vkCreateSemaphore(m_device->Get(), &createInfo, nullptr, &vkSemaphore));
 	
+	Microsoft::WRL::ComPtr<UVkSemaphore> semaphore = new UVkSemaphore(m_device.Get(), vkSemaphore);
 	return semaphore;
 }
 
 
-shared_ptr<AllocatorRef> GraphicsDevice::CreateAllocator() const
+Microsoft::WRL::ComPtr<UVmaAllocator> GraphicsDevice::CreateAllocator() const
 {
 	VmaAllocatorCreateInfo createInfo = {};
-	createInfo.physicalDevice = *m_physicalDevice;
-	createInfo.device = *m_device;
+	createInfo.physicalDevice = m_physicalDevice->Get();
+	createInfo.device = m_device->Get();
 
 	VmaAllocator vmaAllocator{ VK_NULL_HANDLE };
 	ThrowIfFailed(vmaCreateAllocator(&createInfo, &vmaAllocator));
 
-	auto allocator = AllocatorRef::Create(m_instance, m_physicalDevice, m_device, vmaAllocator);
+	Microsoft::WRL::ComPtr<UVmaAllocator> allocator = new UVmaAllocator(m_device.Get(), vmaAllocator);
 	return allocator;
 }
 
@@ -381,7 +381,7 @@ VkFormatProperties GraphicsDevice::GetFormatProperties(Format format)
 	VkFormat vkFormat = static_cast<VkFormat>(format);
 	VkFormatProperties properties{};
 
-	vkGetPhysicalDeviceFormatProperties(*m_physicalDevice, vkFormat, &properties);
+	vkGetPhysicalDeviceFormatProperties(m_physicalDevice->Get(), vkFormat, &properties);
 
 	return properties;
 }
@@ -445,7 +445,7 @@ void GraphicsDevice::InitializeInternal()
 	for (uint32_t i = 0; i < NumSwapChainBuffers; ++i)
 	{
 		m_swapChainBuffers[i] = make_shared<ColorBuffer>();
-		VkImage image = *m_swapchainImages[i];
+		VkImage image = m_swapchainImages[i]->Get();
 		auto handle = ResourceHandle::CreateNoDelete(image, VK_NULL_HANDLE, false);
 		m_swapChainBuffers[i]->CreateFromSwapChain("Primary SwapChain Buffer", handle, m_width, m_height, BackBufferColorFormat);
 	}
@@ -469,8 +469,8 @@ void GraphicsDevice::Present()
 	UnblockPresent(commandQueue, timelineSemaphore, fenceWaitValue);
 
 	// Present
-	VkSemaphore waitSemaphore = *m_presentSemaphore.get();
-	VkSwapchainKHR swapchain = *m_swapchain;
+	VkSemaphore waitSemaphore = m_presentSemaphore->Get();
+	VkSwapchainKHR swapchain = m_swapchain->Get();
 
 	VkPresentInfoKHR presentInfo = { VK_STRUCTURE_TYPE_PRESENT_INFO_KHR };
 	presentInfo.swapchainCount = 1;
@@ -531,7 +531,7 @@ void GraphicsDevice::CreateInstance()
 		Utility::ExitFatal("Could not create Vulkan instance", "Fatal error");
 	}
 
-	m_instance = InstanceRef::Create(vkInstance);
+	m_instance = new UVkInstance(vkInstance);
 }
 
 
@@ -539,8 +539,8 @@ void GraphicsDevice::SelectPhysicalDevice()
 {
 	// GPU selection
 	vector<VkPhysicalDevice> physicalDevices;
-	EnumeratePhysicalDevices(*m_instance, physicalDevices);
-	m_physicalDevice = PhysicalDeviceRef::Create(m_instance, physicalDevices[0]);
+	EnumeratePhysicalDevices(m_instance->Get(), physicalDevices);
+	m_physicalDevice = new UVkPhysicalDevice(m_instance.Get(), physicalDevices[0]);
 
 	// Get available physical device properties and features
 	GetPhysicalDeviceProperties();
@@ -655,8 +655,8 @@ void GraphicsDevice::CreateLogicalDevice()
 	createInfo.ppEnabledExtensionNames = extensionNames.data();
 
 	VkDevice vkDevice{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateDevice(*m_physicalDevice, &createInfo, nullptr, &vkDevice));
-	m_device = DeviceRef::Create(m_physicalDevice, vkDevice);
+	ThrowIfFailed(vkCreateDevice(m_physicalDevice->Get(), &createInfo, nullptr, &vkDevice));
+	m_device = new UVkDevice(m_physicalDevice.Get(), vkDevice);
 
 	// TODO - Delete me
 	g_device = m_device;
@@ -677,25 +677,25 @@ void GraphicsDevice::InitSurface()
 	surfaceCreateInfo.hwnd = m_hwnd;
 
 	VkSurfaceKHR vkSurface{ VK_NULL_HANDLE };
-	VkResult res = vkCreateWin32SurfaceKHR(*m_instance, &surfaceCreateInfo, nullptr, &vkSurface);
+	VkResult res = vkCreateWin32SurfaceKHR(m_instance->Get(), &surfaceCreateInfo, nullptr, &vkSurface);
 
 	if (res != VK_SUCCESS)
 	{
 		Utility::ExitFatal("Could not create surface!", "Fatal error");
 	}
-	m_surface = SurfaceRef::Create(m_instance, vkSurface);
+	m_surface = new UVkSurface(m_instance.Get(), vkSurface);
 
 	// Find a graphics queue that supports present
-	const auto& queueFamilyIndices = GetGraphicsPresentQueueFamilyIndices(*m_surface);
+	const auto& queueFamilyIndices = GetGraphicsPresentQueueFamilyIndices(m_surface->Get());
 	assert(!queueFamilyIndices.empty());
 
 	// Get list of supported surface formats
 	uint32_t formatCount;
-	ThrowIfFailed(vkGetPhysicalDeviceSurfaceFormatsKHR(*m_physicalDevice, *m_surface, &formatCount, nullptr));
+	ThrowIfFailed(vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice->Get(), m_surface->Get(), &formatCount, nullptr));
 	assert(formatCount > 0);
 
 	vector<VkSurfaceFormatKHR> surfaceFormats(formatCount);
-	ThrowIfFailed(vkGetPhysicalDeviceSurfaceFormatsKHR(*m_physicalDevice, *m_surface, &formatCount, surfaceFormats.data()));
+	ThrowIfFailed(vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice->Get(), m_surface->Get(), &formatCount, surfaceFormats.data()));
 
 	// If the surface format list only includes one entry with VK_FORMAT_UNDEFINED,
 	// there is no preferred format, so we assume VK_FORMAT_B8G8R8A8_UNORM
@@ -736,8 +736,8 @@ void GraphicsDevice::CreateSwapChain()
 {
 	auto oldSwapchain = m_swapchain;
 
-	VkPhysicalDevice physicalDevice = *m_physicalDevice;
-	VkSurfaceKHR surface = *m_surface;
+	VkPhysicalDevice physicalDevice = m_physicalDevice->Get();
+	VkSurfaceKHR surface = m_surface->Get();
 
 	// Get physical device surface properties and formats
 	VkSurfaceCapabilitiesKHR surfCaps;
@@ -847,7 +847,7 @@ void GraphicsDevice::CreateSwapChain()
 	VkSwapchainKHR oldsc = VK_NULL_HANDLE;
 	if (oldSwapchain)
 	{
-		oldsc = *oldSwapchain;
+		oldsc = oldSwapchain->Get();
 	}
 
 	VkSwapchainCreateInfoKHR createInfo = {};
@@ -871,21 +871,21 @@ void GraphicsDevice::CreateSwapChain()
 	createInfo.compositeAlpha = compositeAlpha;
 
 	VkSwapchainKHR vkSwapchain{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateSwapchainKHR(*m_device, &createInfo, nullptr, &vkSwapchain));
-	m_swapchain = SwapchainRef::Create(m_device, vkSwapchain);
+	ThrowIfFailed(vkCreateSwapchainKHR(m_device->Get(), &createInfo, nullptr, &vkSwapchain));
+	m_swapchain = new UVkSwapchain(m_device.Get(), vkSwapchain);
 
 	// Count actual swapchain images
 	uint32_t imageCount{ 0 };
-	ThrowIfFailed(vkGetSwapchainImagesKHR(*m_device, *m_swapchain, &imageCount, nullptr));
+	ThrowIfFailed(vkGetSwapchainImagesKHR(m_device->Get(), m_swapchain->Get(), &imageCount, nullptr));
 
 	// Get the swap chain images
 	vector<VkImage> images(imageCount);
-	ThrowIfFailed(vkGetSwapchainImagesKHR(*m_device, *m_swapchain, &imageCount, images.data()));
+	ThrowIfFailed(vkGetSwapchainImagesKHR(m_device->Get(), m_swapchain->Get(), &imageCount, images.data()));
 
 	m_swapchainImages.reserve(imageCount);
 	for (auto image : images)
 	{
-		m_swapchainImages.push_back(ImageRef::Create(m_device, image));
+		m_swapchainImages.push_back(new UVkImage(m_device.Get(), image));
 	}
 }
 
@@ -893,7 +893,7 @@ void GraphicsDevice::CreateSwapChain()
 uint32_t GraphicsDevice::AcquireNextImage()
 {
 	uint32_t nextImageIndex = 0u;
-	vkAcquireNextImageKHR(*m_device, *m_swapchain, UINT64_MAX, *m_imageAcquireSemaphore, VK_NULL_HANDLE, &nextImageIndex);
+	vkAcquireNextImageKHR(m_device->Get(), m_swapchain->Get(), UINT64_MAX, m_imageAcquireSemaphore->Get(), VK_NULL_HANDLE, &nextImageIndex);
 	return nextImageIndex;
 }
 
@@ -902,7 +902,7 @@ void GraphicsDevice::WaitForImageAcquisition(VkQueue queue)
 {
 	VkPipelineStageFlags waitFlag = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 
-	VkSemaphore waitSemaphore = *m_imageAcquireSemaphore;
+	VkSemaphore waitSemaphore = m_imageAcquireSemaphore->Get();
 
 	VkSubmitInfo submitInfo;
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -933,7 +933,7 @@ void GraphicsDevice::UnblockPresent(VkQueue queue, VkSemaphore timelineSemaphore
 
 	VkPipelineStageFlags waitFlag = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 
-	VkSemaphore signalSemaphore = *m_presentSemaphore;
+	VkSemaphore signalSemaphore = m_presentSemaphore->Get();
 
 	VkSubmitInfo submitInfo;
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -952,7 +952,7 @@ void GraphicsDevice::UnblockPresent(VkQueue queue, VkSemaphore timelineSemaphore
 
 void GraphicsDevice::GetPhysicalDeviceProperties()
 {
-	VkPhysicalDevice physicalDevice = *m_physicalDevice;
+	VkPhysicalDevice physicalDevice = m_physicalDevice->Get();
 
 	// Get device and memory properties
 	vkGetPhysicalDeviceProperties(physicalDevice, &m_physicalDeviceProperties);
@@ -983,7 +983,7 @@ void GraphicsDevice::GetPhysicalDeviceProperties()
 void GraphicsDevice::InitializeValidation()
 {
 #if USE_VALIDATION_LAYER
-	VkInstance instance = *m_instance;
+	VkInstance instance = m_instance->Get();
 
 	vkCmdBeginDebugUtilsLabel = reinterpret_cast<PFN_vkCmdBeginDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdBeginDebugUtilsLabelEXT"));
 	vkCmdEndDebugUtilsLabel = reinterpret_cast<PFN_vkCmdEndDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdEndDebugUtilsLabelEXT"));
@@ -1026,7 +1026,7 @@ void GraphicsDevice::InitializeValidation()
 	VkDebugUtilsMessengerEXT messenger{ VK_NULL_HANDLE };
 	ThrowIfFailed(vkCreateDebugUtilsMessenger(instance, &createInfo, nullptr, &messenger));
 
-	m_debugUtilsMessenger = DebugUtilsMessengerRef::Create(m_instance, messenger);
+	m_debugUtilsMessenger = new UVkDebugUtilsMessenger(m_instance.Get(), messenger);
 #endif
 
 #endif // USE_VALIDATION_LAYER
@@ -1529,7 +1529,7 @@ uint32_t GraphicsDevice::GetQueueFamilyIndex(VkQueueFlags queueFlags) const
 bool GraphicsDevice::GetSurfaceSupport(uint32_t index, VkSurfaceKHR surface) const
 {
 	VkBool32 supported = VK_FALSE;
-	ThrowIfFailed(vkGetPhysicalDeviceSurfaceSupportKHR(*m_physicalDevice, index, surface, &supported));
+	ThrowIfFailed(vkGetPhysicalDeviceSurfaceSupportKHR(m_physicalDevice->Get(), index, surface, &supported));
 	return supported == VK_TRUE;
 }
 
@@ -1564,7 +1564,7 @@ vector<uint32_t> GraphicsDevice::GetQueueFamilyIndices(VkQueueFlags queueFlags) 
 
 const DeviceHandle Kodiak::GetDevice()
 {
-	return *g_device.get();
+	return g_device->Get();
 }
 
 

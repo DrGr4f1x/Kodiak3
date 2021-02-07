@@ -22,7 +22,7 @@ class GpuImage
 public:
 
 protected:
-	std::shared_ptr<ImageRef>	m_image;
+	Microsoft::WRL::ComPtr<UVkImage> m_image;
 };
 
 } // namespace Kodiak

@@ -204,9 +204,6 @@
     <ClInclude Include="Graphics\VK\PlatformVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\VK\ReferenceVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\VK\ResourceSetVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
@@ -214,6 +211,9 @@
       <Filter>Graphics\VK</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\VK\UtilVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\RefCountingVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
   </ItemGroup>
@@ -387,9 +387,6 @@
     <ClCompile Include="Graphics\VK\QueryHeapVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\VK\ReferenceVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\VK\ResourceSetVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
@@ -403,6 +400,9 @@
       <Filter>Graphics\VK</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\VK\UtilVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\RefCountingVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
   </ItemGroup>

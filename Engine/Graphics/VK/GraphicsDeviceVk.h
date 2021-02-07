@@ -31,8 +31,8 @@ public:
 	void WaitForGpuIdle();
 
 	// Create methods
-	std::shared_ptr<SemaphoreRef> CreateSemaphore(VkSemaphoreType semaphoreType) const;
-	std::shared_ptr<AllocatorRef> CreateAllocator() const;
+	Microsoft::WRL::ComPtr<UVkSemaphore> CreateSemaphore(VkSemaphoreType semaphoreType) const;
+	Microsoft::WRL::ComPtr<UVmaAllocator> CreateAllocator() const;
 
 	Format GetColorFormat() const { return m_colorFormat; }
 	Format GetDepthFormat() const { return m_depthFormat; }
@@ -112,18 +112,18 @@ private:
 	PlatformData* m_platformData{ nullptr };
 
 	// Vulkan members (ref-counted)
-	std::shared_ptr<InstanceRef> m_instance;
-	std::shared_ptr<PhysicalDeviceRef> m_physicalDevice;
-	std::shared_ptr<DeviceRef> m_device;
-	std::shared_ptr<SemaphoreRef> m_imageAcquireSemaphore;
-	std::shared_ptr<SemaphoreRef> m_presentSemaphore;
-	std::shared_ptr<AllocatorRef> m_allocator;
-	std::shared_ptr<SurfaceRef> m_surface;
-	std::shared_ptr<SwapchainRef> m_swapchain;
-	std::shared_ptr<DebugUtilsMessengerRef> m_debugUtilsMessenger;
+	Microsoft::WRL::ComPtr<UVkInstance> m_instance;
+	Microsoft::WRL::ComPtr<UVkPhysicalDevice> m_physicalDevice;
+	Microsoft::WRL::ComPtr<UVkDevice> m_device;
+	Microsoft::WRL::ComPtr<UVkSemaphore> m_imageAcquireSemaphore;
+	Microsoft::WRL::ComPtr<UVkSemaphore> m_presentSemaphore;
+	Microsoft::WRL::ComPtr<UVmaAllocator> m_allocator;
+	Microsoft::WRL::ComPtr<UVkSurface> m_surface;
+	Microsoft::WRL::ComPtr<UVkSwapchain> m_swapchain;
+	Microsoft::WRL::ComPtr<UVkDebugUtilsMessenger> m_debugUtilsMessenger;
 
 	// Swapchain images
-	std::vector<std::shared_ptr<ImageRef>> m_swapchainImages;
+	std::vector<Microsoft::WRL::ComPtr<UVkImage>> m_swapchainImages;
 
 	// Physical devices, properties, and extensions
 
