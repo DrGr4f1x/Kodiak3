@@ -128,193 +128,6 @@ Microsoft::WRL::ComPtr<IDXGISwapChain3> CreateSwapChain(IDXGIFactory4* dxgiFacto
 namespace Kodiak
 {
 
-struct GraphicsDevice::PlatformData : public NonCopyable
-{
-	PlatformData() = default;
-	~PlatformData() { Destroy(); }
-
-	void EnableFeatures(bool optionalFeatures)
-	{
-		ReadCaps();
-
-		auto& requestedFeatures = optionalFeatures ? g_optionalFeatures : g_requiredFeatures;
-		auto& enabledFeatures = const_cast<GraphicsFeatureSet&>(g_enabledFeatures);
-
-		auto numFeatures = requestedFeatures.GetNumFeatures();
-		for (auto i = 0; i < numFeatures; ++i)
-		{
-			const auto& requestedFeature = requestedFeatures[i];
-			auto& enabledFeature = enabledFeatures[i];
-
-			if (!requestedFeature)
-				continue;
-
-			const string& name = requestedFeature.GetName();
-
-			switch (requestedFeature.GetFeature())
-			{
-			case GraphicsFeature::RobustBufferAccess:
-				enabledFeature = true;
-				break;
-			case GraphicsFeature::FullDrawIndexUint32:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel >= D3D_FEATURE_LEVEL_10_0);
-				break;
-			case GraphicsFeature::TextureCubeArray:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel >= D3D_FEATURE_LEVEL_10_1);
-				break;
-			case GraphicsFeature::IndependentBlend:
-				enabledFeature = true;
-				break;
-			case GraphicsFeature::GeometryShader:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel >= D3D_FEATURE_LEVEL_10_0);
-				break;
-			case GraphicsFeature::TessellationShader:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel >= D3D_FEATURE_LEVEL_11_0);
-				break;
-			case GraphicsFeature::SampleRateShading:
-			case GraphicsFeature::DualSrcBlend:
-			case GraphicsFeature::MultiDrawIndirect:
-				enabledFeature = true;
-				break;
-			case GraphicsFeature::LogicOp:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, dataOptions.OutputMergerLogicOp == TRUE);
-				break;
-			case GraphicsFeature::DrawIndirectFirstInstance:
-			case GraphicsFeature::DepthClamp:
-			case GraphicsFeature::DepthBiasClamp:
-			case GraphicsFeature::FillModeNonSolid:
-				enabledFeature = true;
-				break;
-			case GraphicsFeature::DepthBounds:
-				enabledFeature = TryEnableFeature(optionalFeatures,	name, dataOptions2.DepthBoundsTestSupported == TRUE);
-				break;
-			case GraphicsFeature::WideLines:
-			case GraphicsFeature::LargePoints:
-			case GraphicsFeature::AlphaToOne:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, false);
-				break;
-			case GraphicsFeature::MultiViewport:
-			case GraphicsFeature::SamplerAnisotropy:
-				enabledFeature = true;
-				break;
-			case GraphicsFeature::TextureCompressionETC2:
-			case GraphicsFeature::TextureCompressionASTC_LDR:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, false);
-				break;
-			case GraphicsFeature::TextureCompressionBC:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel >= D3D_FEATURE_LEVEL_11_0);
-				break;
-			case GraphicsFeature::OcclusionQueryPrecise:
-			case GraphicsFeature::PipelineStatisticsQuery:
-				enabledFeature = true;
-				break;
-			case GraphicsFeature::VertexPipelineStoresAndAtomics:
-			case GraphicsFeature::PixelShaderStoresAndAtomics:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, bestFeatureLevel > D3D_FEATURE_LEVEL_11_0);
-				break;
-			case GraphicsFeature::ShaderTessellationAndGeometryPointSize:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, false);
-				break;
-			case GraphicsFeature::ShaderTextureGatherExtended:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, bestShaderModel >= D3D_SHADER_MODEL_5_1);
-				break;
-			case GraphicsFeature::ShaderUAVExtendedFormats:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, dataOptions.TypedUAVLoadAdditionalFormats == TRUE);
-				break;
-			//case
-			case GraphicsFeature::ShaderClipDistance:
-			case GraphicsFeature::ShaderCullDistance:
-				enabledFeature = true;
-				break;
-			case GraphicsFeature::ShaderFloat64:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, dataOptions.DoublePrecisionFloatShaderOps == TRUE);
-				break;
-			case GraphicsFeature::ShaderFloat16:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, (dataOptions.MinPrecisionSupport & D3D12_SHADER_MIN_PRECISION_SUPPORT_16_BIT) != 0);
-				break;
-			case GraphicsFeature::ShaderInt64:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, dataOptions1.Int64ShaderOps == TRUE);
-				break;
-			case GraphicsFeature::ShaderInt16:
-				enabledFeature = TryEnableFeature(optionalFeatures, name, (dataOptions.MinPrecisionSupport & D3D12_SHADER_MIN_PRECISION_SUPPORT_16_BIT) != 0);
-				break;
-			case GraphicsFeature::ShaderInt8:
-				enabledFeature = false;
-				break;
-
-			case GraphicsFeature::VariableMultisampleRate:
-				enabledFeature = true;
-				break;
-			}
-		}
-	}
-
-	bool TryEnableFeature(bool optional, const string& name, bool supported)
-	{
-		if (!optional && !supported)
-		{
-			unsupportedRequiredFeatures.push_back(name);
-		}
-		return supported;
-	}
-
-	void ReadCaps()
-	{
-		if (capsRead)
-			return;
-
-		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &dataOptions, sizeof(dataOptions));
-		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS1, &dataOptions1, sizeof(dataOptions1));
-		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS2, &dataOptions2, sizeof(dataOptions2));
-		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS3, &dataOptions3, sizeof(dataOptions3));
-		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS4, &dataOptions4, sizeof(dataOptions4));
-		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &dataOptions5, sizeof(dataOptions5));
-		device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS6, &dataOptions6, sizeof(dataOptions6));
-
-		dataShaderModel.HighestShaderModel = bestShaderModel;
-		device->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &dataShaderModel, sizeof(dataShaderModel));
-		bestShaderModel = dataShaderModel.HighestShaderModel;
-
-		capsRead = true;
-	}
-
-	void Destroy()
-	{
-		swapChain = nullptr;
-
-#if defined(_DEBUG)
-		ID3D12DebugDevice* debugInterface;
-		if (SUCCEEDED(device->QueryInterface(&debugInterface)))
-		{
-			debugInterface->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
-			debugInterface->Release();
-		}
-#endif
-		
-		g_device = nullptr;
-		device = nullptr;
-	}
-
-	Microsoft::WRL::ComPtr<ID3D12Device> device;
-	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain;
-
-	D3D_FEATURE_LEVEL bestFeatureLevel{ D3D_FEATURE_LEVEL_11_0 };
-	D3D_SHADER_MODEL bestShaderModel{ D3D_SHADER_MODEL_6_5 };
-
-	bool capsRead{ false };
-	D3D12_FEATURE_DATA_D3D12_OPTIONS dataOptions;
-	D3D12_FEATURE_DATA_D3D12_OPTIONS1 dataOptions1;
-	D3D12_FEATURE_DATA_D3D12_OPTIONS2 dataOptions2;
-	D3D12_FEATURE_DATA_D3D12_OPTIONS3 dataOptions3;
-	D3D12_FEATURE_DATA_D3D12_OPTIONS4 dataOptions4;
-	D3D12_FEATURE_DATA_D3D12_OPTIONS5 dataOptions5;
-	D3D12_FEATURE_DATA_D3D12_OPTIONS6 dataOptions6;
-	D3D12_FEATURE_DATA_SHADER_MODEL dataShaderModel;
-
-	vector<string> unsupportedRequiredFeatures;
-};
-
-
 ID3D12Device* GetDevice()
 {
 	return g_device.Get();
@@ -329,8 +142,6 @@ GraphicsDevice::~GraphicsDevice() = default;
 
 void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND hWnd, uint32_t width, uint32_t height, Format colorFormat, Format depthFormat)
 {
-	assert(!m_platformData);
-
 	g_graphicsDevice = this;
 
 	m_appName = appName;
@@ -343,7 +154,7 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 	m_colorFormat = colorFormat;
 	m_depthFormat = depthFormat;
 
-	PlatformCreate();
+	Create();
 }
 
 
@@ -353,8 +164,9 @@ void GraphicsDevice::Destroy()
 
 	CommandContext::DestroyAllContexts();
 
-	// TODO - get rid of this
-	PlatformDestroy();
+	// Former PlatformDestroy
+	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Destroy();
+	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER].Destroy();
 
 	PSO::DestroyAll();
 	Shader::DestroyAll();
@@ -379,7 +191,19 @@ void GraphicsDevice::Destroy()
 
 	g_commandManager.Destroy();
 
-	PlatformDestroyData();
+	m_swapChain = nullptr;
+
+#if defined(_DEBUG)
+	ID3D12DebugDevice* debugInterface;
+	if (SUCCEEDED(m_device->QueryInterface(&debugInterface)))
+	{
+		debugInterface->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
+		debugInterface->Release();
+	}
+#endif
+
+	g_device = nullptr;
+	m_device = nullptr;
 
 	g_graphicsDevice = nullptr;
 }
@@ -387,7 +211,10 @@ void GraphicsDevice::Destroy()
 
 void GraphicsDevice::SubmitFrame()
 {
-	PlatformPresent();
+	UINT presentInterval = 0;
+	m_swapChain->Present(presentInterval, 0);
+
+	m_currentBuffer = m_swapChain->GetCurrentBackBufferIndex();
 
 	ReleaseDeferredResources();
 
@@ -408,10 +235,7 @@ HRESULT GraphicsDevice::CreateQueryHeap(QueryHeapType type, uint32_t queryCount,
 	desc.NodeMask = 0;
 	desc.Type = GetQueryHeapType(type);
 
-	// TODO This is what I want, after getting rid of PlatformData
-	//return m_device->CreateQueryHeap(&desc, IID_PPV_ARGS(ppHeap));
-
-	return GetDevice()->CreateQueryHeap(&desc, IID_PPV_ARGS(ppHeap));
+	return m_device->CreateQueryHeap(&desc, IID_PPV_ARGS(ppHeap));
 }
 
 
@@ -448,10 +272,8 @@ void GraphicsDevice::ReleaseDeferredResources()
 }
 
 
-void GraphicsDevice::PlatformCreate()
+void GraphicsDevice::Create()
 {
-	m_platformData = new PlatformData;
-
 #if _DEBUG
 	Microsoft::WRL::ComPtr<ID3D12Debug> debugInterface;
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface))))
@@ -503,7 +325,7 @@ void GraphicsDevice::PlatformCreate()
 					pAdapter->GetDesc1(&desc);
 					Utility::Printf(L"D3D12-capable hardware found:  %s (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
 					maxSize = desc.DedicatedVideoMemory;
-					m_platformData->bestFeatureLevel = featureLevels[i];
+					m_bestFeatureLevel = featureLevels[i];
 					m_deviceName = MakeStr(desc.Description);
 					break;
 				}
@@ -512,11 +334,11 @@ void GraphicsDevice::PlatformCreate()
 
 		if (maxSize > 0)
 		{
-			m_platformData->device = pDevice;
+			m_device = pDevice;
 		}
 	}
 
-	if (!m_platformData->device)
+	if (!m_device)
 	{
 		if (bUseWarpDriver)
 		{
@@ -528,8 +350,8 @@ void GraphicsDevice::PlatformCreate()
 		}
 
 		assert_succeeded(dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&pAdapter)));
-		assert_succeeded(D3D12CreateDevice(pAdapter.Get(), m_platformData->bestFeatureLevel, IID_PPV_ARGS(&pDevice)));
-		m_platformData->device = pDevice;
+		assert_succeeded(D3D12CreateDevice(pAdapter.Get(), m_bestFeatureLevel, IID_PPV_ARGS(&pDevice)));
+		m_device = pDevice;
 	}
 #ifndef _RELEASE
 	else
@@ -537,52 +359,52 @@ void GraphicsDevice::PlatformCreate()
 		// Prevent the GPU from overclocking or underclocking to get consistent timings
 		if (bIsDeveloperModeEnabled)
 		{
-			m_platformData->device->SetStablePowerState(TRUE);
+			m_device->SetStablePowerState(TRUE);
 		}
 	}
 #endif
 
-	m_platformData->EnableFeatures(false);
-	m_platformData->EnableFeatures(true);
+	EnableFeatures(false);
+	EnableFeatures(true);
 
 	// Report missing features and exit
-	if (!m_platformData->unsupportedRequiredFeatures.empty())
+	if (!m_unsupportedRequiredFeatures.empty())
 	{
 		string errMsg;
 		string errDetails;
-		if (m_platformData->unsupportedRequiredFeatures.size() > 1)
+		if (m_unsupportedRequiredFeatures.size() > 1)
 		{
 			errMsg = "Required Features Not Supported";
 			errDetails = "This Application requires:\n ";
-			for (size_t i = 0; i < m_platformData->unsupportedRequiredFeatures.size(); ++i)
-				errDetails += m_platformData->unsupportedRequiredFeatures[i] + "\n";
+			for (size_t i = 0; i < m_unsupportedRequiredFeatures.size(); ++i)
+				errDetails += m_unsupportedRequiredFeatures[i] + "\n";
 			errDetails += "\n, which are unavailable.  You may need to update your GPU or graphics driver";
 		}
 		else
 		{
 			errMsg = "Required Feature Not Supported";
-			errDetails = "This Application requires:\n " + m_platformData->unsupportedRequiredFeatures[0] + "\n, which is unavailable.  You may need to update your GPU or graphics driver";
+			errDetails = "This Application requires:\n " + m_unsupportedRequiredFeatures[0] + "\n, which is unavailable.  You may need to update your GPU or graphics driver";
 
 		}
 		ExitFatal(errMsg, errDetails);
 	}
 
-	g_device = m_platformData->device;
+	g_device = m_device;
 	
 	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Create("User Descriptor Heap, CBV_SRV_UAV");
 	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER].Create("User Descriptor Heap, SAMPLER");
 
-	ConfigureInfoQueue(m_platformData->device.Get());
+	ConfigureInfoQueue(m_device.Get());
 
 	g_commandManager.Create();
 
-	m_platformData->swapChain = CreateSwapChain(dxgiFactory.Get(), m_hwnd, m_width, m_height, m_colorFormat);
-	m_currentBuffer = m_platformData->swapChain->GetCurrentBackBufferIndex();
+	m_swapChain = CreateSwapChain(dxgiFactory.Get(), m_hwnd, m_width, m_height, m_colorFormat);
+	m_currentBuffer = m_swapChain->GetCurrentBackBufferIndex();
 
 	for (int i = 0; i < NumSwapChainBuffers; ++i)
 	{
 		Microsoft::WRL::ComPtr<ID3D12Resource> displayPlane;
-		assert_succeeded(m_platformData->swapChain->GetBuffer(i, IID_PPV_ARGS(&displayPlane)));
+		assert_succeeded(m_swapChain->GetBuffer(i, IID_PPV_ARGS(&displayPlane)));
 
 		ColorBufferPtr buffer = make_shared<ColorBuffer>();
 		buffer->CreateFromSwapChain("Primary SwapChain Buffer", displayPlane.Detach(), m_width, m_height, m_colorFormat);
@@ -592,24 +414,148 @@ void GraphicsDevice::PlatformCreate()
 }
 
 
-void GraphicsDevice::PlatformPresent()
+void GraphicsDevice::ReadCaps()
 {
-	UINT presentInterval = 0;
-	m_platformData->swapChain->Present(presentInterval, 0);
+	if (m_capsRead)
+		return;
 
-	m_currentBuffer = m_platformData->swapChain->GetCurrentBackBufferIndex();
+	m_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &m_dataOptions, sizeof(m_dataOptions));
+	m_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS1, &m_dataOptions1, sizeof(m_dataOptions1));
+	m_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS2, &m_dataOptions2, sizeof(m_dataOptions2));
+	m_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS3, &m_dataOptions3, sizeof(m_dataOptions3));
+	m_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS4, &m_dataOptions4, sizeof(m_dataOptions4));
+	m_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &m_dataOptions5, sizeof(m_dataOptions5));
+	m_device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS6, &m_dataOptions6, sizeof(m_dataOptions6));
+
+	m_dataShaderModel.HighestShaderModel = m_bestShaderModel;
+	m_device->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &m_dataShaderModel, sizeof(m_dataShaderModel));
+	m_bestShaderModel = m_dataShaderModel.HighestShaderModel;
+
+	m_capsRead = true;
 }
 
 
-void GraphicsDevice::PlatformDestroyData()
+void GraphicsDevice::EnableFeatures(bool optionalFeatures)
 {
-	delete m_platformData;
-	m_platformData = nullptr;
+	ReadCaps();
+
+	auto& requestedFeatures = optionalFeatures ? g_optionalFeatures : g_requiredFeatures;
+	auto& enabledFeatures = const_cast<GraphicsFeatureSet&>(g_enabledFeatures);
+
+	auto numFeatures = requestedFeatures.GetNumFeatures();
+	for (auto i = 0; i < numFeatures; ++i)
+	{
+		const auto& requestedFeature = requestedFeatures[i];
+		auto& enabledFeature = enabledFeatures[i];
+
+		if (!requestedFeature)
+			continue;
+
+		const string& name = requestedFeature.GetName();
+
+		switch (requestedFeature.GetFeature())
+		{
+		case GraphicsFeature::RobustBufferAccess:
+			enabledFeature = true;
+			break;
+		case GraphicsFeature::FullDrawIndexUint32:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, m_bestFeatureLevel >= D3D_FEATURE_LEVEL_10_0);
+			break;
+		case GraphicsFeature::TextureCubeArray:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, m_bestFeatureLevel >= D3D_FEATURE_LEVEL_10_1);
+			break;
+		case GraphicsFeature::IndependentBlend:
+			enabledFeature = true;
+			break;
+		case GraphicsFeature::GeometryShader:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, m_bestFeatureLevel >= D3D_FEATURE_LEVEL_10_0);
+			break;
+		case GraphicsFeature::TessellationShader:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, m_bestFeatureLevel >= D3D_FEATURE_LEVEL_11_0);
+			break;
+		case GraphicsFeature::SampleRateShading:
+		case GraphicsFeature::DualSrcBlend:
+		case GraphicsFeature::MultiDrawIndirect:
+			enabledFeature = true;
+			break;
+		case GraphicsFeature::LogicOp:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, m_dataOptions.OutputMergerLogicOp == TRUE);
+			break;
+		case GraphicsFeature::DrawIndirectFirstInstance:
+		case GraphicsFeature::DepthClamp:
+		case GraphicsFeature::DepthBiasClamp:
+		case GraphicsFeature::FillModeNonSolid:
+			enabledFeature = true;
+			break;
+		case GraphicsFeature::DepthBounds:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, m_dataOptions2.DepthBoundsTestSupported == TRUE);
+			break;
+		case GraphicsFeature::WideLines:
+		case GraphicsFeature::LargePoints:
+		case GraphicsFeature::AlphaToOne:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, false);
+			break;
+		case GraphicsFeature::MultiViewport:
+		case GraphicsFeature::SamplerAnisotropy:
+			enabledFeature = true;
+			break;
+		case GraphicsFeature::TextureCompressionETC2:
+		case GraphicsFeature::TextureCompressionASTC_LDR:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, false);
+			break;
+		case GraphicsFeature::TextureCompressionBC:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, m_bestFeatureLevel >= D3D_FEATURE_LEVEL_11_0);
+			break;
+		case GraphicsFeature::OcclusionQueryPrecise:
+		case GraphicsFeature::PipelineStatisticsQuery:
+			enabledFeature = true;
+			break;
+		case GraphicsFeature::VertexPipelineStoresAndAtomics:
+		case GraphicsFeature::PixelShaderStoresAndAtomics:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, m_bestFeatureLevel > D3D_FEATURE_LEVEL_11_0);
+			break;
+		case GraphicsFeature::ShaderTessellationAndGeometryPointSize:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, false);
+			break;
+		case GraphicsFeature::ShaderTextureGatherExtended:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, m_bestShaderModel >= D3D_SHADER_MODEL_5_1);
+			break;
+		case GraphicsFeature::ShaderUAVExtendedFormats:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, m_dataOptions.TypedUAVLoadAdditionalFormats == TRUE);
+			break;
+			//case
+		case GraphicsFeature::ShaderClipDistance:
+		case GraphicsFeature::ShaderCullDistance:
+			enabledFeature = true;
+			break;
+		case GraphicsFeature::ShaderFloat64:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, m_dataOptions.DoublePrecisionFloatShaderOps == TRUE);
+			break;
+		case GraphicsFeature::ShaderFloat16:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, (m_dataOptions.MinPrecisionSupport & D3D12_SHADER_MIN_PRECISION_SUPPORT_16_BIT) != 0);
+			break;
+		case GraphicsFeature::ShaderInt64:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, m_dataOptions1.Int64ShaderOps == TRUE);
+			break;
+		case GraphicsFeature::ShaderInt16:
+			enabledFeature = TryEnableFeature(optionalFeatures, name, (m_dataOptions.MinPrecisionSupport & D3D12_SHADER_MIN_PRECISION_SUPPORT_16_BIT) != 0);
+			break;
+		case GraphicsFeature::ShaderInt8:
+			enabledFeature = false;
+			break;
+
+		case GraphicsFeature::VariableMultisampleRate:
+			enabledFeature = true;
+			break;
+		}
+	}
 }
 
-
-void GraphicsDevice::PlatformDestroy()
+bool GraphicsDevice::TryEnableFeature(bool optional, const string& name, bool supported)
 {
-	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Destroy();
-	g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER].Destroy();
+	if (!optional && !supported)
+	{
+		m_unsupportedRequiredFeatures.push_back(name);
+	}
+	return supported;
 }

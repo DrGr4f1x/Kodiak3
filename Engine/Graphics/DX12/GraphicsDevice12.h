@@ -48,12 +48,13 @@ public:
 private:
 	void ReleaseDeferredResources();
 
-	// Platform-specific methods
-	void PlatformCreate();
-	void PlatformPresent();
-	void PlatformDestroyData();
-	// TODO - Get rid of this
-	void PlatformDestroy();
+	// Create the device, swapchain, etc.
+	void Create();
+
+	// Feature support
+	void ReadCaps();
+	void EnableFeatures(bool optionalFeatures);
+	bool TryEnableFeature(bool optional, const std::string& name, bool supported);
 
 private:
 	std::string m_appName;
@@ -82,9 +83,24 @@ private:
 	};
 	std::list<DeferredReleaseResource> m_deferredResources;
 
-	// Platform-specific implementation
-	struct PlatformData;
-	PlatformData* m_platformData{ nullptr };
+	// DirectX 12 members
+	Microsoft::WRL::ComPtr<ID3D12Device> m_device;
+	Microsoft::WRL::ComPtr<IDXGISwapChain3> m_swapChain;
+
+	D3D_FEATURE_LEVEL m_bestFeatureLevel{ D3D_FEATURE_LEVEL_11_0 };
+	D3D_SHADER_MODEL m_bestShaderModel{ D3D_SHADER_MODEL_6_5 };
+
+	bool m_capsRead{ false };
+	D3D12_FEATURE_DATA_D3D12_OPTIONS m_dataOptions;
+	D3D12_FEATURE_DATA_D3D12_OPTIONS1 m_dataOptions1;
+	D3D12_FEATURE_DATA_D3D12_OPTIONS2 m_dataOptions2;
+	D3D12_FEATURE_DATA_D3D12_OPTIONS3 m_dataOptions3;
+	D3D12_FEATURE_DATA_D3D12_OPTIONS4 m_dataOptions4;
+	D3D12_FEATURE_DATA_D3D12_OPTIONS5 m_dataOptions5;
+	D3D12_FEATURE_DATA_D3D12_OPTIONS6 m_dataOptions6;
+	D3D12_FEATURE_DATA_SHADER_MODEL m_dataShaderModel;
+
+	std::vector<std::string> m_unsupportedRequiredFeatures;
 };
 
 extern GraphicsDevice* g_graphicsDevice;
