@@ -10,15 +10,73 @@
 
 #include "Stdafx.h"
 
-#include "Graphics\DepthBuffer.h"
+#include "DepthBufferVk.h"
 
-#include "Graphics\GraphicsDevice.h"
-
+#include "GraphicsDeviceVk.h"
 #include "UtilVk.h"
 
 
 using namespace Kodiak;
 using namespace std;
+
+
+DepthBuffer::DepthBuffer(float clearDepth, uint8_t clearStencil)
+	: m_clearDepth(clearDepth)
+	, m_clearStencil(clearStencil)
+{}
+
+
+DepthBuffer::~DepthBuffer()
+{
+	g_graphicsDevice->ReleaseResource(m_resource);
+}
+
+
+void DepthBuffer::CreateDerivedViews()
+{
+	DepthStencilViewDesc dsvDesc = {};
+	dsvDesc.format = m_format;
+	dsvDesc.readOnlyDepth = false;
+	dsvDesc.readOnlyStencil = false;
+
+	m_dsv[0].Create(m_resource, dsvDesc);
+
+	dsvDesc.readOnlyDepth = true;
+	m_dsv[1].Create(m_resource, dsvDesc);
+
+	const bool hasStencil = IsStencilFormat(m_format);
+
+	if (hasStencil)
+	{
+		dsvDesc.readOnlyDepth = false;
+		dsvDesc.readOnlyStencil = true;
+		m_dsv[2].Create(m_resource, dsvDesc);
+
+		dsvDesc.readOnlyDepth = true;
+		m_dsv[3].Create(m_resource, dsvDesc);
+	}
+	else
+	{
+		m_dsv[2] = m_dsv[0];
+		m_dsv[3] = m_dsv[1];
+	}
+
+	TextureViewDesc srvDesc = {};
+	srvDesc.format = m_format;
+	srvDesc.usage = ResourceState::ShaderResource;
+	srvDesc.arraySize = 1;
+	srvDesc.mipCount = 1;
+	srvDesc.isDepth = true;
+
+	m_depthSRV.Create(m_resource, m_type, srvDesc);
+
+	if (hasStencil)
+	{
+		srvDesc.isDepth = false;
+		srvDesc.isStencil = true;
+		m_stencilSRV.Create(m_resource, m_type, srvDesc);
+	}
+}
 
 
 void DepthBuffer::Create(const string& name, uint32_t width, uint32_t height, Format format)

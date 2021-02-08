@@ -335,6 +335,7 @@
     <ClInclude Include="Graphics\dds.h" />
     <ClInclude Include="Graphics\DepthBuffer.h" />
     <ClInclude Include="Graphics\DescriptorHeap.h" />
+    <ClInclude Include="Graphics\DX12\ColorBuffer12.h" />
     <ClInclude Include="Graphics\DX12\CommandAllocatorPool12.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
@@ -355,6 +356,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Graphics\DX12\DepthBuffer12.h" />
     <ClInclude Include="Graphics\DX12\DescriptorHeap12.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
@@ -432,6 +434,7 @@
     <ClInclude Include="Graphics\Shader.h" />
     <ClInclude Include="Graphics\Texture.h" />
     <ClInclude Include="Graphics\UIOverlay.h" />
+    <ClInclude Include="Graphics\VK\ColorBufferVk.h" />
     <ClInclude Include="Graphics\VK\CommandBufferPoolVk.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
@@ -452,6 +455,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Graphics\VK\DepthBufferVk.h" />
     <ClInclude Include="Graphics\VK\DescriptorHeapVk.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">true</ExcludedFromBuild>
@@ -549,9 +553,7 @@
     </ClCompile>
     <ClCompile Include="Filesystem.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
-    <ClCompile Include="Graphics\ColorBuffer.cpp" />
     <ClCompile Include="Graphics\CommonStates.cpp" />
-    <ClCompile Include="Graphics\DepthBuffer.cpp" />
     <ClCompile Include="Graphics\DX12\ColorBuffer12.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">true</ExcludedFromBuild>
