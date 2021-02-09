@@ -33,10 +33,7 @@ void SmokeSimApp::Startup()
 
 	LoadAssets();
 	Vector3 center = m_model->GetBoundingBox().GetCenter();
-	float temp = center.GetY();
-	center.SetY(center.GetZ());
-	center.SetZ(temp);
-
+	
 	m_camera.SetPerspectiveMatrix(
 		XMConvertToRadians(60.0f),
 		(float)m_displayHeight / (float)m_displayWidth,
@@ -47,11 +44,6 @@ void SmokeSimApp::Startup()
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);
 	m_controller.SetOrbitTarget(center, Length(m_camera.GetPosition()), 4.0f);
-
-	Vector4 yAxis = m_modelMatrix.GetY();
-	Vector4 zAxis = m_modelMatrix.GetZ();
-	m_modelMatrix.SetY(zAxis);
-	m_modelMatrix.SetZ(yAxis);
 
 	InitRootSigs();
 	InitPSOs();
