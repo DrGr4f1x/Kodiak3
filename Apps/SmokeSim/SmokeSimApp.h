@@ -13,6 +13,7 @@
 #include "Application.h"
 #include "CameraController.h"
 #include "Graphics\GpuBuffer.h"
+#include "Graphics\Model.h"
 #include "Graphics\PipelineState.h"
 #include "Graphics\ResourceSet.h"
 #include "Graphics\RootSignature.h"
@@ -34,6 +35,40 @@ public:
 	void Render() final;
 
 private:
+	void InitRootSigs();
+	void InitPSOs();
+	void InitConstantBuffer();
+	void InitResourceSets();
+
+	void UpdateConstantBuffer();
+
+	void LoadAssets();
+
+private:
+	struct Vertex
+	{
+		float position[3];
+		float normal[3];
+		float uv[2];
+	};
+
+	struct Constants
+	{
+		Math::Matrix4 projectionMatrix;
+		Math::Matrix4 modelMatrix;
+	};
+
+	Kodiak::RootSignature		m_meshRootSig;
+	Kodiak::GraphicsPSO			m_meshPSO;
+
+	Kodiak::ConstantBuffer		m_constantBuffer;
+	Constants					m_constants;
+
+	Kodiak::ResourceSet			m_meshResources;
+
+	Kodiak::ModelPtr			m_model;
+	Math::Matrix4				m_modelMatrix{ Math::kIdentity };
+
 	// Camera controls
-	Kodiak::CameraController m_controller;
+	Kodiak::CameraController	m_controller;
 };

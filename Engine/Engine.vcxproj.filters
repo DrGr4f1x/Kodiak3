@@ -258,6 +258,9 @@
     <ClInclude Include="Graphics\DX12\GpuBuffer12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
+    <ClInclude Include="Math\BoundingBox.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />

@@ -17,4 +17,12 @@
       <UniqueIdentifier>{fe15a31a-0115-48b5-846c-84558a3bbda9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Shaders\MeshVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\MeshPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+  </ItemGroup>
 </Project>

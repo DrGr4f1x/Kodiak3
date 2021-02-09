@@ -27,6 +27,13 @@ using namespace std;
 namespace
 {
 const int s_defaultFlags = aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_PreTransformVertices | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals;
+
+void UpdateExtents(Math::Vector3& minExtents, Math::Vector3& maxExtents, const Math::Vector3& pos)
+{
+	minExtents = Math::Min(minExtents, pos);
+	maxExtents = Math::Max(maxExtents, pos);
+}
+
 } // anonymous namespace
 
 
@@ -52,6 +59,11 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 
 	vector<float> vertexData;
 	vector<uint32_t> indexData;
+
+	// Min/max for bounding box computation
+	float maxF = std::numeric_limits<float>::max();
+	Math::Vector3 minExtents(maxF, maxF, maxF);
+	Math::Vector3 maxExtents(-maxF, -maxF, -maxF);
 
 	for (uint32_t i = 0; i < aiScene->mNumMeshes; ++i)
 	{
@@ -81,6 +93,7 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 					vertexData.push_back(pos->x * scale);
 					vertexData.push_back(pos->y * scale);  // TODO: Is this a hack?
 					vertexData.push_back(pos->z * scale);
+					UpdateExtents(minExtents, maxExtents, scale * Math::Vector3(pos->x, pos->y, pos->z));
 					break;
 				case VertexComponent::Normal:
 					vertexData.push_back(normal->x);
@@ -139,6 +152,7 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 	uint32_t stride = layout.ComputeStride();
 	model->m_vertexBuffer.Create("Model|VertexBuffer", sizeof(float) * vertexData.size() / stride, stride, false, vertexData.data());
 	model->m_indexBuffer.Create("Model|IndexBuffer", indexData.size(), sizeof(uint32_t), false, indexData.data());
+	model->m_boundingBox = Math::BoundingBoxFromMinMax(minExtents, maxExtents);
 
 	return model;
 }

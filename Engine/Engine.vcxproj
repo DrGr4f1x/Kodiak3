@@ -527,6 +527,7 @@
     <ClInclude Include="Hash.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="Math\BoundingBox.h" />
     <ClInclude Include="Math\BoundingPlane.h" />
     <ClInclude Include="Math\BoundingSphere.h" />
     <ClInclude Include="Math\CommonMath.h" />

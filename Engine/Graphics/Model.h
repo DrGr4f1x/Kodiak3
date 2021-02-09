@@ -10,7 +10,10 @@
 
 #pragma once
 
+
 #include "Graphics\GpuBuffer.h"
+#include "Math\BoundingBox.h"
+
 
 namespace Kodiak
 {
@@ -30,7 +33,7 @@ enum class VertexComponent
 
 struct VertexLayout
 {
-	VertexLayout(const std::vector<VertexComponent>& components) : components(std::move(components))
+	VertexLayout(const std::vector<VertexComponent>& components) : components(components)
 	{}
 
 	uint32_t ComputeStride() const
@@ -81,9 +84,13 @@ public:
 	const VertexBuffer& GetVertexBuffer() const { return m_vertexBuffer; }
 	const IndexBuffer& GetIndexBuffer() const { return m_indexBuffer; }
 
+	const Math::BoundingBox& GetBoundingBox() const { return m_boundingBox; }
+
 protected:
 	VertexBuffer m_vertexBuffer;
 	IndexBuffer m_indexBuffer;
+
+	Math::BoundingBox m_boundingBox;
 
 	std::vector<ModelPart> m_parts;
 };
