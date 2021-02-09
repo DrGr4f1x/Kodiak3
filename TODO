@@ -21,6 +21,8 @@ Cleanup both GraphicsDevices to explicitly support 2 roles
 Refactor command context recycling to use fences explicitly
 Refactor/replace math library
 Add logging to shader compiler
+Make a few basic shaders for meshes that can be re-used.
+Camera focus on bounding box, bounding sphere
 
 Vulkan refactor
 Replace HandleVk with RefCountingVk
