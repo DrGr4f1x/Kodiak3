@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "Math\Vector.h"
+#include "VectorMath.h"
 
 namespace Math
 {

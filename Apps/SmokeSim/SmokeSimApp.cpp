@@ -40,6 +40,7 @@ void SmokeSimApp::Startup()
 		0.001f,
 		256.0f);
 	m_camera.SetPosition(Math::Vector3(-3.38f, 0.0f, -7.25f));
+	m_camera.Focus(m_model->GetBoundingBox());
 
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);

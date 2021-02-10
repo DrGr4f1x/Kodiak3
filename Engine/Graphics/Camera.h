@@ -14,6 +14,8 @@
 #pragma once
 
 #include "VectorMath.h"
+#include "Math/BoundingBox.h"
+#include "Math/BoundingSphere.h"
 #include "Math/Frustum.h"
 
 namespace Math
@@ -35,7 +37,7 @@ public:
 	void SetPosition(Vector3 worldPos);
 	void SetTransform(const AffineTransform& xform);
 	void SetZoomRotation(float zoom, float rotX, float rotY, float rotZ);
-
+	
 	const Quaternion GetRotation() const { return m_cameraToWorld.GetRotation(); }
 	const Vector3 GetRightVec() const { return m_basis.GetX(); }
 	const Vector3 GetUpVec() const { return m_basis.GetY(); }
@@ -102,6 +104,9 @@ public:
 	void SetAspectRatio(float heightOverWidth) { m_aspectRatio = heightOverWidth; UpdateProjMatrix(); }
 	void SetZRange(float nearZ, float farZ) { m_nearClip = nearZ; m_farClip = farZ; UpdateProjMatrix(); }
 	void ReverseZ(bool enable) { m_reverseZ = enable; UpdateProjMatrix(); }
+
+	void Focus(const BoundingBox& sphere, bool adjustPosition = true);
+	void Focus(const BoundingSphere& sphere, bool adjustPosition = true);
 
 	float GetFOV() const { return m_verticalFOV; }
 	float GetNearClip() const { return m_nearClip; }

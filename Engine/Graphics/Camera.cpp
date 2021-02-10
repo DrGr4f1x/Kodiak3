@@ -76,6 +76,35 @@ void BaseCamera::Update()
 }
 
 
+void Camera::Focus(const BoundingBox& box, bool adjustPosition)
+{
+	Focus(BoundingSphere(box), adjustPosition);
+}
+
+
+void Camera::Focus(const BoundingSphere& sphere, bool adjustPosition)
+{
+	m_vulkanCompatMode = false;
+
+	const float margin = 1.1f;
+
+	Vector3 direction = sphere.GetCenter() - GetPosition();
+	SetLookDirection(direction, GetUpVec());
+
+	if (adjustPosition)
+	{
+		float radius = sphere.GetRadius();
+		float minDistance = (radius * margin) / (sinf(GetFOV() * 0.5f));
+
+		Vector3 position = -minDistance * GetForwardVec();
+
+		SetPosition(position);
+	}
+
+	Update();
+}
+
+
 void Camera::UpdateProjMatrix()
 {
 	float Y = 1.0f / std::tanf(m_verticalFOV * 0.5f);

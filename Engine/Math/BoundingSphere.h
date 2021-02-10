@@ -13,7 +13,10 @@
 
 #pragma once
 
+
 #include "VectorMath.h"
+#include "Math\BoundingBox.h"
+
 
 namespace Math
 {
@@ -24,6 +27,7 @@ public:
 	BoundingSphere() {}
 	BoundingSphere(Vector3 center, Scalar radius);
 	explicit BoundingSphere(Vector4 sphere);
+	explicit BoundingSphere(const BoundingBox& box);
 
 	Vector3 GetCenter() const;
 	Scalar GetRadius() const;
@@ -47,6 +51,13 @@ inline BoundingSphere::BoundingSphere(Vector3 center, Scalar radius)
 inline BoundingSphere::BoundingSphere(Vector4 sphere)
 	: m_repr(sphere)
 {}
+
+
+inline BoundingSphere::BoundingSphere(const BoundingBox& box)
+{
+	m_repr = Vector4(box.GetCenter());
+	m_repr.SetW(Length(box.GetExtents()));
+}
 
 
 inline Vector3 BoundingSphere::GetCenter(void) const
