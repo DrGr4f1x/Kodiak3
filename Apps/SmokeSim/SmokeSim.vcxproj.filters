@@ -4,13 +4,18 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Stdafx.cpp" />
     <ClCompile Include="SmokeSimApp.cpp" />
+    <ClCompile Include="FluidEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="SmokeSimApp.h" />
+    <ClInclude Include="FluidEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Shaders\Fluids.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
@@ -24,5 +29,32 @@
     <CustomBuild Include="Shaders\MeshPS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
+    <CustomBuild Include="Shaders\GridVS.hlsl" />
+    <CustomBuild Include="Shaders\ArrayGS.hlsl" />
+    <CustomBuild Include="Shaders\ArrayLineGS.hlsl" />
+    <CustomBuild Include="Shaders\AdvectBFECCPS.hlsl" />
+    <CustomBuild Include="Shaders\AdvectPS.hlsl" />
+    <CustomBuild Include="Shaders\AdvectVelPS.hlsl" />
+    <CustomBuild Include="Shaders\VorticityPS.hlsl" />
+    <CustomBuild Include="Shaders\ConfinementPS.hlsl" />
+    <CustomBuild Include="Shaders\DivergencePS.hlsl" />
+    <CustomBuild Include="Shaders\JacobiPS.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\ProjectPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\GaussianPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\DrawTexturePS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\DrawWhitePS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\DrawBoxPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

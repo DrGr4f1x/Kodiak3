@@ -432,7 +432,7 @@ namespace ShaderCompiler
             m_cmdString += " ";
             m_cmdString += m_inputFile;
 
-            //System.Console.WriteLine("Full command: {0} {1}", GetShaderCompilerStr(), m_cmdString);
+            System.Console.WriteLine("Full command: {0} {1}", GetShaderCompilerStr(), m_cmdString);
         }
 
         public int Execute()
@@ -483,6 +483,13 @@ namespace ShaderCompiler
 
         static int Main(string[] args)
         {
+            string commandline = "";
+            for (int i = 0; i < args.Length; ++i)
+            {
+                commandline += args[i] + " ";
+            }
+            Console.WriteLine(commandline);
+
             var rootCommand = new RootCommand 
             { 
                 new Option("--compiler", "Compiler name string (dxc, fxc, glslc)") { Argument = new Argument<string>() },
