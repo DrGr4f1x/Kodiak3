@@ -29,11 +29,6 @@
     <CustomBuild Include="Shaders\MeshPS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\ProjectPS.hlsl" />
-    <CustomBuild Include="Shaders\GaussianPS.hlsl" />
-    <CustomBuild Include="Shaders\DrawTexturePS.hlsl" />
-    <CustomBuild Include="Shaders\DrawWhitePS.hlsl" />
-    <CustomBuild Include="Shaders\DrawBoxPS.hlsl" />
     <CustomBuild Include="Shaders\AdvectBFECCPS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
@@ -62,6 +57,21 @@
       <Filter>Shaders</Filter>
     </CustomBuild>
     <CustomBuild Include="Shaders\VorticityPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ProjectPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\DrawBoxPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\DrawTexturePS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\DrawWhitePS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\GaussianPS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
   </ItemGroup>

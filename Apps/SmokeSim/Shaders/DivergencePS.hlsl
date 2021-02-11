@@ -13,12 +13,12 @@
 
 float4 main(GSToPSData input) : SV_TARGET
 {
-    float4 fieldL = VelocityTex1.SampleLevel(PointClampSampler, LEFTCELL, 0);
-    float4 fieldR = VelocityTex1.SampleLevel(PointClampSampler, RIGHTCELL, 0);
-    float4 fieldB = VelocityTex1.SampleLevel(PointClampSampler, BOTTOMCELL, 0);
-    float4 fieldT = VelocityTex1.SampleLevel(PointClampSampler, TOPCELL, 0);
-    float4 fieldD = VelocityTex1.SampleLevel(PointClampSampler, DOWNCELL, 0);
-    float4 fieldU = VelocityTex1.SampleLevel(PointClampSampler, UPCELL, 0);
+    float3 fieldL = VelocityTex1.SampleLevel(PointClampSampler, LEFTCELL, 0).xyz;
+    float3 fieldR = VelocityTex1.SampleLevel(PointClampSampler, RIGHTCELL, 0).xyz;
+    float3 fieldB = VelocityTex1.SampleLevel(PointClampSampler, BOTTOMCELL, 0).xyz;
+    float3 fieldT = VelocityTex1.SampleLevel(PointClampSampler, TOPCELL, 0).xyz;
+    float3 fieldD = VelocityTex1.SampleLevel(PointClampSampler, DOWNCELL, 0).xyz;
+    float3 fieldU = VelocityTex1.SampleLevel(PointClampSampler, UPCELL, 0).xyz;
 
     if (IsBoundaryCell(LEFTCELL))  fieldL = GetObstVelocity(LEFTCELL);
     if (IsBoundaryCell(RIGHTCELL)) fieldR = GetObstVelocity(RIGHTCELL);

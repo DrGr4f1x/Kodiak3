@@ -79,9 +79,9 @@ SamplerState LinearSampler;
 #define UPCELL      float3 (input.uvw.x, input.uvw.y, input.DU.y)
 
 
-float4 GetObstVelocity(float3 cellTexCoords)
+float3 GetObstVelocity(float3 cellTexCoords)
 {
-    return ObstVelocityTex.SampleLevel(PointClampSampler, cellTexCoords, 0);
+    return ObstVelocityTex.SampleLevel(PointClampSampler, cellTexCoords, 0).xyz;
 }
 
 

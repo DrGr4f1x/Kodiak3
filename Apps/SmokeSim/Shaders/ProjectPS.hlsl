@@ -14,7 +14,7 @@
 float4 main(GSToPSData input) : SV_TARGET
 {
     if (IsBoundaryCell(input.uvw))
-        return GetObstVelocity(input.uvw);
+        return float4(GetObstVelocity(input.uvw), 0.0);
 
     float pCenter = PressureTex.SampleLevel(PointClampSampler, input.uvw, 0).r;
     float pL = PressureTex.SampleLevel(PointClampSampler, LEFTCELL, 0).r;

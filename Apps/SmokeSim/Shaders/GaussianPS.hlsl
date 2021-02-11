@@ -18,7 +18,7 @@ float4 main(GSToPSData input) : SV_TARGET
 
     float dist = length(input.cell0 - center) * size;
     float4 result;
-    result.rgb = splatColor;    // + sin(splatColor.rgb*10.0+cell*5.0)*0.2;
+    result.rgb = splatColor.rgb;    // + sin(splatColor.rgb*10.0+cell*5.0)*0.2;
     result.a = exp(-dist * dist);
 
     return result;
