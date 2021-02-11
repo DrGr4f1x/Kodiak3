@@ -10,10 +10,9 @@
 
 #include "Stdafx.h"
 
-#include "Graphics\Framebuffer.h"
+#include "FramebufferVk.h"
 
-#include "Graphics\GraphicsDevice.h"
-
+#include "GraphicsDeviceVk.h"
 #include "UtilVk.h"
 
 

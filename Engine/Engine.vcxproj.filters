@@ -261,6 +261,12 @@
     <ClInclude Include="Math\BoundingBox.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\VK\FramebufferVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\Framebuffer12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
