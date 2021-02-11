@@ -483,13 +483,27 @@ namespace ShaderCompiler
         private void StdErrorHandler(object sender, DataReceivedEventArgs args)
         {
             string message = args.Data;
-            m_shaderCompError += message + "\n";
+            
+            if (message == null)
+                return;
+
+            if (message.Length > 0 && !message.Contains("warning: DXIL.dll not found."))
+            {
+                m_shaderCompError += message + "\n";
+            }
         }
 
         private void StdOutputHandler(object sender, DataReceivedEventArgs args)
         {
             string message = args.Data;
-            m_shaderCompOutput += message + "\n";
+
+            if (message == null)
+                return;
+
+            if (message.Length > 0)
+            {
+                m_shaderCompOutput += message + "\n";
+            }
         }
 
         static int Run(string compiler, string shader_stage, string profile, bool spirv, DirectoryInfo output_dir, DirectoryInfo[] include_paths, FileInfo input_file)
