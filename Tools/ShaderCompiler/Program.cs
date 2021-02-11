@@ -445,6 +445,8 @@ namespace ShaderCompiler
             processInfo.CreateNoWindow = true;
             processInfo.WorkingDirectory = fileInfo.FullName;
             processInfo.Arguments = m_cmdString;
+            processInfo.RedirectStandardError = true;
+            processInfo.RedirectStandardOutput = true;
 
             //System.Console.WriteLine("Working Dir {0}", processInfo.WorkingDirectory);
 
@@ -453,6 +455,10 @@ namespace ShaderCompiler
 
             var process = System.Diagnostics.Process.Start(processInfo);
             process.WaitForExit();
+
+            StreamReader errStreamReader = process.StandardError;
+            Console.WriteLine(errStreamReader.ReadLine());
+
             return process.ExitCode;
         }
 
