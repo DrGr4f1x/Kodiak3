@@ -70,6 +70,8 @@ namespace ShaderCompiler
         private string m_inputFile = "";
         private List<string> m_includePaths = new List<string>();
         private string m_cmdString = "";
+        private string m_shaderCompError = "";
+        private string m_shaderCompOutput = "";
 
         private bool IsDirectXCompile()
         {
@@ -432,7 +434,7 @@ namespace ShaderCompiler
             m_cmdString += " ";
             m_cmdString += m_inputFile;
 
-            System.Console.WriteLine("Full command: {0} {1}", GetShaderCompilerStr(), m_cmdString);
+            //System.Console.WriteLine("Full command: {0} {1}", GetShaderCompilerStr(), m_cmdString);
         }
 
         public int Execute()
@@ -447,19 +449,47 @@ namespace ShaderCompiler
             processInfo.Arguments = m_cmdString;
             processInfo.RedirectStandardError = true;
             processInfo.RedirectStandardOutput = true;
+            processInfo.UseShellExecute = false;
 
-            //System.Console.WriteLine("Working Dir {0}", processInfo.WorkingDirectory);
+            var process = new System.Diagnostics.Process();
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.WorkingDirectory = fileInfo.FullName;
+            process.StartInfo.Arguments = m_cmdString;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.FileName = GetShaderCompilerStr();
 
-            string dxcPath = processInfo.WorkingDirectory + "\\" + GetShaderCompilerStr();
-            //System.Console.WriteLine("DXC full path {0}", Path.GetFullPath(dxcPath));
+            process.ErrorDataReceived += this.StdErrorHandler;
+            process.OutputDataReceived += this.StdOutputHandler;
 
-            var process = System.Diagnostics.Process.Start(processInfo);
+            process.Start();
+
+            process.BeginErrorReadLine();
+            process.BeginOutputReadLine();
+
             process.WaitForExit();
 
-            StreamReader errStreamReader = process.StandardError;
-            Console.WriteLine(errStreamReader.ReadLine());
+            if(m_shaderCompError.Length > 0)
+            {
+                Console.WriteLine("Shader Compilation had errors");
+                Console.WriteLine("Full command: {0} {1}", GetShaderCompilerStr(), m_cmdString);
+                Console.WriteLine("{0}", m_shaderCompError);
+            }
 
             return process.ExitCode;
+        }
+
+        private void StdErrorHandler(object sender, DataReceivedEventArgs args)
+        {
+            string message = args.Data;
+            m_shaderCompError += message + "\n";
+        }
+
+        private void StdOutputHandler(object sender, DataReceivedEventArgs args)
+        {
+            string message = args.Data;
+            m_shaderCompOutput += message + "\n";
         }
 
         static int Run(string compiler, string shader_stage, string profile, bool spirv, DirectoryInfo output_dir, DirectoryInfo[] include_paths, FileInfo input_file)
@@ -483,12 +513,12 @@ namespace ShaderCompiler
 
         static int Main(string[] args)
         {
-            string commandline = "";
-            for (int i = 0; i < args.Length; ++i)
-            {
-                commandline += args[i] + " ";
-            }
-            Console.WriteLine(commandline);
+            //string commandline = "";
+            //for (int i = 0; i < args.Length; ++i)
+            //{
+            //    commandline += args[i] + " ";
+            //}
+            //Console.WriteLine(commandline);
 
             var rootCommand = new RootCommand 
             { 

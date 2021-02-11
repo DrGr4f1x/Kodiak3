@@ -29,32 +29,40 @@
     <CustomBuild Include="Shaders\MeshPS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\GridVS.hlsl" />
-    <CustomBuild Include="Shaders\ArrayGS.hlsl" />
-    <CustomBuild Include="Shaders\ArrayLineGS.hlsl" />
-    <CustomBuild Include="Shaders\AdvectBFECCPS.hlsl" />
-    <CustomBuild Include="Shaders\AdvectPS.hlsl" />
-    <CustomBuild Include="Shaders\AdvectVelPS.hlsl" />
-    <CustomBuild Include="Shaders\VorticityPS.hlsl" />
-    <CustomBuild Include="Shaders\ConfinementPS.hlsl" />
-    <CustomBuild Include="Shaders\DivergencePS.hlsl" />
-    <CustomBuild Include="Shaders\JacobiPS.hlsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Shaders\ProjectPS.hlsl">
+    <CustomBuild Include="Shaders\ProjectPS.hlsl" />
+    <CustomBuild Include="Shaders\GaussianPS.hlsl" />
+    <CustomBuild Include="Shaders\DrawTexturePS.hlsl" />
+    <CustomBuild Include="Shaders\DrawWhitePS.hlsl" />
+    <CustomBuild Include="Shaders\DrawBoxPS.hlsl" />
+    <CustomBuild Include="Shaders\AdvectBFECCPS.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\GaussianPS.hlsl">
+    </CustomBuild>
+    <CustomBuild Include="Shaders\AdvectPS.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\DrawTexturePS.hlsl">
+    </CustomBuild>
+    <CustomBuild Include="Shaders\AdvectVelPS.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\DrawWhitePS.hlsl">
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ArrayGS.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\DrawBoxPS.hlsl">
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ArrayLineGS.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\ConfinementPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\DivergencePS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\GridVS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\JacobiPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\VorticityPS.hlsl">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
