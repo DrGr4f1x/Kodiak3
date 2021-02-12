@@ -163,3 +163,100 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 
 	return model;
 }
+
+
+shared_ptr<Model> Model::MakePlane(const VertexLayout& layout, float width, float height)
+{
+	bool bHasNormals = false;
+	bool bHasUVs = false;
+	for (auto component : layout.components)
+	{
+		if (component == VertexComponent::Normal) bHasNormals = true;
+		if (component == VertexComponent::UV) bHasUVs = true;
+		if (bHasNormals && bHasUVs) break;
+	}
+
+	uint32_t stride = 3  * sizeof(float);
+	stride += bHasNormals ? (3 * sizeof(float)) : 0;
+	stride += bHasUVs ? (2 * sizeof(float)) : 0;
+
+	vector<float> vertices;
+	size_t vertexSize = 3; // position
+	vertexSize += bHasNormals ? 3 : 0;
+	vertexSize += bHasUVs ? 2 : 0;
+	vertices.reserve(4 * vertexSize);
+
+	// Vertex 0
+	vertices.push_back(width / 2.0f);
+	vertices.push_back(0.0f);
+	vertices.push_back(-height / 2.0f);
+	if (bHasNormals)
+	{
+		vertices.push_back(0.0f);
+		vertices.push_back(1.0f);
+		vertices.push_back(0.0f);
+	}
+	if (bHasUVs)
+	{
+		vertices.push_back(0.0f);
+		vertices.push_back(0.0f);
+	}
+
+	// Vertex 1
+	vertices.push_back(width / 2.0f);
+	vertices.push_back(0.0f);
+	vertices.push_back(height / 2.0f);
+	if (bHasNormals)
+	{
+		vertices.push_back(0.0f);
+		vertices.push_back(1.0f);
+		vertices.push_back(0.0f);
+	}
+	if (bHasUVs)
+	{
+		vertices.push_back(1.0f);
+		vertices.push_back(0.0f);
+	}
+
+	// Vertex 2
+	vertices.push_back(-width / 2.0f);
+	vertices.push_back(0.0f);
+	vertices.push_back(-height / 2.0f);
+	if (bHasNormals)
+	{
+		vertices.push_back(0.0f);
+		vertices.push_back(1.0f);
+		vertices.push_back(0.0f);
+	}
+	if (bHasUVs)
+	{
+		vertices.push_back(0.0f);
+		vertices.push_back(1.0f);
+	}
+
+	// Vertex 3
+	vertices.push_back(-width / 2.0f);
+	vertices.push_back(0.0f);
+	vertices.push_back(height / 2.0f);
+	if (bHasNormals)
+	{
+		vertices.push_back(0.0f);
+		vertices.push_back(1.0f);
+		vertices.push_back(0.0f);
+	}
+	if (bHasUVs)
+	{
+		vertices.push_back(1.0f);
+		vertices.push_back(1.0f);
+	}
+
+	shared_ptr<Model> model = make_shared<Model>();
+	model->m_vertexBuffer.Create("Plane|VertexBuffer", vertices.size(), stride, false, vertices.data());
+
+	vector<uint16_t> indices { 0, 2, 1, 3, 1, 2 };
+	model->m_indexBuffer.Create("Plane|IndexBuffer", indices.size(), sizeof(uint16_t), false, indices.data());
+
+	model->m_boundingBox = Math::BoundingBox(Math::Vector3(Math::kZero), Math::Vector3(width / 2.0f, 0.0, height / 2.0f));
+
+	return model;
+}

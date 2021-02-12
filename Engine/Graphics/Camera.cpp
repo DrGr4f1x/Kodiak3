@@ -96,7 +96,7 @@ void Camera::Focus(const BoundingSphere& sphere, bool adjustPosition)
 		float radius = sphere.GetRadius();
 		float minDistance = (radius * margin) / (sinf(GetFOV() * 0.5f));
 
-		Vector3 position = -minDistance * GetForwardVec();
+		Vector3 position = minDistance * GetForwardVec();
 
 		SetPosition(position);
 	}

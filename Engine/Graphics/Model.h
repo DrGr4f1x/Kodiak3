@@ -62,6 +62,32 @@ struct VertexLayout
 		return res;
 	}
 
+	uint32_t ComputeNumFloats() const
+	{
+		uint32_t res = 0;
+
+		for (const auto& component : components)
+		{
+			switch (component)
+			{
+			case VertexComponent::UV:
+				res += 2;
+				break;
+			case VertexComponent::DummyFloat:
+				res += 1;
+				break;
+			case VertexComponent::DummyVec4:
+				res += 4;
+				break;
+			default:
+				res += 3;
+				break;
+			}
+		}
+
+		return res;
+	}
+
 	std::vector<VertexComponent> components;
 };
 
@@ -80,6 +106,8 @@ class Model
 public:
 
 	static std::shared_ptr<Model> Load(const std::string& filename, const VertexLayout& layout, float scale = 1.0f);
+
+	static std::shared_ptr<Model> MakePlane(const VertexLayout& layout, float width, float height);
 
 	const VertexBuffer& GetVertexBuffer() const { return m_vertexBuffer; }
 	const IndexBuffer& GetIndexBuffer() const { return m_indexBuffer; }

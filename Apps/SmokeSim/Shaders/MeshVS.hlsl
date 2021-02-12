@@ -10,7 +10,7 @@
 
 struct VSInput
 {
-	float4 pos : POSITION;
+	float3 pos : POSITION;
 	float3 normal : NORMAL;
 	float2 uv : TEXCOORD;
 };
@@ -42,7 +42,7 @@ VSOutput main(VSInput input)
 
 	float4 pos = mul(modelMatrix, float4(input.pos.xyz, 1.0f));
 
-	float3 lightPos = float3(1.0f, -1.0f, 1.0f);
+	float3 lightPos = float3(1.0f, 10.0f, 1.0f);
 	output.lightVec = lightPos - pos.xyz;
 	output.viewVec = -pos.xyz;
 

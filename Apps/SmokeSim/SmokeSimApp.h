@@ -66,7 +66,7 @@ private:
 
 	Kodiak::ResourceSet			m_meshResources;
 
-	Kodiak::ModelPtr			m_model;
+	Kodiak::ModelPtr			m_planeModel;
 	Math::Matrix4				m_modelMatrix{ Math::kIdentity };
 
 	// Camera controls

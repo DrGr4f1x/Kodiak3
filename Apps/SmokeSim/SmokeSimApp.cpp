@@ -32,15 +32,15 @@ void SmokeSimApp::Startup()
 	using namespace Math;
 
 	LoadAssets();
-	Vector3 center = m_model->GetBoundingBox().GetCenter();
+	Vector3 center = m_planeModel->GetBoundingBox().GetCenter();
 	
 	m_camera.SetPerspectiveMatrix(
 		XMConvertToRadians(60.0f),
 		(float)m_displayHeight / (float)m_displayWidth,
 		0.001f,
 		256.0f);
-	m_camera.SetPosition(Math::Vector3(-3.38f, 0.0f, -7.25f));
-	m_camera.Focus(m_model->GetBoundingBox());
+	m_camera.SetPosition(Math::Vector3(-3.38f, 2.0f, -7.25f));
+	m_camera.Focus(m_planeModel->GetBoundingBox());
 
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);
@@ -88,10 +88,10 @@ void SmokeSimApp::Render()
 
 	context.SetResources(m_meshResources);
 
-	context.SetIndexBuffer(m_model->GetIndexBuffer());
-	context.SetVertexBuffer(0, m_model->GetVertexBuffer());
+	context.SetIndexBuffer(m_planeModel->GetIndexBuffer());
+	context.SetVertexBuffer(0, m_planeModel->GetVertexBuffer());
 
-	context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+	context.DrawIndexed((uint32_t)m_planeModel->GetIndexBuffer().GetElementCount());
 
 	context.EndRenderPass();
 
@@ -168,5 +168,6 @@ void SmokeSimApp::LoadAssets()
 		VertexComponent::Normal,
 		VertexComponent::UV
 		});
-	m_model = Model::Load("Statue\\socha_100kuw.obj", layout, 0.25f);
+	//m_model = Model::Load("Statue\\socha_100kuw.obj", layout, 0.25f);
+	m_planeModel = Model::MakePlane(layout, 10.0f, 10.0f);
 }

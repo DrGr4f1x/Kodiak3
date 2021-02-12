@@ -13,13 +13,19 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Shaders\Fluids.hlsli">
-      <Filter>Shaders</Filter>
+    <None Include="Shaders\Fluids\Fluids.hlsli">
+      <Filter>Shaders\Fluids</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
       <UniqueIdentifier>{fe15a31a-0115-48b5-846c-84558a3bbda9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Fluids">
+      <UniqueIdentifier>{73745216-6833-4997-80bc-baa0c29e08cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Voxelization">
+      <UniqueIdentifier>{2d2aea47-e4d9-4421-ada3-3d14392b452b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -29,50 +35,50 @@
     <CustomBuild Include="Shaders\MeshPS.hlsl">
       <Filter>Shaders</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\AdvectBFECCPS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\GridVS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\AdvectPS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\AdvectBFECCPS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\AdvectVelPS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\AdvectPS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\ArrayGS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\AdvectVelPS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\ArrayLineGS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\ArrayGS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\ConfinementPS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\ArrayLineGS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\DivergencePS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\ConfinementPS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\GridVS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\DivergencePS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\JacobiPS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\DrawBoxPS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\VorticityPS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\DrawTexturePS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\ProjectPS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\DrawWhitePS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\DrawBoxPS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\GaussianPS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\DrawTexturePS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\JacobiPS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\DrawWhitePS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\VorticityPS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-    <CustomBuild Include="Shaders\GaussianPS.hlsl">
-      <Filter>Shaders</Filter>
+    <CustomBuild Include="Shaders\Fluids\ProjectPS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
