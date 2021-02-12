@@ -31,7 +31,7 @@ public:
 	void WaitForGpuIdle();
 
 	// Create methods
-	KODIAK_NODISCARD VkResult CreateSemaphore(VkSemaphoreType semaphoreType, UVkSemaphore** ppSemaphore) const;
+	KODIAK_NODISCARD VkResult CreateSemaphore(VkSemaphoreType semaphoreType, uint64_t initialValue, UVkSemaphore** ppSemaphore) const;
 	KODIAK_NODISCARD VkResult CreateAllocator(UVmaAllocator** ppAllocator) const;
 	KODIAK_NODISCARD VkResult CreateQueryPool(QueryHeapType type, uint32_t queryCount, UVkQueryPool** ppPool) const;
 	KODIAK_NODISCARD VkResult CreateCommandPool(uint32_t queueFamilyIndex, UVkCommandPool** ppPool) const;

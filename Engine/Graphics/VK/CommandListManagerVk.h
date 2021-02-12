@@ -46,7 +46,7 @@ public:
 
 	uint64_t GetNextFenceValue() const { return m_nextFenceValue; }
 
-	VkSemaphore GetTimelineSemaphore() { return m_timelineSemaphore; }
+	VkSemaphore GetTimelineSemaphore() { return m_timelineSemaphore->Get(); }
 
 private:
 	uint64_t ExecuteCommandList(VkCommandBuffer cmdList);
@@ -60,7 +60,7 @@ private:
 	CommandBufferPool m_commandBufferPool;
 	std::mutex m_fenceMutex;
 
-	VkSemaphore m_timelineSemaphore{ VK_NULL_HANDLE };
+	Microsoft::WRL::ComPtr<UVkSemaphore> m_timelineSemaphore{ nullptr };
 	uint64_t m_nextFenceValue;
 	uint64_t m_lastCompletedFenceValue;
 };

@@ -48,19 +48,7 @@ void CommandQueue::Create()
 
 	m_commandBufferPool.Create(queueFamilyIndex);
 
-	// Create the timeline semaphore object
-	VkSemaphoreTypeCreateInfo timelineCreateInfo;
-	timelineCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
-	timelineCreateInfo.pNext = nullptr;
-	timelineCreateInfo.semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE;
-	timelineCreateInfo.initialValue = m_lastCompletedFenceValue;
-
-	VkSemaphoreCreateInfo createInfo;
-	createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-	createInfo.pNext = &timelineCreateInfo;
-	createInfo.flags = 0;
-
-	vkCreateSemaphore(GetDevice(), &createInfo, nullptr, &m_timelineSemaphore);
+	ThrowIfFailed(g_graphicsDevice->CreateSemaphore(VK_SEMAPHORE_TYPE_TIMELINE, m_lastCompletedFenceValue, &m_timelineSemaphore));
 }
 
 
@@ -74,10 +62,6 @@ void CommandQueue::Destroy()
 	m_queue = VK_NULL_HANDLE;
 
 	m_commandBufferPool.Destroy();
-
-	// Destroy the timeline semaphore object
-	vkDestroySemaphore(GetDevice(), m_timelineSemaphore, nullptr);
-	m_timelineSemaphore = VK_NULL_HANDLE;
 }
 
 
@@ -94,13 +78,15 @@ uint64_t CommandQueue::IncrementFence()
 	timelineInfo.signalSemaphoreValueCount = 1;
 	timelineInfo.pSignalSemaphoreValues = &m_nextFenceValue;
 
+	VkSemaphore timelineSemaphore = m_timelineSemaphore->Get();
+
 	VkSubmitInfo submitInfo;
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.pNext = &timelineInfo;
 	submitInfo.waitSemaphoreCount = 0;
 	submitInfo.pWaitSemaphores = nullptr;
 	submitInfo.signalSemaphoreCount = 1;
-	submitInfo.pSignalSemaphores = &m_timelineSemaphore;
+	submitInfo.pSignalSemaphores = &timelineSemaphore;
 	submitInfo.commandBufferCount = 0;
 	submitInfo.pCommandBuffers = 0;
 
@@ -118,7 +104,7 @@ bool CommandQueue::IsFenceComplete(uint64_t fenceValue)
 	if (fenceValue > m_lastCompletedFenceValue)
 	{
 		uint64_t semaphoreCounterValue;
-		ThrowIfFailed(vkGetSemaphoreCounterValue(GetDevice(), m_timelineSemaphore, &semaphoreCounterValue));
+		ThrowIfFailed(vkGetSemaphoreCounterValue(GetDevice(), m_timelineSemaphore->Get(), &semaphoreCounterValue));
 		m_lastCompletedFenceValue = std::max(m_lastCompletedFenceValue, semaphoreCounterValue);
 	}
 
@@ -130,12 +116,14 @@ void CommandQueue::StallForFence(uint64_t fenceValue)
 {
 	CommandQueue& producer = g_commandManager.GetQueue((CommandListType)(fenceValue >> 56));
 
+	VkSemaphore timelineSemaphore = producer.GetTimelineSemaphore();
+
 	VkSemaphoreWaitInfo waitInfo;
 	waitInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO;
 	waitInfo.pNext = nullptr;
 	waitInfo.flags = 0;
 	waitInfo.semaphoreCount = 1;
-	waitInfo.pSemaphores = &producer.m_timelineSemaphore;
+	waitInfo.pSemaphores = &timelineSemaphore;
 	waitInfo.pValues = &fenceValue;
 
 	ThrowIfFailed(vkWaitSemaphores(GetDevice(), &waitInfo, UINT64_MAX));
@@ -148,12 +136,14 @@ void CommandQueue::StallForProducer(CommandQueue& producer)
 	
 	uint64_t waitValue = producer.m_nextFenceValue - 1;
 
+	VkSemaphore timelineSemaphore = producer.GetTimelineSemaphore();
+
 	VkSemaphoreWaitInfo waitInfo;
 	waitInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO;
 	waitInfo.pNext = nullptr;
 	waitInfo.flags = 0;
 	waitInfo.semaphoreCount = 1;
-	waitInfo.pSemaphores = &producer.m_timelineSemaphore;
+	waitInfo.pSemaphores = &timelineSemaphore;
 	waitInfo.pValues = &waitValue;
 
 	ThrowIfFailed(vkWaitSemaphores(GetDevice(), &waitInfo, UINT64_MAX));
@@ -172,12 +162,14 @@ void CommandQueue::WaitForFence(uint64_t fenceValue)
 	// the fence can only have one event set on completion, then thread B has to wait for 
 	// 100 before it knows 99 is ready.  Maybe insert sequential events?
 	{
+		VkSemaphore timelineSemaphore = m_timelineSemaphore->Get();
+
 		VkSemaphoreWaitInfo waitInfo;
 		waitInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO;
 		waitInfo.pNext = nullptr;
 		waitInfo.flags = 0;
 		waitInfo.semaphoreCount = 1;
-		waitInfo.pSemaphores = &m_timelineSemaphore;
+		waitInfo.pSemaphores = &timelineSemaphore;
 		waitInfo.pValues = &fenceValue;
 
 		ThrowIfFailed(vkWaitSemaphores(GetDevice(), &waitInfo, UINT64_MAX));
@@ -199,13 +191,15 @@ uint64_t CommandQueue::ExecuteCommandList(VkCommandBuffer cmdList)
 	timelineInfo.signalSemaphoreValueCount = 1;
 	timelineInfo.pSignalSemaphoreValues = &m_nextFenceValue;
 
+	VkSemaphore timelineSemaphore = m_timelineSemaphore->Get();
+
 	VkSubmitInfo submitInfo;
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.pNext = &timelineInfo;
 	submitInfo.waitSemaphoreCount = 0;
 	submitInfo.pWaitSemaphores = nullptr;
 	submitInfo.signalSemaphoreCount = 1;
-	submitInfo.pSignalSemaphores = &m_timelineSemaphore;
+	submitInfo.pSignalSemaphores = &timelineSemaphore;
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &cmdList;
 
@@ -219,7 +213,7 @@ uint64_t CommandQueue::ExecuteCommandList(VkCommandBuffer cmdList)
 VkCommandBuffer CommandQueue::RequestCommandBuffer()
 {
 	uint64_t completedFence;
-	ThrowIfFailed(vkGetSemaphoreCounterValue(GetDevice(), m_timelineSemaphore, &completedFence));
+	ThrowIfFailed(vkGetSemaphoreCounterValue(GetDevice(), m_timelineSemaphore->Get(), &completedFence));
 
 	return m_commandBufferPool.RequestCommandBuffer(completedFence);
 }

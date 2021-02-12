@@ -295,12 +295,12 @@ void GraphicsDevice::WaitForGpuIdle()
 }
 
 
-VkResult GraphicsDevice::CreateSemaphore(VkSemaphoreType semaphoreType, UVkSemaphore** ppSemaphore) const
+VkResult GraphicsDevice::CreateSemaphore(VkSemaphoreType semaphoreType, uint64_t initialValue, UVkSemaphore** ppSemaphore) const
 {
 	VkSemaphoreTypeCreateInfo typeCreateInfo = { VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO };
 	typeCreateInfo.pNext = nullptr;
-	typeCreateInfo.semaphoreType = VK_SEMAPHORE_TYPE_BINARY;
-	typeCreateInfo.initialValue = 0;
+	typeCreateInfo.semaphoreType = semaphoreType;
+	typeCreateInfo.initialValue = initialValue;
 
 	VkSemaphoreCreateInfo createInfo = { VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
 	createInfo.pNext = &typeCreateInfo;
@@ -716,8 +716,8 @@ void GraphicsDevice::CreateLogicalDevice()
 	g_device = m_device;
 
 	// Create semaphores
-	ThrowIfFailed(CreateSemaphore(VK_SEMAPHORE_TYPE_BINARY, &m_imageAcquireSemaphore));
-	ThrowIfFailed(CreateSemaphore(VK_SEMAPHORE_TYPE_BINARY, &m_presentSemaphore));
+	ThrowIfFailed(CreateSemaphore(VK_SEMAPHORE_TYPE_BINARY, 0, &m_imageAcquireSemaphore));
+	ThrowIfFailed(CreateSemaphore(VK_SEMAPHORE_TYPE_BINARY, 0, &m_presentSemaphore));
 }
 
 
