@@ -77,36 +77,6 @@ private:
 };
 
 
-class IndexBufferView
-{
-public:
-	IndexBufferView();
-
-	void Create(const ResourceHandle& resource, const BufferViewDesc& desc);
-
-	IbvHandle& GetHandle() { return m_handle; }
-	const IbvHandle& GetHandle() const { return m_handle; }
-
-private:
-	IbvHandle m_handle;
-};
-
-
-class VertexBufferView
-{
-public:
-	VertexBufferView();
-
-	void Create(const ResourceHandle& resource, const BufferViewDesc& desc);
-
-	VbvHandle& GetHandle() { return m_handle; }
-	const VbvHandle& GetHandle() const { return m_handle; }
-
-private:
-	VbvHandle m_handle;
-};
-
-
 class ConstantBufferView
 {
 public:

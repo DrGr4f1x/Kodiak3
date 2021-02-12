@@ -65,8 +65,6 @@ class IndexBuffer : public GpuBuffer
 public:
 	IndexBuffer() : GpuBuffer(ResourceType::IndexBuffer) {}
 
-	const IndexBufferView& GetIBV() const { return m_ibv; }
-
 	void Update(size_t sizeInBytes, const void* data);
 	void Update(size_t sizeInBytes, size_t offset, const void* data);
 
@@ -76,7 +74,6 @@ protected:
 	void CreateDerivedViews() override;
 
 private:
-	IndexBufferView m_ibv;
 	bool m_indexSize16{ false };
 };
 
@@ -86,16 +83,11 @@ class VertexBuffer : public GpuBuffer
 public:
 	VertexBuffer() : GpuBuffer(ResourceType::VertexBuffer) {}
 
-	const VertexBufferView& GetVBV() const { return m_vbv; }
-
 	void Update(size_t sizeInBytes, const void* data);
 	void Update(size_t sizeInBytes, size_t offset, const void* data);
 
 protected:
 	void CreateDerivedViews() override;
-
-private:
-	VertexBufferView m_vbv;
 };
 
 
@@ -165,8 +157,6 @@ public:
 	const ShaderResourceView& GetCounterSRV(CommandContext& context);
 	const UnorderedAccessView& GetCounterUAV(CommandContext& context);
 
-	const VertexBufferView& GetVBV() const { return m_vbv; }
-
 	void CreateWithFlags(const std::string& name, size_t numElements, size_t elementSize, ResourceType flags, const void* initialData = nullptr)
 	{
 		m_type |= flags;
@@ -178,7 +168,6 @@ protected:
 
 private:
 	ByteAddressBuffer m_counterBuffer;
-	VertexBufferView m_vbv;
 };
 
 

@@ -249,7 +249,6 @@ void IndexBuffer::CreateDerivedViews()
 
 	//m_srv.Create(m_resource, m_type, resDesc);
 	//m_uav.Create(m_resource, m_type, resDesc);
-	m_ibv.Create(m_resource, resDesc);
 
 	m_indexSize16 = (m_elementSize == 2);
 }
@@ -261,7 +260,6 @@ void VertexBuffer::CreateDerivedViews()
 
 	//m_srv.Create(m_resource, m_type, resDesc);
 	//m_uav.Create(m_resource, m_type, resDesc);
-	m_vbv.Create(m_resource, resDesc);
 }
 
 
@@ -288,10 +286,6 @@ void StructuredBuffer::CreateDerivedViews()
 
 	m_srv.Create(m_resource, ResourceType::StructuredBuffer, resDesc);
 	m_uav.Create(m_resource, ResourceType::StructuredBuffer, resDesc);
-	if (HasFlag(m_type, ResourceType::VertexBuffer))
-	{
-		m_vbv.Create(m_resource, resDesc);
-	}
 
 	m_counterBuffer.Create("Counter Buffer", 1, 4, false);
 }

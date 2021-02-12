@@ -110,23 +110,6 @@ void UnorderedAccessView::Create(const ResourceHandle& resource, ResourceType ty
 	m_handle = UavHandle::Create(bufferView);
 }
 
-IndexBufferView::IndexBufferView() = default;
-
-
-void IndexBufferView::Create(const ResourceHandle& handle, const BufferViewDesc& desc)
-{
-	// Nothing to do for Vulkan
-}
-
-
-VertexBufferView::VertexBufferView() = default;
-
-
-void VertexBufferView::Create(const ResourceHandle& handle, const BufferViewDesc& desc)
-{
-	// Nothing to do for Vulkan
-}
-
 
 ConstantBufferView::ConstantBufferView() = default;
 
