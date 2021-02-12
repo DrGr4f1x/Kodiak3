@@ -34,7 +34,7 @@ public:
 private:
 	const CommandListType m_commandListType;
 
-	VkCommandPool m_commandPool{ VK_NULL_HANDLE };
+	Microsoft::WRL::ComPtr<UVkCommandPool> m_commandPool{ nullptr };
 
 	std::vector<VkCommandBuffer> m_commandBufferPool;
 	std::queue<std::pair<uint64_t, VkCommandBuffer>> m_readyCommandBuffers;

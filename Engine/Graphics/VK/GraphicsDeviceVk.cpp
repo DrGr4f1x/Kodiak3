@@ -297,14 +297,12 @@ void GraphicsDevice::WaitForGpuIdle()
 
 VkResult GraphicsDevice::CreateSemaphore(VkSemaphoreType semaphoreType, UVkSemaphore** ppSemaphore) const
 {
-	VkSemaphoreTypeCreateInfo typeCreateInfo;
-	typeCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
+	VkSemaphoreTypeCreateInfo typeCreateInfo = { VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO };
 	typeCreateInfo.pNext = nullptr;
 	typeCreateInfo.semaphoreType = VK_SEMAPHORE_TYPE_BINARY;
 	typeCreateInfo.initialValue = 0;
 
-	VkSemaphoreCreateInfo createInfo;
-	createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	VkSemaphoreCreateInfo createInfo = { VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
 	createInfo.pNext = &typeCreateInfo;
 	createInfo.flags = 0;
 
@@ -344,21 +342,41 @@ VkResult GraphicsDevice::CreateAllocator(UVmaAllocator** ppAllocator) const
 
 VkResult GraphicsDevice::CreateQueryPool(QueryHeapType type, uint32_t queryCount, UVkQueryPool** ppPool) const
 {
-	VkQueryPoolCreateInfo info = {};
-	info.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
-	info.pNext = nullptr;
-	info.flags = 0;
-	info.queryCount = queryCount;
-	info.queryType = QueryHeapTypeToVulkan(type);
-	info.pipelineStatistics = VK_QUERY_PIPELINE_STATISTIC_FLAG_BITS_MAX_ENUM;
+	VkQueryPoolCreateInfo createInfo = { VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO  };
+	createInfo.pNext = nullptr;
+	createInfo.flags = 0;
+	createInfo.queryCount = queryCount;
+	createInfo.queryType = QueryHeapTypeToVulkan(type);
+	createInfo.pipelineStatistics = VK_QUERY_PIPELINE_STATISTIC_FLAG_BITS_MAX_ENUM;
 
-	VkQueryPool vkPool = VK_NULL_HANDLE;
-	auto res = vkCreateQueryPool(m_device->Get(), &info, nullptr, &vkPool);
+	VkQueryPool vkQueryPool = VK_NULL_HANDLE;
+	auto res = vkCreateQueryPool(m_device->Get(), &createInfo, nullptr, &vkQueryPool);
 
 	*ppPool = nullptr;
 	if (res == VK_SUCCESS)
 	{
-		*ppPool = new UVkQueryPool(m_device.Get(), vkPool);
+		*ppPool = new UVkQueryPool(m_device.Get(), vkQueryPool);
+		(*ppPool)->AddRef();
+	}
+
+	return res;
+}
+
+
+VkResult GraphicsDevice::CreateCommandPool(uint32_t queueFamilyIndex, UVkCommandPool** ppPool) const
+{
+	VkCommandPoolCreateInfo createInfo{ VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO };
+	createInfo.pNext = nullptr;
+	createInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+	createInfo.queueFamilyIndex = queueFamilyIndex;
+
+	VkCommandPool vkCommandPool = VK_NULL_HANDLE;
+	auto res = vkCreateCommandPool(m_device->Get(), &createInfo, nullptr, &vkCommandPool);
+
+	*ppPool = nullptr;
+	if (res == VK_SUCCESS)
+	{
+		*ppPool = new UVkCommandPool(m_device.Get(), vkCommandPool);
 		(*ppPool)->AddRef();
 	}
 

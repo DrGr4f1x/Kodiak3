@@ -260,3 +260,9 @@ shared_ptr<Model> Model::MakePlane(const VertexLayout& layout, float width, floa
 
 	return model;
 }
+
+
+//shared_ptr<Model> Model::MakeSphere(const VertexLayout& layout, uint32_t numVerts, uint32_t numRings, float radius)
+//{
+//
+//}
