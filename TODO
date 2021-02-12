@@ -7,7 +7,7 @@ General
 
 Demo bugs/improvements
 Displacement - Investigate/fix busted rendering in DX12 on AMD (compiling with dxc)
-StencilBuffer - Fix busted StencilBuffer outline in VK
+** StencilBuffer - Fix busted StencilBuffer outline in VK
 ComputeNBody - Figure out how to do an *exact* VS/GS replacement for gl_pointsize
 
 General bugs/improvements
@@ -23,6 +23,12 @@ Refactor/replace math library
 Add logging to shader compiler
 Make a few basic shaders for meshes that can be re-used.
 Camera focus on bounding box, bounding sphere
+
+Debug rendering
+Lines, grid, text in 3d space
+Vectors
+Bounding boxes
+Debug console
 
 Vulkan refactor
 Replace HandleVk with RefCountingVk

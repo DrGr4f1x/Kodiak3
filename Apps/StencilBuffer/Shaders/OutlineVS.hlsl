@@ -10,7 +10,8 @@
 
 struct VSInput
 {
-	float4 pos : POSITION;
+	float3 pos : POSITION;
+	float3 color : COLOR;
 	float3 normal : NORMAL;
 };
 
@@ -26,7 +27,7 @@ cbuffer VSConstants : register(b0)
 
 float4 main(VSInput input) : SV_POSITION
 {
-	float4 pos = float4(input.pos.xyz + input.normal * outlineWidth, input.pos.w);
+	float4 pos = float4(input.pos.xyz + input.normal * outlineWidth, 1.0);
 	pos = mul(viewProjectionMatrix, mul(modelMatrix, pos));
 
 	return pos;
