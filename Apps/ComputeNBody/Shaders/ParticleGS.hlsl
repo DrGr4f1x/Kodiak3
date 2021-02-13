@@ -62,7 +62,7 @@ void main(point GSInput input[1], inout TriangleStream<GSOutput> spriteStream)
 	// Emit two new triangles
 	for (int i = 0; i < 4; ++i)
 	{
-		float3 position = float3(positions[i] * scale, 0.0) + pos.xyz;
+		float3 position = float3(positions[i].xy * scale, positions[i].z) + pos.xyz;
 
 		output.pos = float4(position, pos.w);
 		output.uv = texcoords[i];

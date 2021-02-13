@@ -141,7 +141,7 @@ void GeometryShaderApp::InitPSOs()
 	m_meshPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 
 	m_meshPSO.SetBlendState(CommonStates::BlendDisable());
-	m_meshPSO.SetRasterizerState(CommonStates::RasterizerDefaultCW());
+	m_meshPSO.SetRasterizerState(CommonStates::RasterizerDefault());
 	m_meshPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 
 	m_meshPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);

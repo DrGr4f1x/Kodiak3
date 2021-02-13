@@ -179,7 +179,7 @@ void OcclusionQueryApp::InitPSOs()
 	m_solidPSO.SetRootSignature(m_rootSig);
 	m_solidPSO.SetBlendState(CommonStates::BlendDisable());
 	m_solidPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
-	m_solidPSO.SetRasterizerState(CommonStates::RasterizerDefaultCW());
+	m_solidPSO.SetRasterizerState(CommonStates::RasterizerDefault());
 	m_solidPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 	m_solidPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 	m_solidPSO.SetVertexShader("MeshVS");

@@ -131,7 +131,7 @@ void DirectConstantsApp::InitPSO()
 	m_PSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 
 	m_PSO.SetBlendState(CommonStates::BlendDisable());
-	m_PSO.SetRasterizerState(CommonStates::RasterizerDefaultCW());
+	m_PSO.SetRasterizerState(CommonStates::RasterizerDefault());
 	m_PSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 
 	m_PSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
