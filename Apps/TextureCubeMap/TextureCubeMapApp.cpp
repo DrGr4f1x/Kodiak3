@@ -155,7 +155,7 @@ void TextureCubeMapApp::InitPSOs()
 	m_skyboxPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 
 	m_skyboxPSO.SetBlendState(CommonStates::BlendDisable());
-	m_skyboxPSO.SetRasterizerState(CommonStates::RasterizerDefault());
+	m_skyboxPSO.SetRasterizerState(CommonStates::RasterizerDefaultCW());
 	m_skyboxPSO.SetDepthStencilState(CommonStates::DepthStateDisabled());
 
 	m_skyboxPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
@@ -179,7 +179,7 @@ void TextureCubeMapApp::InitPSOs()
 	m_modelPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 
 	m_modelPSO.SetBlendState(CommonStates::BlendDisable());
-	m_modelPSO.SetRasterizerState(CommonStates::RasterizerDefaultCW());
+	m_modelPSO.SetRasterizerState(CommonStates::RasterizerDefault());
 	m_modelPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 
 	m_modelPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);

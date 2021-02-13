@@ -169,7 +169,7 @@ void InstancingApp::InitPSOs()
 	{
 		m_rockPSO.SetRootSignature(m_modelRootSig);
 		m_rockPSO.SetBlendState(CommonStates::BlendDisable());
-		m_rockPSO.SetRasterizerState(CommonStates::RasterizerDefaultCW());
+		m_rockPSO.SetRasterizerState(CommonStates::RasterizerDefault());
 		m_rockPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 		m_rockPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
@@ -208,7 +208,7 @@ void InstancingApp::InitPSOs()
 	{
 		m_planetPSO.SetRootSignature(m_modelRootSig);
 		m_planetPSO.SetBlendState(CommonStates::BlendDisable());
-		m_planetPSO.SetRasterizerState(CommonStates::RasterizerDefaultCW());
+		m_planetPSO.SetRasterizerState(CommonStates::RasterizerDefault());
 		m_planetPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 		m_planetPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 

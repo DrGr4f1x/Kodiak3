@@ -151,7 +151,7 @@ void DisplacementApp::InitPSOs()
 	m_pso.SetRootSignature(m_rootSig);
 
 	// Render state
-	m_pso.SetRasterizerState(CommonStates::RasterizerDefault());
+	m_pso.SetRasterizerState(CommonStates::RasterizerDefaultCW());
 	m_pso.SetBlendState(CommonStates::BlendDisable());
 	m_pso.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 

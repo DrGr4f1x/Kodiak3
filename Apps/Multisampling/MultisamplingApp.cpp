@@ -163,7 +163,7 @@ void MultisamplingApp::InitPSOs()
 	m_psoMsaa.SetRootSignature(m_rootSig);
 
 	// Render state
-	m_psoMsaa.SetRasterizerState(CommonStates::RasterizerDefaultCW());
+	m_psoMsaa.SetRasterizerState(CommonStates::RasterizerDefault());
 	m_psoMsaa.SetBlendState(CommonStates::BlendDisable());
 	m_psoMsaa.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 
