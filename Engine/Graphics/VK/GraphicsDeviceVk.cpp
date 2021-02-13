@@ -707,6 +707,60 @@ VkResult GraphicsDevice::CreateImage(const string& name, const ImageDesc& desc, 
 }
 
 
+VkResult GraphicsDevice::CreatePipelineCache(UVkPipelineCache** ppPipelineCache) const
+{
+	VkPipelineCacheCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO };
+	createInfo.pNext = nullptr;
+	createInfo.flags = 0;
+	createInfo.initialDataSize = 0;
+	createInfo.pInitialData = nullptr;
+
+	VkPipelineCache vkPipelineCache = VK_NULL_HANDLE;
+	auto res = vkCreatePipelineCache(m_device->Get(), &createInfo, nullptr, &vkPipelineCache);
+
+	*ppPipelineCache = nullptr;
+	if (res == VK_SUCCESS)
+	{
+		*ppPipelineCache = new UVkPipelineCache(m_device.Get(), vkPipelineCache);
+		(*ppPipelineCache)->AddRef();
+	}
+
+	return res;
+}
+
+
+VkResult GraphicsDevice::CreateGraphicsPipeline(const VkGraphicsPipelineCreateInfo& createInfo, UVkPipeline** ppPipeline) const
+{
+	VkPipeline vkPipeline = VK_NULL_HANDLE;
+	auto res = vkCreateGraphicsPipelines(m_device->Get(), m_pipelineCache->Get(), 1, &createInfo, nullptr, &vkPipeline);
+
+	*ppPipeline = nullptr;
+	if(res == VK_SUCCESS)
+	{
+		*ppPipeline = new UVkPipeline(m_device.Get(), m_pipelineCache.Get(), vkPipeline);
+		(*ppPipeline)->AddRef();
+	}
+
+	return res;
+}
+
+
+VkResult GraphicsDevice::CreateComputePipeline(const VkComputePipelineCreateInfo& createInfo, UVkPipeline** ppPipeline) const
+{
+	VkPipeline vkPipeline = VK_NULL_HANDLE;
+	auto res = vkCreateComputePipelines(m_device->Get(), m_pipelineCache->Get(), 1, &createInfo, nullptr, &vkPipeline);
+
+	*ppPipeline = nullptr;
+	if (res == VK_SUCCESS)
+	{
+		*ppPipeline = new UVkPipeline(m_device.Get(), m_pipelineCache.Get(), vkPipeline);
+		(*ppPipeline)->AddRef();
+	}
+
+	return res;
+}
+
+
 ColorBufferPtr GraphicsDevice::GetBackBuffer(uint32_t index) const
 {
 	assert(index < NumSwapChainBuffers);
@@ -1050,6 +1104,9 @@ void GraphicsDevice::CreateLogicalDevice()
 	// Create semaphores
 	ThrowIfFailed(CreateSemaphore(VK_SEMAPHORE_TYPE_BINARY, 0, &m_imageAcquireSemaphore));
 	ThrowIfFailed(CreateSemaphore(VK_SEMAPHORE_TYPE_BINARY, 0, &m_presentSemaphore));
+
+	// Create pipeline cache
+	ThrowIfFailed(CreatePipelineCache(&m_pipelineCache));
 }
 
 

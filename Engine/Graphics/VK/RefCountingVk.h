@@ -48,11 +48,10 @@ DEFINE_GUID(IID_UVkCommandPool,	0x9eb11631, 0x4fdb, 0x42a1, 0xb3, 0xb8, 0xe3, 0x
 DEFINE_GUID(IID_UVkRenderPass, 0xf05e727a, 0x9acb, 0x456e, 0x9e, 0x4b, 0x80, 0x50, 0x1, 0x84, 0x73, 0x90);
 // {81B64F6D-7C5D-4A8F-8654-71F4453AD9CA}
 DEFINE_GUID(IID_UVkFramebuffer, 0x81b64f6d, 0x7c5d, 0x4a8f, 0x86, 0x54, 0x71, 0xf4, 0x45, 0x3a, 0xd9, 0xca);
-
-
-
-
-
+// {7656DF62-58F9-4631-8F52-2A7C0CD4227E}
+DEFINE_GUID(IID_UVkPipeline, 0x7656df62, 0x58f9, 0x4631, 0x8f, 0x52, 0x2a, 0x7c, 0xc, 0xd4, 0x22, 0x7e);
+// {7DE4B776-1B41-4EE2-A2CA-6D77A413EE7E}
+DEFINE_GUID(IID_UVkPipelineCache, 0x7de4b776, 0x1b41, 0x4ee2, 0xa2, 0xca, 0x6d, 0x77, 0xa4, 0x13, 0xee, 0x7e);
 
 
 // Macro to define the IUnknown interface
@@ -631,6 +630,68 @@ public:
 private:
 	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
 	VkFramebuffer m_framebuffer{ VK_NULL_HANDLE };
+};
+
+
+//
+// UVkPipelineCache
+//
+class UVkPipelineCache : public IUnknown, public NonCopyable
+{
+public:
+	UVkPipelineCache(UVkDevice* udevice, VkPipelineCache pipelineCache)
+		: m_device(udevice)
+		, m_pipelineCache(pipelineCache)
+	{}
+	~UVkPipelineCache()
+	{
+		if (m_pipelineCache)
+		{
+			vkDestroyPipelineCache(m_device->Get(), m_pipelineCache, nullptr);
+			m_pipelineCache = VK_NULL_HANDLE;
+		}
+	}
+
+	VkPipelineCache Get() const { return m_pipelineCache; }
+	operator VkPipelineCache() const { return m_pipelineCache; }
+
+	IMPLEMENT_IUNKNOWN(IID_UVkPipelineCache)
+
+private:
+	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
+	VkPipelineCache m_pipelineCache{ VK_NULL_HANDLE };
+};
+
+
+//
+// VkPipeline
+//
+class UVkPipeline : public IUnknown, public NonCopyable
+{
+public:
+	UVkPipeline(UVkDevice* udevice, UVkPipelineCache* upipelineCache, VkPipeline pipeline)
+		: m_device(udevice)
+		, m_pipelineCache(upipelineCache)
+		, m_pipeline(pipeline)
+	{}
+	~UVkPipeline()
+	{
+		if (m_pipeline)
+		{
+			vkDestroyPipeline(m_device->Get(), m_pipeline, nullptr);
+			m_pipeline = VK_NULL_HANDLE;
+		}
+	}
+
+	VkPipeline Get() const { return m_pipeline; }
+	operator VkPipeline() const { return m_pipeline; }
+
+	IMPLEMENT_IUNKNOWN(IID_UVkPipeline)
+
+private:
+	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
+	Microsoft::WRL::ComPtr<UVkPipelineCache> m_pipelineCache{ nullptr };
+	VkPipeline m_pipeline{ VK_NULL_HANDLE };
 };
 
 } // namespace Kodiak

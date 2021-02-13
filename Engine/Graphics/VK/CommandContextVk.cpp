@@ -573,7 +573,7 @@ void GraphicsContext::SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, 
 
 void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 {
-	vkCmdBindPipeline(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, pso.GetHandle());
+	vkCmdBindPipeline(m_commandList, VK_PIPELINE_BIND_POINT_GRAPHICS, pso.GetPipeline());
 }
 
 
@@ -591,5 +591,5 @@ void ComputeContext::SetRootSignature(const RootSignature& rootSig)
 
 void ComputeContext::SetPipelineState(const ComputePSO& pso)
 {
-	vkCmdBindPipeline(m_commandList, VK_PIPELINE_BIND_POINT_COMPUTE, pso.GetHandle());
+	vkCmdBindPipeline(m_commandList, VK_PIPELINE_BIND_POINT_COMPUTE, pso.GetPipeline());
 }

@@ -198,9 +198,6 @@
     <ClInclude Include="Graphics\VK\GraphicsEnumsVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\VK\HandleVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\VK\PlatformVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
@@ -265,6 +262,12 @@
       <Filter>Graphics\VK</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\DX12\Framebuffer12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\PipelineStateBaseVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\PipelineStateBase12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
   </ItemGroup>
@@ -408,9 +411,6 @@
     <ClCompile Include="Graphics\VK\GraphicsEnumsVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\VK\HandleVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\VK\PipelineStateVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
@@ -441,7 +441,6 @@
     <ClCompile Include="Graphics\DX12\GpuResource12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\VK\GpuImageVk.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">

@@ -13,6 +13,14 @@
 
 #include "Graphics\InputLayout.h"
 
+#if defined(DX12)
+#include "Graphics\DX12\PipelineStateBase12.h"
+#elif defined (VK)
+#include "Graphics\VK\PipelineStateBaseVk.h"
+#else
+#error No graphics API defined!
+#endif
+
 
 namespace Kodiak
 {
@@ -94,30 +102,6 @@ struct DepthStencilStateDesc
 	uint8_t			stencilWriteMask;
 	StencilOpDesc	frontFace;
 	StencilOpDesc	backFace;
-};
-
-
-class PSO
-{
-public:
-	static void DestroyAll();
-
-	void SetRootSignature(const RootSignature& bindMappings)
-	{
-		m_rootSignature = &bindMappings;
-	}
-
-	const RootSignature& GetRootSignature() const
-	{
-		assert(m_rootSignature != nullptr);
-		return *m_rootSignature;
-	}
-
-	const PsoHandle& GetHandle() const { return m_handle; }
-
-protected:
-	const RootSignature* m_rootSignature{ nullptr };
-	PsoHandle m_handle;
 };
 
 

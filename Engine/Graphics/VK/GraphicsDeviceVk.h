@@ -70,6 +70,9 @@ public:
 	KODIAK_NODISCARD VkResult CreateFramebuffer(const std::vector<ColorBufferPtr>& colorBuffers, DepthBufferPtr depthBuffer, VkRenderPass renderPass, UVkFramebuffer** ppFramebuffer) const;
 	KODIAK_NODISCARD VkResult CreateBuffer(const std::string& name, const BufferDesc& desc, UVkBuffer** ppBuffer) const;
 	KODIAK_NODISCARD VkResult CreateImage(const std::string& name, const ImageDesc& desc, UVkImage** ppImage) const;
+	KODIAK_NODISCARD VkResult CreatePipelineCache(UVkPipelineCache** ppPipelineCache) const;
+	KODIAK_NODISCARD VkResult CreateGraphicsPipeline(const VkGraphicsPipelineCreateInfo& createInfo, UVkPipeline** ppPipeline) const;
+	KODIAK_NODISCARD VkResult CreateComputePipeline(const VkComputePipelineCreateInfo& createInfo, UVkPipeline** ppPipeline) const;
 
 	Format GetColorFormat() const { return m_colorFormat; }
 	Format GetDepthFormat() const { return m_depthFormat; }
@@ -162,6 +165,7 @@ private:
 	Microsoft::WRL::ComPtr<UVkSurface> m_surface;
 	Microsoft::WRL::ComPtr<UVkSwapchain> m_swapchain;
 	Microsoft::WRL::ComPtr<UVkDebugUtilsMessenger> m_debugUtilsMessenger;
+	Microsoft::WRL::ComPtr<UVkPipelineCache> m_pipelineCache;
 
 	// Swapchain images
 	std::vector<Microsoft::WRL::ComPtr<UVkImage>> m_swapchainImages;

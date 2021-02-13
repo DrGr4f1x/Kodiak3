@@ -26,7 +26,6 @@
 
 #include "Extern\VulkanMemoryAllocator\vk_mem_alloc.h"
 
-#include "HandleVk.h"
 #include "RefCountingVk.h"
 
 // Custom define for better code readability

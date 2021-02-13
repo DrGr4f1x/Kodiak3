@@ -25,37 +25,9 @@ using namespace Kodiak;
 using namespace std;
 
 
-namespace
-{
-
-mutex s_pipelineMutex;
-set<VkPipeline> s_graphicsPipelineCache;
-set<VkPipeline> s_computePipelineCache;
-VkPipelineCache s_pipelineCache{ VK_NULL_HANDLE };
-
-} // anonymous namespace
-
-
 void PSO::DestroyAll()
 {
-	lock_guard<mutex> CS(s_pipelineMutex);
-
-	VkDevice device = GetDevice();
-
-	for (auto& pso : s_graphicsPipelineCache)
-	{
-		vkDestroyPipeline(device, pso, nullptr);
-	}
-	s_graphicsPipelineCache.clear();
-
-	for (auto& pso : s_computePipelineCache)
-	{
-		vkDestroyPipeline(device, pso, nullptr);
-	}
-	s_computePipelineCache.clear();
-
-	vkDestroyPipelineCache(device, s_pipelineCache, nullptr);
-	s_pipelineCache = VK_NULL_HANDLE;
+	// TODO Remove this function
 }
 
 
@@ -436,10 +408,10 @@ void GraphicsPSO::Finalize()
 	if (m_parentPSO != nullptr)
 	{
 		assert_msg(
-			m_parentPSO->GetHandle() != VK_NULL_HANDLE,
+			m_parentPSO->GetPipeline() != VK_NULL_HANDLE,
 			"Parent PSO has NULL handle.  Make sure to call Finalize() on the parent PSO before calling Finalize() on child PSOs!");
 
-		createInfo.basePipelineHandle = m_parentPSO->GetHandle();
+		createInfo.basePipelineHandle = m_parentPSO->GetPipeline();
 		createInfo.basePipelineIndex = -1;
 	}
 
@@ -451,21 +423,7 @@ void GraphicsPSO::Finalize()
 
 	createInfo.pDynamicState = &dynamicStateInfo;
 
-	{
-		lock_guard<mutex> CS(s_pipelineMutex);
-
-		if (s_pipelineCache == VK_NULL_HANDLE)
-		{
-			VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
-			pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-			ThrowIfFailed(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &s_pipelineCache));
-		}
-
-		m_handle = VK_NULL_HANDLE;
-		ThrowIfFailed(vkCreateGraphicsPipelines(device, s_pipelineCache, 1, &createInfo, nullptr, &m_handle));
-
-		s_graphicsPipelineCache.insert(m_handle);
-	}
+	ThrowIfFailed(g_graphicsDevice->CreateGraphicsPipeline(createInfo, &m_pipeline));
 
 	vkDestroyRenderPass(device, renderpass, nullptr);
 
@@ -505,21 +463,7 @@ void ComputePSO::Finalize()
 	createInfo.stage.module = module;
 	createInfo.stage.pSpecializationInfo = nullptr;
 
-	{
-		lock_guard<mutex> CS(s_pipelineMutex);
-
-		if (s_pipelineCache == VK_NULL_HANDLE)
-		{
-			VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
-			pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-			ThrowIfFailed(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &s_pipelineCache));
-		}
-
-		m_handle = VK_NULL_HANDLE;
-		ThrowIfFailed(vkCreateComputePipelines(device, s_pipelineCache, 1, &createInfo, nullptr, &m_handle));
-
-		s_graphicsPipelineCache.insert(m_handle);
-	}
+	ThrowIfFailed(g_graphicsDevice->CreateComputePipeline(createInfo, &m_pipeline));
 
 	vkDestroyShaderModule(device, module, nullptr);
 }
