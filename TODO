@@ -8,6 +8,7 @@ General
 Demo bugs/improvements
 Displacement - Investigate/fix busted rendering in DX12 on AMD (compiling with dxc)
 ** StencilBuffer - Fix busted StencilBuffer outline in VK
+** RadialBlur - Fix inverted blur UVs in Vulkan
 ComputeNBody - Figure out how to do an *exact* VS/GS replacement for gl_pointsize
 
 General bugs/improvements
@@ -20,7 +21,7 @@ Cleanup both GraphicsDevices to explicitly support 2 roles
   * API creation
 Refactor command context recycling to use fences explicitly
 Refactor/replace math library
-Add logging to shader compiler
+** Add logging to shader compiler
 Make a few basic shaders for meshes that can be re-used.
 Camera focus on bounding box, bounding sphere
 
