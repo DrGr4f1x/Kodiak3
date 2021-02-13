@@ -81,6 +81,8 @@ public:
 
 	const std::string& GetDeviceName() const { return m_deviceName; }
 
+	VmaAllocator GetAllocator() const { return m_allocator->Get(); }
+
 	void ReleaseResource(UVkImage* image);
 	void ReleaseResource(UVkBuffer* buffer);
 
@@ -212,6 +214,7 @@ extern GraphicsDevice* g_graphicsDevice;
 
 
 VkDevice GetDevice();
+VmaAllocator GetAllocator();
 
 
 uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound = nullptr);

@@ -82,7 +82,7 @@ public:
 		return reinterpret_cast<ComputeContext&>(*this);
 	}
 
-	static void InitializeTexture(Texture& dest, size_t numBytes, const void* initData, uint32_t numBuffers, VkBufferImageCopy bufferCopies[]);
+	static void InitializeTexture(Texture& dest, size_t numBytes, const void* initialData, uint32_t numBuffers, VkBufferImageCopy bufferCopies[]);
 	static void InitializeBuffer(GpuBuffer& dest, const void* initialData, size_t numBytes, bool useOffset = false, size_t offset = 0);
 
 	void TransitionResource(GpuBuffer& resource, ResourceState newState, bool flushImmediate = false);

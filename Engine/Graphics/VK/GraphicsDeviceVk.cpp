@@ -1954,6 +1954,12 @@ VkDevice Kodiak::GetDevice()
 }
 
 
+VmaAllocator Kodiak::GetAllocator()
+{
+	return g_graphicsDevice->GetAllocator();
+}
+
+
 VkFormatProperties Kodiak::GetFormatProperties(Format format)
 {
 	return g_graphicsDevice->GetFormatProperties(format);

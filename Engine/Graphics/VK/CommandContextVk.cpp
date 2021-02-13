@@ -241,36 +241,26 @@ void CommandContext::Initialize()
 }
 
 
-void CommandContext::InitializeTexture(Texture& dest, size_t numBytes, const void* initData, uint32_t numBuffers, VkBufferImageCopy bufferCopies[])
+void CommandContext::InitializeTexture(Texture& dest, size_t numBytes, const void* initialData, uint32_t numBuffers, VkBufferImageCopy bufferCopies[])
 {
 	VkDevice device = GetDevice();
+	VmaAllocator allocator = GetAllocator();
 
-	VkBufferCreateInfo stagingBufferInfo = {};
-	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	VkBufferCreateInfo stagingBufferInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
 	stagingBufferInfo.size = numBytes;
 	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	stagingBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	VkBuffer stagingBuffer{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateBuffer(device, &stagingBufferInfo, nullptr, &stagingBuffer));
+	VmaAllocationCreateInfo stagingAllocCreateInfo = {};
+	stagingAllocCreateInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
+	stagingAllocCreateInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
-	VkMemoryRequirements memReqs;
-	vkGetBufferMemoryRequirements(device, stagingBuffer, &memReqs);
+	VkBuffer stagingBuffer = VK_NULL_HANDLE;
+	VmaAllocation stagingBufferAlloc = VK_NULL_HANDLE;
+	VmaAllocationInfo stagingAllocInfo = {};
+	ThrowIfFailed(vmaCreateBuffer(allocator, &stagingBufferInfo, &stagingAllocCreateInfo, &stagingBuffer, &stagingBufferAlloc, &stagingAllocInfo));
 
-	VkMemoryAllocateInfo memAllocInfo = {};
-	memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	memAllocInfo.allocationSize = memReqs.size;
-	memAllocInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-	void* data = nullptr;
-
-	// Copy to staging buffer with Map/Unmap
-	VkDeviceMemory stagingBufferMemory{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingBufferMemory));
-	ThrowIfFailed(vkMapMemory(device, stagingBufferMemory, 0, numBytes, 0, &data));
-	memcpy(data, initData, numBytes);
-	vkUnmapMemory(device, stagingBufferMemory);
-	ThrowIfFailed(vkBindBufferMemory(device, stagingBuffer, stagingBufferMemory, 0));
+	memcpy(stagingAllocInfo.pMappedData, initialData, numBytes);
 
 	// Upload to GPU
 	CommandContext& context = CommandContext::Begin();
@@ -290,40 +280,31 @@ void CommandContext::InitializeTexture(Texture& dest, size_t numBytes, const voi
 	context.Finish(true);
 
 	// Destroy staging buffer and memory
-	vkDestroyBuffer(device, stagingBuffer, nullptr);
-	vkFreeMemory(device, stagingBufferMemory, nullptr);
+	vmaDestroyBuffer(allocator, stagingBuffer, stagingBufferAlloc);
 }
 
 
 void CommandContext::InitializeBuffer(GpuBuffer& dest, const void* initialData, size_t numBytes, bool useOffset, size_t offset)
 {
+	// TODO - handle device and allocator differently?  Maybe each CommandContext holds on to them directly?
 	VkDevice device = GetDevice();
+	VmaAllocator allocator = GetAllocator();
 
 	VkBufferCreateInfo stagingBufferInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
 	stagingBufferInfo.size = numBytes;
 	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	stagingBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	VkBuffer stagingBuffer{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateBuffer(device, &stagingBufferInfo, nullptr, &stagingBuffer));
+	VmaAllocationCreateInfo stagingAllocCreateInfo = {};
+	stagingAllocCreateInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
+	stagingAllocCreateInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
-	VkMemoryRequirements memReqs;
-	vkGetBufferMemoryRequirements(device, stagingBuffer, &memReqs);
+	VkBuffer stagingBuffer = VK_NULL_HANDLE;
+	VmaAllocation stagingBufferAlloc = VK_NULL_HANDLE;
+	VmaAllocationInfo stagingAllocInfo = {};
+	ThrowIfFailed(vmaCreateBuffer(allocator, &stagingBufferInfo, &stagingAllocCreateInfo, &stagingBuffer, &stagingBufferAlloc, &stagingAllocInfo));
 
-	VkMemoryAllocateInfo memAllocInfo = {};
-	memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	memAllocInfo.allocationSize = memReqs.size;
-	memAllocInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-	void* data = nullptr;
-
-	// Copy to staging buffer with Map/Unmap
-	VkDeviceMemory stagingBufferMemory{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingBufferMemory));
-	ThrowIfFailed(vkMapMemory(device, stagingBufferMemory, 0, numBytes, 0, &data));
-	memcpy(data, initialData, numBytes);
-	vkUnmapMemory(device, stagingBufferMemory);
-	ThrowIfFailed(vkBindBufferMemory(device, stagingBuffer, stagingBufferMemory, 0));
+	memcpy(stagingAllocInfo.pMappedData, initialData, numBytes);
 
 	// Upload to GPU
 	CommandContext& context = CommandContext::Begin();
@@ -336,8 +317,7 @@ void CommandContext::InitializeBuffer(GpuBuffer& dest, const void* initialData, 
 	context.Finish(true);
 
 	// Destroy staging buffer and memory
-	vkDestroyBuffer(device, stagingBuffer, nullptr);
-	vkFreeMemory(device, stagingBufferMemory, nullptr);
+	vmaDestroyBuffer(allocator, stagingBuffer, stagingBufferAlloc);
 }
 
 
