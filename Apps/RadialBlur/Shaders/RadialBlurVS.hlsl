@@ -22,9 +22,7 @@ VSOutput main(uint vertId : SV_VertexID)
 	output.texcoord = float2((vertId << 1) & 2, vertId & 2);
 	output.position = float4(output.texcoord * 2.0f - 1.0f, 0.0f, 1.0f);
 
-#if !VK
 	output.position.y = -output.position.y;
-#endif
 
 	return output;
 }

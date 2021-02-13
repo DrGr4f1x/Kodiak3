@@ -50,9 +50,5 @@ VSOutput main(VSInput input)
 	float3 lightPos = float3(0.0f, 0.0f, -5.0f);
 	output.lightDir = normalize(lightPos - input.position);
 
-#if !VK
-	output.position.y = -output.position.y;
-#endif
-
 	return output;
 }

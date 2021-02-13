@@ -41,9 +41,5 @@ VSOutput main( VSInput input )
 	float4x4 modelToProjection = mul(projectionMatrix, modelMatrix);
 	output.position = mul(modelToProjection, float4(input.position, 1.0f));
 
-#if !VK
-	output.position.y = -output.position.y;
-#endif
-
 	return output;
 }

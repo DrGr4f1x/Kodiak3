@@ -117,8 +117,7 @@ VkBool32 messageCallback(
 	if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
 		if (strstr(pCallbackData->pMessage, "VUID-vkDestroyBuffer-buffer-00922") == nullptr &&
-			strstr(pCallbackData->pMessage, "VUID-vkFreeMemory-memory-00677") == nullptr &&
-			strstr(pCallbackData->pMessage, "VUID-vkResetCommandBuffer-commandBuffer-00045") == nullptr)
+			strstr(pCallbackData->pMessage, "VUID-vkFreeMemory-memory-00677") == nullptr)
 		{
 			assert(false);
 		}
