@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\vcpkg.D.Code.Microsoft.vcpkg.1.0.0\build\native\vcpkg.D.Code.Microsoft.vcpkg.props" Condition="Exists('..\packages\vcpkg.D.Code.Microsoft.vcpkg.1.0.0\build\native\vcpkg.D.Code.Microsoft.vcpkg.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug12|x64">
       <Configuration>Debug12</Configuration>
@@ -901,11 +902,14 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets" Condition="Exists('..\packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets')" />
+    <Import Project="..\packages\vcpkg.D.Code.Microsoft.vcpkg.1.0.0\build\native\vcpkg.D.Code.Microsoft.vcpkg.targets" Condition="Exists('..\packages\vcpkg.D.Code.Microsoft.vcpkg.1.0.0\build\native\vcpkg.D.Code.Microsoft.vcpkg.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets'))" />
+    <Error Condition="!Exists('..\packages\vcpkg.D.Code.Microsoft.vcpkg.1.0.0\build\native\vcpkg.D.Code.Microsoft.vcpkg.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\vcpkg.D.Code.Microsoft.vcpkg.1.0.0\build\native\vcpkg.D.Code.Microsoft.vcpkg.props'))" />
+    <Error Condition="!Exists('..\packages\vcpkg.D.Code.Microsoft.vcpkg.1.0.0\build\native\vcpkg.D.Code.Microsoft.vcpkg.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\vcpkg.D.Code.Microsoft.vcpkg.1.0.0\build\native\vcpkg.D.Code.Microsoft.vcpkg.targets'))" />
   </Target>
 </Project>
