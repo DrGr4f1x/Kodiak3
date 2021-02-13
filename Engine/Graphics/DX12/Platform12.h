@@ -28,9 +28,7 @@
 #define D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN   ((D3D12_GPU_VIRTUAL_ADDRESS)-1)
 
 const std::string s_apiName = "DirectX 12";
-
 const std::string s_apiPrefixString = "[DirectX 12]";
-
 const std::string s_defaultShaderPath = "Shaders\\DXIL";
 
 namespace Kodiak
@@ -49,7 +47,6 @@ using CbvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
 
 using DsvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
 using RtvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
-using FboHandle = void*;
 
 static const uint32_t NumSwapChainBuffers = 3;
 

@@ -37,8 +37,6 @@ public:
 	uint32_t GetHeight() const { return m_height; }
 	uint32_t GetNumSamples() const { return m_numSamples; }
 
-	const FboHandle& GetFboHandle() const { return m_handle; }
-
 	void Finalize();
 
 private:
@@ -48,8 +46,6 @@ private:
 	uint32_t m_width{ 0 };
 	uint32_t m_height{ 0 };
 	uint32_t m_numSamples{ 0 };
-
-	FboHandle m_handle{};
 };
 
 using FrameBufferPtr = std::shared_ptr<FrameBuffer>;

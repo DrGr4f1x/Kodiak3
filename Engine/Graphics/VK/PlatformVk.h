@@ -48,8 +48,6 @@ inline void ThrowIfFailed(VkResult res)
 namespace Kodiak
 {
 
-using PsoHandle = VkPipeline;
-
 static const uint32_t NumSwapChainBuffers = 3;
 
 // Debug name functions
