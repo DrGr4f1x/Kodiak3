@@ -231,9 +231,6 @@
     <ClInclude Include="Graphics\DX12\PixelBuffer12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\VK\ResourceViewVk.h">
-      <Filter>Graphics\VK</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\DX12\ResourceView12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
@@ -268,6 +265,12 @@
       <Filter>Graphics\VK</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\DX12\PipelineStateBase12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\TextureVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\Texture12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
   </ItemGroup>
@@ -310,9 +313,6 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\Shader.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Texture.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\UIOverlay.cpp">
@@ -418,9 +418,6 @@
       <Filter>Graphics\VK</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\VK\ResourceSetVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\VK\ResourceViewVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\VK\RootSignatureVk.cpp">

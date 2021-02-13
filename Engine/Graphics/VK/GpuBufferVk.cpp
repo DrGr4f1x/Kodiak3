@@ -161,84 +161,47 @@ GpuBuffer::~GpuBuffer()
 }
 
 
-BufferViewDesc GpuBuffer::GetDesc() const
-{
-	BufferViewDesc resDesc = {};
-	resDesc.format = Format::Unknown;
-	resDesc.bufferSize = (uint32_t)m_bufferSize;
-	resDesc.elementCount = (uint32_t)m_elementCount;
-	resDesc.elementSize = (uint32_t)m_elementSize;
-	return resDesc;
-}
-
-
 void IndexBuffer::CreateDerivedViews()
 {
-	BufferViewDesc resDesc = GetDesc();
-
-	//m_srv.Create(m_resource, m_type, resDesc);
-	//m_uav.Create(m_resource, m_type, resDesc);
-
 	m_indexSize16 = (m_elementSize == 2);
-}
-
-
-void VertexBuffer::CreateDerivedViews()
-{
-	BufferViewDesc resDesc = GetDesc();
-
-	//m_srv.Create(m_resource, m_type, resDesc);
-	//m_uav.Create(m_resource, m_type, resDesc);
 }
 
 
 void ConstantBuffer::CreateDerivedViews()
 {
-	BufferViewDesc resDesc = GetDesc();
-
-	m_cbv.Create(m_buffer.Get(), resDesc);
+	m_bufferInfo = { m_buffer->Get(), 0, VK_WHOLE_SIZE };
 }
 
 
 void ByteAddressBuffer::CreateDerivedViews()
 {
-	BufferViewDesc resDesc = GetDesc();
-
-	m_srv.Create(m_buffer.Get(), m_type, resDesc);
-	m_uav.Create(m_buffer.Get(), m_type, resDesc);
+	m_bufferInfo = { m_buffer->Get(), 0, VK_WHOLE_SIZE };
 }
 
 
 void StructuredBuffer::CreateDerivedViews()
 {
-	BufferViewDesc resDesc = GetDesc();
-
-	m_srv.Create(m_buffer.Get(), ResourceType::StructuredBuffer, resDesc);
-	m_uav.Create(m_buffer.Get(), ResourceType::StructuredBuffer, resDesc);
+	m_bufferInfo = { m_buffer->Get(), 0, VK_WHOLE_SIZE };
 
 	m_counterBuffer.Create("Counter Buffer", 1, 4, false);
 }
 
 
-const ShaderResourceView& StructuredBuffer::GetCounterSRV(CommandContext& context)
+const VkDescriptorBufferInfo* StructuredBuffer::GetCounterSRVBufferInfoPtr(CommandContext& context)
 {
 	context.TransitionResource(m_counterBuffer, ResourceState::GenericRead);
-	return m_counterBuffer.GetSRV();
+	return m_counterBuffer.GetBufferInfoPtr();
 }
 
 
-const UnorderedAccessView& StructuredBuffer::GetCounterUAV(CommandContext& context)
+const VkDescriptorBufferInfo* StructuredBuffer::GetCounterUAVBufferInfoPtr(CommandContext& context)
 {
 	context.TransitionResource(m_counterBuffer, ResourceState::UnorderedAccess);
-	return m_counterBuffer.GetUAV();
+	return m_counterBuffer.GetBufferInfoPtr();
 }
 
 
 void TypedBuffer::CreateDerivedViews()
 {
-	BufferViewDesc resDesc = GetDesc();
-	resDesc.format = m_dataFormat;
-
-	m_srv.Create(m_buffer.Get(), m_type, resDesc);
-	m_uav.Create(m_buffer.Get(), m_type, resDesc);
+	m_bufferInfo = { m_buffer->Get(), 0, VK_WHOLE_SIZE };
 }

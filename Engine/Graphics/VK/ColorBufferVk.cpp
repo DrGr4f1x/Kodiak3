@@ -36,38 +36,9 @@ void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t
 
 	m_numMipMaps = numMips - 1;
 
-	RenderTargetViewDesc rtvDesc = { m_format, m_arraySize, numMips, m_fragmentCount, false };
-	m_rtvHandle.Create(m_image.Get(), rtvDesc);
-
-	TextureViewDesc srvDesc = {};
-	srvDesc.usage = ResourceState::ShaderResource;
-	srvDesc.format = format;
-	srvDesc.arraySize = m_arraySize;
-	srvDesc.mipCount = numMips;
-
-	ResourceType resType = ResourceType::Texture2D;
-	if (m_arraySize > 1)
-	{
-		resType = ResourceType::Texture2D_Array;
-	}
-	else if (m_fragmentCount > 1)
-	{
-		resType = ResourceType::Texture2DMS;
-	}
-
-	m_srvHandle.Create(m_image.Get(), resType, srvDesc);
-
-	if (m_fragmentCount == 1)
-	{
-		TextureViewDesc uavDesc = {};
-		uavDesc.usage = ResourceState::UnorderedAccess;
-		uavDesc.format = m_format;
-		uavDesc.mipCount = numMips;
-		uavDesc.mipLevel = 0;
-		uavDesc.arraySize = m_arraySize;
-
-		m_uavHandle.Create(m_image.Get(), resType, uavDesc);
-	}
+	ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), ResourceType::Texture2D, format, ImageAspect::Color, 0, numMips, 0, arraySize, &m_imageView));
+	m_imageInfoSRV = { VK_NULL_HANDLE, m_imageView->Get(), GetImageLayout(ResourceState::ShaderResource) };
+	m_imageInfoUAV = { VK_NULL_HANDLE, m_imageView->Get(), GetImageLayout(ResourceState::UnorderedAccess) };
 }
 
 

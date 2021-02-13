@@ -35,9 +35,9 @@ public:
 	void CreateArray(const std::string& name, uint32_t width, uint32_t height, uint32_t arrayCount, Format format);
 
 	// Get pre-created CPU-visible descriptor handles
-	const ShaderResourceView& GetSRV() const { return m_srvHandle; }
-	const RenderTargetView& GetRTV() const { return m_rtvHandle; }
-	const UnorderedAccessView& GetUAV() const { return m_uavHandle; }
+	VkImageView GetImageView() const { return m_imageView->Get(); }
+	const VkDescriptorImageInfo* GetSRVImageInfoPtr() const { return &m_imageInfoSRV; }
+	const VkDescriptorImageInfo* GetUAVImageInfoPtr() const { return &m_imageInfoUAV; }
 
 	void SetClearColor(Color clearColor) { m_clearColor = clearColor; }
 	Color GetClearColor() const { return m_clearColor; }
@@ -64,10 +64,10 @@ protected:
 	void CreateDerivedViews(Format format, uint32_t arraySize, uint32_t numMips);
 
 protected:
+	Microsoft::WRL::ComPtr<UVkImageView> m_imageView{ nullptr };
+	VkDescriptorImageInfo m_imageInfoSRV{};
+	VkDescriptorImageInfo m_imageInfoUAV{};
 	Color m_clearColor;
-	ShaderResourceView m_srvHandle;
-	RenderTargetView m_rtvHandle;
-	UnorderedAccessView m_uavHandle;
 	uint32_t m_numMipMaps{ 0 }; // number of texture sublevels
 	uint32_t m_fragmentCount{ 1 };
 };

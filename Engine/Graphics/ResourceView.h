@@ -13,7 +13,7 @@
 #if defined(DX12)
 #include "Graphics\DX12\ResourceView12.h"
 #elif defined(VK)
-#include "Graphics\VK\ResourceViewVk.h"
+//#include "Graphics\VK\ResourceViewVk.h"
 #else
 #error No graphics API defined!
 #endif

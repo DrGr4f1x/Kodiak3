@@ -27,12 +27,11 @@ public:
 	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numSamples, Format format);
 
 	// Get pre-created CPU - visible descriptor handles
-	const DepthStencilView& GetDSV() const { return m_dsv[0]; }
-	const DepthStencilView& GetDSV_DepthReadOnly() const { return m_dsv[1]; }
-	const DepthStencilView& GetDSV_StencilReadOnly() const { return m_dsv[2]; }
-	const DepthStencilView& GetDSV_ReadOnly() const { return m_dsv[3]; }
-	const ShaderResourceView& GetDepthSRV() const { return m_depthSRV; }
-	const ShaderResourceView& GetStencilSRV() const { return m_stencilSRV; }
+	VkImageView GetDepthStencilImageView() const { return m_imageViewDepthStencil->Get(); }
+	VkImageView GetDepthOnlyImageView() const { return m_imageViewDepthOnly->Get(); }
+	VkImageView GetStencilOnlyImageView() const { return m_imageViewStencilOnly->Get(); }
+	const VkDescriptorImageInfo* GetDepthImageInfoPtr() const { return &m_imageInfoDepth; }
+	const VkDescriptorImageInfo* GetStencilImageInfoPtr() const { return &m_imageInfoStencil; }
 
 	float GetClearDepth() const { return m_clearDepth; }
 	uint8_t GetClearStencil() const { return m_clearStencil; }
@@ -41,11 +40,14 @@ private:
 	void CreateDerivedViews();
 
 private:
+	Microsoft::WRL::ComPtr<UVkImageView> m_imageViewDepthStencil{ nullptr };
+	Microsoft::WRL::ComPtr<UVkImageView> m_imageViewDepthOnly{ nullptr };
+	Microsoft::WRL::ComPtr<UVkImageView> m_imageViewStencilOnly{ nullptr };
+	VkDescriptorImageInfo m_imageInfoDepth{};
+	VkDescriptorImageInfo m_imageInfoStencil{};
+
 	float m_clearDepth;
 	uint8_t m_clearStencil;
-	DepthStencilView m_dsv[4];
-	ShaderResourceView m_depthSRV;
-	ShaderResourceView m_stencilSRV;
 };
 
 using DepthBufferPtr = std::shared_ptr<DepthBuffer>;

@@ -296,10 +296,22 @@ VkImageAspectFlags GetAspectFlagsFromFormat(Format format, bool ignoreStencil)
 	return flags;
 }
 
+
 template <typename T>
 static inline bool HasFlag(T type, T flag)
 {
 	return (type & flag) != 0;
+}
+
+VkImageAspectFlags GetImageAspect(ImageAspect aspect)
+{
+	VkImageAspectFlags flags = 0;
+
+	flags |= HasFlag(aspect, ImageAspect::Color) ? VK_IMAGE_ASPECT_COLOR_BIT : 0;
+	flags |= HasFlag(aspect, ImageAspect::Depth) ? VK_IMAGE_ASPECT_DEPTH_BIT : 0;
+	flags |= HasFlag(aspect, ImageAspect::Stencil) ? VK_IMAGE_ASPECT_STENCIL_BIT : 0;
+
+	return flags;
 }
 
 

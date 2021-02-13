@@ -405,4 +405,14 @@ enum class CommandListType
 	Copy
 };
 
+
+enum class ImageAspect
+{
+	Color = 1 << 0,
+	Depth = 1 << 1,
+	Stencil = 1 << 2
+};
+
+template <> struct EnableBitmaskOperators<ImageAspect> { static const bool enable = true; };
+
 } // namespace Kodiak

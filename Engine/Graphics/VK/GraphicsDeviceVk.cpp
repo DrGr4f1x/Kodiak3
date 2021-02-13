@@ -384,7 +384,7 @@ VkResult GraphicsDevice::CreateCommandPool(uint32_t queueFamilyIndex, UVkCommand
 }
 
 
-VkResult GraphicsDevice::CreateImageView(UVkImage* uimage, ResourceType type, Format format, bool forceColorAspect, uint32_t baseMipLevel, uint32_t mipCount, uint32_t baseArraySlice, uint32_t arraySize, UVkImageView** ppImageView) const
+VkResult GraphicsDevice::CreateImageView(UVkImage* uimage, ResourceType type, Format format, ImageAspect aspect, uint32_t baseMipLevel, uint32_t mipCount, uint32_t baseArraySlice, uint32_t arraySize, UVkImageView** ppImageView) const
 {
 	VkImageViewCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -400,7 +400,7 @@ VkResult GraphicsDevice::CreateImageView(UVkImage* uimage, ResourceType type, Fo
 		createInfo.components.a = VK_COMPONENT_SWIZZLE_A;
 	}
 	createInfo.subresourceRange = {};
-	createInfo.subresourceRange.aspectMask = forceColorAspect ? VK_IMAGE_ASPECT_COLOR_BIT : GetAspectFlagsFromFormat(format);
+	createInfo.subresourceRange.aspectMask = GetImageAspect(aspect);
 	createInfo.subresourceRange.baseMipLevel = 0;
 	createInfo.subresourceRange.levelCount = mipCount;
 	createInfo.subresourceRange.baseArrayLayer = 0;
@@ -601,13 +601,13 @@ VkResult GraphicsDevice::CreateFramebuffer(const vector<ColorBufferPtr>& colorBu
 	uint32_t attachmentCount = 0;
 	for (uint32_t i = 0; i < numColorBuffers; ++i)
 	{
-		attachments[i] = colorBuffers[i]->GetRTV().GetImageView();
+		attachments[i] = colorBuffers[i]->GetImageView();
 		++attachmentCount;
 	}
 
 	if (depthBuffer)
 	{
-		attachments[attachmentCount] = depthBuffer->GetDSV().GetImageView();
+		attachments[attachmentCount] = depthBuffer->GetDepthStencilImageView();
 		++attachmentCount;
 	}
 

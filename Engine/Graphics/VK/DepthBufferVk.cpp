@@ -34,48 +34,27 @@ DepthBuffer::~DepthBuffer()
 
 void DepthBuffer::CreateDerivedViews()
 {
-	DepthStencilViewDesc dsvDesc = {};
-	dsvDesc.format = m_format;
-	dsvDesc.readOnlyDepth = false;
-	dsvDesc.readOnlyStencil = false;
-
-	m_dsv[0].Create(m_image.Get(), dsvDesc);
-
-	dsvDesc.readOnlyDepth = true;
-	m_dsv[1].Create(m_image.Get(), dsvDesc);
-
 	const bool hasStencil = IsStencilFormat(m_format);
+
+	
+	ImageAspect aspect = ImageAspect::Depth;
+	if (hasStencil)
+		aspect |= ImageAspect::Stencil;
+	ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), ResourceType::Texture2D, m_format, aspect, 0, 1, 0, 1, &m_imageViewDepthStencil));
 
 	if (hasStencil)
 	{
-		dsvDesc.readOnlyDepth = false;
-		dsvDesc.readOnlyStencil = true;
-		m_dsv[2].Create(m_image.Get(), dsvDesc);
-
-		dsvDesc.readOnlyDepth = true;
-		m_dsv[3].Create(m_image.Get(), dsvDesc);
+		ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), ResourceType::Texture2D, m_format, ImageAspect::Depth, 0, 1, 0, 1, &m_imageViewDepthOnly));
+		ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), ResourceType::Texture2D, m_format, ImageAspect::Stencil, 0, 1, 0, 1, &m_imageViewStencilOnly));
 	}
 	else
 	{
-		m_dsv[2] = m_dsv[0];
-		m_dsv[3] = m_dsv[1];
+		m_imageViewDepthOnly = m_imageViewDepthStencil;
+		m_imageViewStencilOnly = m_imageViewDepthStencil;
 	}
 
-	TextureViewDesc srvDesc = {};
-	srvDesc.format = m_format;
-	srvDesc.usage = ResourceState::ShaderResource;
-	srvDesc.arraySize = 1;
-	srvDesc.mipCount = 1;
-	srvDesc.isDepth = true;
-
-	m_depthSRV.Create(m_image.Get(), m_type, srvDesc);
-
-	if (hasStencil)
-	{
-		srvDesc.isDepth = false;
-		srvDesc.isStencil = true;
-		m_stencilSRV.Create(m_image.Get(), m_type, srvDesc);
-	}
+	m_imageInfoDepth = { VK_NULL_HANDLE, m_imageViewDepthOnly->Get(), GetImageLayout(ResourceState::ShaderResource) };
+	m_imageInfoStencil = { VK_NULL_HANDLE, m_imageViewStencilOnly->Get(), GetImageLayout(ResourceState::ShaderResource) };
 }
 
 

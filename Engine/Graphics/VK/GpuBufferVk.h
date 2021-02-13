@@ -12,7 +12,6 @@
 
 
 #include "GpuResourceVk.h"
-#include "ResourceViewVk.h"
 
 
 namespace Kodiak
@@ -36,8 +35,8 @@ public:
 	UVkBuffer* GetBufferHandle() { return m_buffer.Get(); }
 	const UVkBuffer* GetBufferHandle() const { return m_buffer.Get(); }
 
-	const ShaderResourceView& GetSRV() const { return m_srv; }
-	const UnorderedAccessView& GetUAV() const { return m_uav; }
+	const VkDescriptorBufferInfo* GetBufferInfoPtr() const { return &m_bufferInfo; }
+	//const VkDescriptorBufferInfo* GetUAVBufferInfoPtr() const { return &m_bufferInfoUAV; }
 
 	size_t GetSize() const { return m_bufferSize; }
 	size_t GetElementCount() const { return m_elementCount; }
@@ -55,8 +54,7 @@ protected:
 		m_type = type;
 	}
 	virtual void CreateDerivedViews() = 0;
-	BufferViewDesc GetDesc() const;
-
+	
 protected:
 	Microsoft::WRL::ComPtr<UVkBuffer> m_buffer;
 
@@ -66,8 +64,8 @@ protected:
 
 	uint64_t m_gpuAddress{ 0 };
 
-	ShaderResourceView m_srv;
-	UnorderedAccessView m_uav;
+	VkDescriptorBufferInfo m_bufferInfo{};
+	//VkDescriptorBufferInfo m_bufferInfoUAV{};
 };
 
 
@@ -98,7 +96,7 @@ public:
 	void Update(size_t sizeInBytes, size_t offset, const void* data);
 
 protected:
-	void CreateDerivedViews() override;
+	void CreateDerivedViews() override {}
 };
 
 
@@ -124,16 +122,11 @@ public:
 #endif
 	}
 
-	const ConstantBufferView& GetCBV() const { return m_cbv; }
-
 	void Update(size_t sizeInBytes, const void* data);
 	void Update(size_t sizeInBytes, size_t offset, const void* data);
 
 protected:
 	void CreateDerivedViews() override;
-
-private:
-	ConstantBufferView m_cbv;
 };
 
 
@@ -165,8 +158,8 @@ public:
 
 	ByteAddressBuffer& GetCounterBuffer() { return m_counterBuffer; }
 
-	const ShaderResourceView& GetCounterSRV(CommandContext& context);
-	const UnorderedAccessView& GetCounterUAV(CommandContext& context);
+	const VkDescriptorBufferInfo* GetCounterSRVBufferInfoPtr(CommandContext& context);
+	const VkDescriptorBufferInfo* GetCounterUAVBufferInfoPtr(CommandContext& context);
 
 	void CreateWithFlags(const std::string& name, size_t numElements, size_t elementSize, ResourceType flags, const void* initialData = nullptr)
 	{
