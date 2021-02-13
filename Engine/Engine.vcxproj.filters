@@ -294,9 +294,6 @@
     <ClCompile Include="Graphics\CommonStates.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Framebuffer.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\GraphicsFeatures.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -405,9 +402,6 @@
     <ClCompile Include="Graphics\VK\GpuBufferVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\VK\GpuImageVk.cpp">
-      <Filter>Graphics\VK</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\VK\GraphicsDeviceVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
@@ -447,6 +441,7 @@
     <ClCompile Include="Graphics\DX12\GpuResource12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\VK\GpuImageVk.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">

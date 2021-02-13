@@ -22,14 +22,12 @@ class GpuResource
 
 public:
 	GpuResource();
-	GpuResource(const ResourceHandle& resource, ResourceState initialState);
+	explicit GpuResource(ResourceState initialState);
 	virtual ~GpuResource() = 0;
 
 	const ResourceType GetType() const { return m_type; }
-	const ResourceHandle& GetHandle() const { return m_resource; }
 
 protected:
-	ResourceHandle	m_resource;
 	ResourceState	m_usageState;
 	ResourceState	m_transitioningState;
 	ResourceType	m_type;

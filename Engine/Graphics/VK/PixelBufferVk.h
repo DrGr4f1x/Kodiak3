@@ -16,7 +16,7 @@
 namespace Kodiak
 {
 
-class PixelBuffer : public GpuResource
+class PixelBuffer : public GpuImage
 {
 public:
 	uint32_t GetWidth() const { return m_width; }

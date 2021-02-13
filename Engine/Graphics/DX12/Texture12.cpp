@@ -213,6 +213,12 @@ void TextureInitializer::SetData(uint32_t slice, uint32_t mipLevel, const void* 
 }
 
 
+Texture::~Texture()
+{
+	g_graphicsDevice->ReleaseResource(m_resource);
+}
+
+
 void Texture::Create1D(uint32_t width, Format format, const void* initData)
 {
 	TextureInitializer init(ResourceType::Texture1D, format, width, 1, 1, 1);
@@ -282,6 +288,20 @@ void Texture::Create(TextureInitializer& init)
 	CommandContext::InitializeTexture(*this, arraySize * m_numMips, init.m_platformData->data.data());
 
 	CreateDerivedViews();
+}
+
+
+void Texture::CreateDerivedViews()
+{
+	TextureViewDesc desc = {};
+	desc.format = m_format;
+	desc.usage = ResourceState::ShaderResource;
+	desc.arraySize = m_arraySize;
+	desc.mipCount = m_numMips;
+	desc.isDepth = false;
+	desc.isStencil = false;
+
+	m_srv.Create(m_resource, m_type, desc);
 }
 
 

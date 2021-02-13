@@ -49,19 +49,7 @@ inline void ThrowIfFailed(VkResult res)
 namespace Kodiak
 {
 
-using PlatformHandle = std::shared_ptr<VkBaseHandle>;
-using ResourceHandle = VkResourceHandle::VkPointer;
 using PsoHandle = VkPipeline;
-
-using SrvHandle = VkDescriptorHandle::VkPointer;
-using UavHandle = VkDescriptorHandle::VkPointer;
-struct IbvHandle {};
-struct VbvHandle {};
-using CbvHandle = VkDescriptorHandle::VkPointer;
-
-using DsvHandle = VkHandle<VkImageView>::VkPointer;
-using RtvHandle = VkHandle<VkImageView>::VkPointer;
-using FboHandle = VkFramebufferHandle::VkPointer;
 
 static const uint32_t NumSwapChainBuffers = 3;
 

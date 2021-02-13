@@ -85,8 +85,9 @@ public:
 	static void InitializeTexture(Texture& dest, size_t numBytes, const void* initData, uint32_t numBuffers, VkBufferImageCopy bufferCopies[]);
 	static void InitializeBuffer(GpuBuffer& dest, const void* initialData, size_t numBytes, bool useOffset = false, size_t offset = 0);
 
-	void TransitionResource(GpuResource& resource, ResourceState newState, bool flushImmediate = false);
-	void InsertUAVBarrier(GpuResource& resource, bool flushImmediate = false);
+	void TransitionResource(GpuBuffer& resource, ResourceState newState, bool flushImmediate = false);
+	void TransitionResource(GpuImage& image, ResourceState newState, bool flushImmediate = false);
+	void InsertUAVBarrier(GpuBuffer& resource, bool flushImmediate = false);
 	//void InsertAliasBarrier(GpuResource& before, GpuResource& after, bool flushImmediate = false);
 	inline void FlushResourceBarriers() { /* TODO - see if we can cache and flush multiple barriers at once */ }
 
@@ -132,7 +133,7 @@ public:
 
 	void BeginOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex);
 	void EndOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t heapIndex);
-	void ResolveOcclusionQueries(OcclusionQueryHeap& queryHeap, uint32_t startIndex, uint32_t numQueries, GpuResource& destBuffer, uint64_t destBufferOffset);
+	void ResolveOcclusionQueries(OcclusionQueryHeap& queryHeap, uint32_t startIndex, uint32_t numQueries, GpuBuffer& destBuffer, uint64_t destBufferOffset);
 	void ResetOcclusionQueries(OcclusionQueryHeap& queryHeap, uint32_t startIndex, uint32_t numQueries);
 
 	void SetRootSignature(const RootSignature& rootSig);
@@ -222,7 +223,7 @@ inline void GraphicsContext::ClearColor(ColorBuffer& target)
 	range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 
 	FlushResourceBarriers();
-	vkCmdClearColorImage(m_commandList, target.m_resource, GetImageLayout(target.m_usageState), &colVal, 1, &range);
+	vkCmdClearColorImage(m_commandList, target.m_image->Get(), GetImageLayout(target.m_usageState), &colVal, 1, &range);
 
 	TransitionResource(target, oldState);
 }
@@ -248,7 +249,7 @@ inline void GraphicsContext::ClearColor(ColorBuffer& target, Color clearColor)
 	range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 
 	FlushResourceBarriers();
-	vkCmdClearColorImage(m_commandList, target.m_resource, GetImageLayout(target.m_usageState), &colVal, 1, &range);
+	vkCmdClearColorImage(m_commandList, target.m_image->Get(), GetImageLayout(target.m_usageState), &colVal, 1, &range);
 
 	TransitionResource(target, oldState);
 }
@@ -272,7 +273,7 @@ inline void GraphicsContext::ClearDepth(DepthBuffer& target)
 	range.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
 
 	FlushResourceBarriers();
-	vkCmdClearDepthStencilImage(m_commandList, target.m_resource, GetImageLayout(target.m_usageState), &depthVal, 1, &range);
+	vkCmdClearDepthStencilImage(m_commandList, target.m_image->Get(), GetImageLayout(target.m_usageState), &depthVal, 1, &range);
 
 	TransitionResource(target, oldState);
 }
@@ -296,7 +297,7 @@ inline void GraphicsContext::ClearStencil(DepthBuffer& target)
 	range.aspectMask = VK_IMAGE_ASPECT_STENCIL_BIT;
 
 	FlushResourceBarriers();
-	vkCmdClearDepthStencilImage(m_commandList, target.m_resource, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &depthVal, 1, &range);
+	vkCmdClearDepthStencilImage(m_commandList, target.m_image->Get(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &depthVal, 1, &range);
 
 	TransitionResource(target, oldState);
 }
@@ -320,7 +321,7 @@ inline void GraphicsContext::ClearDepthAndStencil(DepthBuffer& target)
 	range.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
 
 	FlushResourceBarriers();
-	vkCmdClearDepthStencilImage(m_commandList, target.m_resource, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &depthVal, 1, &range);
+	vkCmdClearDepthStencilImage(m_commandList, target.m_image->Get(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &depthVal, 1, &range);
 	TransitionResource(target, oldState);
 }
 
@@ -403,14 +404,14 @@ inline void GraphicsContext::SetResources(const ResourceSet& resources)
 inline void GraphicsContext::SetIndexBuffer(const IndexBuffer& indexBuffer)
 {
 	VkIndexType indexType = indexBuffer.IndexSize16Bit() ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32;
-	vkCmdBindIndexBuffer(m_commandList, indexBuffer.m_resource, 0, indexType);
+	vkCmdBindIndexBuffer(m_commandList, indexBuffer.m_buffer->Get(), 0, indexType);
 }
 
 
 inline void GraphicsContext::SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer)
 {
 	VkDeviceSize offsets[1] = { 0 };
-	VkBuffer buffers[1] = { vertexBuffer.m_resource };
+	VkBuffer buffers[1] = { vertexBuffer.m_buffer->Get() };
 	vkCmdBindVertexBuffers(m_commandList, slot, 1, buffers, offsets);
 }
 
@@ -418,7 +419,7 @@ inline void GraphicsContext::SetVertexBuffer(uint32_t slot, const VertexBuffer& 
 inline void GraphicsContext::SetVertexBuffer(uint32_t slot, const StructuredBuffer& vertexBuffer)
 {
 	VkDeviceSize offsets[1] = { 0 };
-	VkBuffer buffers[1] = { vertexBuffer.m_resource };
+	VkBuffer buffers[1] = { vertexBuffer.m_buffer->Get() };
 	vkCmdBindVertexBuffers(m_commandList, slot, 1, buffers, offsets);
 }
 
@@ -430,7 +431,7 @@ inline void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count
 	for (uint32_t i = 0; i < count; ++i)
 	{
 		offsets[i] = 0;
-		buffers[i] = vertexBuffers[i].m_resource;
+		buffers[i] = vertexBuffers[i].m_buffer->Get();
 	}
 	vkCmdBindVertexBuffers(m_commandList, startSlot, count, buffers.data(), offsets.data());
 }
@@ -489,9 +490,9 @@ inline void GraphicsContext::Resolve(ColorBuffer& src, ColorBuffer& dest, Format
 
 	vkCmdResolveImage(
 		m_commandList, 
-		src.m_resource, 
+		src.m_image->Get(), 
 		VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 
-		dest.m_resource, 
+		dest.m_image->Get(), 
 		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
 		1, 
 		&resolve);

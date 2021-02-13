@@ -49,14 +49,19 @@ class ShaderResourceView
 public:
 	ShaderResourceView();
 
-	void Create(const ResourceHandle& resource, ResourceType type, const TextureViewDesc& desc);
-	void Create(const ResourceHandle& resource, ResourceType type, const BufferViewDesc& desc);
+	void Create(UVkImage* uimage, ResourceType type, const TextureViewDesc& desc);
+	void Create(UVkBuffer* ubuffer, ResourceType type, const BufferViewDesc& desc);
 
-	SrvHandle& GetHandle() { return m_handle; }
-	const SrvHandle& GetHandle() const { return m_handle; }
+	// TODO Get rid of this
+	VkImageView& GetImageViewRef() const { return m_imageView->GetRef(); }
+	VkImageView GetImageView() const { return m_imageView->Get(); }
+	const VkDescriptorImageInfo* GetDescriptorImageInfoPtr() const { return &m_imageInfo; }
+	const VkDescriptorBufferInfo* GetDescriptorBufferInfoPtr() const { return &m_bufferInfo; }
 
 private:
-	SrvHandle m_handle;
+	Microsoft::WRL::ComPtr<UVkImageView> m_imageView;
+	VkDescriptorImageInfo m_imageInfo{};
+	VkDescriptorBufferInfo m_bufferInfo{};
 };
 
 
@@ -65,15 +70,18 @@ class UnorderedAccessView
 public:
 	UnorderedAccessView();
 
-	void Create(const ResourceHandle& resource, ResourceType type, const TextureViewDesc& desc);
-	void Create(const ResourceHandle& resource, ResourceType type, const BufferViewDesc& desc);
-	void Create(const ResourceHandle& resource, ResourceType type, const TypedBufferViewDesc& desc);
+	void Create(UVkImage* uimage, ResourceType type, const TextureViewDesc& desc);
+	void Create(UVkBuffer* ubuffer, ResourceType type, const BufferViewDesc& desc);
+	void Create(UVkBuffer* ubuffer, ResourceType type, const TypedBufferViewDesc& desc);
 
-	UavHandle& GetHandle() { return m_handle; }
-	const UavHandle& GetHandle() const { return m_handle; }
+	VkImageView GetImageView() const { return m_imageView->Get(); }
+	const VkDescriptorImageInfo* GetDescriptorImageInfoPtr() const { return &m_imageInfo; }
+	const VkDescriptorBufferInfo* GetDescriptorBufferInfoPtr() const { return &m_bufferInfo; }
 
 private:
-	UavHandle m_handle;
+	Microsoft::WRL::ComPtr<UVkImageView> m_imageView;
+	VkDescriptorImageInfo m_imageInfo{};
+	VkDescriptorBufferInfo m_bufferInfo{};
 };
 
 
@@ -82,13 +90,12 @@ class ConstantBufferView
 public:
 	ConstantBufferView();
 
-	void Create(const ResourceHandle& resource, const BufferViewDesc& desc);
+	void Create(UVkBuffer* ubuffer, const BufferViewDesc& desc);
 
-	CbvHandle& GetHandle() { return m_handle; }
-	const CbvHandle& GetHandle() const { return m_handle; }
+	const VkDescriptorBufferInfo* GetDescriptorBufferInfoPtr() const { return &m_bufferInfo; }
 
 private:
-	CbvHandle m_handle;
+	VkDescriptorBufferInfo m_bufferInfo{};
 };
 
 
@@ -105,13 +112,12 @@ class DepthStencilView
 public:
 	DepthStencilView();
 
-	void Create(const ResourceHandle& resource, const DepthStencilViewDesc& desc);
+	void Create(UVkImage* uimage, const DepthStencilViewDesc& desc);
 
-	DsvHandle& GetHandle() { return m_handle; }
-	const DsvHandle& GetHandle() const { return m_handle; }
+	VkImageView GetImageView() const { return m_imageView->Get(); }
 
 private:
-	DsvHandle m_handle;
+	Microsoft::WRL::ComPtr<UVkImageView> m_imageView;
 };
 
 
@@ -130,13 +136,12 @@ class RenderTargetView
 public:
 	RenderTargetView();
 
-	void Create(const ResourceHandle& resource, const RenderTargetViewDesc& desc);
+	void Create(UVkImage* uimage, const RenderTargetViewDesc& desc);
 
-	RtvHandle& GetHandle() { return m_handle; }
-	const RtvHandle& GetHandle() const { return m_handle; }
+	VkImageView GetImageView() const { return m_imageView->Get(); }
 
 private:
-	RtvHandle m_handle;
+	Microsoft::WRL::ComPtr<UVkImageView> m_imageView;
 };
 
 } // namespace Kodiak

@@ -409,7 +409,7 @@ inline void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count
 	{
 		vbv[i] = vertexBuffers[i].GetVBV().GetHandle();
 	}
-	m_commandList->IASetVertexBuffers(startSlot, 1, vbv.data());
+	m_commandList->IASetVertexBuffers(startSlot, count, vbv.data());
 }
 
 

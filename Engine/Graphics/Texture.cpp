@@ -74,12 +74,6 @@ shared_ptr<Texture> MakeTexture(const string& filename, F fn)
 Texture::Texture() = default;
 
 
-Texture::~Texture()
-{
-	g_graphicsDevice->ReleaseResource(m_resource);
-}
-
-
 shared_ptr<Texture> Texture::Load(const string& filename, Format format, bool sRgb)
 {
 	auto& filesystem = Filesystem::GetInstance();
@@ -172,20 +166,6 @@ void Texture::LoadTexture(const string& fullpath, Format format, bool sRgb)
 	}
 
 	stbi_image_free(data);
-}
-
-
-void Texture::CreateDerivedViews()
-{
-	TextureViewDesc desc = {};
-	desc.format = m_format;
-	desc.usage = ResourceState::ShaderResource;
-	desc.arraySize = m_arraySize;
-	desc.mipCount = m_numMips;
-	desc.isDepth = false;
-	desc.isStencil = false;
-
-	m_srv.Create(m_resource, m_type, desc);
 }
 
 

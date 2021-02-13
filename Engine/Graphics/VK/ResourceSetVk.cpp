@@ -100,7 +100,7 @@ void ResourceSet::SetSRV(int rootIndex, int paramIndex, const ColorBuffer& buffe
 	writeSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 	writeSet.dstSet = m_resourceTables[rootIndex].descriptorSet;
 	writeSet.dstBinding = paramIndex;
-	writeSet.pImageInfo = buffer.GetSRV().GetHandle();
+	writeSet.pImageInfo = buffer.GetSRV().GetDescriptorImageInfoPtr();
 }
 
 
@@ -115,11 +115,11 @@ void ResourceSet::SetSRV(int rootIndex, int paramIndex, const DepthBuffer& buffe
 
 	if (depthSrv)
 	{
-		writeSet.pImageInfo = buffer.GetDepthSRV().GetHandle();
+		writeSet.pImageInfo = buffer.GetDepthSRV().GetDescriptorImageInfoPtr();
 	}
 	else
 	{
-		writeSet.pImageInfo = buffer.GetStencilSRV().GetHandle();
+		writeSet.pImageInfo = buffer.GetStencilSRV().GetDescriptorImageInfoPtr();
 	}
 }
 
@@ -132,7 +132,7 @@ void ResourceSet::SetSRV(int rootIndex, int paramIndex, const StructuredBuffer& 
 	writeSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 	writeSet.dstSet = m_resourceTables[rootIndex].descriptorSet;
 	writeSet.dstBinding = paramIndex;
-	writeSet.pBufferInfo = buffer.GetSRV().GetHandle();
+	writeSet.pBufferInfo = buffer.GetSRV().GetDescriptorBufferInfoPtr();
 }
 
 
@@ -144,7 +144,7 @@ void ResourceSet::SetSRV(int rootIndex, int paramIndex, const Texture& texture)
 	writeSet.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 	writeSet.dstSet = m_resourceTables[rootIndex].descriptorSet;
 	writeSet.dstBinding = paramIndex;
-	writeSet.pImageInfo = texture.GetSRV().GetHandle();
+	writeSet.pImageInfo = texture.GetSRV().GetDescriptorImageInfoPtr();
 }
 
 
@@ -156,7 +156,7 @@ void ResourceSet::SetUAV(int rootIndex, int paramIndex, const ColorBuffer& buffe
 	writeSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
 	writeSet.dstSet = m_resourceTables[rootIndex].descriptorSet;
 	writeSet.dstBinding = paramIndex;
-	writeSet.pImageInfo = buffer.GetUAV().GetHandle();
+	writeSet.pImageInfo = buffer.GetUAV().GetDescriptorImageInfoPtr();
 }
 
 
@@ -174,7 +174,7 @@ void ResourceSet::SetUAV(int rootIndex, int paramIndex, const StructuredBuffer& 
 	writeSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 	writeSet.dstSet = m_resourceTables[rootIndex].descriptorSet;
 	writeSet.dstBinding = paramIndex;
-	writeSet.pBufferInfo = buffer.GetUAV().GetHandle();
+	writeSet.pBufferInfo = buffer.GetUAV().GetDescriptorBufferInfoPtr();
 }
 
 
@@ -192,7 +192,7 @@ void ResourceSet::SetCBV(int rootIndex, int paramIndex, const ConstantBuffer& bu
 	writeSet.descriptorType = m_resourceTables[rootIndex].isDynamicCBV ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC : VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	writeSet.dstSet = m_resourceTables[rootIndex].descriptorSet;
 	writeSet.dstBinding = paramIndex;
-	writeSet.pBufferInfo = buffer.GetCBV().GetHandle();
+	writeSet.pBufferInfo = buffer.GetCBV().GetDescriptorBufferInfoPtr();
 }
 
 

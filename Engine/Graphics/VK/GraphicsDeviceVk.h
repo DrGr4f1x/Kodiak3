@@ -11,11 +11,40 @@
 #pragma once
 
 #include "Graphics\ColorBuffer.h"
+#include "Graphics\DepthBuffer.h"
 #include "Graphics\GraphicsFeatures.h"
 
 
 namespace Kodiak
 {
+
+struct ImageDesc
+{
+	Format format =				Format::Unknown;
+	ResourceType type =			ResourceType::Unknown;
+	GpuImageUsage usage =		GpuImageUsage::Unknown;
+	MemoryAccess access =		MemoryAccess::Unknown;
+	uint32_t width =			1;
+	uint32_t height =			1;
+	uint32_t depthOrArraySize = 1;
+	uint32_t numMips =			1;
+	uint32_t numSamples =		1;
+
+	uint32_t GetDepth() const { return type == ResourceType::Texture3D ? depthOrArraySize : 1; }
+	uint32_t GetArraySize() const { return IsTextureArray(type) ? depthOrArraySize : 1; }
+};
+
+
+struct BufferDesc
+{
+	Format format =					Format::Unknown;
+	ResourceType type =				ResourceType::Unknown;
+	MemoryAccess access =			MemoryAccess::Unknown;
+	uint32_t numElements =			0;
+	uint32_t elementSizeInBytes =	0;
+	uint32_t bufferSizeInBytes =	0;
+};
+
 
 class GraphicsDevice
 {
@@ -35,6 +64,12 @@ public:
 	KODIAK_NODISCARD VkResult CreateAllocator(UVmaAllocator** ppAllocator) const;
 	KODIAK_NODISCARD VkResult CreateQueryPool(QueryHeapType type, uint32_t queryCount, UVkQueryPool** ppPool) const;
 	KODIAK_NODISCARD VkResult CreateCommandPool(uint32_t queueFamilyIndex, UVkCommandPool** ppPool) const;
+	KODIAK_NODISCARD VkResult CreateImageView(UVkImage* uimage, ResourceType type, Format format, bool forceColorAspect, uint32_t baseMipLevel, uint32_t mipCount, uint32_t baseArraySlice, uint32_t arraySize, UVkImageView** ppImageView) const;
+	KODIAK_NODISCARD VkResult CreateBufferView(UVkBuffer* ubuffer, ResourceType type, Format format, uint32_t offsetInBytes, uint32_t sizeInBytes, UVkBufferView** ppBufferView) const;
+	KODIAK_NODISCARD VkResult CreateRenderPass(const std::vector<ColorBufferPtr>& colorBuffers, DepthBufferPtr depthBuffer, UVkRenderPass** ppRenderPass) const;
+	KODIAK_NODISCARD VkResult CreateFramebuffer(const std::vector<ColorBufferPtr>& colorBuffers, DepthBufferPtr depthBuffer, VkRenderPass renderPass, UVkFramebuffer** ppFramebuffer) const;
+	KODIAK_NODISCARD VkResult CreateBuffer(const std::string& name, const BufferDesc& desc, UVkBuffer** ppBuffer) const;
+	KODIAK_NODISCARD VkResult CreateImage(const std::string& name, const ImageDesc& desc, UVkImage** ppImage) const;
 
 	Format GetColorFormat() const { return m_colorFormat; }
 	Format GetDepthFormat() const { return m_depthFormat; }
@@ -46,10 +81,11 @@ public:
 
 	const std::string& GetDeviceName() const { return m_deviceName; }
 
-	void ReleaseResource(PlatformHandle handle);
+	void ReleaseResource(UVkImage* image);
+	void ReleaseResource(UVkBuffer* buffer);
 
 	uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound) const;
-	VkFormatProperties GetFormatProperties(Format format);
+	VkFormatProperties GetFormatProperties(Format format) const;
 	uint32_t GetQueueFamilyIndex(CommandListType type) const;
 
 private:
@@ -105,7 +141,8 @@ private:
 	struct DeferredReleaseResource
 	{
 		uint64_t fenceValue;
-		PlatformHandle resourceHandle;
+		Microsoft::WRL::ComPtr<UVkImage> image;
+		Microsoft::WRL::ComPtr<UVkBuffer> buffer;
 	};
 	std::list<DeferredReleaseResource> m_deferredResources;
 

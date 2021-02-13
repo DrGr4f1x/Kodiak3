@@ -17,16 +17,14 @@ using namespace Kodiak;
 
 
 GpuResource::GpuResource()
-	: m_resource(nullptr)
-	, m_usageState(ResourceState::Undefined)
+	: m_usageState(ResourceState::Undefined)
 	, m_transitioningState(ResourceState::Undefined)
 	, m_type(ResourceType::Unknown)
 {}
 
 
-GpuResource::GpuResource(const ResourceHandle& resource, ResourceState initialState)
-	: m_resource(resource)
-	, m_usageState(initialState)
+GpuResource::GpuResource(ResourceState initialState)
+	: m_usageState(initialState)
 	, m_transitioningState(ResourceState::Undefined)
 	, m_type(ResourceType::Unknown)
 {}

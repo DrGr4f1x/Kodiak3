@@ -44,6 +44,11 @@ DEFINE_GUID(IID_UVkBufferView, 0x2cfdbef9, 0x69af, 0x43a1, 0x9b, 0x43, 0x75, 0xb
 DEFINE_GUID(IID_UVkQueryPool, 0xcd51d2ff, 0xe501, 0x4cf4, 0xbd, 0x97, 0x70, 0x50, 0xab, 0x4e, 0x26, 0x36);
 // {9EB11631-4FDB-42A1-B3B8-E3B3FBBB2D01}
 DEFINE_GUID(IID_UVkCommandPool,	0x9eb11631, 0x4fdb, 0x42a1, 0xb3, 0xb8, 0xe3, 0xb3, 0xfb, 0xbb, 0x2d, 0x1);
+// {F05E727A-9ACB-456E-9E4B-805001847390}
+DEFINE_GUID(IID_UVkRenderPass, 0xf05e727a, 0x9acb, 0x456e, 0x9e, 0x4b, 0x80, 0x50, 0x1, 0x84, 0x73, 0x90);
+// {81B64F6D-7C5D-4A8F-8654-71F4453AD9CA}
+DEFINE_GUID(IID_UVkFramebuffer, 0x81b64f6d, 0x7c5d, 0x4a8f, 0x86, 0x54, 0x71, 0xf4, 0x45, 0x3a, 0xd9, 0xca);
+
 
 
 
@@ -429,6 +434,9 @@ public:
 
 	VkBuffer Get() const { return m_buffer; }
 	operator VkBuffer() const { return m_buffer; }
+	
+	VmaAllocator GetAllocator() const { return m_allocator->Get(); }
+	VmaAllocation GetAllocation() const { return m_allocation; }
 
 	IMPLEMENT_IUNKNOWN(IID_UVkBuffer)
 
@@ -461,6 +469,7 @@ public:
 		}
 	}
 
+	VkImageView& GetRef() { return m_imageView; }
 	VkImageView Get() const { return m_imageView; }
 	operator VkImageView() const { return m_imageView; }
 
@@ -562,6 +571,66 @@ public:
 private:
 	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
 	VkCommandPool m_commandPool{ VK_NULL_HANDLE };
+};
+
+
+//
+// VkRenderPass
+//
+class UVkRenderPass : public IUnknown, public NonCopyable
+{
+public:
+	UVkRenderPass(UVkDevice* udevice, VkRenderPass renderPass)
+		: m_device(udevice)
+		, m_renderPass(renderPass)
+	{}
+	~UVkRenderPass()
+	{
+		if (m_renderPass)
+		{
+			vkDestroyRenderPass(m_device->Get(), m_renderPass, nullptr);
+			m_renderPass = VK_NULL_HANDLE;
+		}
+	}
+
+	VkRenderPass Get() const { return m_renderPass; }
+	operator VkRenderPass() const { return m_renderPass; }
+
+	IMPLEMENT_IUNKNOWN(IID_UVkRenderPass)
+
+private:
+	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
+	VkRenderPass m_renderPass{ VK_NULL_HANDLE };
+};
+
+
+//
+// VkFramebuffer
+//
+class UVkFramebuffer : public IUnknown, public NonCopyable
+{
+public:
+	UVkFramebuffer(UVkDevice* udevice, VkFramebuffer framebuffer)
+		: m_device(udevice)
+		, m_framebuffer(framebuffer)
+	{}
+	~UVkFramebuffer()
+	{
+		if (m_framebuffer)
+		{
+			vkDestroyFramebuffer(m_device->Get(), m_framebuffer, nullptr);
+			m_framebuffer = VK_NULL_HANDLE;
+		}
+	}
+
+	VkFramebuffer Get() const { return m_framebuffer; }
+	operator VkFramebuffer() const { return m_framebuffer; }
+
+	IMPLEMENT_IUNKNOWN(IID_UVkFramebuffer)
+
+private:
+	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
+	VkFramebuffer m_framebuffer{ VK_NULL_HANDLE };
 };
 
 } // namespace Kodiak

@@ -314,6 +314,12 @@ inline bool IsDepthStencilFormat(Format format)
 }
 
 
+inline bool IsColorFormat(Format format)
+{
+	return !IsDepthStencilFormat(format);
+}
+
+
 enum class ResourceType
 {
 	Unknown =				1 << 0,
@@ -345,10 +351,48 @@ inline bool IsTextureResource(ResourceType type)
 }
 
 
+inline bool IsTextureArray(ResourceType type)
+{
+	return 
+		type == ResourceType::Texture1D_Array ||
+		type == ResourceType::Texture2D_Array ||
+		type == ResourceType::Texture2DMS_Array ||
+		type == ResourceType::TextureCube ||
+		type == ResourceType::TextureCube_Array;
+}
+
+
 inline bool IsBufferResource(ResourceType type)
 {
 	return (type > ResourceType::Texture3D);
 }
+
+
+enum class GpuImageUsage
+{
+	Unknown = 0,
+	RenderTarget = 1 << 0,
+	DepthStencilTarget = 1 << 1,
+	ShaderResource = 1 << 2,
+	UnorderedAccess = 1 << 3,
+	CopySource = 1 << 4,
+	CopyDest = 1 << 5,
+};
+
+template <> struct EnableBitmaskOperators<GpuImageUsage> { static const bool enable = true; };
+
+
+enum class MemoryAccess
+{
+	Unknown = 0,
+	GpuRead = 1 << 0,
+	GpuWrite = 1 << 1,
+	CpuRead = 1 << 2,
+	CpuWrite = 1 << 3,
+	CpuMapped = 1 << 4
+};
+
+template <> struct EnableBitmaskOperators<MemoryAccess> { static const bool enable = true; };
 
 
 enum class GpuVendor

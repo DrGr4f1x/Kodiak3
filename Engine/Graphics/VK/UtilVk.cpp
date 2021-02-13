@@ -23,55 +23,6 @@ using namespace std;
 namespace Kodiak
 {
 
-VkImageCreateInfo DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthOrArraySize, uint32_t numMips,
-	uint32_t numSamples, Format format, VkImageUsageFlags usageFlags)
-{
-	VkImageCreateInfo imageCreateInfo = {};
-	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-	imageCreateInfo.pNext = nullptr;
-	imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-	imageCreateInfo.format = static_cast<VkFormat>(format);
-	imageCreateInfo.extent = { width, height, 1 };
-	imageCreateInfo.mipLevels = numMips;
-	imageCreateInfo.arrayLayers = depthOrArraySize;
-	imageCreateInfo.samples = SamplesToFlags(numSamples);
-	imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-	imageCreateInfo.usage = usageFlags;
-	imageCreateInfo.flags = 0;
-
-	return imageCreateInfo;
-}
-
-
-ResourceHandle CreateTextureResource(const string& name, const VkImageCreateInfo& imageCreateInfo)
-{
-	VkDevice device = GetDevice();
-
-	VkImage image{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateImage(device, &imageCreateInfo, nullptr, &image));
-
-	VkMemoryRequirements memReqs = {};
-	vkGetImageMemoryRequirements(device, image, &memReqs);
-
-	VkMemoryAllocateInfo memoryAllocateInfo = {};
-	memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	memoryAllocateInfo.pNext = nullptr;
-	memoryAllocateInfo.allocationSize = memReqs.size;
-	memoryAllocateInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-	VkDeviceMemory mem{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &mem));
-	ResourceHandle handle = ResourceHandle::Create(image, mem);
-
-	ThrowIfFailed(vkBindImageMemory(device, image, handle, 0));
-
-	SetDebugName(image, name + " image");
-	SetDebugName(mem, name + " memory");
-
-	return handle;
-}
-
-
 VkSampleCountFlagBits Kodiak::SamplesToFlags(uint32_t numSamples)
 {
 	switch (numSamples)
@@ -95,6 +46,7 @@ VkSampleCountFlagBits Kodiak::SamplesToFlags(uint32_t numSamples)
 		return VK_SAMPLE_COUNT_1_BIT;
 	}
 }
+
 
 VkImageType GetImageType(ResourceType type)
 {
@@ -342,6 +294,75 @@ VkImageAspectFlags GetAspectFlagsFromFormat(Format format, bool ignoreStencil)
 	}
 
 	return flags;
+}
+
+template <typename T>
+static inline bool HasFlag(T type, T flag)
+{
+	return (type & flag) != 0;
+}
+
+
+VkImageUsageFlags GetImageUsageFlags(GpuImageUsage usage)
+{
+	VkImageUsageFlags flags = 0;
+
+	flags |= HasFlag(usage, GpuImageUsage::RenderTarget) ? VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT : 0;
+	flags |= HasFlag(usage, GpuImageUsage::DepthStencilTarget) ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : 0;
+	flags |= HasFlag(usage, GpuImageUsage::CopySource) ? VK_IMAGE_USAGE_TRANSFER_SRC_BIT : 0;
+	flags |= HasFlag(usage, GpuImageUsage::CopyDest) ? VK_IMAGE_USAGE_TRANSFER_DST_BIT : 0;
+	flags |= HasFlag(usage, GpuImageUsage::ShaderResource) ? VK_IMAGE_USAGE_SAMPLED_BIT : 0;
+	flags |= HasFlag(usage, GpuImageUsage::UnorderedAccess) ? VK_IMAGE_USAGE_STORAGE_BIT : 0;
+
+	return flags;
+}
+
+
+VkBufferUsageFlags GetBufferUsageFlags(ResourceType type)
+{
+	static const ResourceType s_genericBuffer =
+		ResourceType::ByteAddressBuffer | 
+		ResourceType::IndirectArgsBuffer | 
+		ResourceType::ReadbackBuffer;
+
+	VkBufferUsageFlags flags = 0;
+
+	flags |= HasFlag(type, ResourceType::IndexBuffer) ? VK_BUFFER_USAGE_INDEX_BUFFER_BIT : 0;
+	flags |= HasFlag(type, ResourceType::VertexBuffer) ? VK_BUFFER_USAGE_VERTEX_BUFFER_BIT : 0;
+	flags |= HasFlag(type, ResourceType::TypedBuffer) ? (VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT) : 0;
+	flags |= HasFlag(type, s_genericBuffer) ? VK_BUFFER_USAGE_STORAGE_BUFFER_BIT : 0;
+	flags |= HasFlag(type, ResourceType::StructuredBuffer) ? VK_BUFFER_USAGE_STORAGE_BUFFER_BIT : 0;
+	flags |= HasFlag(type, ResourceType::ConstantBuffer) ? VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT : 0;
+
+	return flags;
+}
+
+
+VmaAllocationCreateFlags GetMemoryFlags(MemoryAccess access)
+{
+	return HasFlag(access, MemoryAccess::CpuMapped) ? VMA_ALLOCATION_CREATE_MAPPED_BIT : 0;
+}
+
+
+VmaMemoryUsage GetMemoryUsage(MemoryAccess access)
+{
+	bool bGpuAccessAny = HasFlag(access, MemoryAccess::GpuRead) || HasFlag(access, MemoryAccess::GpuWrite);
+	bool bCpuAccessAny = HasFlag(access, MemoryAccess::CpuRead) || HasFlag(access, MemoryAccess::CpuWrite) || HasFlag(access, MemoryAccess::CpuMapped);
+
+	if (bGpuAccessAny && !bCpuAccessAny)
+		return VMA_MEMORY_USAGE_GPU_ONLY;
+
+	if (bCpuAccessAny && !bGpuAccessAny)
+		return VMA_MEMORY_USAGE_CPU_ONLY;
+
+	if (bGpuAccessAny && HasFlag(access, MemoryAccess::CpuWrite))
+		return VMA_MEMORY_USAGE_CPU_TO_GPU;
+
+	if (bGpuAccessAny && HasFlag(access, MemoryAccess::CpuRead))
+		return VMA_MEMORY_USAGE_GPU_TO_CPU;
+
+	assert(false);
+	return VMA_MEMORY_USAGE_GPU_ONLY;
 }
 
 } // namespace Kodiak

@@ -28,7 +28,7 @@ DepthBuffer::DepthBuffer(float clearDepth, uint8_t clearStencil)
 
 DepthBuffer::~DepthBuffer()
 {
-	g_graphicsDevice->ReleaseResource(m_resource);
+	g_graphicsDevice->ReleaseResource(m_image.Get());
 }
 
 
@@ -39,10 +39,10 @@ void DepthBuffer::CreateDerivedViews()
 	dsvDesc.readOnlyDepth = false;
 	dsvDesc.readOnlyStencil = false;
 
-	m_dsv[0].Create(m_resource, dsvDesc);
+	m_dsv[0].Create(m_image.Get(), dsvDesc);
 
 	dsvDesc.readOnlyDepth = true;
-	m_dsv[1].Create(m_resource, dsvDesc);
+	m_dsv[1].Create(m_image.Get(), dsvDesc);
 
 	const bool hasStencil = IsStencilFormat(m_format);
 
@@ -50,10 +50,10 @@ void DepthBuffer::CreateDerivedViews()
 	{
 		dsvDesc.readOnlyDepth = false;
 		dsvDesc.readOnlyStencil = true;
-		m_dsv[2].Create(m_resource, dsvDesc);
+		m_dsv[2].Create(m_image.Get(), dsvDesc);
 
 		dsvDesc.readOnlyDepth = true;
-		m_dsv[3].Create(m_resource, dsvDesc);
+		m_dsv[3].Create(m_image.Get(), dsvDesc);
 	}
 	else
 	{
@@ -68,57 +68,45 @@ void DepthBuffer::CreateDerivedViews()
 	srvDesc.mipCount = 1;
 	srvDesc.isDepth = true;
 
-	m_depthSRV.Create(m_resource, m_type, srvDesc);
+	m_depthSRV.Create(m_image.Get(), m_type, srvDesc);
 
 	if (hasStencil)
 	{
 		srvDesc.isDepth = false;
 		srvDesc.isStencil = true;
-		m_stencilSRV.Create(m_resource, m_type, srvDesc);
+		m_stencilSRV.Create(m_image.Get(), m_type, srvDesc);
 	}
 }
 
 
 void DepthBuffer::Create(const string& name, uint32_t width, uint32_t height, Format format)
 {
-	m_format = format;
-
-	const uint32_t arraySize = 1;
-	const uint32_t numMips = 1;
-	const uint32_t numSamples = 1;
-	const VkImageUsageFlags flags = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-
-	auto imageCreateInfo = DescribeTex2D(width, height, arraySize, numMips, numSamples, format, flags);
-
-	m_width = imageCreateInfo.extent.width;
-	m_height = imageCreateInfo.extent.height;
-	m_arraySize = imageCreateInfo.arrayLayers;
-	m_numSamples = 1;
-	m_type = ResourceType::Texture2D;
-
-	m_resource = CreateTextureResource(name, imageCreateInfo);
-
-	CreateDerivedViews();
+	Create(name, width, height, 1, format);
 }
 
 
 void DepthBuffer::Create(const string& name, uint32_t width, uint32_t height, uint32_t numSamples, Format format)
 {
 	m_format = format;
-
-	const uint32_t arraySize = 1;
-	const uint32_t numMips = 1;
-	const VkImageUsageFlags flags = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-
-	auto imageCreateInfo = DescribeTex2D(width, height, arraySize, numMips, numSamples, format, flags);
-
-	m_width = imageCreateInfo.extent.width;
-	m_height = imageCreateInfo.extent.height;
-	m_arraySize = imageCreateInfo.arrayLayers;
+	m_width = width;
+	m_height = height;
+	m_numMips = 1;
+	m_arraySize = 1;
 	m_numSamples = numSamples;
-	m_type = (m_numSamples == 1) ? ResourceType::Texture2D : ResourceType::Texture2DMS;
+	m_type = ResourceType::Texture2D;
 
-	m_resource = CreateTextureResource(name, imageCreateInfo);
+	ImageDesc desc = {};
+	desc.width = m_width;
+	desc.height = m_height;
+	desc.depthOrArraySize = 1;
+	desc.numMips = m_numMips;
+	desc.numSamples = m_numSamples;
+	desc.format = m_format;
+	desc.type = m_numSamples == 1 ? ResourceType::Texture2D : ResourceType::Texture2DMS;
+	desc.usage = GpuImageUsage::DepthStencilTarget | GpuImageUsage::CopyDest | GpuImageUsage::CopySource;
+	desc.access = MemoryAccess::GpuRead | MemoryAccess::GpuWrite;
+
+	ThrowIfFailed(g_graphicsDevice->CreateImage(name, desc, &m_image));
 
 	CreateDerivedViews();
 }

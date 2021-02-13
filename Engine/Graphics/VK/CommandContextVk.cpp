@@ -280,7 +280,7 @@ void CommandContext::InitializeTexture(Texture& dest, size_t numBytes, const voi
 	vkCmdCopyBufferToImage(
 		context.m_commandList,
 		stagingBuffer,
-		dest.m_resource,
+		dest.m_image->Get(),
 		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 		numBuffers,
 		bufferCopies);
@@ -299,8 +299,7 @@ void CommandContext::InitializeBuffer(GpuBuffer& dest, const void* initialData, 
 {
 	VkDevice device = GetDevice();
 
-	VkBufferCreateInfo stagingBufferInfo = {};
-	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	VkBufferCreateInfo stagingBufferInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
 	stagingBufferInfo.size = numBytes;
 	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	stagingBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -332,7 +331,7 @@ void CommandContext::InitializeBuffer(GpuBuffer& dest, const void* initialData, 
 	// Put buffer region copies into command buffer
 	VkBufferCopy copyRegion = {};
 	copyRegion.size = numBytes;
-	vkCmdCopyBuffer(context.m_commandList, stagingBuffer, dest.m_resource, 1, &copyRegion);
+	vkCmdCopyBuffer(context.m_commandList, stagingBuffer, dest.m_buffer->Get(), 1, &copyRegion);
 
 	context.Finish(true);
 
@@ -342,12 +341,12 @@ void CommandContext::InitializeBuffer(GpuBuffer& dest, const void* initialData, 
 }
 
 
-void CommandContext::TransitionResource(GpuResource& resource, ResourceState newState, bool flushImmediate)
+void CommandContext::TransitionResource(GpuBuffer& buffer, ResourceState newState, bool flushImmediate)
 {
 	assert_msg(newState != ResourceState::Undefined, "Can\'t transition to Undefined resource state");
 	assert(!m_isRenderPassActive);
 
-	ResourceState oldState = resource.m_usageState;
+	ResourceState oldState = buffer.m_usageState;
 
 	if (m_type == CommandListType::Compute)
 	{
@@ -357,92 +356,99 @@ void CommandContext::TransitionResource(GpuResource& resource, ResourceState new
 
 	if (oldState != newState)
 	{
-		if (IsTextureResource(resource.m_type))
-		{
-			PixelBuffer& texture = dynamic_cast<PixelBuffer&>(resource);
+		assert(IsBufferResource(buffer.m_type));
+		
+		VkBufferMemoryBarrier barrierDesc = {};
 
-			VkImageMemoryBarrier barrierDesc = {};
+		barrierDesc.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+		barrierDesc.pNext = nullptr;
+		barrierDesc.buffer = buffer.m_buffer->Get();
+		barrierDesc.srcAccessMask = GetAccessMask(oldState);
+		barrierDesc.dstAccessMask = GetAccessMask(newState);
+		barrierDesc.offset = 0;
+		barrierDesc.size = buffer.GetSize();
 
-			barrierDesc.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-			barrierDesc.pNext = nullptr;
-			barrierDesc.image = resource.m_resource;
-			barrierDesc.oldLayout = GetImageLayout(oldState);
-			barrierDesc.newLayout = GetImageLayout(newState);
-			barrierDesc.subresourceRange.aspectMask = GetAspectFlagsFromFormat(texture.GetFormat());
-			barrierDesc.subresourceRange.baseArrayLayer = 0;
-			barrierDesc.subresourceRange.baseMipLevel = 0;
-			barrierDesc.subresourceRange.layerCount = resource.m_type == ResourceType::Texture3D ? 1 : texture.GetArraySize();
-			barrierDesc.subresourceRange.levelCount = texture.GetNumMips();
-			barrierDesc.srcAccessMask = GetAccessMask(oldState);
-			barrierDesc.dstAccessMask = GetAccessMask(newState);
+		auto srcStageMask = GetShaderStageMask(oldState, true);
+		auto dstStageMask = GetShaderStageMask(newState, false);
 
-			auto srcStageMask = GetShaderStageMask(oldState, true);
-			auto dstStageMask = GetShaderStageMask(newState, false);
+		vkCmdPipelineBarrier(
+			m_commandList,
+			srcStageMask,
+			dstStageMask,
+			0,
+			0,
+			nullptr,
+			1,
+			&barrierDesc,
+			0,
+			nullptr);
 
-			vkCmdPipelineBarrier(
-				m_commandList,
-				srcStageMask,
-				dstStageMask,
-				0,
-				0,
-				nullptr,
-				0,
-				nullptr,
-				1,
-				&barrierDesc);
-
-			resource.m_usageState = newState;
-		}
-		else if (IsBufferResource(resource.m_type))
-		{
-			GpuBuffer& buffer = dynamic_cast<GpuBuffer&>(resource);
-
-			VkBufferMemoryBarrier barrierDesc = {};
-
-			barrierDesc.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-			barrierDesc.pNext = nullptr;
-			barrierDesc.buffer = resource.m_resource;
-			barrierDesc.srcAccessMask = GetAccessMask(oldState);
-			barrierDesc.dstAccessMask = GetAccessMask(newState);
-			barrierDesc.offset = 0;
-			barrierDesc.size = buffer.GetSize();
-
-			auto srcStageMask = GetShaderStageMask(oldState, true);
-			auto dstStageMask = GetShaderStageMask(newState, false);
-
-			vkCmdPipelineBarrier(
-				m_commandList,
-				srcStageMask,
-				dstStageMask,
-				0,
-				0,
-				nullptr,
-				1,
-				&barrierDesc,
-				0,
-				nullptr);
-
-			resource.m_usageState = newState;
-		}
-		else
-		{
-			assert(false);
-		}
+		buffer.m_usageState = newState;
 	}
 }
 
 
-void CommandContext::InsertUAVBarrier(GpuResource& resource, bool flushImmediate)
+void CommandContext::TransitionResource(GpuImage& image, ResourceState newState, bool flushImmediate)
+{
+	assert_msg(newState != ResourceState::Undefined, "Can\'t transition to Undefined resource state");
+	assert(!m_isRenderPassActive);
+
+	ResourceState oldState = image.m_usageState;
+
+	if (m_type == CommandListType::Compute)
+	{
+		assert(IsValidComputeResourceState(oldState));
+		assert(IsValidComputeResourceState(newState));
+	}
+
+	if (oldState != newState)
+	{
+		assert(IsTextureResource(image.m_type));
+
+		PixelBuffer& texture = dynamic_cast<PixelBuffer&>(image);
+
+		VkImageMemoryBarrier barrierDesc = {};
+
+		barrierDesc.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		barrierDesc.pNext = nullptr;
+		barrierDesc.image = image.m_image->Get();
+		barrierDesc.oldLayout = GetImageLayout(oldState);
+		barrierDesc.newLayout = GetImageLayout(newState);
+		barrierDesc.subresourceRange.aspectMask = GetAspectFlagsFromFormat(texture.GetFormat());
+		barrierDesc.subresourceRange.baseArrayLayer = 0;
+		barrierDesc.subresourceRange.baseMipLevel = 0;
+		barrierDesc.subresourceRange.layerCount = image.m_type == ResourceType::Texture3D ? 1 : texture.GetArraySize();
+		barrierDesc.subresourceRange.levelCount = texture.GetNumMips();
+		barrierDesc.srcAccessMask = GetAccessMask(oldState);
+		barrierDesc.dstAccessMask = GetAccessMask(newState);
+
+		auto srcStageMask = GetShaderStageMask(oldState, true);
+		auto dstStageMask = GetShaderStageMask(newState, false);
+
+		vkCmdPipelineBarrier(
+			m_commandList,
+			srcStageMask,
+			dstStageMask,
+			0,
+			0,
+			nullptr,
+			0,
+			nullptr,
+			1,
+			&barrierDesc);
+
+		image.m_usageState = newState;
+	}
+}
+
+
+void CommandContext::InsertUAVBarrier(GpuBuffer& buffer, bool flushImmediate)
 {
 	//assert_msg(m_numBarriersToFlush < 16, "Exceeded arbitrary limit on buffered barriers");
 
-	GpuBuffer& buffer = dynamic_cast<GpuBuffer&>(resource);
-
-	VkBufferMemoryBarrier barrierDesc = {};
-
-	barrierDesc.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+	VkBufferMemoryBarrier barrierDesc = { VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER };
 	barrierDesc.pNext = nullptr;
-	barrierDesc.buffer = resource.m_resource;
+	barrierDesc.buffer = buffer.m_buffer->Get();
 	barrierDesc.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
 	barrierDesc.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 	barrierDesc.offset = 0;
@@ -478,7 +484,7 @@ void GraphicsContext::BeginRenderPass(FrameBuffer& framebuffer)
 	VkRenderPassBeginInfo renderPassBeginInfo = {};
 	renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassBeginInfo.pNext = nullptr;
-	renderPassBeginInfo.renderPass = framebuffer.GetFboHandle();
+	renderPassBeginInfo.renderPass = framebuffer.GetRenderPass();
 
 	renderPassBeginInfo.renderArea.offset.x = 0;
 	renderPassBeginInfo.renderArea.offset.y = 0;
@@ -487,7 +493,7 @@ void GraphicsContext::BeginRenderPass(FrameBuffer& framebuffer)
 
 	renderPassBeginInfo.clearValueCount = 0;
 	renderPassBeginInfo.pClearValues = nullptr;
-	renderPassBeginInfo.framebuffer = framebuffer.GetFboHandle();
+	renderPassBeginInfo.framebuffer = framebuffer.GetFramebuffer();
 
 	vkCmdBeginRenderPass(m_commandList, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -507,7 +513,7 @@ void GraphicsContext::EndOcclusionQuery(OcclusionQueryHeap& queryHeap, uint32_t 
 }
 
 
-void GraphicsContext::ResolveOcclusionQueries(OcclusionQueryHeap& queryHeap, uint32_t startIndex, uint32_t numQueries, GpuResource& destBuffer, uint64_t destBufferOffset)
+void GraphicsContext::ResolveOcclusionQueries(OcclusionQueryHeap& queryHeap, uint32_t startIndex, uint32_t numQueries, GpuBuffer& destBuffer, uint64_t destBufferOffset)
 {
 	assert(!m_isRenderPassActive);
 
@@ -516,7 +522,7 @@ void GraphicsContext::ResolveOcclusionQueries(OcclusionQueryHeap& queryHeap, uin
 		queryHeap.GetQueryPool(),
 		startIndex,
 		numQueries,
-		destBuffer.GetHandle(),
+		destBuffer.m_buffer->Get(),
 		destBufferOffset,
 		sizeof(uint64_t), // TODO - don't hardcode this
 		VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT);

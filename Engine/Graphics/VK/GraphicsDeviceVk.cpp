@@ -103,14 +103,15 @@ VkBool32 messageCallback(
 	// Display message to default output (console/logcat)
 	stringstream debugMessage;
 	debugMessage << prefix << " [" << pCallbackData->pMessageIdName << "] Code " << pCallbackData->messageIdNumber << " : " << pCallbackData->pMessage;
+	debugMessage << "\n";
 
 	if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
-		cerr << debugMessage.str() << "\n";
+		cerr << debugMessage.str();
 	}
 	else
 	{
-		cout << debugMessage.str() << "\n";
+		cout << debugMessage.str();
 	}
 
 	OutputDebugString(debugMessage.str().c_str());
@@ -383,6 +384,329 @@ VkResult GraphicsDevice::CreateCommandPool(uint32_t queueFamilyIndex, UVkCommand
 }
 
 
+VkResult GraphicsDevice::CreateImageView(UVkImage* uimage, ResourceType type, Format format, bool forceColorAspect, uint32_t baseMipLevel, uint32_t mipCount, uint32_t baseArraySlice, uint32_t arraySize, UVkImageView** ppImageView) const
+{
+	VkImageViewCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	createInfo.pNext = nullptr;
+	createInfo.flags = 0;
+	createInfo.viewType = GetImageViewType(type);
+	createInfo.format = static_cast<VkFormat>(format);
+	if (IsColorFormat(format))
+	{
+		createInfo.components.r = VK_COMPONENT_SWIZZLE_R;
+		createInfo.components.g = VK_COMPONENT_SWIZZLE_G;
+		createInfo.components.b = VK_COMPONENT_SWIZZLE_B;
+		createInfo.components.a = VK_COMPONENT_SWIZZLE_A;
+	}
+	createInfo.subresourceRange = {};
+	createInfo.subresourceRange.aspectMask = forceColorAspect ? VK_IMAGE_ASPECT_COLOR_BIT : GetAspectFlagsFromFormat(format);
+	createInfo.subresourceRange.baseMipLevel = 0;
+	createInfo.subresourceRange.levelCount = mipCount;
+	createInfo.subresourceRange.baseArrayLayer = 0;
+	createInfo.subresourceRange.layerCount = type == ResourceType::Texture3D ? 1 : arraySize;
+	createInfo.image = uimage->Get();
+
+	VkImageView vkImageView = VK_NULL_HANDLE;
+	auto res = vkCreateImageView(m_device->Get(), &createInfo, nullptr, &vkImageView);
+
+	*ppImageView = nullptr;
+	if (res == VK_SUCCESS)
+	{
+		*ppImageView = new UVkImageView(m_device.Get(), uimage, vkImageView);
+		(*ppImageView)->AddRef();
+	}
+
+	return res;
+}
+
+
+VkResult GraphicsDevice::CreateBufferView(UVkBuffer* ubuffer, ResourceType type, Format format, uint32_t offsetInBytes, uint32_t sizeInBytes, UVkBufferView** ppBufferView) const
+{
+	VkBufferViewCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
+	createInfo.pNext = nullptr;
+	createInfo.flags = 0;
+	createInfo.buffer = ubuffer->Get();
+	createInfo.offset = offsetInBytes;
+	createInfo.range = sizeInBytes;
+	createInfo.format = static_cast<VkFormat>(format);
+
+	VkBufferView vkBufferView = VK_NULL_HANDLE;
+	auto res = vkCreateBufferView(m_device->Get(), &createInfo, nullptr, &vkBufferView);
+
+	*ppBufferView = nullptr;
+	if (res == VK_SUCCESS)
+	{
+		*ppBufferView = new UVkBufferView(m_device.Get(), ubuffer, vkBufferView);
+		(*ppBufferView)->AddRef();
+	}
+
+	return res;
+}
+
+
+
+// TODO Move this elsewhere?
+static bool QueryLinearTilingFeature(VkFormatProperties properties, VkFormatFeatureFlagBits flags)
+{
+	return (properties.linearTilingFeatures & flags) != 0;
+}
+
+
+static bool QueryOptimalTilingFeature(VkFormatProperties properties, VkFormatFeatureFlagBits flags)
+{
+	return (properties.optimalTilingFeatures & flags) != 0;
+}
+
+
+static bool QueryBufferFeature(VkFormatProperties properties, VkFormatFeatureFlagBits flags)
+{
+	return (properties.bufferFeatures & flags) != 0;
+}
+
+
+
+VkResult GraphicsDevice::CreateRenderPass(const vector<ColorBufferPtr>& colorBuffers, DepthBufferPtr depthBuffer, UVkRenderPass** ppRenderPass) const
+{
+	vector<VkAttachmentDescription> attachments(colorBuffers.size() + 1);
+	vector<uint32_t> regToAttachmentIndex(attachments.size(), VK_ATTACHMENT_UNUSED);
+
+	// Process color targets
+	uint32_t rtCount = 0;
+	uint32_t numSamples = 1;
+	for (uint32_t i = 0; i < uint32_t(colorBuffers.size()); ++i)
+	{
+		assert(colorBuffers[i] != nullptr);
+
+		auto format = colorBuffers[i]->GetFormat();
+		numSamples = colorBuffers[i]->GetNumSamples();
+		if (format != Format::Unknown)
+		{
+			auto& desc = attachments[rtCount];
+			regToAttachmentIndex[i] = rtCount;
+			++rtCount;
+
+			desc.flags = 0;
+			desc.format = static_cast<VkFormat>(format);
+			desc.samples = SamplesToFlags(numSamples);
+			desc.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+			desc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+			desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE; // This is a color attachment
+			desc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE; // This is a color attachment
+			desc.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			desc.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		}
+	}
+
+	bool hasColor = rtCount > 0;
+	bool hasDepth = false;
+
+	// Process depth target
+	if (depthBuffer && depthBuffer->GetFormat() != Format::Unknown)
+	{
+		auto& depthDesc = attachments[rtCount];
+		regToAttachmentIndex.back() = rtCount;
+		rtCount++;
+
+		depthDesc.flags = 0;
+		depthDesc.format = static_cast<VkFormat>(depthBuffer->GetFormat());
+		depthDesc.samples = SamplesToFlags(numSamples);
+		depthDesc.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+		depthDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+		depthDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+		depthDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
+		depthDesc.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		depthDesc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+		hasDepth = true;
+	}
+
+	// Init subpass
+	VkSubpassDescription subpassDesc = {};
+	subpassDesc.flags = 0;
+
+	vector<VkAttachmentReference> attachmentRefs(attachments.size());
+
+	if (hasDepth)
+	{
+		auto& depthRef = attachmentRefs.back();
+		depthRef.attachment = regToAttachmentIndex.back();
+		depthRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		subpassDesc.pDepthStencilAttachment = &attachmentRefs.back();
+	}
+
+	if (hasColor)
+	{
+		for (uint32_t i = 0; i < uint32_t(colorBuffers.size()); ++i)
+		{
+			auto& ref = attachmentRefs[i];
+			ref.attachment = regToAttachmentIndex[i];
+			ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		}
+
+		subpassDesc.colorAttachmentCount = uint32_t(colorBuffers.size());
+		subpassDesc.pColorAttachments = attachmentRefs.data();
+	}
+
+	// Build renderpass
+	VkRenderPassCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	createInfo.pNext = nullptr;
+	createInfo.flags = 0;
+	createInfo.attachmentCount = rtCount;
+	createInfo.pAttachments = attachments.data();
+	createInfo.subpassCount = 1;
+	createInfo.pSubpasses = &subpassDesc;
+	createInfo.dependencyCount = 0;
+	createInfo.pDependencies = nullptr;
+
+	VkRenderPass vkRenderPass = VK_NULL_HANDLE;
+	auto res = vkCreateRenderPass(GetDevice(), &createInfo, nullptr, &vkRenderPass);
+
+	*ppRenderPass = nullptr;
+	if (res == VK_SUCCESS)
+	{
+		*ppRenderPass = new UVkRenderPass(m_device.Get(), vkRenderPass);
+		(*ppRenderPass)->AddRef();
+	}
+
+	return res;
+}
+
+
+VkResult GraphicsDevice::CreateFramebuffer(const vector<ColorBufferPtr>& colorBuffers, DepthBufferPtr depthBuffer, VkRenderPass renderPass, UVkFramebuffer** ppFramebuffer) const
+{
+	const uint32_t numColorBuffers = uint32_t(colorBuffers.size());
+	uint32_t rtCount = numColorBuffers;
+	rtCount += depthBuffer ? 1 : 0;
+
+	assert(rtCount > 0);
+
+	uint32_t width = 0;
+	uint32_t height = 0;
+	if (numColorBuffers > 0)
+	{
+		width = colorBuffers[0]->GetWidth();
+		height = colorBuffers[0]->GetHeight();
+	}
+	else
+	{
+		width = depthBuffer->GetWidth();
+		height = depthBuffer->GetHeight();
+	}
+
+	vector<VkImageView> attachments(rtCount);
+
+	uint32_t attachmentCount = 0;
+	for (uint32_t i = 0; i < numColorBuffers; ++i)
+	{
+		attachments[i] = colorBuffers[i]->GetRTV().GetImageView();
+		++attachmentCount;
+	}
+
+	if (depthBuffer)
+	{
+		attachments[attachmentCount] = depthBuffer->GetDSV().GetImageView();
+		++attachmentCount;
+	}
+
+	VkFramebufferCreateInfo frameBufferCreateInfo = {};
+	frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+	frameBufferCreateInfo.pNext = nullptr;
+	frameBufferCreateInfo.renderPass = renderPass;
+	frameBufferCreateInfo.attachmentCount = attachmentCount;
+	frameBufferCreateInfo.pAttachments = attachments.data();
+	frameBufferCreateInfo.width = width;
+	frameBufferCreateInfo.height = height;
+	frameBufferCreateInfo.layers = 1;
+
+	// TODO - Move this to GraphicsDevice
+	VkFramebuffer vkFramebuffer = VK_NULL_HANDLE;
+	auto res = vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &vkFramebuffer);
+
+	*ppFramebuffer = nullptr;
+	if (res == VK_SUCCESS)
+	{
+		*ppFramebuffer = new UVkFramebuffer(m_device.Get(), vkFramebuffer);
+		(*ppFramebuffer)->AddRef();
+	}
+
+	return res;
+}
+
+
+VkResult GraphicsDevice::CreateBuffer(const string& name, const BufferDesc& desc, UVkBuffer** ppBuffer) const
+{
+	VkBufferCreateInfo createInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
+	createInfo.size = desc.bufferSizeInBytes;
+	createInfo.usage = GetBufferUsageFlags(desc.type) | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	VmaAllocationCreateInfo allocCreateInfo = {};
+	allocCreateInfo.flags = GetMemoryFlags(desc.access);
+	allocCreateInfo.usage = GetMemoryUsage(desc.access);
+
+	VkBuffer vkBuffer = VK_NULL_HANDLE;
+	VmaAllocation vmaBufferAlloc = VK_NULL_HANDLE;
+
+	auto res = vmaCreateBuffer(m_allocator->Get(), &createInfo, &allocCreateInfo, &vkBuffer, &vmaBufferAlloc, nullptr);
+
+	*ppBuffer = nullptr;
+	if (res == VK_SUCCESS)
+	{
+		SetDebugName(vkBuffer, name);
+
+		*ppBuffer = new UVkBuffer(m_device.Get(), m_allocator.Get(), vkBuffer, vmaBufferAlloc);
+		(*ppBuffer)->AddRef();
+	}
+
+	return res;
+}
+
+
+VkResult GraphicsDevice::CreateImage(const string& name, const ImageDesc& desc, UVkImage** ppImage) const
+{
+	VkImageCreateInfo imageCreateInfo = { VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
+	imageCreateInfo.pNext = nullptr;
+	imageCreateInfo.flags = GetImageCreateFlags(desc.type);
+	imageCreateInfo.imageType = GetImageType(desc.type);
+	imageCreateInfo.format = static_cast<VkFormat>(desc.format);
+	imageCreateInfo.extent = { desc.width, desc.height, desc.GetDepth() };
+	imageCreateInfo.mipLevels = desc.numMips;
+	imageCreateInfo.arrayLayers = desc.GetArraySize();
+	imageCreateInfo.samples = SamplesToFlags(desc.numSamples);
+	imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	imageCreateInfo.usage = GetImageUsageFlags(desc.usage);
+
+	// Remove storage flag if this format doesn't support it.
+	// TODO - Make a table with all the format properties?
+	VkFormatProperties properties = GetFormatProperties(desc.format);
+	if (!QueryOptimalTilingFeature(properties, VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT))
+	{
+		imageCreateInfo.usage &= ~VK_IMAGE_USAGE_STORAGE_BIT;
+	}
+
+	VmaAllocationCreateInfo imageAllocCreateInfo = {};
+	imageAllocCreateInfo.flags = GetMemoryFlags(desc.access);
+	imageAllocCreateInfo.usage = GetMemoryUsage(desc.access);
+
+	VkImage vkImage = VK_NULL_HANDLE;
+	VmaAllocation vmaAllocation = VK_NULL_HANDLE;
+	auto res = vmaCreateImage(m_allocator->Get(), &imageCreateInfo, &imageAllocCreateInfo, &vkImage, &vmaAllocation, nullptr);
+
+	*ppImage = nullptr;
+	if (res == VK_SUCCESS)
+	{
+		*ppImage = new UVkImage(m_device.Get(), m_allocator.Get(), vkImage, vmaAllocation);
+		(*ppImage)->AddRef();
+
+		SetDebugName(vkImage, name);
+	}
+
+	return res;
+}
+
+
 ColorBufferPtr GraphicsDevice::GetBackBuffer(uint32_t index) const
 {
 	assert(index < NumSwapChainBuffers);
@@ -390,11 +714,20 @@ ColorBufferPtr GraphicsDevice::GetBackBuffer(uint32_t index) const
 }
 
 
-void GraphicsDevice::ReleaseResource(PlatformHandle handle)
+void GraphicsDevice::ReleaseResource(UVkImage* image)
 {
 	uint64_t nextFence = g_commandManager.GetGraphicsQueue().GetNextFenceValue();
 
-	DeferredReleaseResource resource{ nextFence, handle };
+	DeferredReleaseResource resource{ nextFence, image, nullptr };
+	m_deferredResources.emplace_back(resource);
+}
+
+
+void GraphicsDevice::ReleaseResource(UVkBuffer* buffer)
+{
+	uint64_t nextFence = g_commandManager.GetGraphicsQueue().GetNextFenceValue();
+
+	DeferredReleaseResource resource{ nextFence, nullptr, buffer };
 	m_deferredResources.emplace_back(resource);
 }
 
@@ -429,7 +762,7 @@ uint32_t GraphicsDevice::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyF
 }
 
 
-VkFormatProperties GraphicsDevice::GetFormatProperties(Format format)
+VkFormatProperties GraphicsDevice::GetFormatProperties(Format format) const
 {
 	VkFormat vkFormat = static_cast<VkFormat>(format);
 	VkFormatProperties properties{};
@@ -499,8 +832,8 @@ void GraphicsDevice::InitializeInternal()
 	{
 		m_swapChainBuffers[i] = make_shared<ColorBuffer>();
 		VkImage image = m_swapchainImages[i]->Get();
-		auto handle = ResourceHandle::CreateNoDelete(image, VK_NULL_HANDLE, false);
-		m_swapChainBuffers[i]->CreateFromSwapChain("Primary SwapChain Buffer", handle, m_width, m_height, BackBufferColorFormat);
+		auto uimage = new UVkImage(m_device.Get(), image);
+		m_swapChainBuffers[i]->CreateFromSwapChain("Primary SwapChain Buffer", uimage, m_width, m_height, BackBufferColorFormat);
 	}
 
 	g_commandManager.Create();

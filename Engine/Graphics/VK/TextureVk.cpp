@@ -128,24 +128,6 @@ void GetSurfaceInfo(size_t width, size_t height, VkFormat format, size_t& numByt
 	}
 }
 
-
-bool QueryLinearTilingFeature(VkFormatProperties properties, VkFormatFeatureFlagBits flags)
-{
-	return (properties.linearTilingFeatures & flags) != 0;
-}
-
-
-bool QueryOptimalTilingFeature(VkFormatProperties properties, VkFormatFeatureFlagBits flags)
-{
-	return (properties.optimalTilingFeatures & flags) != 0;
-}
-
-
-bool QueryBufferFeature(VkFormatProperties properties, VkFormatFeatureFlagBits flags)
-{
-	return (properties.bufferFeatures & flags) != 0;
-}
-
 } // anonymous namespace
 
 
@@ -258,6 +240,12 @@ void TextureInitializer::SetData(uint32_t slice, uint32_t mipLevel, const void* 
 }
 
 
+Texture::~Texture()
+{
+	g_graphicsDevice->ReleaseResource(m_image.Get());
+}
+
+
 void Texture::Create1D(uint32_t width, Format format, const void* initData)
 {
 	TextureInitializer init(ResourceType::Texture1D, format, width, 1, 1, 1);
@@ -293,56 +281,22 @@ void Texture::Create(TextureInitializer& init)
 	m_format = init.m_format;
 	m_numMips = init.m_numMips;
 	m_type = init.m_type;
-
-	VkDevice device = GetDevice();
+	m_numSamples = 1;
 
 	VkFormat vkFormat = static_cast<VkFormat>(m_format);
-	
-	VkFormatProperties properties = GetFormatProperties(m_format);
-	VkImageUsageFlags additionalFlags = 0;
 
-	if (QueryOptimalTilingFeature(properties, VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT))
-	{
-		additionalFlags |= VK_IMAGE_USAGE_STORAGE_BIT;
-	}
+	ImageDesc desc = {};
+	desc.width = m_width;
+	desc.height = m_height;
+	desc.depthOrArraySize = m_arraySize;
+	desc.numMips = m_numMips;
+	desc.numSamples = m_numSamples;
+	desc.format = m_format;
+	desc.type = m_type;
+	desc.usage = GpuImageUsage::ShaderResource | GpuImageUsage::UnorderedAccess | GpuImageUsage::CopyDest;
+	desc.access = MemoryAccess::GpuRead | MemoryAccess::GpuWrite;
 
-	// Create optimal tiled target image
-	VkImageCreateInfo imageCreateInfo = {};
-	imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-	imageCreateInfo.pNext = nullptr;
-	imageCreateInfo.flags = GetImageCreateFlags(m_type);
-	imageCreateInfo.imageType = GetImageType(m_type);
-	imageCreateInfo.format = vkFormat;
-	imageCreateInfo.mipLevels = m_numMips;
-	imageCreateInfo.arrayLayers = m_type == ResourceType::Texture3D ? 1 : m_arraySize;
-	imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-	imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-	imageCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	imageCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	imageCreateInfo.extent = { m_width, m_height, (m_type == ResourceType::Texture3D ? m_arraySize : 1) };
-	imageCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | additionalFlags;
-	// Ensure that the TRANSFER_DST bit is set for staging
-	if (!(imageCreateInfo.usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
-	{
-		imageCreateInfo.usage |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-	}
-
-	VkImage image{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkCreateImage(device, &imageCreateInfo, nullptr, &image));
-
-	VkMemoryRequirements memReqs = {};
-	vkGetImageMemoryRequirements(device, image, &memReqs);
-
-	VkMemoryAllocateInfo memAllocInfo = {};
-	memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	memAllocInfo.allocationSize = memReqs.size;
-	memAllocInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-	VkDeviceMemory mem{ VK_NULL_HANDLE };
-	ThrowIfFailed(vkAllocateMemory(device, &memAllocInfo, nullptr, &mem));
-	m_resource = ResourceHandle::Create(image, mem);
-
-	ThrowIfFailed(vkBindImageMemory(device, image, m_resource, 0));
+	ThrowIfFailed(g_graphicsDevice->CreateImage("Texture", desc, &m_image));
 
 	// Setup buffer copy regions for each mip level
 	uint32_t effectiveArraySize = m_type == ResourceType::Texture3D ? 1 : m_arraySize;
@@ -420,9 +374,23 @@ void Texture::LoadKTX(const string& fullpath, Format format, bool sRgb)
 }
 
 
+void Texture::CreateDerivedViews()
+{
+	TextureViewDesc desc = {};
+	desc.format = m_format;
+	desc.usage = ResourceState::ShaderResource;
+	desc.arraySize = m_arraySize;
+	desc.mipCount = m_numMips;
+	desc.isDepth = false;
+	desc.isStencil = false;
+
+	m_srv.Create(m_image.Get(), m_type, desc);
+}
+
+
 void ManagedTexture::WaitForLoad() const
 {
-	volatile VkImageView& volHandle = (volatile VkImageView&)m_srv.GetHandle();
+	volatile VkImageView& volHandle = (volatile VkImageView&)m_srv.GetImageViewRef();
 	volatile bool& volValid = (volatile bool&)m_isValid;
 	while (volHandle == VK_NULL_HANDLE && volValid)
 	{

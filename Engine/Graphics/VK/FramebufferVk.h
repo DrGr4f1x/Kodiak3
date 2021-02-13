@@ -37,7 +37,8 @@ public:
 	uint32_t GetHeight() const { return m_height; }
 	uint32_t GetNumSamples() const { return m_numSamples; }
 
-	const FboHandle& GetFboHandle() const { return m_handle; }
+	VkFramebuffer GetFramebuffer() { return m_framebuffer->Get(); }
+	VkRenderPass GetRenderPass() { return m_renderPass->Get(); }
 
 	void Finalize();
 
@@ -49,7 +50,8 @@ private:
 	uint32_t m_height{ 0 };
 	uint32_t m_numSamples{ 0 };
 
-	FboHandle m_handle{};
+	Microsoft::WRL::ComPtr<UVkFramebuffer> m_framebuffer;
+	Microsoft::WRL::ComPtr<UVkRenderPass> m_renderPass;
 };
 
 using FrameBufferPtr = std::shared_ptr<FrameBuffer>;

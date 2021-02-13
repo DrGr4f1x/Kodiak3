@@ -26,7 +26,7 @@ public:
 	~ColorBuffer();
 
 	// Create a color buffer from a swap chain buffer.  Unordered access is restricted.
-	void CreateFromSwapChain(const std::string& name, const ResourceHandle& resource, uint32_t width, uint32_t height, Format format);
+	void CreateFromSwapChain(const std::string& name, UVkImage* uimage, uint32_t width, uint32_t height, Format format);
 
 	// Create a color buffer.
 	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips, Format format);

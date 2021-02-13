@@ -24,8 +24,17 @@ class CommandContext;
 
 class GpuBuffer : public GpuResource
 {
+	friend class CommandContext;
+	friend class GraphicsContext;
+	friend class ComputeContext;
+
 public:
+	GpuBuffer() : m_buffer(nullptr) {}
+	explicit GpuBuffer(UVkBuffer* ubuffer) : m_buffer(ubuffer) {}
 	~GpuBuffer();
+
+	UVkBuffer* GetBufferHandle() { return m_buffer.Get(); }
+	const UVkBuffer* GetBufferHandle() const { return m_buffer.Get(); }
 
 	const ShaderResourceView& GetSRV() const { return m_srv; }
 	const UnorderedAccessView& GetUAV() const { return m_uav; }
@@ -49,6 +58,8 @@ protected:
 	BufferViewDesc GetDesc() const;
 
 protected:
+	Microsoft::WRL::ComPtr<UVkBuffer> m_buffer;
+
 	size_t m_bufferSize{ 0 };
 	size_t m_elementCount{ 0 };
 	size_t m_elementSize{ 0 };
