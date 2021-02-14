@@ -106,3 +106,29 @@ operator!=(int lhs, E rhs)
 {
 	return lhs != static_cast<int>(rhs);
 }
+
+
+template <typename E>
+typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
+HasFlag(E bitmask, E flag)
+{
+	using underlying = std::underlying_type_t<E>;
+	return (static_cast<underlying>(bitmask) & static_cast<underlying>(flag)) != underlying(0);
+}
+
+
+template <typename E>
+typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
+HasAnyFlag(E bitmask, E flags)
+{
+	return HasFlag(bitmask, flags);
+}
+
+
+template <typename E>
+typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
+HasAllFlags(E bitmask, E flags)
+{
+	using underlying = std::underlying_type_t<E>;
+	return (static_cast<underlying>(bitmask) & static_cast<underlying>(flags)) == static_cast<underlying>(flags);
+}

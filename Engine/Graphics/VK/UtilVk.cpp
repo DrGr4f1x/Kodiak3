@@ -297,12 +297,6 @@ VkImageAspectFlags GetAspectFlagsFromFormat(Format format, bool ignoreStencil)
 }
 
 
-template <typename T>
-static inline bool HasFlag(T type, T flag)
-{
-	return (type & flag) != 0;
-}
-
 VkImageAspectFlags GetImageAspect(ImageAspect aspect)
 {
 	VkImageAspectFlags flags = 0;

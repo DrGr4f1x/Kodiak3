@@ -18,6 +18,78 @@
 namespace Kodiak
 {
 
+enum class ModelLoad
+{
+	CalcTangentSpace =				1 << 0,
+	JoinIdenticalVertices =			1 << 1,
+	MakeLeftHanded  =				1 << 2,
+	Triangulate =					1 << 3,
+	RemoveComponent =				1 << 4,
+	GenNormals =					1 << 5,
+	GenSmoothNormals =				1 << 6,
+	SplitLargeMeshes =				1 << 7,
+	PreTransformVertices =			1 << 8,
+	LimitBoneWeights =				1 << 9,
+	ValidateDataStructure =			1 << 10,
+	ImproveCacheLocality =			1 << 11,
+	RemoveRedundantMaterials =		1 << 12,
+	FixInfacingNormals =			1 << 13,
+	SortByPType =					1 << 14,
+	FindDegenerates =				1 << 15,
+	FindInvalidData =				1 << 16,
+	GenUVCoords =					1 << 17,
+	TransformUVCoords =				1 << 18,
+	FindInstances =					1 << 19,
+	OptimizeMeshes =				1 << 20,
+	OptimizeGraph =					1 << 21,
+	FlipUVs =						1 << 22,
+	FlipWindingOrder =				1 << 23,
+	SplitByBoneCount =				1 << 24,
+	Debone =						1 << 25,
+	GlobalScale =					1 << 26,
+	EmbedTextures =					1 << 27,
+	ForceGenNormals =				1 << 28,
+	DropNormals =					1 << 29,
+	GenBoundingBoxes =				1 << 30,
+
+	ConvertToLeftHandded =			MakeLeftHanded | 
+									FlipUVs | 
+									FlipWindingOrder,
+
+	TargetRealtime_Fast =			CalcTangentSpace | 
+									GenNormals | 
+									JoinIdenticalVertices | 
+									Triangulate | 
+									GenUVCoords | 
+									SortByPType,
+
+	TargetRealtime_Quality =		CalcTangentSpace | 
+									GenSmoothNormals | 
+									JoinIdenticalVertices | 
+									Triangulate | 
+									GenUVCoords | 
+									SortByPType | 
+									ImproveCacheLocality | 
+									LimitBoneWeights | 
+									RemoveRedundantMaterials | 
+									SplitLargeMeshes | 
+									FindDegenerates | 
+									FindInvalidData,
+
+	TargetRealtime_MaxQuality =		TargetRealtime_Quality |
+									FindInstances |
+									ValidateDataStructure |
+									OptimizeMeshes,
+
+	StandardDefault =				FlipUVs |
+									Triangulate |
+									PreTransformVertices |
+									CalcTangentSpace
+};
+
+template <> struct EnableBitmaskOperators<ModelLoad> { static const bool enable = true; };
+
+
 enum class VertexComponent
 {
 	Position,
@@ -105,7 +177,7 @@ class Model
 {
 public:
 
-	static std::shared_ptr<Model> Load(const std::string& filename, const VertexLayout& layout, float scale = 1.0f);
+	static std::shared_ptr<Model> Load(const std::string& filename, const VertexLayout& layout, float scale = 1.0f, ModelLoad loadFlags = ModelLoad::StandardDefault);
 
 	static std::shared_ptr<Model> MakePlane(const VertexLayout& layout, float width, float height);
 	//static std::shared_ptr<Model> MakeSphere(const VertexLayout& layout, uint32_t numVerts, uint32_t numRings, float radius);

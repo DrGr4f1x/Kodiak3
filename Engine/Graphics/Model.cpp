@@ -27,31 +27,62 @@ using namespace std;
 namespace
 {
 
-const int s_defaultFlags = 
-	aiProcess_FlipUVs | 
-	//aiProcess_FlipWindingOrder |
-	aiProcess_Triangulate | 
-	aiProcess_PreTransformVertices | 
-	aiProcess_CalcTangentSpace; // | 
-	// aiProcess_GenSmoothNormals;
-
 void UpdateExtents(Math::Vector3& minExtents, Math::Vector3& maxExtents, const Math::Vector3& pos)
 {
 	minExtents = Math::Min(minExtents, pos);
 	maxExtents = Math::Max(maxExtents, pos);
 }
 
+uint32_t GetPreprocessFlags(ModelLoad modelLoadFlags)
+{
+	uint32_t flags = 0;
+
+	flags |= HasFlag(modelLoadFlags, ModelLoad::CalcTangentSpace) ? aiProcess_CalcTangentSpace : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::JoinIdenticalVertices) ? aiProcess_JoinIdenticalVertices : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::MakeLeftHanded) ? aiProcess_CalcTangentSpace : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::Triangulate) ? aiProcess_Triangulate : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::RemoveComponent) ? aiProcess_RemoveComponent : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::GenNormals) ? aiProcess_GenNormals : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::GenSmoothNormals) ? aiProcess_GenSmoothNormals : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::SplitLargeMeshes) ? aiProcess_SplitLargeMeshes : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::PreTransformVertices) ? aiProcess_PreTransformVertices : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::LimitBoneWeights) ? aiProcess_LimitBoneWeights : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::ValidateDataStructure) ? aiProcess_ValidateDataStructure : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::ImproveCacheLocality) ? aiProcess_ImproveCacheLocality : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::RemoveRedundantMaterials) ? aiProcess_RemoveRedundantMaterials : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::FixInfacingNormals) ? aiProcess_FixInfacingNormals : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::SortByPType) ? aiProcess_SortByPType : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::FindDegenerates) ? aiProcess_FindDegenerates : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::FindInvalidData) ? aiProcess_FindInvalidData : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::GenUVCoords) ? aiProcess_GenUVCoords : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::TransformUVCoords) ? aiProcess_TransformUVCoords : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::FindInstances) ? aiProcess_FindInstances : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::OptimizeMeshes) ? aiProcess_OptimizeMeshes : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::OptimizeGraph) ? aiProcess_OptimizeGraph : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::FlipUVs) ? aiProcess_FlipUVs : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::FlipWindingOrder) ? aiProcess_FlipWindingOrder : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::SplitByBoneCount) ? aiProcess_SplitByBoneCount : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::Debone) ? aiProcess_Debone : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::GlobalScale) ? aiProcess_GlobalScale : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::EmbedTextures) ? aiProcess_EmbedTextures : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::ForceGenNormals) ? aiProcess_ForceGenNormals : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::DropNormals) ? aiProcess_DropNormals : 0;
+	flags |= HasFlag(modelLoadFlags, ModelLoad::GenBoundingBoxes) ? aiProcess_GenBoundingBoxes : 0;
+
+	return flags;
+}
+
 } // anonymous namespace
 
 
-ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float scale)
+ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float scale, ModelLoad modelLoadFlags)
 {
 	const string fullpath = Filesystem::GetInstance().GetFullPath(filename);
 	assert(!fullpath.empty());
 
 	Assimp::Importer aiImporter;
 
-	const auto aiScene = aiImporter.ReadFile(fullpath.c_str(), s_defaultFlags);
+	const auto aiScene = aiImporter.ReadFile(fullpath.c_str(), GetPreprocessFlags(modelLoadFlags));
 	assert(aiScene != nullptr);
 
 	ModelPtr model = make_shared<Model>();

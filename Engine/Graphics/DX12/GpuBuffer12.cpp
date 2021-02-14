@@ -21,12 +21,6 @@ using namespace Kodiak;
 using namespace std;
 
 
-static inline bool HasFlag(ResourceType type, ResourceType flag)
-{
-	return (type & flag) != 0;
-}
-
-
 void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSize, bool allowCpuWrites, const void* initialData)
 {
 	if (m_resource)

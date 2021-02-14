@@ -221,7 +221,7 @@ void MultisamplingApp::LoadAssets()
 		VertexComponent::UV,
 		VertexComponent::Color
 		});
-	m_model = Model::Load("voyager.dae", layout, 1.0f);
+	m_model = Model::Load("voyager.dae", layout, 1.0f, ModelLoad::Triangulate | ModelLoad::CalcTangentSpace | ModelLoad::PreTransformVertices);
 
 	m_texture = Texture::Load("voyager_bc3_unorm.ktx");
 }
