@@ -12,6 +12,7 @@
 
 #include "Graphics\Camera.h"
 #include "Graphics\Framebuffer.h"
+#include "Graphics\Grid.h"
 #include "Graphics\UIOverlay.h"
 
 
@@ -78,6 +79,7 @@ public:
 protected:
 	void PrepareUI();
 	void RenderUI(GraphicsContext& context);
+	void RenderGrid(GraphicsContext& context);
 
 	void CheckDeveloperMode();
 	void CheckRenderDoc();
@@ -92,6 +94,7 @@ protected:
 	bool m_isRunning{ false };
 	bool m_paused{ false };
 	bool m_showUI{ true };
+	bool m_showGrid{ false };
 	float m_frameTimer{ 0.0f };
 	float m_timer{ 0.0f };
 	float m_timerSpeed{ 1.0f };
@@ -115,6 +118,7 @@ protected:
 	DepthBufferPtr							m_defaultDepthBuffer;
 
 	std::unique_ptr<UIOverlay>				m_uiOverlay;
+	std::unique_ptr<Grid>					m_grid;
 
 	// External features/state
 	bool m_isDeveloperModeEnabled{ false };

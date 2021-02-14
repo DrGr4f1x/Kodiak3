@@ -261,6 +261,15 @@ void Application::RenderUI(GraphicsContext& context)
 }
 
 
+void Application::RenderGrid(GraphicsContext& context)
+{
+	if (!m_showGrid)
+		return;
+
+	m_grid->Render(context);
+}
+
+
 void Application::CheckDeveloperMode()
 {
 	m_isDeveloperModeEnabled = false;
@@ -322,6 +331,9 @@ void Application::Initialize()
 	m_uiOverlay = make_unique<UIOverlay>();
 	m_uiOverlay->Startup(GetWidth(), GetHeight(), GetColorFormat(), GetDepthFormat());
 
+	m_grid = make_unique<Grid>();
+	m_grid->Startup();
+
 	Startup();
 
 	m_isRunning = true;
@@ -335,6 +347,9 @@ void Application::Finalize()
 	LOG_NOTICE << "Finalizing application";
 
 	Shutdown();
+
+	m_grid->Shutdown();
+	m_grid.reset();
 
 	m_uiOverlay->Shutdown();
 	m_uiOverlay.reset();
@@ -376,9 +391,15 @@ bool Application::Tick()
 	if (g_input.IsFirstPressed(DigitalInput::kKey_pause))
 		TogglePause();
 
+	// Check toggle grid with 'g'
+	if (g_input.IsFirstPressed(DigitalInput::kKey_g))
+		m_showGrid = !m_showGrid;
+
 	bool res = Update();
 	if (res)
 	{
+		m_grid->Update(m_camera);
+
 		Render();
 
 		m_graphicsDevice->SubmitFrame();

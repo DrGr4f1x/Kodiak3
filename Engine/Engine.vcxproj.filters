@@ -267,6 +267,9 @@
     <ClInclude Include="Graphics\DX12\Texture12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\Grid.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -429,6 +432,9 @@
     <ClCompile Include="Graphics\DX12\GpuResource12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\Grid.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -477,6 +483,12 @@
     </CustomBuild>
     <CustomBuild Include="Shaders\UIVS.hlsl">
       <Filter>Graphics\Shaders\UI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\GridVS.hlsl">
+      <Filter>Graphics\Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\GridPS.hlsl">
+      <Filter>Graphics\Shaders</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

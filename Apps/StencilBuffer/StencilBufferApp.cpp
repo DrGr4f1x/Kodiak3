@@ -106,6 +106,7 @@ void StencilBufferApp::Render()
 		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
 	}
 
+	RenderGrid(context);
 	RenderUI(context);
 
 	context.EndRenderPass();
