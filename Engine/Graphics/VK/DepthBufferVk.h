@@ -11,7 +11,6 @@
 #pragma once
 
 #include "Graphics\PixelBuffer.h"
-#include "Graphics\ResourceView.h"
 
 
 namespace Kodiak
