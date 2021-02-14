@@ -198,9 +198,9 @@ void GraphicsPSO::Finalize()
 
 	if (firstCompile)
 	{
-		HRESULT res = GetDevice()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&m_handle));
+		HRESULT res = GetDevice()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&m_pso));
 		ThrowIfFailed(res);
-		s_graphicsPSOHashMap[hashCode].Attach(m_handle);
+		s_graphicsPSOHashMap[hashCode].Attach(m_pso);
 	}
 	else
 	{
@@ -208,7 +208,7 @@ void GraphicsPSO::Finalize()
 		{
 			this_thread::yield();
 		}
-		m_handle = *PSORef;
+		m_pso = *PSORef;
 	}
 }
 
@@ -250,8 +250,8 @@ void ComputePSO::Finalize()
 
 	if (firstCompile)
 	{
-		assert_succeeded(GetDevice()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&m_handle)));
-		s_computePSOHashMap[hashCode].Attach(m_handle);
+		assert_succeeded(GetDevice()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&m_pso)));
+		s_computePSOHashMap[hashCode].Attach(m_pso);
 	}
 	else
 	{
@@ -259,6 +259,6 @@ void ComputePSO::Finalize()
 		{
 			this_thread::yield();
 		}
-		m_handle = *PSORef;
+		m_pso = *PSORef;
 	}
 }

@@ -34,11 +34,11 @@ public:
 		return *m_rootSignature;
 	}
 
-	const PsoHandle& GetHandle() const { return m_handle; }
+	ID3D12PipelineState* GetPipelineStateObject() const { return m_pso; }
 
 protected:
 	const RootSignature* m_rootSignature{ nullptr };
-	PsoHandle m_handle;
+	ID3D12PipelineState* m_pso{ nullptr };
 };
 
 }

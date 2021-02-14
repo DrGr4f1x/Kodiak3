@@ -22,14 +22,15 @@ class GpuResource
 
 public:
 	GpuResource();
-	GpuResource(const ResourceHandle& resource, ResourceState initialState);
+	GpuResource(ID3D12Resource* resource, ResourceState initialState);
 	virtual ~GpuResource() = 0;
 
 	const ResourceType GetType() const { return m_type; }
-	const ResourceHandle& GetHandle() const { return m_resource; }
+	ID3D12Resource* GetResource() { return m_resource.Get(); }
+	const ID3D12Resource* GetResource() const { return m_resource.Get(); }
 
 protected:
-	ResourceHandle	m_resource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_resource;
 	ResourceState	m_usageState;
 	ResourceState	m_transitioningState;
 	ResourceType	m_type;

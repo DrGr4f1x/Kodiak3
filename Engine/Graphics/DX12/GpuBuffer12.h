@@ -12,7 +12,6 @@
 
 
 #include "GpuResource12.h"
-#include "ResourceView12.h"
 
 
 namespace Kodiak
@@ -27,8 +26,8 @@ class GpuBuffer : public GpuResource
 public:
 	~GpuBuffer();
 
-	const ShaderResourceView& GetSRV() const { return m_srv; }
-	const UnorderedAccessView& GetUAV() const { return m_uav; }
+	const D3D12_CPU_DESCRIPTOR_HANDLE& GetSRV() const { return m_srvHandle; }
+	const D3D12_CPU_DESCRIPTOR_HANDLE& GetUAV() const { return m_uavHandle; }
 
 	size_t GetSize() const { return m_bufferSize; }
 	size_t GetElementCount() const { return m_elementCount; }
@@ -44,9 +43,12 @@ protected:
 	{
 		m_usageState = ResourceState::Common;
 		m_type = type;
+		m_resourceFlags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		m_srvHandle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+		m_uavHandle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	}
+
 	virtual void CreateDerivedViews() = 0;
-	BufferViewDesc GetDesc() const;
 
 protected:
 	size_t m_bufferSize{ 0 };
@@ -55,8 +57,10 @@ protected:
 
 	uint64_t m_gpuAddress{ 0 };
 
-	ShaderResourceView m_srv;
-	UnorderedAccessView m_uav;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_srvHandle;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_uavHandle;
+
+	D3D12_RESOURCE_FLAGS m_resourceFlags;
 };
 
 
@@ -65,7 +69,7 @@ class IndexBuffer : public GpuBuffer
 public:
 	IndexBuffer() : GpuBuffer(ResourceType::IndexBuffer) {}
 
-	const IndexBufferView& GetIBV() const { return m_ibv; }
+	const D3D12_INDEX_BUFFER_VIEW& GetIBV() const { return m_ibvHandle; }
 
 	void Update(size_t sizeInBytes, const void* data);
 	void Update(size_t sizeInBytes, size_t offset, const void* data);
@@ -76,7 +80,7 @@ protected:
 	void CreateDerivedViews() override;
 
 private:
-	IndexBufferView m_ibv;
+	D3D12_INDEX_BUFFER_VIEW m_ibvHandle;
 	bool m_indexSize16{ false };
 };
 
@@ -86,7 +90,7 @@ class VertexBuffer : public GpuBuffer
 public:
 	VertexBuffer() : GpuBuffer(ResourceType::VertexBuffer) {}
 
-	const VertexBufferView& GetVBV() const { return m_vbv; }
+	const D3D12_VERTEX_BUFFER_VIEW& GetVBV() const { return m_vbvHandle; }
 
 	void Update(size_t sizeInBytes, const void* data);
 	void Update(size_t sizeInBytes, size_t offset, const void* data);
@@ -95,7 +99,7 @@ protected:
 	void CreateDerivedViews() override;
 
 private:
-	VertexBufferView m_vbv;
+	D3D12_VERTEX_BUFFER_VIEW m_vbvHandle;
 };
 
 
@@ -104,7 +108,9 @@ class ConstantBuffer : public GpuBuffer
 public:
 	ConstantBuffer() : GpuBuffer(ResourceType::ConstantBuffer)
 	{
+		m_cbvHandle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 		m_usageState = ResourceState::GenericRead;
+		m_resourceFlags = D3D12_RESOURCE_FLAG_NONE;
 	}
 
 	void Create(const std::string& name, size_t numElements, size_t elementSize, const void* initialData = nullptr)
@@ -121,7 +127,7 @@ public:
 #endif
 	}
 
-	const ConstantBufferView& GetCBV() const { return m_cbv; }
+	const D3D12_CPU_DESCRIPTOR_HANDLE& GetCBV() const { return m_cbvHandle; }
 
 	void Update(size_t sizeInBytes, const void* data);
 	void Update(size_t sizeInBytes, size_t offset, const void* data);
@@ -130,7 +136,7 @@ protected:
 	void CreateDerivedViews() override;
 
 private:
-	ConstantBufferView m_cbv;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_cbvHandle;
 };
 
 
@@ -162,10 +168,10 @@ public:
 
 	ByteAddressBuffer& GetCounterBuffer() { return m_counterBuffer; }
 
-	const ShaderResourceView& GetCounterSRV(CommandContext& context);
-	const UnorderedAccessView& GetCounterUAV(CommandContext& context);
+	const D3D12_CPU_DESCRIPTOR_HANDLE& GetCounterSRV(CommandContext& context);
+	const D3D12_CPU_DESCRIPTOR_HANDLE& GetCounterUAV(CommandContext& context);
 
-	const VertexBufferView& GetVBV() const { return m_vbv; }
+	const D3D12_VERTEX_BUFFER_VIEW& GetVBV() const { return m_vbvHandle; }
 
 	void CreateWithFlags(const std::string& name, size_t numElements, size_t elementSize, ResourceType flags, const void* initialData = nullptr)
 	{
@@ -178,7 +184,7 @@ protected:
 
 private:
 	ByteAddressBuffer m_counterBuffer;
-	VertexBufferView m_vbv;
+	D3D12_VERTEX_BUFFER_VIEW m_vbvHandle;
 };
 
 

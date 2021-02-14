@@ -259,12 +259,15 @@ void TextureInitializer::SetData(uint32_t slice, uint32_t mipLevel, const void* 
 }
 
 
-Texture::Texture() = default;
+Texture::Texture()
+{
+	m_srvHandle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+}
 
 
 Texture::~Texture()
 {
-	g_graphicsDevice->ReleaseResource(m_resource);
+	g_graphicsDevice->ReleaseResource(m_resource.Get());
 }
 
 
@@ -447,31 +450,67 @@ void Texture::ClearRetainedData()
 
 void Texture::CreateDerivedViews()
 {
-	TextureViewDesc desc = {};
-	desc.format = m_format;
-	desc.usage = ResourceState::ShaderResource;
-	desc.arraySize = m_arraySize;
-	desc.mipCount = m_numMips;
-	desc.isDepth = false;
-	desc.isStencil = false;
+	auto dxFormat = static_cast<DXGI_FORMAT>(m_format);
 
-	m_srv.Create(m_resource, m_type, desc);
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.ViewDimension = GetSRVDimension(m_type);
+	srvDesc.Format = dxFormat;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+	switch (m_type)
+	{
+	case ResourceType::Texture1D:
+		srvDesc.Texture1D.MipLevels = m_numMips;
+		break;
+	case ResourceType::Texture1D_Array:
+		srvDesc.Texture1DArray.MipLevels = m_numMips;
+		srvDesc.Texture1DArray.ArraySize = m_arraySize;
+		break;
+	case ResourceType::Texture2D:
+	case ResourceType::Texture2DMS:
+		srvDesc.Texture2D.MipLevels = m_numMips;
+		break;
+	case ResourceType::Texture2D_Array:
+	case ResourceType::Texture2DMS_Array:
+		srvDesc.Texture2DArray.MipLevels = m_numMips;
+		srvDesc.Texture2DArray.ArraySize = m_arraySize;
+		break;
+	case ResourceType::TextureCube:
+		srvDesc.TextureCube.MipLevels = m_numMips;
+		break;
+	case ResourceType::TextureCube_Array:
+		srvDesc.TextureCubeArray.MipLevels = m_numMips;
+		srvDesc.TextureCubeArray.NumCubes = m_arraySize;
+		break;
+	case ResourceType::Texture3D:
+		srvDesc.Texture3D.MipLevels = m_numMips;
+		break;
+
+	default:
+		assert(false);
+		return;
+	}
+
+	if (m_srvHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_srvHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+	GetDevice()->CreateShaderResourceView(m_resource.Get(), &srvDesc, m_srvHandle);
 }
 
 
 void Texture::LoadDDS(const string& fullpath, Format format, bool sRgb)
 {
 	// TODO this is janky
-	auto& descriptorHandle = m_srv.GetHandle();
-
-	if (descriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	
+	if (m_srvHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
 	{
-		descriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		m_srvHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
 	ThrowIfFailed(BinaryReader::ReadEntireFile(fullpath, m_data, &m_dataSize));
 
-	ThrowIfFailed(CreateDDSTextureFromMemory(GetDevice(), m_data.get(), m_dataSize, 0, format, sRgb, &m_resource, descriptorHandle));
+	ThrowIfFailed(CreateDDSTextureFromMemory(GetDevice(), m_data.get(), m_dataSize, 0, format, sRgb, &m_resource, m_srvHandle));
 
 	ClearRetainedData();
 }
@@ -480,11 +519,9 @@ void Texture::LoadDDS(const string& fullpath, Format format, bool sRgb)
 void Texture::LoadKTX(const string& fullpath, Format format, bool sRgb)
 {
 	// TODO this is janky
-	auto& descriptorHandle = m_srv.GetHandle();
-
-	if (descriptorHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	if (m_srvHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
 	{
-		descriptorHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		m_srvHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
 	ThrowIfFailed(BinaryReader::ReadEntireFile(fullpath, m_data, &m_dataSize));
@@ -497,7 +534,7 @@ void Texture::LoadKTX(const string& fullpath, Format format, bool sRgb)
 
 void ManagedTexture::WaitForLoad() const
 {
-	volatile D3D12_CPU_DESCRIPTOR_HANDLE& volHandle = (volatile D3D12_CPU_DESCRIPTOR_HANDLE&)m_srv.GetHandle();
+	volatile D3D12_CPU_DESCRIPTOR_HANDLE& volHandle = (volatile D3D12_CPU_DESCRIPTOR_HANDLE&)m_srvHandle;
 	volatile bool& volValid = (volatile bool&)m_isValid;
 	while (volHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN && volValid)
 	{
@@ -508,7 +545,7 @@ void ManagedTexture::WaitForLoad() const
 
 void ManagedTexture::SetToInvalidTexture()
 {
-	m_srv = Texture::GetMagentaTex2D()->GetSRV();
+	m_srvHandle = Texture::GetMagentaTex2D()->GetSRV();
 	m_isValid = false;
 }
 

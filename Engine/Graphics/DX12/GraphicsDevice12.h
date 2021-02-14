@@ -43,7 +43,7 @@ public:
 
 	const std::string& GetDeviceName() const { return m_deviceName; }
 
-	void ReleaseResource(PlatformHandle handle);
+	void ReleaseResource(ID3D12Resource* resource);
 
 private:
 	void ReleaseDeferredResources();
@@ -79,7 +79,7 @@ private:
 	struct DeferredReleaseResource
 	{
 		uint64_t fenceValue;
-		PlatformHandle resourceHandle;
+		Microsoft::WRL::ComPtr<ID3D12Resource> resourceHandle;
 	};
 	std::list<DeferredReleaseResource> m_deferredResources;
 

@@ -383,35 +383,35 @@ void CommandContext::Reset()
 void GraphicsContext::ClearColor(ColorBuffer& target)
 {
 	FlushResourceBarriers();
-	m_commandList->ClearRenderTargetView(target.GetRTV().GetHandle(), target.GetClearColor().GetPtr(), 0, nullptr);
+	m_commandList->ClearRenderTargetView(target.GetRTV(), target.GetClearColor().GetPtr(), 0, nullptr);
 }
 
 
 void GraphicsContext::ClearColor(ColorBuffer& target, Color clearColor)
 {
 	FlushResourceBarriers();
-	m_commandList->ClearRenderTargetView(target.GetRTV().GetHandle(), clearColor.GetPtr(), 0, nullptr);
+	m_commandList->ClearRenderTargetView(target.GetRTV(), clearColor.GetPtr(), 0, nullptr);
 }
 
 
 void GraphicsContext::ClearDepth(DepthBuffer& target)
 {
 	FlushResourceBarriers();
-	m_commandList->ClearDepthStencilView(target.GetDSV().GetHandle(), D3D12_CLEAR_FLAG_DEPTH, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
+	m_commandList->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_DEPTH, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
 }
 
 
 void GraphicsContext::ClearStencil(DepthBuffer& target)
 {
 	FlushResourceBarriers();
-	m_commandList->ClearDepthStencilView(target.GetDSV().GetHandle(), D3D12_CLEAR_FLAG_STENCIL, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
+	m_commandList->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_STENCIL, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
 }
 
 
 void GraphicsContext::ClearDepthAndStencil(DepthBuffer& target)
 {
 	FlushResourceBarriers();
-	m_commandList->ClearDepthStencilView(target.GetDSV().GetHandle(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
+	m_commandList->ClearDepthStencilView(target.GetDSV(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, target.GetClearDepth(), target.GetClearStencil(), 0, nullptr);
 }
 
 
@@ -426,7 +426,7 @@ void GraphicsContext::BeginRenderPass(FrameBuffer& framebuffer)
 		m_renderTargets[i] = framebuffer.m_colorBuffers[i].get();
 		if (m_renderTargets[i])
 		{
-			RTVs[i] = m_renderTargets[i]->GetRTV().GetHandle();
+			RTVs[i] = m_renderTargets[i]->GetRTV();
 			highWaterMark = i;
 		}
 	}
@@ -435,7 +435,7 @@ void GraphicsContext::BeginRenderPass(FrameBuffer& framebuffer)
 	m_depthTarget = framebuffer.GetDepthBuffer().get();
 	if (m_depthTarget)
 	{
-		DSV = m_depthTarget->GetDSV().GetHandle();
+		DSV = m_depthTarget->GetDSV();
 	}
 
 	// Set the render targets
@@ -472,22 +472,22 @@ void GraphicsContext::ResolveOcclusionQueries(OcclusionQueryHeap& queryHeap, uin
 		D3D12_QUERY_TYPE_OCCLUSION,
 		startIndex,
 		numQueries,
-		destBuffer.GetHandle().Get(),
+		destBuffer.GetResource(),
 		destBufferOffset);
 }
 
 
 void GraphicsContext::SetRenderTarget(const ColorBuffer& colorBuffer)
 {
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvs[] = { colorBuffer.GetRTV().GetHandle() };
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvs[] = { colorBuffer.GetRTV() };
 	m_commandList->OMSetRenderTargets(1, rtvs, FALSE, nullptr);
 }
 
 
 void GraphicsContext::SetRenderTarget(const ColorBuffer& colorBuffer, const DepthBuffer& depthBuffer)
 {
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvs[] = { colorBuffer.GetRTV().GetHandle() };
-	D3D12_CPU_DESCRIPTOR_HANDLE dsv = depthBuffer.GetDSV().GetHandle();
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvs[] = { colorBuffer.GetRTV() };
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = depthBuffer.GetDSV();
 	m_commandList->OMSetRenderTargets(1, rtvs, FALSE, &dsv);
 }
 

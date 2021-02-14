@@ -114,9 +114,6 @@
     <ClInclude Include="Graphics\ResourceSet.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\ResourceView.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\QueryHeap.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -229,9 +226,6 @@
       <Filter>Graphics\VK</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\DX12\PixelBuffer12.h">
-      <Filter>Graphics\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\DX12\ResourceView12.h">
       <Filter>Graphics\DX12</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\VK\DepthBufferVk.h">
@@ -364,9 +358,6 @@
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\DX12\ResourceSet12.cpp">
-      <Filter>Graphics\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\DX12\ResourceView12.cpp">
       <Filter>Graphics\DX12</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\DX12\RootSignature12.cpp">

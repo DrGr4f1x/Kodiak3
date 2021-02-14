@@ -24,7 +24,7 @@ GpuResource::GpuResource()
 {}
 
 
-GpuResource::GpuResource(const ResourceHandle& resource, ResourceState initialState)
+GpuResource::GpuResource(ID3D12Resource* resource, ResourceState initialState)
 	: m_resource(resource)
 	, m_usageState(initialState)
 	, m_transitioningState(ResourceState::Undefined)

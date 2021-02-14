@@ -246,12 +246,12 @@ ColorBufferPtr GraphicsDevice::GetBackBuffer(uint32_t index) const
 }
 
 
-void GraphicsDevice::ReleaseResource(PlatformHandle handle)
+void GraphicsDevice::ReleaseResource(ID3D12Resource* resource)
 {
 	uint64_t nextFence = g_commandManager.GetGraphicsQueue().GetNextFenceValue();
 
-	DeferredReleaseResource resource{ nextFence, handle };
-	m_deferredResources.emplace_back(resource);
+	DeferredReleaseResource deferredResource{ nextFence, resource };
+	m_deferredResources.emplace_back(deferredResource);
 }
 
 

@@ -99,7 +99,7 @@ void ResourceSet::Finalize()
 
 void ResourceSet::SetSRV(int rootIndex, int paramIndex, const ColorBuffer& buffer)
 {
-	m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetSRV().GetHandle();
+	m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetSRV();
 }
 
 
@@ -107,30 +107,30 @@ void ResourceSet::SetSRV(int rootIndex, int paramIndex, const DepthBuffer& buffe
 {
 	if (depthSrv)
 	{
-		m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetDepthSRV().GetHandle();
+		m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetDepthSRV();
 	}
 	else
 	{
-		m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetStencilSRV().GetHandle();
+		m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetStencilSRV();
 	}
 }
 
 
 void ResourceSet::SetSRV(int rootIndex, int paramIndex, const StructuredBuffer& buffer)
 {
-	m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetSRV().GetHandle();
+	m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetSRV();
 }
 
 
 void ResourceSet::SetSRV(int rootIndex, int paramIndex, const Texture& texture)
 {
-	m_resourceTables[rootIndex].descriptors[paramIndex] = texture.GetSRV().GetHandle();
+	m_resourceTables[rootIndex].descriptors[paramIndex] = texture.GetSRV();
 }
 
 
 void ResourceSet::SetUAV(int rootIndex, int paramIndex, const ColorBuffer& buffer)
 {
-	m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetUAV().GetHandle();
+	m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetUAV();
 }
 
 
@@ -142,7 +142,7 @@ void ResourceSet::SetUAV(int rootIndex, int paramIndex, const DepthBuffer& buffe
 
 void ResourceSet::SetUAV(int rootIndex, int paramIndex, const StructuredBuffer& buffer)
 {
-	m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetUAV().GetHandle();
+	m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetUAV();
 }
 
 
@@ -160,7 +160,7 @@ void ResourceSet::SetCBV(int rootIndex, int paramIndex, const ConstantBuffer& bu
 	}
 	else
 	{
-		m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetCBV().GetHandle();
+		m_resourceTables[rootIndex].descriptors[paramIndex] = buffer.GetCBV();
 	}
 }
 

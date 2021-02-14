@@ -322,7 +322,7 @@ inline void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 {
 	m_curComputePipelineState = nullptr;
 
-	auto pipelineState = pso.GetHandle();
+	auto pipelineState = pso.GetPipelineStateObject();
 	if (pipelineState != m_curGraphicsPipelineState)
 	{
 		m_commandList->SetPipelineState(pipelineState);
@@ -384,20 +384,20 @@ inline void GraphicsContext::SetResources(const ResourceSet& resources)
 
 inline void GraphicsContext::SetIndexBuffer(const IndexBuffer& indexBuffer)
 {
-	m_commandList->IASetIndexBuffer(&indexBuffer.GetIBV().GetHandle());
+	m_commandList->IASetIndexBuffer(&indexBuffer.GetIBV());
 }
 
 
 inline void GraphicsContext::SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer)
 {
-	D3D12_VERTEX_BUFFER_VIEW vbv[1] = { vertexBuffer.GetVBV().GetHandle() };
+	D3D12_VERTEX_BUFFER_VIEW vbv[1] = { vertexBuffer.GetVBV() };
 	m_commandList->IASetVertexBuffers(slot, 1, vbv);
 }
 
 
 inline void GraphicsContext::SetVertexBuffer(uint32_t slot, const StructuredBuffer& vertexBuffer)
 {
-	D3D12_VERTEX_BUFFER_VIEW vbv[1] = { vertexBuffer.GetVBV().GetHandle() };
+	D3D12_VERTEX_BUFFER_VIEW vbv[1] = { vertexBuffer.GetVBV() };
 	m_commandList->IASetVertexBuffers(slot, 1, vbv);
 }
 
@@ -407,7 +407,7 @@ inline void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count
 	std::vector<D3D12_VERTEX_BUFFER_VIEW> vbv(count);
 	for (uint32_t i = 0; i < count; ++i)
 	{
-		vbv[i] = vertexBuffers[i].GetVBV().GetHandle();
+		vbv[i] = vertexBuffers[i].GetVBV();
 	}
 	m_commandList->IASetVertexBuffers(startSlot, count, vbv.data());
 }
@@ -468,7 +468,7 @@ inline void ComputeContext::SetPipelineState(const ComputePSO& pso)
 {
 	m_curGraphicsPipelineState = nullptr;
 
-	auto pipelineState = pso.GetHandle();
+	auto pipelineState = pso.GetPipelineStateObject();
 	if (pipelineState != m_curComputePipelineState)
 	{
 		m_commandList->SetPipelineState(pipelineState);

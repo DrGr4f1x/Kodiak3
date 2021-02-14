@@ -12,7 +12,6 @@
 
 
 #include "Graphics\PixelBuffer.h"
-#include "Graphics\ResourceView.h"
 
 
 namespace Kodiak
@@ -99,7 +98,7 @@ public:
 
 	static void DestroyAll();
 
-	const ShaderResourceView& GetSRV() const { return m_srv; }
+	const D3D12_CPU_DESCRIPTOR_HANDLE& GetSRV() const { return m_srvHandle; }
 
 protected:
 	void LoadDDS(const std::string& fullpath, Format format, bool sRgb);
@@ -110,9 +109,9 @@ protected:
 	void ClearRetainedData();
 
 protected:
-	ShaderResourceView m_srv;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_srvHandle;
 
-	std::unique_ptr<uint8_t[]>		m_data;
+	std::unique_ptr<uint8_t[]>	m_data;
 	size_t						m_dataSize{ 0 };
 	bool						m_retainData{ false };
 };

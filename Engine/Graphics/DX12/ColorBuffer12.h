@@ -13,7 +13,6 @@
 
 #include "Color.h"
 #include "Graphics\PixelBuffer.h"
-#include "Graphics\ResourceView.h"
 
 
 namespace Kodiak
@@ -26,7 +25,7 @@ public:
 	~ColorBuffer();
 
 	// Create a color buffer from a swap chain buffer.  Unordered access is restricted.
-	void CreateFromSwapChain(const std::string& name, const ResourceHandle& resource, uint32_t width, uint32_t height, Format format);
+	void CreateFromSwapChain(const std::string& name, ID3D12Resource* resource, uint32_t width, uint32_t height, Format format);
 
 	// Create a color buffer.
 	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips, Format format);
@@ -35,9 +34,9 @@ public:
 	void CreateArray(const std::string& name, uint32_t width, uint32_t height, uint32_t arrayCount, Format format);
 
 	// Get pre-created CPU-visible descriptor handles
-	const ShaderResourceView& GetSRV() const { return m_srvHandle; }
-	const RenderTargetView& GetRTV() const { return m_rtvHandle; }
-	const UnorderedAccessView& GetUAV() const { return m_uavHandle; }
+	const D3D12_CPU_DESCRIPTOR_HANDLE& GetSRV() const { return m_srvHandle; }
+	const D3D12_CPU_DESCRIPTOR_HANDLE& GetRTV() const { return m_rtvHandle; }
+	const D3D12_CPU_DESCRIPTOR_HANDLE& GetUAV() const { return m_uavHandle[0]; }
 
 	void SetClearColor(Color clearColor) { m_clearColor = clearColor; }
 	Color GetClearColor() const { return m_clearColor; }
@@ -65,9 +64,9 @@ protected:
 
 protected:
 	Color m_clearColor;
-	ShaderResourceView m_srvHandle;
-	RenderTargetView m_rtvHandle;
-	UnorderedAccessView m_uavHandle;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_srvHandle;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_rtvHandle;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_uavHandle[12];
 	uint32_t m_numMipMaps{ 0 }; // number of texture sublevels
 	uint32_t m_fragmentCount{ 1 };
 };

@@ -27,58 +27,104 @@ using namespace std;
 DepthBuffer::DepthBuffer(float clearDepth, uint8_t clearStencil)
 	: m_clearDepth(clearDepth)
 	, m_clearStencil(clearStencil)
-{}
+{
+	m_dsvHandle[0].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	m_dsvHandle[1].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	m_dsvHandle[2].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	m_dsvHandle[3].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	m_depthSRVHandle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	m_stencilSRVHandle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+}
 
 
 DepthBuffer::~DepthBuffer()
 {
-	g_graphicsDevice->ReleaseResource(m_resource);
+	g_graphicsDevice->ReleaseResource(m_resource.Get());
 }
 
 
 void DepthBuffer::CreateDerivedViews()
 {
-	DepthStencilViewDesc dsvDesc = {};
-	dsvDesc.format = m_format;
-	dsvDesc.readOnlyDepth = false;
-	dsvDesc.readOnlyStencil = false;
+	ID3D12Resource* resource = m_resource.Get();
 
-	m_dsv[0].Create(m_resource, dsvDesc);
+	DXGI_FORMAT dxgiFormat = static_cast<DXGI_FORMAT>(m_format);
 
-	dsvDesc.readOnlyDepth = true;
-	m_dsv[1].Create(m_resource, dsvDesc);
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+	dsvDesc.Format = GetDSVFormat(dxgiFormat);
 
-	const bool hasStencil = IsStencilFormat(m_format);
-
-	if (hasStencil)
+	if (resource->GetDesc().SampleDesc.Count == 1)
 	{
-		dsvDesc.readOnlyDepth = false;
-		dsvDesc.readOnlyStencil = true;
-		m_dsv[2].Create(m_resource, dsvDesc);
-
-		dsvDesc.readOnlyDepth = true;
-		m_dsv[3].Create(m_resource, dsvDesc);
+		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+		dsvDesc.Texture2D.MipSlice = 0;
 	}
 	else
 	{
-		m_dsv[2] = m_dsv[0];
-		m_dsv[3] = m_dsv[1];
+		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DMS;
 	}
 
-	TextureViewDesc srvDesc = {};
-	srvDesc.format = m_format;
-	srvDesc.usage = ResourceState::ShaderResource;
-	srvDesc.arraySize = 1;
-	srvDesc.mipCount = 1;
-	srvDesc.isDepth = true;
-
-	m_depthSRV.Create(m_resource, m_type, srvDesc);
-
-	if (hasStencil)
+	if (m_dsvHandle[0].ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
 	{
-		srvDesc.isDepth = false;
-		srvDesc.isStencil = true;
-		m_stencilSRV.Create(m_resource, m_type, srvDesc);
+		m_dsvHandle[0] = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+		m_dsvHandle[1] = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	}
+
+	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+	GetDevice()->CreateDepthStencilView(resource, &dsvDesc, m_dsvHandle[0]);
+
+	dsvDesc.Flags = D3D12_DSV_FLAG_READ_ONLY_DEPTH;
+	GetDevice()->CreateDepthStencilView(resource, &dsvDesc, m_dsvHandle[1]);
+
+	DXGI_FORMAT stencilReadFormat = GetStencilFormat(dxgiFormat);
+	if (stencilReadFormat != DXGI_FORMAT_UNKNOWN)
+	{
+		if (m_dsvHandle[2].ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+		{
+			m_dsvHandle[2] = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+			m_dsvHandle[3] = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+		}
+
+		dsvDesc.Flags = D3D12_DSV_FLAG_READ_ONLY_STENCIL;
+		GetDevice()->CreateDepthStencilView(resource, &dsvDesc, m_dsvHandle[2]);
+
+		dsvDesc.Flags = D3D12_DSV_FLAG_READ_ONLY_DEPTH | D3D12_DSV_FLAG_READ_ONLY_STENCIL;
+		GetDevice()->CreateDepthStencilView(resource, &dsvDesc, m_dsvHandle[3]);
+	}
+	else
+	{
+		m_dsvHandle[2] = m_dsvHandle[0];
+		m_dsvHandle[3] = m_dsvHandle[1];
+	}
+
+	if (m_depthSRVHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_depthSRVHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	// Create the shader resource view
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Format = GetDepthFormat(dxgiFormat);
+	if (dsvDesc.ViewDimension == D3D12_DSV_DIMENSION_TEXTURE2D)
+	{
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = 1;
+	}
+	else
+	{
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DMS;
+	}
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	GetDevice()->CreateShaderResourceView(resource, &srvDesc, m_depthSRVHandle);
+
+	if (stencilReadFormat != DXGI_FORMAT_UNKNOWN)
+	{
+		if (m_stencilSRVHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+		{
+			m_stencilSRVHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		}
+
+		srvDesc.Format = stencilReadFormat;
+		srvDesc.Texture2D.PlaneSlice = (srvDesc.Format == DXGI_FORMAT_X32_TYPELESS_G8X24_UINT) ? 1 : 0;
+		GetDevice()->CreateShaderResourceView(resource, &srvDesc, m_stencilSRVHandle);
 	}
 }
 

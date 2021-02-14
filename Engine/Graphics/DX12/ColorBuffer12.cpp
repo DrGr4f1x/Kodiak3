@@ -42,12 +42,16 @@ D3D12_RESOURCE_FLAGS CombineResourceFlags(uint32_t fragmentCount)
 
 ColorBuffer::ColorBuffer(Color clearColor)
 	: m_clearColor(clearColor)
-{}
+{
+	m_srvHandle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	m_rtvHandle.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	memset(m_uavHandle, 0xFF, sizeof(m_uavHandle));
+}
 
 
 ColorBuffer::~ColorBuffer()
 {
-	g_graphicsDevice->ReleaseResource(m_resource);
+	g_graphicsDevice->ReleaseResource(m_resource.Get());
 }
 
 
@@ -57,47 +61,90 @@ void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t
 
 	m_numMipMaps = numMips - 1;
 
-	RenderTargetViewDesc rtvDesc = { m_format, m_arraySize, numMips, m_fragmentCount, false };
-	m_rtvHandle.Create(m_resource, rtvDesc);
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 
-	TextureViewDesc srvDesc = {};
-	srvDesc.usage = ResourceState::ShaderResource;
-	srvDesc.format = format;
-	srvDesc.arraySize = m_arraySize;
-	srvDesc.mipCount = numMips;
+	DXGI_FORMAT dxgiFormat = static_cast<DXGI_FORMAT>(format);
+	rtvDesc.Format = dxgiFormat;
+	uavDesc.Format = GetUAVFormat(dxgiFormat);
+	srvDesc.Format = dxgiFormat;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
-	ResourceType resType = ResourceType::Texture2D;
-	if (m_arraySize > 1)
+	if (arraySize > 1)
 	{
-		resType = ResourceType::Texture2D_Array;
+		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
+		rtvDesc.Texture2DArray.MipSlice = 0;
+		rtvDesc.Texture2DArray.FirstArraySlice = 0;
+		rtvDesc.Texture2DArray.ArraySize = (UINT)arraySize;
+
+		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
+		uavDesc.Texture2DArray.MipSlice = 0;
+		uavDesc.Texture2DArray.FirstArraySlice = 0;
+		uavDesc.Texture2DArray.ArraySize = (UINT)arraySize;
+
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
+		srvDesc.Texture2DArray.MipLevels = numMips;
+		srvDesc.Texture2DArray.MostDetailedMip = 0;
+		srvDesc.Texture2DArray.FirstArraySlice = 0;
+		srvDesc.Texture2DArray.ArraySize = (UINT)arraySize;
 	}
 	else if (m_fragmentCount > 1)
 	{
-		resType = ResourceType::Texture2DMS;
+		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMS;
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DMS;
+	}
+	else
+	{
+		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+		rtvDesc.Texture2D.MipSlice = 0;
+
+		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+		uavDesc.Texture2D.MipSlice = 0;
+
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = numMips;
+		srvDesc.Texture2D.MostDetailedMip = 0;
 	}
 
-	m_srvHandle.Create(m_resource, resType, srvDesc);
-
-	if (m_fragmentCount == 1)
+	if (m_srvHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
 	{
-		TextureViewDesc uavDesc = {};
-		uavDesc.usage = ResourceState::UnorderedAccess;
-		uavDesc.format = m_format;
-		uavDesc.mipCount = numMips;
-		uavDesc.mipLevel = 0;
-		uavDesc.arraySize = m_arraySize;
+		m_rtvHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		m_srvHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
 
-		m_uavHandle.Create(m_resource, resType, uavDesc);
+	ID3D12Resource* resource = m_resource.Get();
+
+	// Create the render target view
+	GetDevice()->CreateRenderTargetView(resource, &rtvDesc, m_rtvHandle);
+
+	// Create the shader resource view
+	GetDevice()->CreateShaderResourceView(resource, &srvDesc, m_srvHandle);
+
+	if (m_fragmentCount > 1)
+		return;
+
+	// Create the UAVs for each mip level (RWTexture2D)
+	for (uint32_t i = 0; i < numMips; ++i)
+	{
+		if (m_uavHandle[i].ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+		{
+			m_uavHandle[i] = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			}
+
+		GetDevice()->CreateUnorderedAccessView(resource, nullptr, &uavDesc, m_uavHandle[i]);
+
+		uavDesc.Texture2D.MipSlice++;
 	}
 }
 
 
-void ColorBuffer::CreateFromSwapChain(const string& name, const ResourceHandle& resource, uint32_t width, uint32_t height, Format format)
+void ColorBuffer::CreateFromSwapChain(const string& name, ID3D12Resource* resource, uint32_t width, uint32_t height, Format format)
 {
 	assert(resource != nullptr);
 	D3D12_RESOURCE_DESC resourceDesc = resource->GetDesc();
 
-	m_resource.Attach(resource.Get());
+	m_resource.Attach(resource);
 	m_usageState = ResourceState::Present;
 
 	m_width = (uint32_t)resourceDesc.Width;		// We don't care about large virtual textures yet
@@ -113,8 +160,8 @@ void ColorBuffer::CreateFromSwapChain(const string& name, const ResourceHandle& 
 	(name);
 #endif
 
-	RenderTargetViewDesc rtvDesc = { m_format, 0, 1, 0, true };
-	m_rtvHandle.Create(m_resource, rtvDesc);
+	m_rtvHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	GetDevice()->CreateRenderTargetView(m_resource.Get(), nullptr, m_rtvHandle);
 }
 
 

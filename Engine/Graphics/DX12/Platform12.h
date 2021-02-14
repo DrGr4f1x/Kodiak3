@@ -34,20 +34,6 @@ const std::string s_defaultShaderPath = "Shaders\\DXIL";
 namespace Kodiak
 {
 
-using PlatformHandle = Microsoft::WRL::ComPtr<IUnknown>;
-using ResourceHandle = Microsoft::WRL::ComPtr<ID3D12Resource>;
-using SwapChainHandle = Microsoft::WRL::ComPtr<IDXGISwapChain1>;
-using PsoHandle = ID3D12PipelineState*;
-
-using SrvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
-using UavHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
-using VbvHandle = D3D12_VERTEX_BUFFER_VIEW;
-using IbvHandle = D3D12_INDEX_BUFFER_VIEW;
-using CbvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
-
-using DsvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
-using RtvHandle = D3D12_CPU_DESCRIPTOR_HANDLE;
-
 static const uint32_t NumSwapChainBuffers = 3;
 
 } // namespace Kodiak
