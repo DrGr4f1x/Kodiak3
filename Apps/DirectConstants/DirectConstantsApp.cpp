@@ -102,10 +102,7 @@ void DirectConstantsApp::Render()
 	context.SetResources(m_resources);
 	context.SetConstantArray(1, 24, &m_lightConstants);
 
-	context.SetIndexBuffer(m_model->GetIndexBuffer());
-	context.SetVertexBuffer(0, m_model->GetVertexBuffer());
-
-	context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+	m_model->Render(context);
 
 	RenderUI(context);
 

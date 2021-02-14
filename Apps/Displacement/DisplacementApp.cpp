@@ -110,19 +110,20 @@ void DisplacementApp::Render()
 	
 	context.SetResources(m_resources);
 
-	context.SetIndexBuffer(m_model->GetIndexBuffer());
-	context.SetVertexBuffer(0, m_model->GetVertexBuffer());
-
+	// Wireframe
 	if (m_split)
 	{
 		context.SetPipelineState(m_wireframePSO);
 		context.SetScissor(0u, 0u, m_displayWidth / 2, m_displayHeight);
-		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+		m_model->Render(context);
 	}
 
-	context.SetPipelineState(m_pso);
-	context.SetScissor(m_split ? m_displayWidth / 2 : 0u, 0u, m_displayWidth, m_displayHeight);
-	context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+	// Opaque
+	{
+		context.SetPipelineState(m_pso);
+		context.SetScissor(m_split ? m_displayWidth / 2 : 0u, 0u, m_displayWidth, m_displayHeight);
+		m_model->Render(context);
+	}
 
 	RenderUI(context);
 

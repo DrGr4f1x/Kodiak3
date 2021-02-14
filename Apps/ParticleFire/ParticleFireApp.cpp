@@ -87,9 +87,7 @@ void ParticleFireApp::Render()
 		
 		context.SetResources(m_resources);
 
-		context.SetIndexBuffer(m_model->GetIndexBuffer());
-		context.SetVertexBuffer(0, m_model->GetVertexBuffer());
-		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+		m_model->Render(context);
 	}
 
 	RenderUI(context);
@@ -121,7 +119,7 @@ void ParticleFireApp::InitPSOs()
 		m_modelPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 
 		m_modelPSO.SetBlendState(CommonStates::BlendDisable());
-		m_modelPSO.SetRasterizerState(CommonStates::RasterizerDefaultCW());
+		m_modelPSO.SetRasterizerState(CommonStates::RasterizerDefault());
 		m_modelPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 
 		m_modelPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);

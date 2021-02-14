@@ -106,10 +106,25 @@ void MultisamplingApp::Render()
 
 	context.SetResources(m_resources);
 
-	context.SetIndexBuffer(m_model->GetIndexBuffer());
-	context.SetVertexBuffer(0, m_model->GetVertexBuffer());
+	// Render model
+	{
+		const size_t numMeshes = m_model->GetNumMeshes();
+		for (size_t meshIdx = 0; meshIdx < numMeshes; ++meshIdx)
+		{
+			auto mesh = m_model->GetMesh(meshIdx);
 
-	context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+			context.SetIndexBuffer(mesh->GetIndexBuffer());
+			context.SetVertexBuffer(0, mesh->GetVertexBuffer());
+
+			const auto numParts = mesh->GetNumMeshParts();
+			for (size_t partIdx = 0; partIdx < numParts; ++partIdx)
+			{
+				const auto& meshPart = mesh->GetMeshPart(partIdx);
+
+				context.DrawIndexed(meshPart.indexCount, meshPart.indexBase, meshPart.vertexBase);
+			}
+		}
+	}
 
 	context.EndRenderPass();
 
@@ -221,7 +236,7 @@ void MultisamplingApp::LoadAssets()
 		VertexComponent::UV,
 		VertexComponent::Color
 		});
-	m_model = Model::Load("voyager.dae", layout, 1.0f, ModelLoad::Triangulate | ModelLoad::CalcTangentSpace | ModelLoad::PreTransformVertices);
+	m_model = Model::Load("voyager.dae", layout, 1.0f, RemoveFlag(ModelLoad::StandardDefault, ModelLoad::FlipUVs) | ModelLoad::GenBoundingBoxes);
 
 	m_texture = Texture::Load("voyager_bc3_unorm.ktx");
 }

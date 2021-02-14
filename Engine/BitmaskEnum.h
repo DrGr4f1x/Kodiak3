@@ -132,3 +132,13 @@ HasAllFlags(E bitmask, E flags)
 	using underlying = std::underlying_type_t<E>;
 	return (static_cast<underlying>(bitmask) & static_cast<underlying>(flags)) == static_cast<underlying>(flags);
 }
+
+
+template <typename E>
+typename std::enable_if<EnableBitmaskOperators<E>::enable, E>::type
+RemoveFlag(E bitmask, E flag)
+{
+	using underlying = std::underlying_type_t<E>;
+	bitmask &= static_cast<E>(~static_cast<underlying>(flag));
+	return bitmask;
+}

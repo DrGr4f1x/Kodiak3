@@ -120,12 +120,9 @@ void ComputeClothApp::Render()
 	context.SetPipelineState(m_spherePSO);
 
 	context.SetResources(m_sphereResources);
-
-	context.SetIndexBuffer(m_sphereModel->GetIndexBuffer());
-	context.SetVertexBuffer(0, m_sphereModel->GetVertexBuffer());
-
-	context.DrawIndexed((uint32_t)m_sphereModel->GetIndexBuffer().GetElementCount());
-
+	
+	m_sphereModel->Render(context);
+	
 	// Cloth
 	context.SetRootSignature(m_clothRootSig);
 	context.SetPipelineState(m_clothPSO);

@@ -97,17 +97,13 @@ void OcclusionQueryApp::Render()
 
 		// Occluder plane
 		context.SetResources(m_occluderResources);
-		context.SetVertexBuffer(0, m_occluderModel->GetVertexBuffer());
-		context.SetIndexBuffer(m_occluderModel->GetIndexBuffer());
-		context.DrawIndexed((uint32_t)m_occluderModel->GetIndexBuffer().GetElementCount());
+		m_occluderModel->Render(context);
 
 		// Teapot
 		context.BeginOcclusionQuery(m_queryHeap, 2 * curFrame);
 
 		context.SetResources(m_teapotResources);
-		context.SetVertexBuffer(0, m_teapotModel->GetVertexBuffer());
-		context.SetIndexBuffer(m_teapotModel->GetIndexBuffer());
-		context.DrawIndexed((uint32_t)m_teapotModel->GetIndexBuffer().GetElementCount());
+		m_teapotModel->Render(context);
 
 		context.EndOcclusionQuery(m_queryHeap, 2 * curFrame);
 
@@ -115,9 +111,7 @@ void OcclusionQueryApp::Render()
 		context.BeginOcclusionQuery(m_queryHeap, 2 * curFrame + 1);
 
 		context.SetResources(m_sphereResources);
-		context.SetVertexBuffer(0, m_sphereModel->GetVertexBuffer());
-		context.SetIndexBuffer(m_sphereModel->GetIndexBuffer());
-		context.DrawIndexed((uint32_t)m_sphereModel->GetIndexBuffer().GetElementCount());
+		m_sphereModel->Render(context);
 
 		context.EndOcclusionQuery(m_queryHeap, 2 * curFrame + 1);
 	}
@@ -139,22 +133,16 @@ void OcclusionQueryApp::Render()
 		// Teapot
 		context.SetPipelineState(m_solidPSO);
 		context.SetResources(m_teapotResources);
-		context.SetVertexBuffer(0, m_teapotModel->GetVertexBuffer());
-		context.SetIndexBuffer(m_teapotModel->GetIndexBuffer());
-		context.DrawIndexed((uint32_t)m_teapotModel->GetIndexBuffer().GetElementCount());
+		m_teapotModel->Render(context);
 
 		// Sphere
 		context.SetResources(m_sphereResources);
-		context.SetVertexBuffer(0, m_sphereModel->GetVertexBuffer());
-		context.SetIndexBuffer(m_sphereModel->GetIndexBuffer());
-		context.DrawIndexed((uint32_t)m_sphereModel->GetIndexBuffer().GetElementCount());
+		m_sphereModel->Render(context);
 
 		// Occluder plane
 		context.SetPipelineState(m_occluderPSO);
 		context.SetResources(m_occluderResources);
-		context.SetVertexBuffer(0, m_occluderModel->GetVertexBuffer());
-		context.SetIndexBuffer(m_occluderModel->GetIndexBuffer());
-		context.DrawIndexed((uint32_t)m_occluderModel->GetIndexBuffer().GetElementCount());
+		m_occluderModel->Render(context);
 	}
 
 	RenderUI(context);

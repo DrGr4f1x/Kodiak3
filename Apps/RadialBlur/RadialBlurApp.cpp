@@ -90,10 +90,7 @@ void RadialBlurApp::Render()
 
 		// Draw the model
 		context.SetResources(m_sceneResources);
-
-		context.SetVertexBuffer(0, m_model->GetVertexBuffer());
-		context.SetIndexBuffer(m_model->GetIndexBuffer());
-		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+		m_model->Render(context);
 
 		context.EndRenderPass();
 
@@ -119,10 +116,7 @@ void RadialBlurApp::Render()
 
 		// Draw the model
 		context.SetResources(m_sceneResources);
-
-		context.SetVertexBuffer(0, m_model->GetVertexBuffer());
-		context.SetIndexBuffer(m_model->GetIndexBuffer());
-		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+		m_model->Render(context);
 
 		if (m_blur)
 		{

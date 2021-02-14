@@ -87,11 +87,8 @@ void SmokeSimApp::Render()
 	context.SetPipelineState(m_meshPSO);
 
 	context.SetResources(m_meshResources);
-
-	context.SetIndexBuffer(m_planeModel->GetIndexBuffer());
-	context.SetVertexBuffer(0, m_planeModel->GetVertexBuffer());
-
-	context.DrawIndexed((uint32_t)m_planeModel->GetIndexBuffer().GetElementCount());
+	
+	m_planeModel->Render(context);
 
 	context.EndRenderPass();
 

@@ -100,10 +100,7 @@ void TextureCubeMapApp::Render()
 
 		context.SetResources(m_skyboxResources);
 
-		context.SetIndexBuffer(m_skyboxModel->GetIndexBuffer());
-		context.SetVertexBuffer(0, m_skyboxModel->GetVertexBuffer());
-
-		context.DrawIndexed((uint32_t)m_skyboxModel->GetIndexBuffer().GetElementCount());
+		m_skyboxModel->Render(context);
 	}
 
 	// Model
@@ -115,10 +112,7 @@ void TextureCubeMapApp::Render()
 
 		context.SetResources(m_modelResources);
 
-		context.SetIndexBuffer(model->GetIndexBuffer());
-		context.SetVertexBuffer(0, model->GetVertexBuffer());
-
-		context.DrawIndexed((uint32_t)model->GetIndexBuffer().GetElementCount());
+		model->Render(context);
 	}
 
 	RenderUI(context);

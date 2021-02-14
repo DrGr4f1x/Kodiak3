@@ -13,6 +13,7 @@
 #include "Model.h"
 
 #include "Filesystem.h"
+#include "Graphics\CommandContext.h"
 
 #include <assimp/Importer.hpp> 
 #include <assimp/scene.h>     
@@ -21,6 +22,7 @@
 
 
 using namespace Kodiak;
+using namespace Math;
 using namespace std;
 
 
@@ -75,6 +77,65 @@ uint32_t GetPreprocessFlags(ModelLoad modelLoadFlags)
 } // anonymous namespace
 
 
+void Mesh::SetName(const string& name)
+{
+	m_name = name;
+}
+
+
+void Mesh::AddMeshPart(MeshPart meshPart)
+{
+	m_meshParts.push_back(meshPart);
+}
+
+
+void Mesh::SetMatrix(const Matrix4& matrix)
+{
+	m_matrix = matrix;
+	// TODO transform bounding box
+}
+
+
+void Mesh::Render(GraphicsContext& context)
+{
+	context.SetIndexBuffer(m_indexBuffer);
+	context.SetVertexBuffer(0, m_vertexBuffer);
+
+	for (const auto& meshPart : m_meshParts)
+	{
+		context.DrawIndexed(meshPart.indexCount, meshPart.indexBase, meshPart.vertexBase);
+	}
+}
+
+
+void Model::SetName(const string& name)
+{
+	m_name = name;
+}
+
+
+void Model::AddMesh(MeshPtr mesh)
+{
+	mesh->m_model = this;
+	m_meshes.push_back(mesh);
+}
+
+
+void Model::SetMatrix(const Matrix4& matrix)
+{
+	m_matrix = matrix;
+}
+
+
+void Model::Render(GraphicsContext& context)
+{
+	for (auto mesh : m_meshes)
+	{
+		mesh->Render(context);
+	}
+}
+
+
 ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float scale, ModelLoad modelLoadFlags)
 {
 	const string fullpath = Filesystem::GetInstance().GetFullPath(filename);
@@ -87,8 +148,8 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 
 	ModelPtr model = make_shared<Model>();
 
-	model->m_parts.clear();
-	model->m_parts.resize(aiScene->mNumMeshes);
+	model->m_meshes.clear();
+	model->m_meshes.reserve(aiScene->mNumMeshes);
 
 	uint32_t vertexCount = 0;
 	uint32_t indexCount = 0;
@@ -107,8 +168,10 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 	{
 		const auto aiMesh = aiScene->mMeshes[i];
 
-		model->m_parts[i] = {};
-		model->m_parts[i].vertexBase = vertexCount;
+		MeshPtr mesh = make_shared<Mesh>();
+		MeshPart meshPart = {};
+		
+		meshPart.vertexBase = vertexCount;
 
 		vertexCount += aiMesh->mNumVertices;
 
@@ -171,7 +234,7 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 			}
 		}
 
-		model->m_parts[i].vertexCount = aiMesh->mNumVertices;
+		meshPart.vertexCount = aiMesh->mNumVertices;
 
 		uint32_t indexBase = static_cast<uint32_t>(indexData.size());
 		for (unsigned int j = 0; j < aiMesh->mNumFaces; j++)
@@ -182,15 +245,18 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 			indexData.push_back(indexBase + Face.mIndices[0]);
 			indexData.push_back(indexBase + Face.mIndices[1]);
 			indexData.push_back(indexBase + Face.mIndices[2]);
-			model->m_parts[i].indexCount += 3;
+			meshPart.indexCount += 3;
 			indexCount += 3;
 		}
-	}
 
-	uint32_t stride = layout.ComputeStride();
-	model->m_vertexBuffer.Create("Model|VertexBuffer", sizeof(float) * vertexData.size() / stride, stride, false, vertexData.data());
-	model->m_indexBuffer.Create("Model|IndexBuffer", indexData.size(), sizeof(uint32_t), false, indexData.data());
-	model->m_boundingBox = Math::BoundingBoxFromMinMax(minExtents, maxExtents);
+		uint32_t stride = layout.ComputeStride();
+		mesh->m_vertexBuffer.Create("Model|VertexBuffer", sizeof(float) * vertexData.size() / stride, stride, false, vertexData.data());
+		mesh->m_indexBuffer.Create("Model|IndexBuffer", indexData.size(), sizeof(uint32_t), false, indexData.data());
+		mesh->m_boundingBox = Math::BoundingBoxFromMinMax(minExtents, maxExtents);
+
+		mesh->AddMeshPart(meshPart);
+		model->AddMesh(mesh);
+	}
 
 	return model;
 }
@@ -281,13 +347,21 @@ shared_ptr<Model> Model::MakePlane(const VertexLayout& layout, float width, floa
 		vertices.push_back(1.0f);
 	}
 
-	shared_ptr<Model> model = make_shared<Model>();
-	model->m_vertexBuffer.Create("Plane|VertexBuffer", vertices.size(), stride, false, vertices.data());
+	auto model = make_shared<Model>();
+	auto mesh = make_shared<Mesh>();
+
+	mesh->m_vertexBuffer.Create("Plane|VertexBuffer", vertices.size(), stride, false, vertices.data());
 
 	vector<uint16_t> indices { 0, 2, 1, 3, 1, 2 };
-	model->m_indexBuffer.Create("Plane|IndexBuffer", indices.size(), sizeof(uint16_t), false, indices.data());
+	mesh->m_indexBuffer.Create("Plane|IndexBuffer", indices.size(), sizeof(uint16_t), false, indices.data());
 
-	model->m_boundingBox = Math::BoundingBox(Math::Vector3(Math::kZero), Math::Vector3(width / 2.0f, 0.0, height / 2.0f));
+	mesh->m_boundingBox = Math::BoundingBox(Math::Vector3(Math::kZero), Math::Vector3(width / 2.0f, 0.0, height / 2.0f));
+
+	MeshPart meshPart = {};
+	meshPart.indexCount = uint32_t(indices.size());
+
+	mesh->AddMeshPart(meshPart);
+	model->AddMesh(mesh);
 
 	return model;
 }

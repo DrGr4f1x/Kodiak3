@@ -88,21 +88,18 @@ void PipelinesApp::Render()
 	context.SetRootSignature(m_rootSig);
 	context.SetResources(m_resources);
 
-	context.SetVertexBuffer(0, m_model->GetVertexBuffer());
-	context.SetIndexBuffer(m_model->GetIndexBuffer());
-
 	// Left : solid color
 	{
 		context.SetViewport(0.0f, 0.0f, (float)m_displayWidth / 3.0f, (float)m_displayHeight);
 		context.SetPipelineState(m_phongPSO);
-		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+		m_model->Render(context);
 	}
 
 	// Middle : toon shading
 	{
 		context.SetViewport((float)m_displayWidth / 3.0f, 0.0f, (float)m_displayWidth / 3.0f, (float)m_displayHeight);
 		context.SetPipelineState(m_toonPSO);
-		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+		m_model->Render(context);
 	}
 
 	// Right : wireframe
@@ -110,7 +107,7 @@ void PipelinesApp::Render()
 	{
 		context.SetViewport(2.0f * (float)m_displayWidth / 3.0f, 0, (float)m_displayWidth / 3.0f, (float)m_displayHeight);
 		context.SetPipelineState(m_wireframePSO);
-		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+		m_model->Render(context);
 	}
 
 	RenderUI(context);
@@ -135,7 +132,7 @@ void PipelinesApp::InitPSOs()
 	m_phongPSO.SetRootSignature(m_rootSig);
 	m_phongPSO.SetBlendState(CommonStates::BlendDisable());
 	m_phongPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
-	m_phongPSO.SetRasterizerState(CommonStates::RasterizerDefaultCW());
+	m_phongPSO.SetRasterizerState(CommonStates::RasterizerDefault());
 	m_phongPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 	m_phongPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 

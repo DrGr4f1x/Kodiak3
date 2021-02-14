@@ -103,10 +103,7 @@ void InstancingApp::Render()
 
 		context.SetResources(m_planetResources);
 
-		context.SetIndexBuffer(m_planetModel->GetIndexBuffer());
-		context.SetVertexBuffer(0, m_planetModel->GetVertexBuffer());
-
-		context.DrawIndexed((uint32_t)m_planetModel->GetIndexBuffer().GetElementCount());
+		m_planetModel->Render(context);
 	}
 
 	// Rocks
@@ -115,11 +112,25 @@ void InstancingApp::Render()
 
 		context.SetResources(m_rockResources);
 
-		context.SetIndexBuffer(m_rockModel->GetIndexBuffer());
-		context.SetVertexBuffer(0, m_rockModel->GetVertexBuffer());
-		context.SetVertexBuffer(1, m_instanceBuffer);
+		{
+			const size_t numMeshes = m_rockModel->GetNumMeshes();
+			for (size_t meshIdx = 0; meshIdx < numMeshes; ++meshIdx)
+			{
+				auto mesh = m_rockModel->GetMesh(meshIdx);
 
-		context.DrawIndexedInstanced((uint32_t)m_rockModel->GetIndexBuffer().GetElementCount(), m_numInstances, 0, 0, 0);
+				context.SetIndexBuffer(mesh->GetIndexBuffer());
+				context.SetVertexBuffer(0, mesh->GetVertexBuffer());
+				context.SetVertexBuffer(1, m_instanceBuffer);
+
+				const auto numParts = mesh->GetNumMeshParts();
+				for (size_t partIdx = 0; partIdx < numParts; ++partIdx)
+				{
+					const auto& meshPart = mesh->GetMeshPart(partIdx);
+
+					context.DrawIndexedInstanced(meshPart.indexCount, m_numInstances, meshPart.indexBase, meshPart.vertexBase, 0);
+				}
+			}
+		}
 	}
 
 	RenderUI(context);

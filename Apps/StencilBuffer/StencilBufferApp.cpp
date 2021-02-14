@@ -89,21 +89,18 @@ void StencilBufferApp::Render()
 
 	context.SetResources(m_resources);
 
-	context.SetVertexBuffer(0, m_model->GetVertexBuffer());
-	context.SetIndexBuffer(m_model->GetIndexBuffer());
-
 	context.SetStencilRef(1);
 
 	// Draw model toon-shaded to setup stencil mask
 	{
 		context.SetPipelineState(m_toonPSO);
-		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+		m_model->Render(context);
 	}
 
 	// Draw stenciled outline
 	{
 		context.SetPipelineState(m_outlinePSO);
-		context.DrawIndexed((uint32_t)m_model->GetIndexBuffer().GetElementCount());
+		m_model->Render(context);
 	}
 
 	RenderGrid(context);

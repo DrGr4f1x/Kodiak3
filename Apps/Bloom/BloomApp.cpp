@@ -116,10 +116,25 @@ void BloomApp::Render()
 
 			context.SetResources(m_sceneResources);
 
-			context.SetIndexBuffer(m_ufoGlowModel->GetIndexBuffer());
-			context.SetVertexBuffer(0, m_ufoGlowModel->GetVertexBuffer());
+			// Render model
+			{
+				const size_t numMeshes = m_ufoGlowModel->GetNumMeshes();
+				for (size_t meshIdx = 0; meshIdx < numMeshes; ++meshIdx)
+				{
+					auto mesh = m_ufoGlowModel->GetMesh(meshIdx);
 
-			context.DrawIndexed((uint32_t)m_ufoGlowModel->GetIndexBuffer().GetElementCount());
+					context.SetIndexBuffer(mesh->GetIndexBuffer());
+					context.SetVertexBuffer(0, mesh->GetVertexBuffer());
+
+					const auto numParts = mesh->GetNumMeshParts();
+					for (size_t partIdx = 0; partIdx < numParts; ++partIdx)
+					{
+						const auto& meshPart = mesh->GetMeshPart(partIdx);
+
+						context.DrawIndexed(meshPart.indexCount, meshPart.indexBase, meshPart.vertexBase);
+					}
+				}
+			}
 
 			context.EndRenderPass();
 		}
@@ -174,10 +189,25 @@ void BloomApp::Render()
 
 		context.SetResources(m_skyboxResources);
 
-		context.SetIndexBuffer(m_skyboxModel->GetIndexBuffer());
-		context.SetVertexBuffer(0, m_skyboxModel->GetVertexBuffer());
+		// Render model
+		{
+			const size_t numMeshes = m_skyboxModel->GetNumMeshes();
+			for (size_t meshIdx = 0; meshIdx < numMeshes; ++meshIdx)
+			{
+				auto mesh = m_skyboxModel->GetMesh(meshIdx);
 
-		context.DrawIndexed((uint32_t)m_skyboxModel->GetIndexBuffer().GetElementCount());
+				context.SetIndexBuffer(mesh->GetIndexBuffer());
+				context.SetVertexBuffer(0, mesh->GetVertexBuffer());
+
+				const auto numParts = mesh->GetNumMeshParts();
+				for (size_t partIdx = 0; partIdx < numParts; ++partIdx)
+				{
+					const auto& meshPart = mesh->GetMeshPart(partIdx);
+
+					context.DrawIndexed(meshPart.indexCount, meshPart.indexBase, meshPart.vertexBase);
+				}
+			}
+		}
 	}
 
 	// 3D scene (phong pass)
@@ -189,10 +219,25 @@ void BloomApp::Render()
 
 		context.SetResources(m_sceneResources);
 
-		context.SetIndexBuffer(m_ufoModel->GetIndexBuffer());
-		context.SetVertexBuffer(0, m_ufoModel->GetVertexBuffer());
+		// Render model
+		{
+			const size_t numMeshes = m_ufoModel->GetNumMeshes();
+			for (size_t meshIdx = 0; meshIdx < numMeshes; ++meshIdx)
+			{
+				auto mesh = m_ufoModel->GetMesh(meshIdx);
 
-		context.DrawIndexed((uint32_t)m_ufoModel->GetIndexBuffer().GetElementCount());
+				context.SetIndexBuffer(mesh->GetIndexBuffer());
+				context.SetVertexBuffer(0, mesh->GetVertexBuffer());
+
+				const auto numParts = mesh->GetNumMeshParts();
+				for (size_t partIdx = 0; partIdx < numParts; ++partIdx)
+				{
+					const auto& meshPart = mesh->GetMeshPart(partIdx);
+
+					context.DrawIndexed(meshPart.indexCount, meshPart.indexBase, meshPart.vertexBase);
+				}
+			}
+		}
 	}
 
 	// Horizontal blur pass

@@ -133,10 +133,7 @@ void TerrainTessellationApp::Render()
 
 	context.SetResources(m_skyResources);
 
-	context.SetIndexBuffer(m_skyModel->GetIndexBuffer());
-	context.SetVertexBuffer(0, m_skyModel->GetVertexBuffer());
-
-	context.DrawIndexed((uint32_t)m_skyModel->GetIndexBuffer().GetElementCount());
+	m_skyModel->Render(context);
 
 	// Terrain
 	context.SetRootSignature(m_terrainRootSig);

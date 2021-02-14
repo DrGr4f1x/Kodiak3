@@ -18,6 +18,10 @@
 namespace Kodiak
 {
 
+// Forward declarations
+class GraphicsContext;
+
+
 enum class ModelLoad
 {
 	CalcTangentSpace =				1 << 0,
@@ -84,7 +88,8 @@ enum class ModelLoad
 	StandardDefault =				FlipUVs |
 									Triangulate |
 									PreTransformVertices |
-									CalcTangentSpace
+									CalcTangentSpace |
+									GenBoundingBoxes
 };
 
 template <> struct EnableBitmaskOperators<ModelLoad> { static const bool enable = true; };
@@ -164,7 +169,7 @@ struct VertexLayout
 };
 
 
-struct ModelPart
+struct MeshPart
 {
 	uint32_t vertexBase{ 0 };
 	uint32_t vertexCount{ 0 };
@@ -173,27 +178,77 @@ struct ModelPart
 };
 
 
+class Mesh
+{
+	friend class Model;
+
+public:
+	// Accessors
+	void SetName(const std::string& name);
+	const std::string& GetName() const { return m_name; }
+
+	void AddMeshPart(MeshPart meshPart);
+	size_t GetNumMeshParts() const { return m_meshParts.size(); }
+	MeshPart& GetMeshPart(size_t index) { return m_meshParts[index]; }
+	const MeshPart& GetMeshPart(size_t index) const { return m_meshParts[index]; }
+
+	VertexBuffer& GetVertexBuffer() { return m_vertexBuffer; }
+	const VertexBuffer& GetVertexBuffer() const { return m_vertexBuffer; }
+	IndexBuffer& GetIndexBuffer() { return m_indexBuffer; }
+	const IndexBuffer& GetIndexBuffer() const { return m_indexBuffer; }
+
+	void SetMatrix(const Math::Matrix4& matrix);
+	const Math::Matrix4 GetMatrix() const { return m_matrix; }
+
+	void Render(GraphicsContext& context);
+
+private:
+	std::string m_name;
+
+	VertexBuffer m_vertexBuffer;
+	IndexBuffer m_indexBuffer;
+
+	Math::Matrix4 m_matrix{ Math::kIdentity };
+	Math::BoundingBox m_boundingBox;
+	
+	std::vector<MeshPart> m_meshParts;
+
+	class Model* m_model{ nullptr };
+};
+
+using MeshPtr = std::shared_ptr<Mesh>;
+
+
 class Model
 {
 public:
+	// Accessors
+	void SetName(const std::string& name);
+	const std::string& GetName() const { return m_name; }
+
+	void AddMesh(MeshPtr mesh);
+	size_t GetNumMeshes() const { return m_meshes.size(); }
+	MeshPtr GetMesh(size_t index) const { return m_meshes[index]; }
+
+	void SetMatrix(const Math::Matrix4& matrix);
+	const Math::Matrix4 GetMatrix() const { return m_matrix; }
+
+	const Math::BoundingBox& GetBoundingBox() const { return m_boundingBox; }
+
+	void Render(GraphicsContext& context);
 
 	static std::shared_ptr<Model> Load(const std::string& filename, const VertexLayout& layout, float scale = 1.0f, ModelLoad loadFlags = ModelLoad::StandardDefault);
 
 	static std::shared_ptr<Model> MakePlane(const VertexLayout& layout, float width, float height);
 	//static std::shared_ptr<Model> MakeSphere(const VertexLayout& layout, uint32_t numVerts, uint32_t numRings, float radius);
 
-	const VertexBuffer& GetVertexBuffer() const { return m_vertexBuffer; }
-	const IndexBuffer& GetIndexBuffer() const { return m_indexBuffer; }
-
-	const Math::BoundingBox& GetBoundingBox() const { return m_boundingBox; }
-
 protected:
-	VertexBuffer m_vertexBuffer;
-	IndexBuffer m_indexBuffer;
+	std::string m_name;
 
+	Math::Matrix4 m_matrix{ Math::kIdentity };
 	Math::BoundingBox m_boundingBox;
 
-	std::vector<ModelPart> m_parts;
+	std::vector<MeshPtr> m_meshes;
 };
 
 using ModelPtr = std::shared_ptr<Model>;
