@@ -442,21 +442,17 @@ D3D12_RESOURCE_DESC DescribeTex2D(uint32_t width, uint32_t height, uint32_t dept
 }
 
 
-ID3D12Resource* CreateTextureResource(const string& name, const D3D12_RESOURCE_DESC& resourceDesc, D3D12_CLEAR_VALUE clearValue)
+void CreateTextureResource(const string& name, const D3D12_RESOURCE_DESC& resourceDesc, D3D12_CLEAR_VALUE clearValue, ID3D12Resource** ppResource)
 {
-	ID3D12Resource* resource = nullptr;
-
 	CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_DEFAULT);
 	assert_succeeded(GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
-		&resourceDesc, D3D12_RESOURCE_STATE_COMMON, &clearValue, IID_PPV_ARGS(&resource)));
+		&resourceDesc, D3D12_RESOURCE_STATE_COMMON, &clearValue, IID_PPV_ARGS(ppResource)));
 
 #ifndef _RELEASE
-	resource->SetName(MakeWStr(name).c_str());
+	(*ppResource)->SetName(MakeWStr(name).c_str());
 #else
 	(name);
 #endif
-
-	return resource;
 }
 
 

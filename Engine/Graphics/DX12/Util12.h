@@ -28,7 +28,7 @@ size_t BytesPerPixel(DXGI_FORMAT format);
 D3D12_RESOURCE_DESC DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthOrArraySize,
 	uint32_t numMips, uint32_t numSamples, Format format, uint32_t flags);
 
-ID3D12Resource* CreateTextureResource(const std::string& name, const D3D12_RESOURCE_DESC& resourceDesc, D3D12_CLEAR_VALUE clearValue);
+void CreateTextureResource(const std::string& name, const D3D12_RESOURCE_DESC& resourceDesc, D3D12_CLEAR_VALUE clearValue, ID3D12Resource** ppResource);
 
 D3D12_RESOURCE_STATES GetResourceState(ResourceState state);
 D3D12_QUERY_HEAP_TYPE GetQueryHeapType(QueryHeapType type);

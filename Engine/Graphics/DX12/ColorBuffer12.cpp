@@ -130,7 +130,7 @@ void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t
 		if (m_uavHandle[i].ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
 		{
 			m_uavHandle[i] = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			}
+		}
 
 		GetDevice()->CreateUnorderedAccessView(resource, nullptr, &uavDesc, m_uavHandle[i]);
 
@@ -189,7 +189,7 @@ void ColorBuffer::Create(const string& name, uint32_t width, uint32_t height, ui
 	clearValue.Color[3] = m_clearColor.A();
 
 	m_usageState = ResourceState::Common;
-	m_resource = CreateTextureResource(name, resourceDesc, clearValue);
+	CreateTextureResource(name, resourceDesc, clearValue, &m_resource);
 
 	CreateDerivedViews(format, 1, numMips);
 }
@@ -219,7 +219,7 @@ void ColorBuffer::CreateArray(const string& name, uint32_t width, uint32_t heigh
 	clearValue.Color[3] = m_clearColor.A();
 
 	m_usageState = ResourceState::Common;
-	m_resource = CreateTextureResource(name, resourceDesc, clearValue);
+	CreateTextureResource(name, resourceDesc, clearValue, &m_resource);
 
 	CreateDerivedViews(format, arrayCount, 1);
 }

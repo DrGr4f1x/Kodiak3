@@ -149,7 +149,7 @@ void DepthBuffer::Create(const string& name, uint32_t width, uint32_t height, Fo
 	clearValue.DepthStencil.Stencil = m_clearStencil;
 
 	m_usageState = ResourceState::Common;
-	m_resource = CreateTextureResource(name, resourceDesc, clearValue);
+	CreateTextureResource(name, resourceDesc, clearValue, &m_resource);
 
 	CreateDerivedViews();
 }
@@ -174,7 +174,7 @@ void DepthBuffer::Create(const string& name, uint32_t width, uint32_t height, ui
 	clearValue.DepthStencil.Stencil = m_clearStencil;
 
 	m_usageState = ResourceState::Common;
-	m_resource = CreateTextureResource(name, resourceDesc, clearValue);
+	CreateTextureResource(name, resourceDesc, clearValue, &m_resource);
 
 	CreateDerivedViews();
 }

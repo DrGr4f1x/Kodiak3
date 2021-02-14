@@ -253,15 +253,15 @@ void IndexBuffer::CreateDerivedViews()
 
 	m_ibvHandle.BufferLocation = m_gpuAddress;
 	m_ibvHandle.Format = m_indexSize16 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
-	m_ibvHandle.SizeInBytes = m_bufferSize;
+	m_ibvHandle.SizeInBytes = (UINT)m_bufferSize;
 }
 
 
 void VertexBuffer::CreateDerivedViews()
 {
 	m_vbvHandle.BufferLocation = m_gpuAddress;
-	m_vbvHandle.SizeInBytes = m_bufferSize;
-	m_vbvHandle.StrideInBytes = m_elementSize;
+	m_vbvHandle.SizeInBytes = (UINT)m_bufferSize;
+	m_vbvHandle.StrideInBytes = (UINT)m_elementSize;
 }
 
 
@@ -269,7 +269,7 @@ void ConstantBuffer::CreateDerivedViews()
 {
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 	cbvDesc.BufferLocation = m_gpuAddress;
-	cbvDesc.SizeInBytes = m_bufferSize;
+	cbvDesc.SizeInBytes = (UINT)m_bufferSize;
 
 	m_cbvHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	GetDevice()->CreateConstantBufferView(&cbvDesc, m_cbvHandle);
@@ -311,8 +311,8 @@ void StructuredBuffer::CreateDerivedViews()
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.Buffer.NumElements = m_elementCount;
-	srvDesc.Buffer.StructureByteStride = m_elementSize;
+	srvDesc.Buffer.NumElements = (UINT)m_elementCount;
+	srvDesc.Buffer.StructureByteStride = (UINT)m_elementSize;
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
 	if (m_srvHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
@@ -325,8 +325,8 @@ void StructuredBuffer::CreateDerivedViews()
 	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 	uavDesc.Buffer.CounterOffsetInBytes = 0;
-	uavDesc.Buffer.NumElements = m_elementCount;
-	uavDesc.Buffer.StructureByteStride = m_elementSize;
+	uavDesc.Buffer.NumElements = (UINT)m_elementCount;
+	uavDesc.Buffer.StructureByteStride = (UINT)m_elementSize;
 	uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
 
 	m_counterBuffer.Create("StructuredBuffer::Counter", 1, 4, false);
@@ -340,8 +340,8 @@ void StructuredBuffer::CreateDerivedViews()
 	if (HasFlag(m_type, ResourceType::VertexBuffer))
 	{
 		m_vbvHandle.BufferLocation = m_gpuAddress;
-		m_vbvHandle.SizeInBytes = m_bufferSize;
-		m_vbvHandle.StrideInBytes = m_elementSize;
+		m_vbvHandle.SizeInBytes = (UINT)m_bufferSize;
+		m_vbvHandle.StrideInBytes = (UINT)m_elementSize;
 	}
 }
 
@@ -366,7 +366,7 @@ void TypedBuffer::CreateDerivedViews()
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	srvDesc.Format = static_cast<DXGI_FORMAT>(m_dataFormat);
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.Buffer.NumElements = m_elementCount;
+	srvDesc.Buffer.NumElements = (UINT)m_elementCount;
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
 	if (m_srvHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
@@ -378,7 +378,7 @@ void TypedBuffer::CreateDerivedViews()
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 	uavDesc.Format = static_cast<DXGI_FORMAT>(m_dataFormat);;
-	uavDesc.Buffer.NumElements = m_elementCount;
+	uavDesc.Buffer.NumElements = (UINT)m_elementCount;
 	uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
 
 	if (m_uavHandle.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
