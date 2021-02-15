@@ -15,6 +15,8 @@
 #include "Graphics\CommandContext.h"
 #include "Graphics\CommonStates.h"
 
+#include <iostream>
+
 
 using namespace Kodiak;
 using namespace DirectX;
@@ -31,8 +33,15 @@ void SmokeSimApp::Startup()
 {
 	using namespace Math;
 
-	LoadAssets();
-	Vector3 center = m_planeModel->GetBoundingBox().GetCenter();
+	InitRootSigs();
+	SetupScene();
+
+	vector<BoundingBox> boxes;
+	for (const auto& obj : m_sceneObjects)
+	{
+		boxes.push_back(obj.model->GetBoundingBox());
+	}
+	BoundingBox sceneBB = BoundingBoxUnion(boxes);
 	
 	m_camera.SetPerspectiveMatrix(
 		XMConvertToRadians(60.0f),
@@ -40,17 +49,11 @@ void SmokeSimApp::Startup()
 		0.001f,
 		256.0f);
 	m_camera.SetPosition(Math::Vector3(-3.38f, 2.0f, -7.25f));
-	m_camera.Focus(m_planeModel->GetBoundingBox());
+	m_camera.Focus(sceneBB);
 
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);
-	m_controller.SetOrbitTarget(center, Length(m_camera.GetPosition()), 4.0f);
-
-	InitRootSigs();
-	InitPSOs();
-	InitConstantBuffer();
-
-	InitResourceSets();
+	m_controller.SetOrbitTarget(sceneBB.GetCenter(), Length(m_camera.GetPosition()), 4.0f);
 }
 
 
@@ -64,11 +67,32 @@ bool SmokeSimApp::Update()
 {
 	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
 
-	UpdateConstantBuffer();
+	// Animate the sphere
+	{
+		float x = 3.0f * sinf(m_appElapsedTime);
+
+		using namespace Math;
+		m_sceneObjects[3].model->SetMatrix(Matrix4(AffineTransform(Vector3(x, 4.0f, 0.0f))));
+	}
+
+	UpdateConstantBuffers();
 
 	return true;
 }
 
+/*
+* High-level algorithm
+* Per-frame
+*   Initialize fluid grid if needed
+*   Update fluid
+*   Voxelize scene
+*   If debug mode
+*     Draw selected volume texture
+*   Else
+*     Render 3D scene
+*     Render smoke
+*   UI, whatever
+*/
 
 void SmokeSimApp::Render()
 {
@@ -83,25 +107,14 @@ void SmokeSimApp::Render()
 
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
-	context.SetRootSignature(m_meshRootSig);
 	
+	RenderScene(context);
 
-	context.SetResources(m_meshResources);
 	
-	// Plane
-	{
-		context.SetPipelineState(m_planePSO);
-		m_planeModel->Render(context);
-	}
-
-	// Cylinder
-	{
-		context.SetPipelineState(m_cylinderPSO);
-		m_boxModel->Render(context);
-	}
 
 	// Grid and UI
 	RenderGrid(context);
+	RenderUI(context);
 
 	context.EndRenderPass();
 
@@ -118,97 +131,91 @@ void SmokeSimApp::InitRootSigs()
 	m_meshRootSig.Finalize("Mesh Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
 }
 
-void SmokeSimApp::InitPSOs()
+
+void SmokeSimApp::UpdateConstantBuffers()
 {
+	for (uint32_t i = 0; i < 4; ++i)
 	{
-		m_planePSO.SetRootSignature(m_meshRootSig);
-		m_planePSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
+		auto& obj = m_sceneObjects[i];
+		obj.constants.projectionMatrix = m_camera.GetProjMatrix();
+		obj.constants.modelMatrix = m_camera.GetViewMatrix() * obj.model->GetMatrix();
 
-		m_planePSO.SetBlendState(CommonStates::BlendDisable());
-		m_planePSO.SetRasterizerState(CommonStates::RasterizerDefault());
-		m_planePSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
-
-		m_planePSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
-
-		m_planePSO.SetVertexShader("MeshVS");
-		m_planePSO.SetPixelShader("MeshPS");
-
-		VertexStreamDesc vertexStream{ 0, sizeof(Vertex), InputClassification::PerVertexData };
-		vector<VertexElementDesc> vertexElements =
-		{
-			{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
-			{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 },
-			{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 },
-
-		};
-		m_planePSO.SetInputLayout(vertexStream, vertexElements);
-		m_planePSO.Finalize();
-	}
-
-	{
-		m_cylinderPSO.SetRootSignature(m_meshRootSig);
-		m_cylinderPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
-
-		m_cylinderPSO.SetBlendState(CommonStates::BlendDisable());
-		m_cylinderPSO.SetRasterizerState(CommonStates::RasterizerDefault());
-		m_cylinderPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
-
-		m_cylinderPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleStrip);
-		m_cylinderPSO.SetPrimitiveRestart(IndexBufferStripCutValue::Value_0xFFFF);
-
-		m_cylinderPSO.SetVertexShader("MeshVS");
-		m_cylinderPSO.SetPixelShader("MeshPS");
-
-		VertexStreamDesc vertexStream{ 0, sizeof(Vertex), InputClassification::PerVertexData };
-		vector<VertexElementDesc> vertexElements =
-		{
-			{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
-			{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 },
-			{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 },
-
-		};
-		m_cylinderPSO.SetInputLayout(vertexStream, vertexElements);
-		m_cylinderPSO.Finalize();
+		obj.constantBuffer.Update(sizeof(obj.constants), &obj.constants);
 	}
 }
 
 
-void SmokeSimApp::InitConstantBuffer()
+void SmokeSimApp::SetupScene()
 {
-	m_constantBuffer.Create("Constant Buffer", 1, sizeof(Constants));
+	for (int i = 0; i < 4; ++i)
+	{
+		auto& obj = m_sceneObjects[i];
 
-	UpdateConstantBuffer();
+		// Setup the PSO
+		{
+			obj.objectPSO.SetRootSignature(m_meshRootSig);
+			obj.objectPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
+
+			obj.objectPSO.SetBlendState(CommonStates::BlendDisable());
+			obj.objectPSO.SetRasterizerState(CommonStates::RasterizerDefault());
+			obj.objectPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
+
+			obj.objectPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleStrip);
+			obj.objectPSO.SetPrimitiveRestart(IndexBufferStripCutValue::Value_0xFFFF);
+
+			obj.objectPSO.SetVertexShader("MeshVS");
+			obj.objectPSO.SetPixelShader("MeshPS");
+
+			VertexStreamDesc vertexStream{ 0, sizeof(Vertex), InputClassification::PerVertexData };
+			vector<VertexElementDesc> vertexElements =
+			{
+				{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
+				{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 }
+
+			};
+			obj.objectPSO.SetInputLayout(vertexStream, vertexElements);
+			obj.objectPSO.Finalize();
+		}
+
+		// Create constant buffer
+		obj.constantBuffer.Create("Constant Buffer", 1, sizeof(Constants));
+
+		// Initialize resource set
+		obj.resources.Init(&m_meshRootSig);
+		obj.resources.SetCBV(0, 0, obj.constantBuffer);
+		obj.resources.Finalize();
+	}
+
+	// Create models
+	auto layout = VertexLayout( { VertexComponent::Position,VertexComponent::Normal } );
+	m_sceneObjects[0].model = Model::MakeBox(layout, 8.0f, 0.25f, 8.0f);
+	m_sceneObjects[1].model = Model::MakeCylinder(layout, 4.0f, 0.25f, 32);
+	m_sceneObjects[2].model = Model::MakeCylinder(layout, 6.0f, 0.25f, 32);
+	m_sceneObjects[3].model = Model::MakeSphere(layout, 1.0f, 32, 32);
+
+	// Set initial constants
+	using namespace Math;
+	m_sceneObjects[0].constants.color = DirectX::Colors::AntiqueWhite;
+	m_sceneObjects[1].model->SetMatrix(Matrix4(AffineTransform(Vector3(2.0f, 0.0f, 2.0f))));
+	m_sceneObjects[1].constants.color = DirectX::Colors::Red;
+	m_sceneObjects[2].model->SetMatrix(Matrix4(AffineTransform(Vector3(-2.0f, 0.0f, -2.0f))));
+	m_sceneObjects[2].constants.color = DirectX::Colors::Red;
+	m_sceneObjects[3].model->SetMatrix(Matrix4(AffineTransform(Vector3(0.0f, 4.0f, 0.0f))));
+	m_sceneObjects[3].constants.color = DirectX::Colors::Blue;
+
+	// Update constant buffers
+	UpdateConstantBuffers();
 }
 
 
-void SmokeSimApp::InitResourceSets()
+void SmokeSimApp::RenderScene(GraphicsContext& context)
 {
-	m_meshResources.Init(&m_meshRootSig);
-	m_meshResources.SetCBV(0, 0, m_constantBuffer);
-	m_meshResources.Finalize();
-}
+	context.SetRootSignature(m_meshRootSig);
 
-
-void SmokeSimApp::UpdateConstantBuffer()
-{
-	m_constants.projectionMatrix = m_camera.GetProjMatrix();
-	Math::Matrix4 viewMatrix = m_camera.GetViewMatrix();
-	m_constants.modelMatrix = viewMatrix * m_modelMatrix;
-
-	m_constantBuffer.Update(sizeof(m_constants), &m_constants);
-}
-
-
-void SmokeSimApp::LoadAssets()
-{
-	auto layout = VertexLayout({
-		VertexComponent::Position,
-		VertexComponent::Normal,
-		VertexComponent::UV
-		});
-	//m_model = Model::Load("Statue\\socha_100kuw.obj", layout, 0.25f);
-	m_planeModel = Model::MakePlane(layout, 10.0f, 10.0f);
-	m_cylinderModel = Model::MakeCylinder(layout, 5.0f, 1.0f, 32);
-	m_sphereModel = Model::MakeSphere(layout, 5.0f, 16, 16);
-	m_boxModel = Model::MakeBox(layout, 2.0f, 4.0f, 6.0f);
+	for (const auto& obj : m_sceneObjects)
+	{
+		context.SetResources(obj.resources);
+		context.SetPipelineState(obj.objectPSO);
+		obj.model->Render(context);
+	}
 }

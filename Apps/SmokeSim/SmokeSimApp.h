@@ -36,42 +36,39 @@ public:
 
 private:
 	void InitRootSigs();
-	void InitPSOs();
-	void InitConstantBuffer();
-	void InitResourceSets();
+	void UpdateConstantBuffers();
 
-	void UpdateConstantBuffer();
+	void SetupScene();
 
-	void LoadAssets();
+	// Simulation and render
+	void RenderScene(Kodiak::GraphicsContext& context);
 
 private:
 	struct Vertex
 	{
 		float position[3];
 		float normal[3];
-		float uv[2];
 	};
 
 	struct Constants
 	{
 		Math::Matrix4 projectionMatrix;
 		Math::Matrix4 modelMatrix;
+		Kodiak::Color color;
+	};
+
+	struct Object
+	{
+		Kodiak::GraphicsPSO		objectPSO;
+		Kodiak::ConstantBuffer	constantBuffer;
+		Constants				constants;
+		Kodiak::ResourceSet		resources;
+		Kodiak::ModelPtr		model;
 	};
 
 	Kodiak::RootSignature		m_meshRootSig;
-	Kodiak::GraphicsPSO			m_planePSO;
-	Kodiak::GraphicsPSO			m_cylinderPSO;
 
-	Kodiak::ConstantBuffer		m_constantBuffer;
-	Constants					m_constants;
-
-	Kodiak::ResourceSet			m_meshResources;
-
-	Kodiak::ModelPtr			m_planeModel;
-	Kodiak::ModelPtr			m_cylinderModel;
-	Kodiak::ModelPtr			m_sphereModel;
-	Kodiak::ModelPtr			m_boxModel;
-	Math::Matrix4				m_modelMatrix{ Math::kIdentity };
+	std::array<Object, 4>		m_sceneObjects;
 
 	// Camera controls
 	Kodiak::CameraController	m_controller;

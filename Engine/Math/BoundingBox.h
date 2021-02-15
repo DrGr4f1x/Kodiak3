@@ -27,6 +27,9 @@ public:
 	Vector3 GetCenter() const { return m_center; }
 	Vector3 GetExtents() const { return m_extents; }
 
+	Vector3 GetMin() const { return m_center - m_extents; }
+	Vector3 GetMax() const { return m_center + m_extents; }
+
 private:
 	Vector3 m_center{ Math::kZero };
 	Vector3 m_extents{ Math::kOne };
@@ -42,6 +45,8 @@ inline BoundingBox BoundingBoxFromMinMax(Vector3 minExtents, Vector3 maxExtents)
 }
 
 
+BoundingBox BoundingBoxUnion(const std::vector<BoundingBox>& boxes);
+BoundingBox operator*(Matrix4 mat, BoundingBox box);
 
 
 } // namespace Math

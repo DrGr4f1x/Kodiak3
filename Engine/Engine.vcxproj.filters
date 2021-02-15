@@ -438,6 +438,9 @@
     <ClCompile Include="Graphics\Grid.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Math\BoundingBox.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">

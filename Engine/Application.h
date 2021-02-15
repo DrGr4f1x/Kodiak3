@@ -96,10 +96,12 @@ protected:
 	bool m_showUI{ true };
 	bool m_showGrid{ false };
 	float m_frameTimer{ 0.0f };
+	float m_appElapsedTime{ 0.0f };
 	float m_timer{ 0.0f };
 	float m_timerSpeed{ 1.0f };
 	uint32_t m_lastFps{ 0 };
 	uint32_t m_frameCounter{ 0 };
+	std::chrono::time_point<std::chrono::high_resolution_clock> m_appStartTime;
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_lastTimestamp;
 
 	uint32_t m_mouseX{ 0 };

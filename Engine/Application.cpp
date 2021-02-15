@@ -105,6 +105,8 @@ void Application::Run()
 
 	LOG_NOTICE << "Beginning main loop";
 
+	m_appStartTime = std::chrono::high_resolution_clock::now();
+
 	do
 	{
 		MSG msg = {};
@@ -418,6 +420,10 @@ bool Application::Tick()
 		{
 			m_timer -= 1.0f;
 		}
+
+		// Track global elapsed time
+		auto globalTimeDiff = chrono::duration<double, std::milli>(timeEnd - m_appStartTime).count();
+		m_appElapsedTime = static_cast<float>(globalTimeDiff) / 1000.0f;
 	}
 
 	float fpsTimer = (float)(std::chrono::duration<double, std::milli>(timeEnd - m_lastTimestamp).count());

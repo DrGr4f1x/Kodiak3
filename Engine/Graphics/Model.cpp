@@ -92,7 +92,7 @@ void Mesh::AddMeshPart(MeshPart meshPart)
 void Mesh::SetMatrix(const Matrix4& matrix)
 {
 	m_matrix = matrix;
-	// TODO transform bounding box
+	m_boundingBox = m_matrix * m_boundingBox;
 }
 
 
@@ -124,6 +124,7 @@ void Model::AddMesh(MeshPtr mesh)
 void Model::SetMatrix(const Matrix4& matrix)
 {
 	m_matrix = matrix;
+	m_boundingBox = m_matrix * m_boundingBox;
 }
 
 

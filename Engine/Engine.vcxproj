@@ -811,6 +811,7 @@
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="Math\BoundingBox.cpp" />
     <ClCompile Include="Math\Frustum.cpp" />
     <ClCompile Include="Math\Random.cpp" />
     <ClCompile Include="Stdafx.cpp">

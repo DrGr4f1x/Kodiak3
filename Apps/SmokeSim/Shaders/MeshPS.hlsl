@@ -12,6 +12,7 @@ struct PSInput
 {
 	float4 pos : SV_Position;
 	float3 normal : NORMAL;
+	float3 color : COLOR;
 	float2 uv : TEXCOORD0;
 	float3 viewVec : TEXCOORD1;
 	float3 lightVec : TEXCOORD2;
@@ -29,5 +30,5 @@ float4 main(PSInput input) : SV_Target
 	float3 diffuse = max(dot(N, L), 0.0);
 	float3 specular = pow(max(dot(R, V), 0.0), 16.0) * 0.75.xxx;
 
-	return float4((ambient + diffuse) * float3(0.6, 0.6, 0.6) + specular, 1.0);
+	return float4((ambient + diffuse) * input.color + specular, 1.0);
 }

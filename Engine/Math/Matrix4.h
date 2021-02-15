@@ -62,7 +62,7 @@ public:
 
 	INLINE operator XMMATRIX() const { return m_mat; }
 
-	INLINE Vector4 operator*(Vector3 vec) const { return Vector4(XMVector3Transform(vec, m_mat)); }
+	INLINE Vector3 operator*(Vector3 vec) const { return Vector3(XMVector3Transform(vec, m_mat)); }
 	INLINE Vector4 operator*(Vector4 vec) const { return Vector4(XMVector4Transform(vec, m_mat)); }
 	INLINE Matrix4 operator*(const Matrix4& mat) const { return Matrix4(XMMatrixMultiply(mat, m_mat)); }
 
