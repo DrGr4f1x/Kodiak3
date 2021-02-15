@@ -197,6 +197,8 @@ public:
 	void SetScissor(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom);
 	void SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 	void SetStencilRef(uint32_t stencilRef);
+	void SetBlendFactor(Color blendFactor);
+	void SetPrimitiveTopology(PrimitiveTopology topology);
 
 	void SetPipelineState(const GraphicsPSO& PSO);
 
@@ -315,6 +317,18 @@ inline void GraphicsContext::SetRootSignature(const RootSignature& rootSig)
 inline void GraphicsContext::SetStencilRef(uint32_t stencilRef)
 {
 	m_commandList->OMSetStencilRef(stencilRef);
+}
+
+
+inline void GraphicsContext::SetBlendFactor(Color blendFactor)
+{
+	m_commandList->OMSetBlendFactor(blendFactor.GetPtr());
+}
+
+
+inline void GraphicsContext::SetPrimitiveTopology(PrimitiveTopology topology)
+{
+	m_commandList->IASetPrimitiveTopology(static_cast<D3D12_PRIMITIVE_TOPOLOGY>(topology));
 }
 
 

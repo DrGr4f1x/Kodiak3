@@ -236,7 +236,7 @@ void MultisamplingApp::LoadAssets()
 		VertexComponent::UV,
 		VertexComponent::Color
 		});
-	m_model = Model::Load("voyager.dae", layout, 1.0f, RemoveFlag(ModelLoad::StandardDefault, ModelLoad::FlipUVs) | ModelLoad::GenBoundingBoxes);
+	m_model = Model::Load("voyager.dae", layout, 1.0f, RemoveFlag(ModelLoad::StandardDefault, ModelLoad::FlipUVs));
 
 	m_texture = Texture::Load("voyager_bc3_unorm.ktx");
 }

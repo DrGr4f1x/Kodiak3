@@ -59,7 +59,8 @@ private:
 	};
 
 	Kodiak::RootSignature		m_meshRootSig;
-	Kodiak::GraphicsPSO			m_meshPSO;
+	Kodiak::GraphicsPSO			m_planePSO;
+	Kodiak::GraphicsPSO			m_cylinderPSO;
 
 	Kodiak::ConstantBuffer		m_constantBuffer;
 	Constants					m_constants;
@@ -67,6 +68,7 @@ private:
 	Kodiak::ResourceSet			m_meshResources;
 
 	Kodiak::ModelPtr			m_planeModel;
+	Kodiak::ModelPtr			m_cylinderModel;
 	Math::Matrix4				m_modelMatrix{ Math::kIdentity };
 
 	// Camera controls

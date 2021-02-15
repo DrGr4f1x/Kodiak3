@@ -84,11 +84,21 @@ void SmokeSimApp::Render()
 	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
 	context.SetRootSignature(m_meshRootSig);
-	context.SetPipelineState(m_meshPSO);
+	
 
 	context.SetResources(m_meshResources);
 	
-	m_planeModel->Render(context);
+	// Plane
+	{
+		context.SetPipelineState(m_planePSO);
+		m_planeModel->Render(context);
+	}
+
+	// Cylinder
+	{
+		context.SetPipelineState(m_cylinderPSO);
+		m_cylinderModel->Render(context);
+	}
 
 	context.EndRenderPass();
 
@@ -107,28 +117,56 @@ void SmokeSimApp::InitRootSigs()
 
 void SmokeSimApp::InitPSOs()
 {
-	m_meshPSO.SetRootSignature(m_meshRootSig);
-	m_meshPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
-
-	m_meshPSO.SetBlendState(CommonStates::BlendDisable());
-	m_meshPSO.SetRasterizerState(CommonStates::RasterizerDefault());
-	m_meshPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
-
-	m_meshPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
-
-	m_meshPSO.SetVertexShader("MeshVS");
-	m_meshPSO.SetPixelShader("MeshPS");
-
-	VertexStreamDesc vertexStream{ 0, sizeof(Vertex), InputClassification::PerVertexData };
-	vector<VertexElementDesc> vertexElements =
 	{
-		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
-		{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 },
-		{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 },
+		m_planePSO.SetRootSignature(m_meshRootSig);
+		m_planePSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
 
-	};
-	m_meshPSO.SetInputLayout(vertexStream, vertexElements);
-	m_meshPSO.Finalize();
+		m_planePSO.SetBlendState(CommonStates::BlendDisable());
+		m_planePSO.SetRasterizerState(CommonStates::RasterizerDefault());
+		m_planePSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
+
+		m_planePSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
+
+		m_planePSO.SetVertexShader("MeshVS");
+		m_planePSO.SetPixelShader("MeshPS");
+
+		VertexStreamDesc vertexStream{ 0, sizeof(Vertex), InputClassification::PerVertexData };
+		vector<VertexElementDesc> vertexElements =
+		{
+			{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
+			{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 },
+			{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 },
+
+		};
+		m_planePSO.SetInputLayout(vertexStream, vertexElements);
+		m_planePSO.Finalize();
+	}
+
+	{
+		m_cylinderPSO.SetRootSignature(m_meshRootSig);
+		m_cylinderPSO.SetRenderTargetFormat(GetColorFormat(), GetDepthFormat());
+
+		m_cylinderPSO.SetBlendState(CommonStates::BlendDisable());
+		m_cylinderPSO.SetRasterizerState(CommonStates::RasterizerDefault());
+		m_cylinderPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
+
+		m_cylinderPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleStrip);
+		m_cylinderPSO.SetPrimitiveRestart(IndexBufferStripCutValue::Value_0xFFFF);
+
+		m_cylinderPSO.SetVertexShader("MeshVS");
+		m_cylinderPSO.SetPixelShader("MeshPS");
+
+		VertexStreamDesc vertexStream{ 0, sizeof(Vertex), InputClassification::PerVertexData };
+		vector<VertexElementDesc> vertexElements =
+		{
+			{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
+			{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 },
+			{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 },
+
+		};
+		m_cylinderPSO.SetInputLayout(vertexStream, vertexElements);
+		m_cylinderPSO.Finalize();
+	}
 }
 
 
@@ -167,4 +205,5 @@ void SmokeSimApp::LoadAssets()
 		});
 	//m_model = Model::Load("Statue\\socha_100kuw.obj", layout, 0.25f);
 	m_planeModel = Model::MakePlane(layout, 10.0f, 10.0f);
+	m_cylinderModel = Model::MakeCylinder(layout, 5.0f, 1.0f, 32);
 }

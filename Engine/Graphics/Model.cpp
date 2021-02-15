@@ -356,6 +356,214 @@ shared_ptr<Model> Model::MakePlane(const VertexLayout& layout, float width, floa
 	mesh->m_indexBuffer.Create("Plane|IndexBuffer", indices.size(), sizeof(uint16_t), false, indices.data());
 
 	mesh->m_boundingBox = Math::BoundingBox(Math::Vector3(Math::kZero), Math::Vector3(width / 2.0f, 0.0, height / 2.0f));
+	model->m_boundingBox = mesh->m_boundingBox;
+
+	MeshPart meshPart = {};
+	meshPart.indexCount = uint32_t(indices.size());
+
+	mesh->AddMeshPart(meshPart);
+	model->AddMesh(mesh);
+
+	return model;
+}
+
+
+shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, float radius, uint32_t numVerts)
+{
+	bool bHasNormals = false;
+	bool bHasUVs = false;
+	for (auto component : layout.components)
+	{
+		if (component == VertexComponent::Normal) bHasNormals = true;
+		if (component == VertexComponent::UV) bHasUVs = true;
+		if (bHasNormals && bHasUVs) break;
+	}
+
+	uint32_t stride = 3 * sizeof(float);
+	stride += bHasNormals ? (3 * sizeof(float)) : 0;
+	stride += bHasUVs ? (2 * sizeof(float)) : 0;
+
+	vector<float> vertices;
+	size_t vertexSize = 3; // position
+	vertexSize += bHasNormals ? 3 : 0;
+	vertexSize += bHasUVs ? 2 : 0;
+	vertices.reserve((4 * numVerts + 2) * vertexSize);
+
+	vector<uint16_t> indices;
+
+	float deltaPhi = DirectX::XM_2PI / static_cast<float>(numVerts - 1);
+
+	// Cylinder side
+	float phi = 0.0f;
+	for (uint32_t i = 0; i < numVerts; ++i)
+	{
+		const float nx = sinf(phi);
+		const float nz = cosf(phi);
+		const float x = radius * nx;
+		const float z = radius * nz;
+		const float u = phi / DirectX::XM_2PI;
+
+		// Position top
+		vertices.push_back(x);
+		vertices.push_back(height);
+		vertices.push_back(z);
+
+		if (bHasNormals)
+		{
+			vertices.push_back(nx);
+			vertices.push_back(0.0f);
+			vertices.push_back(nz);
+		}
+
+		if (bHasUVs)
+		{
+			vertices.push_back(u);
+			vertices.push_back(1.0);
+		}
+
+		// Position bottom
+		vertices.push_back(x);
+		vertices.push_back(0.0f);
+		vertices.push_back(z);
+
+		if (bHasNormals)
+		{
+			vertices.push_back(nx);
+			vertices.push_back(0.0f);
+			vertices.push_back(nz);
+		}
+
+		if (bHasUVs)
+		{
+			vertices.push_back(u);
+			vertices.push_back(0.0);
+		}
+
+		indices.push_back(2 * i);
+		indices.push_back(2 * i + 1);
+
+		phi += deltaPhi;
+	}
+
+	#if 1
+
+	// Restart strip
+	indices.push_back(0xFFFF);
+
+	// Cylinder bottom
+	phi = 0.0f;
+	uint16_t startVert = 2 * numVerts;
+	for (uint32_t i = 0; i < numVerts; ++i)
+	{
+		const float nx = sinf(phi);
+		const float nz = cosf(phi);
+		const float x = radius * nx;
+		const float z = radius * nz;
+
+		// Position bottom
+		vertices.push_back(x);
+		vertices.push_back(0.0f);
+		vertices.push_back(z);
+
+		if (bHasNormals)
+		{
+			vertices.push_back(0.0f);
+			vertices.push_back(-1.0f);
+			vertices.push_back(0.0f);
+		}
+
+		if (bHasUVs)
+		{
+			vertices.push_back(0.5f * nx + 0.5f);
+			vertices.push_back(0.5f * nz + 0.5f);
+		}
+
+		indices.push_back(3 * numVerts);
+		indices.push_back(startVert + i);
+
+		phi += deltaPhi;
+	}
+	// Position center
+	vertices.push_back(0.0f);
+	vertices.push_back(0.0f);
+	vertices.push_back(0.0f);
+
+	if (bHasNormals)
+	{
+		vertices.push_back(0.0f);
+		vertices.push_back(-1.0f);
+		vertices.push_back(0.0f);
+	}
+
+	if (bHasUVs)
+	{
+		vertices.push_back(0.5f);
+		vertices.push_back(0.5f);
+	}
+
+	// Restart strip
+	indices.push_back(0xFFFF);
+
+	// Cylinder top
+	phi = 0.0f;
+	startVert = 3 * numVerts + 1;
+	for (uint32_t i = 0; i < numVerts; ++i)
+	{
+		const float nx = sinf(phi);
+		const float nz = cosf(phi);
+		const float x = radius * nx;
+		const float z = radius * nz;
+
+		// Position top
+		vertices.push_back(x);
+		vertices.push_back(height);
+		vertices.push_back(z);
+
+		if (bHasNormals)
+		{
+			vertices.push_back(0.0f);
+			vertices.push_back(1.0f);
+			vertices.push_back(0.0f);
+		}
+
+		if (bHasUVs)
+		{
+			vertices.push_back(0.5f * nx + 0.5f);
+			vertices.push_back(0.5f * nz + 0.5f);
+		}
+
+		indices.push_back(4 * numVerts + 1);
+		indices.push_back(startVert + i);
+
+		phi += deltaPhi;
+	}
+	// Position center
+	vertices.push_back(0.0f);
+	vertices.push_back(height);
+	vertices.push_back(0.0f);
+
+	if (bHasNormals)
+	{
+		vertices.push_back(0.0f);
+		vertices.push_back(1.0f);
+		vertices.push_back(0.0f);
+	}
+
+	if (bHasUVs)
+	{
+		vertices.push_back(0.5f);
+		vertices.push_back(0.5f);
+	}
+#endif
+
+	auto model = make_shared<Model>();
+	auto mesh = make_shared<Mesh>();
+
+	mesh->m_vertexBuffer.Create("Cylinder|VertexBuffer", vertices.size(), stride, false, vertices.data());
+	mesh->m_indexBuffer.Create("Cylinder|IndexBuffer", indices.size(), sizeof(uint16_t), false, indices.data());
+
+	mesh->m_boundingBox = Math::BoundingBoxFromMinMax(Math::Vector3(-radius, 0.0f, -radius), Math::Vector3(radius, height, radius));
+	model->m_boundingBox = mesh->m_boundingBox;
 
 	MeshPart meshPart = {};
 	meshPart.indexCount = uint32_t(indices.size());

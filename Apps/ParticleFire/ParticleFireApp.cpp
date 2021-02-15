@@ -194,5 +194,5 @@ void ParticleFireApp::LoadAssets()
 		VertexComponent::Bitangent,
 	});
 
-	m_model = Model::Load("fireplace.obj", layout, 10.0f);
+	m_model = Model::Load("fireplace.obj", layout, 10.0f, RemoveFlag(ModelLoad::StandardDefault, ModelLoad::FlipUVs));
 }
