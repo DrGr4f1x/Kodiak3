@@ -18,6 +18,9 @@
 #include "Graphics\ResourceSet.h"
 #include "Graphics\RootSignature.h"
 
+#include "FluidEngine.h"
+#include "Voxelizer.h"
+
 
 class SmokeSimApp : public Kodiak::Application
 {
@@ -72,4 +75,11 @@ private:
 
 	// Camera controls
 	Kodiak::CameraController	m_controller;
+
+	// Fluid sim and rendering
+	uint32_t m_gridWidth{ 64 };
+	uint32_t m_gridHeight{ 64 };
+	uint32_t m_gridDepth{ 64 };
+	FluidEngine m_fluidEngine;
+	Voxelizer m_voxelizer;
 };

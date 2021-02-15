@@ -422,13 +422,33 @@ size_t BytesPerPixel(DXGI_FORMAT format)
 }
 
 
-D3D12_RESOURCE_DESC DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthOrArraySize,
+D3D12_RESOURCE_DESC DescribeTex2D(uint32_t width, uint32_t height, uint32_t arraySize,
 	uint32_t numMips, uint32_t numSamples, Format format, uint32_t flags)
 {
 	D3D12_RESOURCE_DESC desc = {};
 	desc.Alignment = 0;
-	desc.DepthOrArraySize = (UINT16)depthOrArraySize;
+	desc.DepthOrArraySize = (UINT16)arraySize;
 	desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	desc.Flags = (D3D12_RESOURCE_FLAGS)flags;
+	desc.Format = GetBaseFormat(static_cast<DXGI_FORMAT>(format));
+	desc.Height = (UINT)height;
+	desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	desc.MipLevels = (UINT16)numMips;
+	desc.SampleDesc.Count = numSamples;
+	desc.SampleDesc.Quality = 0;
+	desc.Width = (UINT64)width;
+
+	return desc;
+}
+
+
+D3D12_RESOURCE_DESC DescribeTex3D(uint32_t width, uint32_t height, uint32_t depth,
+	uint32_t numMips, uint32_t numSamples, Format format, uint32_t flags)
+{
+	D3D12_RESOURCE_DESC desc = {};
+	desc.Alignment = 0;
+	desc.DepthOrArraySize = (UINT16)depth;
+	desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE3D;
 	desc.Flags = (D3D12_RESOURCE_FLAGS)flags;
 	desc.Format = GetBaseFormat(static_cast<DXGI_FORMAT>(format));
 	desc.Height = (UINT)height;

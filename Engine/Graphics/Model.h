@@ -232,6 +232,8 @@ public:
 
 	void SetMatrix(const Math::Matrix4& matrix);
 	const Math::Matrix4 GetMatrix() const { return m_matrix; }
+	void StorePrevMatrix();
+	const Math::Matrix4 GetPrevMatrix() const { return m_prevMatrix; }
 
 	const Math::BoundingBox& GetBoundingBox() const { return m_boundingBox; }
 
@@ -248,6 +250,7 @@ protected:
 	std::string m_name;
 
 	Math::Matrix4 m_matrix{ Math::kIdentity };
+	Math::Matrix4 m_prevMatrix{ Math::kIdentity };
 	Math::BoundingBox m_boundingBox;
 
 	std::vector<MeshPtr> m_meshes;

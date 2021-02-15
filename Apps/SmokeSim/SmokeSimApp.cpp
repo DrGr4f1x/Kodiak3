@@ -22,6 +22,17 @@ using namespace Kodiak;
 using namespace DirectX;
 using namespace std;
 
+static void ComputeFlattened3DTextureDims(uint32_t depth, uint32_t& outRows, uint32_t& outCols)
+{
+	uint32_t rows = (uint32_t)floorf(sqrtf((float)depth));
+	uint32_t cols = rows;
+	while (rows * cols < depth)
+		cols++;
+	assert(rows * cols >= depth);
+
+	outRows = rows;
+	outCols = cols;
+}
 
 void SmokeSimApp::Configure()
 {
@@ -54,6 +65,13 @@ void SmokeSimApp::Startup()
 	m_controller.SetSpeedScale(0.01f);
 	m_controller.SetCameraMode(CameraMode::ArcBall);
 	m_controller.SetOrbitTarget(sceneBB.GetCenter(), Length(m_camera.GetPosition()), 4.0f);
+
+	uint32_t rows = 0;
+	uint32_t cols = 0;
+	uint32_t depth = 128;
+	ComputeFlattened3DTextureDims(depth, rows, cols);
+
+	m_fluidEngine.Initialize(m_gridWidth, m_gridHeight, m_gridDepth);
 }
 
 
@@ -66,6 +84,12 @@ void SmokeSimApp::Shutdown()
 bool SmokeSimApp::Update()
 {
 	m_controller.Update(m_frameTimer, m_mouseMoveHandled);
+
+	// Store previous matrices (for velocity calculation)
+	for (const auto& obj : m_sceneObjects)
+	{
+		obj.model->StorePrevMatrix();
+	}
 
 	// Animate the sphere
 	{

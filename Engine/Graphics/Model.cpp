@@ -128,6 +128,12 @@ void Model::SetMatrix(const Matrix4& matrix)
 }
 
 
+void Model::StorePrevMatrix()
+{
+	m_prevMatrix = m_matrix;
+}
+
+
 void Model::Render(GraphicsContext& context)
 {
 	for (auto mesh : m_meshes)

@@ -30,6 +30,8 @@ public:
 	// Create a color buffer.
 	void Create(const std::string& name, uint32_t width, uint32_t height, uint32_t numMips, Format format);
 
+	void Create3D(const std::string& name, uint32_t width, uint32_t height, uint32_t depth, Format format);
+
 	// Create a color buffer.
 	void CreateArray(const std::string& name, uint32_t width, uint32_t height, uint32_t arrayCount, Format format);
 

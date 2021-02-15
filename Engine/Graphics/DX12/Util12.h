@@ -25,7 +25,9 @@ DXGI_FORMAT GetStencilFormat(DXGI_FORMAT format);
 
 size_t BytesPerPixel(DXGI_FORMAT format);
 
-D3D12_RESOURCE_DESC DescribeTex2D(uint32_t width, uint32_t height, uint32_t depthOrArraySize,
+D3D12_RESOURCE_DESC DescribeTex2D(uint32_t width, uint32_t height, uint32_t arraySize,
+	uint32_t numMips, uint32_t numSamples, Format format, uint32_t flags);
+D3D12_RESOURCE_DESC DescribeTex3D(uint32_t width, uint32_t height, uint32_t depth,
 	uint32_t numMips, uint32_t numSamples, Format format, uint32_t flags);
 
 void CreateTextureResource(const std::string& name, const D3D12_RESOURCE_DESC& resourceDesc, D3D12_CLEAR_VALUE clearValue, ID3D12Resource** ppResource);

@@ -20,8 +20,8 @@ class PixelBuffer : public GpuResource
 public:
 	uint32_t GetWidth() const { return m_width; }
 	uint32_t GetHeight() const { return m_height; }
-	uint32_t GetDepth() const { return m_arraySize; }
-	uint32_t GetArraySize() const { return m_arraySize; }
+	uint32_t GetDepth() const { return m_type == ResourceType::Texture3D ? m_arraySize : 1; }
+	uint32_t GetArraySize() const { return m_type == ResourceType::Texture3D ? 1 : m_arraySize; }
 	uint32_t GetNumMips() const { return m_numMips; }
 	uint32_t GetNumSamples() const { return m_numSamples; }
 	Format GetFormat() const { return m_format; }

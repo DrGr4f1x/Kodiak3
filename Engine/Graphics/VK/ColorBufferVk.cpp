@@ -36,7 +36,7 @@ void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t
 
 	m_numMipMaps = numMips - 1;
 
-	ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), ResourceType::Texture2D, format, ImageAspect::Color, 0, numMips, 0, arraySize, &m_imageView));
+	ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), m_type, format, ImageAspect::Color, 0, numMips, 0, arraySize, &m_imageView));
 	m_imageInfoSRV = { VK_NULL_HANDLE, m_imageView->Get(), GetImageLayout(ResourceState::ShaderResource) };
 	m_imageInfoUAV = { VK_NULL_HANDLE, m_imageView->Get(), GetImageLayout(ResourceState::UnorderedAccess) };
 }
@@ -66,7 +66,7 @@ void ColorBuffer::Create(const string& name, uint32_t width, uint32_t height, ui
 	m_height = height;
 	m_arraySize = 1;
 	m_format = format;
-	m_numMips = (numMips == 0 ? ComputeNumMips(width, height) : numMips);;
+	m_numMips = (numMips == 0 ? ComputeNumMips(width, height) : numMips);
 	m_type = ResourceType::Texture2D;
 
 	ImageDesc desc = {};
@@ -83,4 +83,30 @@ void ColorBuffer::Create(const string& name, uint32_t width, uint32_t height, ui
 	ThrowIfFailed(g_graphicsDevice->CreateImage(name, desc, &m_image));
 
 	CreateDerivedViews(format, 1, m_numMips);
+}
+
+
+void ColorBuffer::Create3D(const string& name, uint32_t width, uint32_t height, uint32_t depth, Format format)
+{
+	m_width = width;
+	m_height = height;
+	m_arraySize = depth;
+	m_format = format;
+	m_numMips = 1;
+	m_type = ResourceType::Texture3D;
+
+	ImageDesc desc = {};
+	desc.width = m_width;
+	desc.height = m_height;
+	desc.depthOrArraySize = m_arraySize;
+	desc.numMips = 1;
+	desc.numSamples = m_numSamples;
+	desc.format = m_format;
+	desc.type = ResourceType::Texture3D;
+	desc.usage = GpuImageUsage::RenderTarget | GpuImageUsage::ShaderResource | GpuImageUsage::UnorderedAccess | GpuImageUsage::CopyDest | GpuImageUsage::CopySource;
+	desc.access = MemoryAccess::GpuRead | MemoryAccess::GpuWrite;
+
+	ThrowIfFailed(g_graphicsDevice->CreateImage(name, desc, &m_image));
+
+	CreateDerivedViews(format, m_arraySize, m_numMips);
 }

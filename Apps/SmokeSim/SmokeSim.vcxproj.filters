@@ -5,11 +5,13 @@
     <ClCompile Include="Stdafx.cpp" />
     <ClCompile Include="SmokeSimApp.cpp" />
     <ClCompile Include="FluidEngine.cpp" />
+    <ClCompile Include="Voxelizer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="SmokeSimApp.h" />
     <ClInclude Include="FluidEngine.h" />
+    <ClInclude Include="Voxelizer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

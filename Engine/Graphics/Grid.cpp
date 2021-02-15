@@ -71,6 +71,9 @@ void Grid::InitMesh()
 		vertices.push_back( { {x, y, z}, {c.R(), c.G(), c.B()} } );
 	};
 
+	const float width = float(m_width);
+	const float height = float(m_height);
+
 	// Horizontal lines
 	float zCur = -10.0f;
 	for (int j = -m_height; j <= m_height; ++j)
@@ -79,20 +82,20 @@ void Grid::InitMesh()
 		{
 			Color color = DirectX::Colors::WhiteSmoke;
 
-			InsertVertex(-m_width, 0.0f, zCur, color);
+			InsertVertex(-width, 0.0f, zCur, color);
 			InsertVertex(0.0f, 0.0f, zCur, color);
 
 			color = DirectX::Colors::Red;
 
 			InsertVertex(0.0f, 0.0f, zCur, color);
-			InsertVertex(m_width + 1.0f, 0.0f, zCur, color);
+			InsertVertex(width + 1.0f, 0.0f, zCur, color);
 		}
 		else
 		{
 			Color color = DirectX::Colors::WhiteSmoke;
 
-			InsertVertex(-m_width, 0.0f, zCur, color);
-			InsertVertex( m_width, 0.0f, zCur, color);
+			InsertVertex(-width, 0.0f, zCur, color);
+			InsertVertex( width, 0.0f, zCur, color);
 		}
 		zCur += 1.0f;
 	}
@@ -105,27 +108,27 @@ void Grid::InitMesh()
 		{
 			Color color = DirectX::Colors::WhiteSmoke;
 
-			InsertVertex(xCur, 0.0f, -m_height, color);
+			InsertVertex(xCur, 0.0f, -height, color);
 			InsertVertex(xCur, 0.0f, 0.0f, color);
 
 			color = DirectX::Colors::Blue;
 
 			InsertVertex(xCur, 0.0f, 0.0f, color);
-			InsertVertex(xCur, 0.0f, m_height + 1.0f, color);
+			InsertVertex(xCur, 0.0f, height + 1.0f, color);
 		}
 		else
 		{
 			Color color = DirectX::Colors::WhiteSmoke;
 
-			InsertVertex(xCur, 0.0f, -m_height, color);
-			InsertVertex(xCur, 0.0f, m_height, color);
+			InsertVertex(xCur, 0.0f, -height, color);
+			InsertVertex(xCur, 0.0f,  height, color);
 		}
 		xCur += 1.0f;
 	}
 
 	Color color = DirectX::Colors::Green;
 	InsertVertex(0.0f, 0.0f, 0.0f, color);
-	InsertVertex(0.0f, m_height, 0.0f, color);
+	InsertVertex(0.0f, height, 0.0f, color);
 
 	m_vertexBuffer.Create("Vertex buffer", vertices.size(), sizeof(Vertex), false, vertices.data());
 

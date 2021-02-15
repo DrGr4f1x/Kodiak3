@@ -73,21 +73,40 @@ void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t
 
 	if (arraySize > 1)
 	{
-		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
-		rtvDesc.Texture2DArray.MipSlice = 0;
-		rtvDesc.Texture2DArray.FirstArraySlice = 0;
-		rtvDesc.Texture2DArray.ArraySize = (UINT)arraySize;
+		if (m_type == ResourceType::Texture3D)
+		{
+			rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE3D;
+			rtvDesc.Texture3D.MipSlice = 0;
+			rtvDesc.Texture3D.FirstWSlice = 0;
+			rtvDesc.Texture3D.WSize = (UINT)arraySize;
 
-		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
-		uavDesc.Texture2DArray.MipSlice = 0;
-		uavDesc.Texture2DArray.FirstArraySlice = 0;
-		uavDesc.Texture2DArray.ArraySize = (UINT)arraySize;
+			uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE3D;
+			uavDesc.Texture3D.MipSlice = 0;
+			uavDesc.Texture3D.FirstWSlice = 0;
+			uavDesc.Texture3D.WSize = (UINT)arraySize;
 
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
-		srvDesc.Texture2DArray.MipLevels = numMips;
-		srvDesc.Texture2DArray.MostDetailedMip = 0;
-		srvDesc.Texture2DArray.FirstArraySlice = 0;
-		srvDesc.Texture2DArray.ArraySize = (UINT)arraySize;
+			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
+			srvDesc.Texture3D.MipLevels = numMips;
+			srvDesc.Texture3D.MostDetailedMip = 0;
+		}
+		else
+		{
+			rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
+			rtvDesc.Texture2DArray.MipSlice = 0;
+			rtvDesc.Texture2DArray.FirstArraySlice = 0;
+			rtvDesc.Texture2DArray.ArraySize = (UINT)arraySize;
+
+			uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
+			uavDesc.Texture2DArray.MipSlice = 0;
+			uavDesc.Texture2DArray.FirstArraySlice = 0;
+			uavDesc.Texture2DArray.ArraySize = (UINT)arraySize;
+
+			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
+			srvDesc.Texture2DArray.MipLevels = numMips;
+			srvDesc.Texture2DArray.MostDetailedMip = 0;
+			srvDesc.Texture2DArray.FirstArraySlice = 0;
+			srvDesc.Texture2DArray.ArraySize = (UINT)arraySize;
+		}
 	}
 	else if (m_fragmentCount > 1)
 	{
@@ -192,6 +211,35 @@ void ColorBuffer::Create(const string& name, uint32_t width, uint32_t height, ui
 	CreateTextureResource(name, resourceDesc, clearValue, &m_resource);
 
 	CreateDerivedViews(format, 1, numMips);
+}
+
+
+void ColorBuffer::Create3D(const string& name, uint32_t width, uint32_t height, uint32_t depth,	Format format)
+{
+	const uint32_t numMips = 1;
+	const uint32_t numSamples = 1;
+	auto flags = CombineResourceFlags(numSamples);
+	auto resourceDesc = DescribeTex3D(width, height, depth, numMips, numSamples, format, flags);
+
+	m_width = width;
+	m_height = height;
+	m_arraySize = depth;
+	m_fragmentCount = numSamples;
+	m_numSamples = numSamples;
+	m_format = format;
+	m_type = ResourceType::Texture3D;
+
+	D3D12_CLEAR_VALUE clearValue = {};
+	clearValue.Format = static_cast<DXGI_FORMAT>(format);
+	clearValue.Color[0] = m_clearColor.R();
+	clearValue.Color[1] = m_clearColor.G();
+	clearValue.Color[2] = m_clearColor.B();
+	clearValue.Color[3] = m_clearColor.A();
+
+	m_usageState = ResourceState::Common;
+	CreateTextureResource(name, resourceDesc, clearValue, &m_resource);
+
+	CreateDerivedViews(format, depth, 1);
 }
 
 

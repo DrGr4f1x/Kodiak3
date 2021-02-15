@@ -409,6 +409,7 @@ bool Application::Tick()
 
 	++m_frameCounter;
 
+	// Elapsed time for this frame
 	auto timeEnd = chrono::high_resolution_clock::now();
 	auto timeDiff = chrono::duration<double, std::milli>(timeEnd - timeStart).count();
 	m_frameTimer = static_cast<float>(timeDiff) / 1000.0f;
@@ -421,7 +422,7 @@ bool Application::Tick()
 			m_timer -= 1.0f;
 		}
 
-		// Track global elapsed time
+		// Global elapsed time since application start
 		auto globalTimeDiff = chrono::duration<double, std::milli>(timeEnd - m_appStartTime).count();
 		m_appElapsedTime = static_cast<float>(globalTimeDiff) / 1000.0f;
 	}
