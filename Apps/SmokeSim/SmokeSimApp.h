@@ -69,6 +69,8 @@ private:
 
 	Kodiak::ModelPtr			m_planeModel;
 	Kodiak::ModelPtr			m_cylinderModel;
+	Kodiak::ModelPtr			m_sphereModel;
+	Kodiak::ModelPtr			m_boxModel;
 	Math::Matrix4				m_modelMatrix{ Math::kIdentity };
 
 	// Camera controls

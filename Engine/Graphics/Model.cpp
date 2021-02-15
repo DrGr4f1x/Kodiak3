@@ -383,11 +383,13 @@ shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, 
 	stride += bHasNormals ? (3 * sizeof(float)) : 0;
 	stride += bHasUVs ? (2 * sizeof(float)) : 0;
 
+	const size_t totalVerts = 4 * numVerts + 2;
+
 	vector<float> vertices;
 	size_t vertexSize = 3; // position
 	vertexSize += bHasNormals ? 3 : 0;
 	vertexSize += bHasUVs ? 2 : 0;
-	vertices.reserve((4 * numVerts + 2) * vertexSize);
+	vertices.reserve(totalVerts * vertexSize);
 
 	vector<uint16_t> indices;
 
@@ -444,8 +446,6 @@ shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, 
 
 		phi += deltaPhi;
 	}
-
-	#if 1
 
 	// Restart strip
 	indices.push_back(0xFFFF);
@@ -554,12 +554,12 @@ shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, 
 		vertices.push_back(0.5f);
 		vertices.push_back(0.5f);
 	}
-#endif
 
 	auto model = make_shared<Model>();
 	auto mesh = make_shared<Mesh>();
 
-	mesh->m_vertexBuffer.Create("Cylinder|VertexBuffer", vertices.size(), stride, false, vertices.data());
+	assert(totalVerts == vertices.size() / vertexSize);
+	mesh->m_vertexBuffer.Create("Cylinder|VertexBuffer", totalVerts, stride, false, vertices.data());
 	mesh->m_indexBuffer.Create("Cylinder|IndexBuffer", indices.size(), sizeof(uint16_t), false, indices.data());
 
 	mesh->m_boundingBox = Math::BoundingBoxFromMinMax(Math::Vector3(-radius, 0.0f, -radius), Math::Vector3(radius, height, radius));
@@ -575,7 +575,198 @@ shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, 
 }
 
 
-//shared_ptr<Model> Model::MakeSphere(const VertexLayout& layout, uint32_t numVerts, uint32_t numRings, float radius)
-//{
-//
-//}
+shared_ptr<Model> Model::MakeSphere(const VertexLayout& layout, float radius, uint32_t numVerts, uint32_t numRings)
+{
+	bool bHasNormals = false;
+	bool bHasUVs = false;
+	for (auto component : layout.components)
+	{
+		if (component == VertexComponent::Normal) bHasNormals = true;
+		if (component == VertexComponent::UV) bHasUVs = true;
+		if (bHasNormals && bHasUVs) break;
+	}
+
+	uint32_t stride = 3 * sizeof(float);
+	stride += bHasNormals ? (3 * sizeof(float)) : 0;
+	stride += bHasUVs ? (2 * sizeof(float)) : 0;
+
+	const size_t totalVerts = numVerts * numRings;
+
+	vector<float> vertices;
+	size_t vertexSize = 3; // position
+	vertexSize += bHasNormals ? 3 : 0;
+	vertexSize += bHasUVs ? 2 : 0;
+	vertices.reserve(totalVerts * vertexSize);
+
+	vector<uint16_t> indices;
+
+	float phi = 0.0f;
+	float theta = 0.0f;
+	float deltaPhi = DirectX::XM_2PI / static_cast<float>(numVerts - 1);
+	float deltaTheta = DirectX::XM_PI / static_cast<float>(numRings - 1);
+
+	uint16_t curVert = 0;
+	for (uint32_t i = 0; i < numRings; ++i)
+	{
+		phi = 0.0f;
+		for (uint32_t j = 0; j < numVerts; ++j)
+		{
+			float nx = sinf(theta) * cosf(phi);
+			float ny = cosf(theta);
+			float nz = sinf(theta) * sinf(phi);
+			
+			vertices.push_back(radius * nx);
+			vertices.push_back(radius * ny);
+			vertices.push_back(radius * nz);
+
+			if (bHasNormals)
+			{
+				vertices.push_back(nx);
+				vertices.push_back(ny);
+				vertices.push_back(nz);
+			}
+
+			if (bHasUVs)
+			{
+				vertices.push_back(float(j) / float(numVerts - 1));
+				vertices.push_back(float(i) / float(numRings - 1));
+			}
+
+			indices.push_back(curVert + numVerts);
+			indices.push_back(curVert);
+
+			++curVert;
+			phi += deltaPhi;
+		}
+
+		indices.push_back(0xFFFF);
+
+		theta += deltaTheta;
+	}
+
+	auto model = make_shared<Model>();
+	auto mesh = make_shared<Mesh>();
+
+	assert(totalVerts == vertices.size() / vertexSize);
+	mesh->m_vertexBuffer.Create("Sphere|VertexBuffer", totalVerts, stride, false, vertices.data());
+	mesh->m_indexBuffer.Create("Sphere|IndexBuffer", indices.size(), sizeof(uint16_t), false, indices.data());
+
+	mesh->m_boundingBox = Math::BoundingBoxFromMinMax(Math::Vector3(-radius, -radius, -radius), Math::Vector3(radius, radius, radius));
+	model->m_boundingBox = mesh->m_boundingBox;
+
+	MeshPart meshPart = {};
+	meshPart.indexCount = uint32_t(indices.size());
+
+	mesh->AddMeshPart(meshPart);
+	model->AddMesh(mesh);
+
+	return model;
+}
+
+
+shared_ptr<Model> Model::MakeBox(const VertexLayout& layout, float width, float height, float depth)
+{
+	bool bHasNormals = false;
+	bool bHasUVs = false;
+	for (auto component : layout.components)
+	{
+		if (component == VertexComponent::Normal) bHasNormals = true;
+		if (component == VertexComponent::UV) bHasUVs = true;
+		if (bHasNormals && bHasUVs) break;
+	}
+
+	uint32_t stride = 3 * sizeof(float);
+	stride += bHasNormals ? (3 * sizeof(float)) : 0;
+	stride += bHasUVs ? (2 * sizeof(float)) : 0;
+
+	const size_t totalVerts = 24;
+
+	vector<float> vertices;
+	size_t vertexSize = 3; // position
+	vertexSize += bHasNormals ? 3 : 0;
+	vertexSize += bHasUVs ? 2 : 0;
+	vertices.reserve(totalVerts * vertexSize);
+
+	const float hwidth = 0.5f * width;
+	const float hheight = 0.5f * height;
+	const float hdepth = 0.5f * depth;
+
+	auto InsertVertex = [&vertices, bHasNormals, bHasUVs](float x, float y, float z, float nx, float ny, float nz, float u, float v)
+	{
+		// Position
+		vertices.push_back(x);
+		vertices.push_back(y);
+		vertices.push_back(z);
+		// Normal
+		if (bHasNormals)
+		{
+			vertices.push_back(nx);
+			vertices.push_back(ny);
+			vertices.push_back(nz);
+		}
+		// UV
+		if (bHasUVs)
+		{
+			vertices.push_back(u);
+			vertices.push_back(v);
+		}
+	};
+
+	// -X face
+	InsertVertex(-hwidth, -hheight, -hdepth, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	InsertVertex(-hwidth,  hheight, -hdepth, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	InsertVertex(-hwidth, -hheight,  hdepth, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	InsertVertex(-hwidth,  hheight,  hdepth, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+	// +X face
+	InsertVertex( hwidth, -hheight,  hdepth, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	InsertVertex( hwidth,  hheight,  hdepth, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+	InsertVertex( hwidth, -hheight, -hdepth, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	InsertVertex( hwidth,  hheight, -hdepth, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	// -Y face
+	InsertVertex(-hwidth, -hheight, -hdepth, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f);
+	InsertVertex(-hwidth, -hheight,  hdepth, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f);
+	InsertVertex( hwidth, -hheight, -hdepth, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f);
+	InsertVertex( hwidth, -hheight,  hdepth, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f);
+	// +Y face
+	InsertVertex( hwidth,  hheight, -hdepth, 0.0f,  1.0f, 0.0f, 1.0f, 0.0f);
+	InsertVertex( hwidth,  hheight,  hdepth, 0.0f,  1.0f, 0.0f, 1.0f, 1.0f);
+	InsertVertex(-hwidth,  hheight, -hdepth, 0.0f,  1.0f, 0.0f, 0.0f, 0.0f);
+	InsertVertex(-hwidth,  hheight,  hdepth, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f);
+	// -Z face
+	InsertVertex( hwidth, -hheight, -hdepth, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f);
+	InsertVertex( hwidth,  hheight, -hdepth, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f);
+	InsertVertex(-hwidth, -hheight, -hdepth, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f);
+	InsertVertex(-hwidth,  hheight, -hdepth, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f);
+	// +Z face
+	InsertVertex(-hwidth, -hheight,  hdepth, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+	InsertVertex(-hwidth,  hheight,  hdepth, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f);
+	InsertVertex( hwidth, -hheight,  hdepth, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	InsertVertex( hwidth,  hheight,  hdepth, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+
+	vector<uint16_t> indices = {
+		1, 0, 3, 2, 0xFFFF,
+		5, 4, 7, 6, 0xFFFF,
+		9, 8, 11, 10, 0xFFFF,
+		13, 12, 15, 14, 0xFFFF,
+		17, 16, 19, 18, 0xFFFF,
+		21, 20, 23, 22
+	};
+
+	auto model = make_shared<Model>();
+	auto mesh = make_shared<Mesh>();
+
+	assert(totalVerts == vertices.size() / vertexSize);
+	mesh->m_vertexBuffer.Create("Sphere|VertexBuffer", totalVerts, stride, false, vertices.data());
+	mesh->m_indexBuffer.Create("Sphere|IndexBuffer", indices.size(), sizeof(uint16_t), false, indices.data());
+
+	mesh->m_boundingBox = Math::BoundingBoxFromMinMax(Math::Vector3(-hwidth, -hheight, -hdepth), Math::Vector3(hwidth, hheight, hdepth));
+	model->m_boundingBox = mesh->m_boundingBox;
+
+	MeshPart meshPart = {};
+	meshPart.indexCount = uint32_t(indices.size());
+
+	mesh->AddMeshPart(meshPart);
+	model->AddMesh(mesh);
+
+	return model;
+}

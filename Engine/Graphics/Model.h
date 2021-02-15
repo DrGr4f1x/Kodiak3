@@ -241,7 +241,8 @@ public:
 
 	static std::shared_ptr<Model> MakePlane(const VertexLayout& layout, float width, float height);
 	static std::shared_ptr<Model> MakeCylinder(const VertexLayout& layout, float height, float radius, uint32_t numVerts);
-	//static std::shared_ptr<Model> MakeSphere(const VertexLayout& layout, uint32_t numVerts, uint32_t numRings, float radius);
+	static std::shared_ptr<Model> MakeSphere(const VertexLayout& layout, float radius, uint32_t numVerts, uint32_t numRings);
+	static std::shared_ptr<Model> MakeBox(const VertexLayout& layout, float width, float height, float depth);
 
 protected:
 	std::string m_name;

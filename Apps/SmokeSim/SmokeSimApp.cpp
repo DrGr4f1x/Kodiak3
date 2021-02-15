@@ -97,8 +97,11 @@ void SmokeSimApp::Render()
 	// Cylinder
 	{
 		context.SetPipelineState(m_cylinderPSO);
-		m_cylinderModel->Render(context);
+		m_boxModel->Render(context);
 	}
+
+	// Grid and UI
+	RenderGrid(context);
 
 	context.EndRenderPass();
 
@@ -206,4 +209,6 @@ void SmokeSimApp::LoadAssets()
 	//m_model = Model::Load("Statue\\socha_100kuw.obj", layout, 0.25f);
 	m_planeModel = Model::MakePlane(layout, 10.0f, 10.0f);
 	m_cylinderModel = Model::MakeCylinder(layout, 5.0f, 1.0f, 32);
+	m_sphereModel = Model::MakeSphere(layout, 5.0f, 16, 16);
+	m_boxModel = Model::MakeBox(layout, 2.0f, 4.0f, 6.0f);
 }
