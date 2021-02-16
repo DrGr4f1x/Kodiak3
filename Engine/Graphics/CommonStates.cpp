@@ -29,14 +29,17 @@ const BlendStateDesc& CommonStates::BlendNoColorWrite()
 	{
 		desc.alphaToCoverageEnable = false;
 		desc.independentBlendEnable = false;
-		desc.renderTargetBlend[0].blendEnable = false;
-		desc.renderTargetBlend[0].srcBlend = Blend::SrcAlpha;
-		desc.renderTargetBlend[0].dstBlend = Blend::InvSrcAlpha;
-		desc.renderTargetBlend[0].blendOp = BlendOp::Add;
-		desc.renderTargetBlend[0].srcBlendAlpha = Blend::One;
-		desc.renderTargetBlend[0].dstBlendAlpha = Blend::InvSrcAlpha;
-		desc.renderTargetBlend[0].blendOpAlpha = BlendOp::Add;
-		desc.renderTargetBlend[0].writeMask = ColorWrite::None;
+		for (auto& renderTargetBlend : desc.renderTargetBlend)
+		{
+			renderTargetBlend.blendEnable = false;
+			renderTargetBlend.srcBlend = Blend::SrcAlpha;
+			renderTargetBlend.dstBlend = Blend::InvSrcAlpha;
+			renderTargetBlend.blendOp = BlendOp::Add;
+			renderTargetBlend.srcBlendAlpha = Blend::One;
+			renderTargetBlend.dstBlendAlpha = Blend::InvSrcAlpha;
+			renderTargetBlend.blendOpAlpha = BlendOp::Add;
+			renderTargetBlend.writeMask = ColorWrite::None;
+		}
 		initialized = true;
 	}
 
@@ -53,14 +56,17 @@ const BlendStateDesc& CommonStates::BlendDisable()
 	{
 		desc.alphaToCoverageEnable = false;
 		desc.independentBlendEnable = false;
-		desc.renderTargetBlend[0].blendEnable = false;
-		desc.renderTargetBlend[0].srcBlend = Blend::SrcAlpha;
-		desc.renderTargetBlend[0].dstBlend = Blend::InvSrcAlpha;
-		desc.renderTargetBlend[0].blendOp = BlendOp::Add;
-		desc.renderTargetBlend[0].srcBlendAlpha = Blend::One;
-		desc.renderTargetBlend[0].dstBlendAlpha = Blend::InvSrcAlpha;
-		desc.renderTargetBlend[0].blendOpAlpha = BlendOp::Add;
-		desc.renderTargetBlend[0].writeMask = ColorWrite::All;
+		for (auto& renderTargetBlend : desc.renderTargetBlend)
+		{
+			renderTargetBlend.blendEnable = false;
+			renderTargetBlend.srcBlend = Blend::SrcAlpha;
+			renderTargetBlend.dstBlend = Blend::InvSrcAlpha;
+			renderTargetBlend.blendOp = BlendOp::Add;
+			renderTargetBlend.srcBlendAlpha = Blend::One;
+			renderTargetBlend.dstBlendAlpha = Blend::InvSrcAlpha;
+			renderTargetBlend.blendOpAlpha = BlendOp::Add;
+			renderTargetBlend.writeMask = ColorWrite::All;
+		}
 		initialized = true;
 	}
 
@@ -77,14 +83,17 @@ const BlendStateDesc& CommonStates::BlendPreMultiplied()
 	{
 		desc.alphaToCoverageEnable = false;
 		desc.independentBlendEnable = false;
-		desc.renderTargetBlend[0].blendEnable = true;
-		desc.renderTargetBlend[0].srcBlend = Blend::One;
-		desc.renderTargetBlend[0].dstBlend = Blend::InvSrcAlpha;
-		desc.renderTargetBlend[0].blendOp = BlendOp::Add;
-		desc.renderTargetBlend[0].srcBlendAlpha = Blend::One;
-		desc.renderTargetBlend[0].dstBlendAlpha = Blend::InvSrcAlpha;
-		desc.renderTargetBlend[0].blendOpAlpha = BlendOp::Add;
-		desc.renderTargetBlend[0].writeMask = ColorWrite::All;
+		for (auto& renderTargetBlend : desc.renderTargetBlend)
+		{
+			renderTargetBlend.blendEnable = true;
+			renderTargetBlend.srcBlend = Blend::One;
+			renderTargetBlend.dstBlend = Blend::InvSrcAlpha;
+			renderTargetBlend.blendOp = BlendOp::Add;
+			renderTargetBlend.srcBlendAlpha = Blend::One;
+			renderTargetBlend.dstBlendAlpha = Blend::InvSrcAlpha;
+			renderTargetBlend.blendOpAlpha = BlendOp::Add;
+			renderTargetBlend.writeMask = ColorWrite::All;
+		}
 		initialized = true;
 	}
 
@@ -101,14 +110,17 @@ const BlendStateDesc& CommonStates::BlendTraditional()
 	{
 		desc.alphaToCoverageEnable = false;
 		desc.independentBlendEnable = false;
-		desc.renderTargetBlend[0].blendEnable = true;
-		desc.renderTargetBlend[0].srcBlend = Blend::SrcAlpha;
-		desc.renderTargetBlend[0].dstBlend = Blend::InvSrcAlpha;
-		desc.renderTargetBlend[0].blendOp = BlendOp::Add;
-		desc.renderTargetBlend[0].srcBlendAlpha = Blend::One;
-		desc.renderTargetBlend[0].dstBlendAlpha = Blend::InvSrcAlpha;
-		desc.renderTargetBlend[0].blendOpAlpha = BlendOp::Add;
-		desc.renderTargetBlend[0].writeMask = ColorWrite::All;
+		for (auto& renderTargetBlend : desc.renderTargetBlend)
+		{
+			renderTargetBlend.blendEnable = true;
+			renderTargetBlend.srcBlend = Blend::SrcAlpha;
+			renderTargetBlend.dstBlend = Blend::InvSrcAlpha;
+			renderTargetBlend.blendOp = BlendOp::Add;
+			renderTargetBlend.srcBlendAlpha = Blend::One;
+			renderTargetBlend.dstBlendAlpha = Blend::InvSrcAlpha;
+			renderTargetBlend.blendOpAlpha = BlendOp::Add;
+			renderTargetBlend.writeMask = ColorWrite::All;
+		}
 		initialized = true;
 	}
 
@@ -125,14 +137,17 @@ const BlendStateDesc& CommonStates::BlendAdditive()
 	{
 		desc.alphaToCoverageEnable = false;
 		desc.independentBlendEnable = false;
-		desc.renderTargetBlend[0].blendEnable = true;
-		desc.renderTargetBlend[0].srcBlend = Blend::One;
-		desc.renderTargetBlend[0].dstBlend = Blend::One;
-		desc.renderTargetBlend[0].blendOp = BlendOp::Add;
-		desc.renderTargetBlend[0].srcBlendAlpha = Blend::One;
-		desc.renderTargetBlend[0].dstBlendAlpha = Blend::InvSrcAlpha;
-		desc.renderTargetBlend[0].blendOpAlpha = BlendOp::Add;
-		desc.renderTargetBlend[0].writeMask = ColorWrite::All;
+		for (auto& renderTargetBlend : desc.renderTargetBlend)
+		{
+			renderTargetBlend.blendEnable = true;
+			renderTargetBlend.srcBlend = Blend::One;
+			renderTargetBlend.dstBlend = Blend::One;
+			renderTargetBlend.blendOp = BlendOp::Add;
+			renderTargetBlend.srcBlendAlpha = Blend::One;
+			renderTargetBlend.dstBlendAlpha = Blend::InvSrcAlpha;
+			renderTargetBlend.blendOpAlpha = BlendOp::Add;
+			renderTargetBlend.writeMask = ColorWrite::All;
+		}
 		initialized = true;
 	}
 
@@ -149,14 +164,17 @@ const BlendStateDesc& CommonStates::BlendTraditionalAdditive()
 	{
 		desc.alphaToCoverageEnable = false;
 		desc.independentBlendEnable = false;
-		desc.renderTargetBlend[0].blendEnable = true;
-		desc.renderTargetBlend[0].srcBlend = Blend::SrcAlpha;
-		desc.renderTargetBlend[0].dstBlend = Blend::One;
-		desc.renderTargetBlend[0].blendOp = BlendOp::Add;
-		desc.renderTargetBlend[0].srcBlendAlpha = Blend::One;
-		desc.renderTargetBlend[0].dstBlendAlpha = Blend::InvSrcAlpha;
-		desc.renderTargetBlend[0].blendOpAlpha = BlendOp::Add;
-		desc.renderTargetBlend[0].writeMask = ColorWrite::All;
+		for (auto& renderTargetBlend : desc.renderTargetBlend)
+		{
+			renderTargetBlend.blendEnable = true;
+			renderTargetBlend.srcBlend = Blend::SrcAlpha;
+			renderTargetBlend.dstBlend = Blend::One;
+			renderTargetBlend.blendOp = BlendOp::Add;
+			renderTargetBlend.srcBlendAlpha = Blend::One;
+			renderTargetBlend.dstBlendAlpha = Blend::InvSrcAlpha;
+			renderTargetBlend.blendOpAlpha = BlendOp::Add;
+			renderTargetBlend.writeMask = ColorWrite::All;
+		}
 		initialized = true;
 	}
 

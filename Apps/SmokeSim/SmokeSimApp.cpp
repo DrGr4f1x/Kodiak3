@@ -14,6 +14,7 @@
 
 #include "Graphics\CommandContext.h"
 #include "Graphics\CommonStates.h"
+#include "Graphics\GraphicsFeatures.h"
 
 #include <iostream>
 
@@ -22,21 +23,11 @@ using namespace Kodiak;
 using namespace DirectX;
 using namespace std;
 
-static void ComputeFlattened3DTextureDims(uint32_t depth, uint32_t& outRows, uint32_t& outCols)
-{
-	uint32_t rows = (uint32_t)floorf(sqrtf((float)depth));
-	uint32_t cols = rows;
-	while (rows * cols < depth)
-		cols++;
-	assert(rows * cols >= depth);
-
-	outRows = rows;
-	outCols = cols;
-}
-
 void SmokeSimApp::Configure()
 {
 	Application::Configure();
+
+	g_requiredFeatures.geometryShader = true;
 }
 
 
@@ -66,12 +57,11 @@ void SmokeSimApp::Startup()
 	m_controller.SetCameraMode(CameraMode::ArcBall);
 	m_controller.SetOrbitTarget(sceneBB.GetCenter(), Length(m_camera.GetPosition()), 4.0f);
 
-	uint32_t rows = 0;
-	uint32_t cols = 0;
-	uint32_t depth = 128;
-	ComputeFlattened3DTextureDims(depth, rows, cols);
-
+	// Initialize fluid simulation
 	m_fluidEngine.Initialize(m_gridWidth, m_gridHeight, m_gridDepth);
+	m_voxelizer.Initialize(
+		m_fluidEngine.GetRenderTarget(FluidEngine::RenderTarget::Obstacles), 
+		m_fluidEngine.GetRenderTarget(FluidEngine::RenderTarget::ObstacleVelocity));
 }
 
 

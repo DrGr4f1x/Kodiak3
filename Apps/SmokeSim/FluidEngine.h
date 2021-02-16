@@ -31,8 +31,10 @@ public:
 
 	FluidEngine();
 
-	HRESULT Initialize(uint32_t width, uint32_t height, uint32_t depth);
-	void Reset();
+	void Initialize(uint32_t width, uint32_t height, uint32_t depth);
+	void Clear();
+
+	Kodiak::ColorBufferPtr GetRenderTarget(RenderTarget target);
 
 private:
 	void SetFormat(RenderTarget target, Kodiak::Format format);

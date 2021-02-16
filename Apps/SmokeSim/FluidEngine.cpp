@@ -12,6 +12,7 @@
 
 #include "FluidEngine.h"
 
+#include "SmokeSimUtils.h"
 #include "Graphics\CommandContext.h"
 
 
@@ -43,10 +44,8 @@ FluidEngine::FluidEngine()
 }
 
 
-HRESULT FluidEngine::Initialize(uint32_t width, uint32_t height, uint32_t depth)
+void FluidEngine::Initialize(uint32_t width, uint32_t height, uint32_t depth)
 {
-	HRESULT hr = S_OK;
-
 	// Create 3D render targets
 	for (uint32_t i = 0; i < 9; ++i)
 	{
@@ -58,13 +57,11 @@ HRESULT FluidEngine::Initialize(uint32_t width, uint32_t height, uint32_t depth)
 		m_renderTargets[i] = target;
 	}
 
-	Reset();
-
-	return hr;
+	Clear();
 }
 
 
-void FluidEngine::Reset()
+void FluidEngine::Clear()
 {
 	GraphicsContext& context = GraphicsContext::Begin("Reset Fluid Textures");
 
@@ -75,6 +72,12 @@ void FluidEngine::Reset()
 	}
 
 	context.Finish(true);
+}
+
+
+ColorBufferPtr FluidEngine::GetRenderTarget(RenderTarget target)
+{
+	return m_renderTargets[uint32_t(target)];
 }
 
 

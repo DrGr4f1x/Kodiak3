@@ -169,7 +169,14 @@ void GraphicsPSO::SetPrimitiveTopology(PrimitiveTopology topology)
 
 void GraphicsPSO::SetRenderTargetFormat(Format rtvFormat, Format dsvFormat, uint32_t msaaCount, bool sampleRateShading)
 {
-	SetRenderTargetFormats(1, &rtvFormat, dsvFormat, msaaCount, sampleRateShading);
+	if (rtvFormat == Format::Unknown)
+	{
+		SetRenderTargetFormats(0, nullptr, dsvFormat, msaaCount, sampleRateShading);
+	}
+	else
+	{
+		SetRenderTargetFormats(1, &rtvFormat, dsvFormat, msaaCount, sampleRateShading);
+	}
 }
 
 

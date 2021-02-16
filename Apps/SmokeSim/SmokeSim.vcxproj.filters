@@ -6,12 +6,14 @@
     <ClCompile Include="SmokeSimApp.cpp" />
     <ClCompile Include="FluidEngine.cpp" />
     <ClCompile Include="Voxelizer.cpp" />
+    <ClCompile Include="SmokeSimUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="SmokeSimApp.h" />
     <ClInclude Include="FluidEngine.h" />
     <ClInclude Include="Voxelizer.h" />
+    <ClInclude Include="SmokeSimUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -26,7 +28,7 @@
     <Filter Include="Shaders\Fluids">
       <UniqueIdentifier>{73745216-6833-4997-80bc-baa0c29e08cf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\Voxelization">
+    <Filter Include="Shaders\Voxelizer">
       <UniqueIdentifier>{2d2aea47-e4d9-4421-ada3-3d14392b452b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -82,5 +84,28 @@
     <CustomBuild Include="Shaders\Fluids\ProjectPS.hlsl">
       <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\Voxelizer\VoxelizeVS.hlsl">
+      <Filter>Shaders\Voxelizer</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Voxelizer\ResolveVS.hlsl">
+      <Filter>Shaders\Voxelizer</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Voxelizer\ResolveGS.hlsl">
+      <Filter>Shaders\Voxelizer</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Voxelizer\ResolvePS.hlsl">
+      <Filter>Shaders\Voxelizer</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Voxelizer\GenVelocityVS.hlsl">
+      <Filter>Shaders\Voxelizer</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Voxelizer\GenVelocityGS.hlsl">
+      <Filter>Shaders\Voxelizer</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Voxelizer\GenVelocityPS.hlsl">
+      <Filter>Shaders\Voxelizer</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
