@@ -201,11 +201,13 @@ public:
 	const Math::Matrix4 GetMatrix() const { return m_matrix; }
 
 	void Render(GraphicsContext& context);
+	void RenderPositionOnly(GraphicsContext& context);
 
 private:
 	std::string m_name;
 
 	VertexBuffer m_vertexBuffer;
+	VertexBuffer m_vertexBufferPositionOnly;
 	IndexBuffer m_indexBuffer;
 
 	Math::Matrix4 m_matrix{ Math::kIdentity };
@@ -238,6 +240,7 @@ public:
 	const Math::BoundingBox& GetBoundingBox() const { return m_boundingBox; }
 
 	void Render(GraphicsContext& context);
+	void RenderPositionOnly(GraphicsContext& context);
 
 	static std::shared_ptr<Model> Load(const std::string& filename, const VertexLayout& layout, float scale = 1.0f, ModelLoad loadFlags = ModelLoad::StandardDefault);
 

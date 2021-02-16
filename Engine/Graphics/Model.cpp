@@ -108,6 +108,18 @@ void Mesh::Render(GraphicsContext& context)
 }
 
 
+void Mesh::RenderPositionOnly(GraphicsContext& context)
+{
+	context.SetIndexBuffer(m_indexBuffer);
+	context.SetVertexBuffer(0, m_vertexBufferPositionOnly);
+
+	for (const auto& meshPart : m_meshParts)
+	{
+		context.DrawIndexed(meshPart.indexCount, meshPart.indexBase, meshPart.vertexBase);
+	}
+}
+
+
 void Model::SetName(const string& name)
 {
 	m_name = name;
@@ -143,6 +155,15 @@ void Model::Render(GraphicsContext& context)
 }
 
 
+void Model::RenderPositionOnly(GraphicsContext& context)
+{
+	for (auto mesh : m_meshes)
+	{
+		mesh->RenderPositionOnly(context);
+	}
+}
+
+
 ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float scale, ModelLoad modelLoadFlags)
 {
 	const string fullpath = Filesystem::GetInstance().GetFullPath(filename);
@@ -164,6 +185,7 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 	const aiVector3D zero(0.0f, 0.0f, 0.0f);
 
 	vector<float> vertexData;
+	vector<float> vertexDataPositionOnly;
 	vector<uint32_t> indexData;
 
 	// Min/max for bounding box computation
@@ -201,6 +223,11 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 					vertexData.push_back(pos->x * scale);
 					vertexData.push_back(pos->y * scale);  // TODO: Is this a hack?
 					vertexData.push_back(pos->z * scale);
+
+					vertexDataPositionOnly.push_back(pos->x * scale);
+					vertexDataPositionOnly.push_back(pos->y * scale);  // TODO: Is this a hack?
+					vertexDataPositionOnly.push_back(pos->z * scale);
+
 					UpdateExtents(minExtents, maxExtents, scale * Math::Vector3(pos->x, pos->y, pos->z));
 					break;
 				case VertexComponent::Normal:
@@ -258,6 +285,8 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 
 		uint32_t stride = layout.ComputeStride();
 		mesh->m_vertexBuffer.Create("Model|VertexBuffer", sizeof(float) * vertexData.size() / stride, stride, false, vertexData.data());
+		stride = 3 * sizeof(float);
+		mesh->m_vertexBufferPositionOnly.Create("Model|VertexBuffer (Position Only)", sizeof(float) * vertexDataPositionOnly.size() / stride, stride, false, vertexDataPositionOnly.data());
 		mesh->m_indexBuffer.Create("Model|IndexBuffer", indexData.size(), sizeof(uint32_t), false, indexData.data());
 		mesh->m_boundingBox = Math::BoundingBoxFromMinMax(minExtents, maxExtents);
 
@@ -285,10 +314,12 @@ shared_ptr<Model> Model::MakePlane(const VertexLayout& layout, float width, floa
 	stride += bHasUVs ? (2 * sizeof(float)) : 0;
 
 	vector<float> vertices;
+	vector<float> verticesPositionOnly;
 	size_t vertexSize = 3; // position
 	vertexSize += bHasNormals ? 3 : 0;
 	vertexSize += bHasUVs ? 2 : 0;
 	vertices.reserve(4 * vertexSize);
+	verticesPositionOnly.reserve(4 * 3);
 
 	// Vertex 0
 	vertices.push_back(width / 2.0f);
@@ -305,6 +336,9 @@ shared_ptr<Model> Model::MakePlane(const VertexLayout& layout, float width, floa
 		vertices.push_back(0.0f);
 		vertices.push_back(0.0f);
 	}
+	verticesPositionOnly.push_back(width / 2.0f);
+	verticesPositionOnly.push_back(0.0f);
+	verticesPositionOnly.push_back(-height / 2.0f);
 
 	// Vertex 1
 	vertices.push_back(width / 2.0f);
@@ -321,6 +355,9 @@ shared_ptr<Model> Model::MakePlane(const VertexLayout& layout, float width, floa
 		vertices.push_back(1.0f);
 		vertices.push_back(0.0f);
 	}
+	verticesPositionOnly.push_back(width / 2.0f);
+	verticesPositionOnly.push_back(0.0f);
+	verticesPositionOnly.push_back(height / 2.0f);
 
 	// Vertex 2
 	vertices.push_back(-width / 2.0f);
@@ -337,6 +374,9 @@ shared_ptr<Model> Model::MakePlane(const VertexLayout& layout, float width, floa
 		vertices.push_back(0.0f);
 		vertices.push_back(1.0f);
 	}
+	verticesPositionOnly.push_back(-width / 2.0f);
+	verticesPositionOnly.push_back(0.0f);
+	verticesPositionOnly.push_back(-height / 2.0f);
 
 	// Vertex 3
 	vertices.push_back(-width / 2.0f);
@@ -353,11 +393,16 @@ shared_ptr<Model> Model::MakePlane(const VertexLayout& layout, float width, floa
 		vertices.push_back(1.0f);
 		vertices.push_back(1.0f);
 	}
+	verticesPositionOnly.push_back(-width / 2.0f);
+	verticesPositionOnly.push_back(0.0f);
+	verticesPositionOnly.push_back(height / 2.0f);
 
 	auto model = make_shared<Model>();
 	auto mesh = make_shared<Mesh>();
 
 	mesh->m_vertexBuffer.Create("Plane|VertexBuffer", vertices.size(), stride, false, vertices.data());
+	stride = 3 * sizeof(float);
+	mesh->m_vertexBufferPositionOnly.Create("Plane|VertexBuffer (Position Only)", verticesPositionOnly.size(), stride, false, verticesPositionOnly.data());
 
 	vector<uint16_t> indices { 0, 2, 1, 3, 1, 2 };
 	mesh->m_indexBuffer.Create("Plane|IndexBuffer", indices.size(), sizeof(uint16_t), false, indices.data());
@@ -393,10 +438,12 @@ shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, 
 	const size_t totalVerts = 4 * numVerts + 2;
 
 	vector<float> vertices;
+	vector<float> verticesPositionOnly;
 	size_t vertexSize = 3; // position
 	vertexSize += bHasNormals ? 3 : 0;
 	vertexSize += bHasUVs ? 2 : 0;
 	vertices.reserve(totalVerts * vertexSize);
+	verticesPositionOnly.reserve(totalVerts * 3);
 
 	vector<uint16_t> indices;
 
@@ -430,6 +477,10 @@ shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, 
 			vertices.push_back(1.0);
 		}
 
+		verticesPositionOnly.push_back(x);
+		verticesPositionOnly.push_back(height);
+		verticesPositionOnly.push_back(z);
+
 		// Position bottom
 		vertices.push_back(x);
 		vertices.push_back(0.0f);
@@ -447,6 +498,10 @@ shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, 
 			vertices.push_back(u);
 			vertices.push_back(0.0);
 		}
+
+		verticesPositionOnly.push_back(x);
+		verticesPositionOnly.push_back(0.0f);
+		verticesPositionOnly.push_back(z);
 
 		indices.push_back(2 * i);
 		indices.push_back(2 * i + 1);
@@ -485,6 +540,10 @@ shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, 
 			vertices.push_back(0.5f * nz + 0.5f);
 		}
 
+		verticesPositionOnly.push_back(x);
+		verticesPositionOnly.push_back(0.0f);
+		verticesPositionOnly.push_back(z);
+
 		indices.push_back(3 * numVerts);
 		indices.push_back(startVert + i);
 
@@ -507,6 +566,10 @@ shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, 
 		vertices.push_back(0.5f);
 		vertices.push_back(0.5f);
 	}
+
+	verticesPositionOnly.push_back(0.0f);
+	verticesPositionOnly.push_back(0.0f);
+	verticesPositionOnly.push_back(0.0f);
 
 	// Restart strip
 	indices.push_back(0xFFFF);
@@ -539,6 +602,10 @@ shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, 
 			vertices.push_back(0.5f * nz + 0.5f);
 		}
 
+		verticesPositionOnly.push_back(x);
+		verticesPositionOnly.push_back(height);
+		verticesPositionOnly.push_back(z);
+
 		indices.push_back(4 * numVerts + 1);
 		indices.push_back(startVert + i);
 
@@ -562,11 +629,17 @@ shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, 
 		vertices.push_back(0.5f);
 	}
 
+	verticesPositionOnly.push_back(0.0f);
+	verticesPositionOnly.push_back(height);
+	verticesPositionOnly.push_back(0.0f);
+
 	auto model = make_shared<Model>();
 	auto mesh = make_shared<Mesh>();
 
 	assert(totalVerts == vertices.size() / vertexSize);
 	mesh->m_vertexBuffer.Create("Cylinder|VertexBuffer", totalVerts, stride, false, vertices.data());
+	stride = 3 * sizeof(float);
+	mesh->m_vertexBufferPositionOnly.Create("Cylinder|VertexBuffer (Position Only)", totalVerts, stride, false, verticesPositionOnly.data());
 	mesh->m_indexBuffer.Create("Cylinder|IndexBuffer", indices.size(), sizeof(uint16_t), false, indices.data());
 
 	mesh->m_boundingBox = Math::BoundingBoxFromMinMax(Math::Vector3(-radius, 0.0f, -radius), Math::Vector3(radius, height, radius));
@@ -600,10 +673,12 @@ shared_ptr<Model> Model::MakeSphere(const VertexLayout& layout, float radius, ui
 	const size_t totalVerts = numVerts * numRings;
 
 	vector<float> vertices;
+	vector<float> verticesPositionOnly;
 	size_t vertexSize = 3; // position
 	vertexSize += bHasNormals ? 3 : 0;
 	vertexSize += bHasUVs ? 2 : 0;
 	vertices.reserve(totalVerts * vertexSize);
+	verticesPositionOnly.reserve(totalVerts * 3);
 
 	vector<uint16_t> indices;
 
@@ -639,6 +714,10 @@ shared_ptr<Model> Model::MakeSphere(const VertexLayout& layout, float radius, ui
 				vertices.push_back(float(i) / float(numRings - 1));
 			}
 
+			verticesPositionOnly.push_back(radius * nx);
+			verticesPositionOnly.push_back(radius * ny);
+			verticesPositionOnly.push_back(radius * nz);
+
 			indices.push_back(curVert + numVerts);
 			indices.push_back(curVert);
 
@@ -656,6 +735,8 @@ shared_ptr<Model> Model::MakeSphere(const VertexLayout& layout, float radius, ui
 
 	assert(totalVerts == vertices.size() / vertexSize);
 	mesh->m_vertexBuffer.Create("Sphere|VertexBuffer", totalVerts, stride, false, vertices.data());
+	stride = 3 * sizeof(float);
+	mesh->m_vertexBufferPositionOnly.Create("Sphere|VertexBuffer (Position Only)", totalVerts, stride, false, verticesPositionOnly.data());
 	mesh->m_indexBuffer.Create("Sphere|IndexBuffer", indices.size(), sizeof(uint16_t), false, indices.data());
 
 	mesh->m_boundingBox = Math::BoundingBoxFromMinMax(Math::Vector3(-radius, -radius, -radius), Math::Vector3(radius, radius, radius));
@@ -689,21 +770,24 @@ shared_ptr<Model> Model::MakeBox(const VertexLayout& layout, float width, float 
 	const size_t totalVerts = 24;
 
 	vector<float> vertices;
+	vector<float> verticesPositionOnly;
 	size_t vertexSize = 3; // position
 	vertexSize += bHasNormals ? 3 : 0;
 	vertexSize += bHasUVs ? 2 : 0;
 	vertices.reserve(totalVerts * vertexSize);
+	verticesPositionOnly.reserve(totalVerts * 3);
 
 	const float hwidth = 0.5f * width;
 	const float hheight = 0.5f * height;
 	const float hdepth = 0.5f * depth;
 
-	auto InsertVertex = [&vertices, bHasNormals, bHasUVs](float x, float y, float z, float nx, float ny, float nz, float u, float v)
+	auto InsertVertex = [&vertices, &verticesPositionOnly, bHasNormals, bHasUVs](float x, float y, float z, float nx, float ny, float nz, float u, float v)
 	{
 		// Position
 		vertices.push_back(x);
 		vertices.push_back(y);
 		vertices.push_back(z);
+
 		// Normal
 		if (bHasNormals)
 		{
@@ -711,12 +795,18 @@ shared_ptr<Model> Model::MakeBox(const VertexLayout& layout, float width, float 
 			vertices.push_back(ny);
 			vertices.push_back(nz);
 		}
+
 		// UV
 		if (bHasUVs)
 		{
 			vertices.push_back(u);
 			vertices.push_back(v);
 		}
+
+		// Position only
+		verticesPositionOnly.push_back(x);
+		verticesPositionOnly.push_back(y);
+		verticesPositionOnly.push_back(z);
 	};
 
 	// -X face
@@ -763,8 +853,10 @@ shared_ptr<Model> Model::MakeBox(const VertexLayout& layout, float width, float 
 	auto mesh = make_shared<Mesh>();
 
 	assert(totalVerts == vertices.size() / vertexSize);
-	mesh->m_vertexBuffer.Create("Sphere|VertexBuffer", totalVerts, stride, false, vertices.data());
-	mesh->m_indexBuffer.Create("Sphere|IndexBuffer", indices.size(), sizeof(uint16_t), false, indices.data());
+	mesh->m_vertexBuffer.Create("Box|VertexBuffer", totalVerts, stride, false, vertices.data());
+	stride = 3 * sizeof(float);
+	mesh->m_vertexBufferPositionOnly.Create("Box|VertexBuffer", totalVerts, stride, false, verticesPositionOnly.data());
+	mesh->m_indexBuffer.Create("Box|IndexBuffer", indices.size(), sizeof(uint16_t), false, indices.data());
 
 	mesh->m_boundingBox = Math::BoundingBoxFromMinMax(Math::Vector3(-hwidth, -hheight, -hdepth), Math::Vector3(hwidth, hheight, hdepth));
 	model->m_boundingBox = mesh->m_boundingBox;
