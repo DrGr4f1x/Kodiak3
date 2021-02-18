@@ -286,9 +286,7 @@ void Voxelizer::StencilClipScene(GraphicsContext& context)
 	uint32_t y = 0;
 	for (uint32_t z = 0; z < m_depth; ++z)
 	{
-		stringstream sstr;
-		sstr << "Slice z = " << z;
-		ScopedDrawEvent innerEvent(context, sstr.str());
+		ScopedDrawEvent innerEvent(context, fmt::format("Slice z = {}", z));
 
 		x = (z % m_cols) * m_width;
 		y = (z / m_cols) * m_height;

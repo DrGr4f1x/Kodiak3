@@ -95,10 +95,8 @@ VkCommandBuffer CommandBufferPool::RequestCommandBuffer(uint64_t completedFenceV
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 
 		ThrowIfFailed(vkAllocateCommandBuffers(GetDevice(), &allocInfo, &commandBuffer));
-		stringstream sstr;
-		sstr << "CommandBuffer " << m_commandBufferPool.size();
 	
-		SetDebugName(commandBuffer, sstr.str());
+		SetDebugName(commandBuffer, fmt::format("CommandBuffer {}", m_commandBufferPool.size()));
 
 		m_commandBufferPool.push_back(commandBuffer);
 	}

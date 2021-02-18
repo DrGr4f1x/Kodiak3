@@ -25,14 +25,8 @@
 
 #if 201703L < KODIAK_CPLUSPLUS
 #define KODIAK_CPP_VERSION 20
-#elif 201402L < KODIAK_CPLUSPLUS
-#define KODIAK_CPP_VERSION 17
-#elif 201103L < KODIAK_CPLUSPLUS
-#define KODIAK_CPP_VERSION 14
-#elif 199711L < KODIAK_CPLUSPLUS
-#define KODIAK_CPP_VERSION 11
 #else
-#error "Kodiak needs at least C++ standard version 11"
+#error "Kodiak needs at least C++ standard version 20"
 #endif
 
 #if (17 <= KODIAK_CPP_VERSION)
@@ -88,12 +82,18 @@ inline void ThrowIfFailed(HRESULT hr)
 #include <queue>
 #include <set>
 #include <shared_mutex>
+#include <span>
 #include <sstream>
 #include <string>
 #include <thread>
 #include <unordered_map>
 #include <vector>
 
+// Additional headers
+#define FMT_HEADER_ONLY 1
+#include <fmt/core.h>
+#include <fmt/format.h>
+#include <fmt/format-inl.h>
 
 // Engine headers
 #include "BitmaskEnum.h"

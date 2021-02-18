@@ -109,4 +109,9 @@
       <Filter>Shaders\Voxelizer</Filter>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\Voxelizer\ResolveCS.hlsl">
+      <Filter>Shaders\Voxelizer</Filter>
+    </FxCompile>
+  </ItemGroup>
 </Project>

@@ -100,21 +100,19 @@ VkBool32 messageCallback(
 
 	prefix += ":";
 
-	// Display message to default output (console/logcat)
-	stringstream debugMessage;
-	debugMessage << prefix << " [" << pCallbackData->pMessageIdName << "] Code " << pCallbackData->messageIdNumber << " : " << pCallbackData->pMessage;
-	debugMessage << "\n";
+	string debugMessage = fmt::format("{} [{}] Code {} : {} \n", prefix, pCallbackData->pMessageIdName, pCallbackData->messageIdNumber, pCallbackData->pMessageIdName);
 
+	// Display message to default output (console/logcat)
 	if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
-		cerr << debugMessage.str();
+		fmt::print(stderr, debugMessage);
 	}
 	else
 	{
-		cout << debugMessage.str();
+		fmt::print(stdout, debugMessage);
 	}
 
-	OutputDebugString(debugMessage.str().c_str());
+	OutputDebugString(debugMessage.c_str());
 	if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
 		if (strstr(pCallbackData->pMessage, "VUID-vkDestroyBuffer-buffer-00922") == nullptr &&

@@ -224,14 +224,16 @@ void ReadbackBuffer::Create(const string& name, uint32_t numElements, uint32_t e
 void* ReadbackBuffer::Map()
 {
 	void* mem;
-	m_resource->Map(0, &CD3DX12_RANGE(0, m_bufferSize), &mem);
+	auto range = CD3DX12_RANGE(0, m_bufferSize);
+	m_resource->Map(0, &range, &mem);
 	return mem;
 }
 
 
 void ReadbackBuffer::Unmap()
 {
-	m_resource->Unmap(0, &CD3DX12_RANGE(0, 0));
+	auto range = CD3DX12_RANGE(0, 0);
+	m_resource->Unmap(0, &range);
 }
 
 
