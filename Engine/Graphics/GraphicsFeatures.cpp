@@ -89,6 +89,7 @@ const string GraphicsFeatureToString(GraphicsFeature feature)
 	case GraphicsFeature::ShaderInt8: return "Shader Int 8"; break;
 
 	case GraphicsFeature::VariableMultisampleRate: return "Variable Multisample Rate"; break;
+	case GraphicsFeature::ImagelessFramebuffer: return "Imageless Framebuffer"; break;
 
 	default: return "Unknown"; break;
 	}

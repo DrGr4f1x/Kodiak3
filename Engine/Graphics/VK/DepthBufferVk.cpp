@@ -82,7 +82,7 @@ void DepthBuffer::Create(const string& name, uint32_t width, uint32_t height, ui
 	desc.numSamples = m_numSamples;
 	desc.format = m_format;
 	desc.type = m_numSamples == 1 ? ResourceType::Texture2D : ResourceType::Texture2DMS;
-	desc.usage = GpuImageUsage::DepthStencilTarget | GpuImageUsage::CopyDest | GpuImageUsage::CopySource;
+	desc.usage = GpuImageUsage::DepthStencilTarget | GpuImageUsage::CopyDest | GpuImageUsage::CopySource | GpuImageUsage::ShaderResource;
 	desc.access = MemoryAccess::GpuRead | MemoryAccess::GpuWrite;
 
 	ThrowIfFailed(g_graphicsDevice->CreateImage(name, desc, &m_image));

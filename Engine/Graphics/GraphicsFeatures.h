@@ -58,6 +58,7 @@ enum class GraphicsFeature
 	ShaderInt8,
 
 	VariableMultisampleRate,
+	ImagelessFramebuffer,
 };
 
 class GraphicsFeatureProxy
@@ -132,6 +133,7 @@ public:
 	GraphicsFeatureProxy shaderInt8{ this, GraphicsFeature::ShaderInt8 };
 
 	GraphicsFeatureProxy variableMultisampleRate{ this, GraphicsFeature::VariableMultisampleRate };
+	GraphicsFeatureProxy imagelessFramebuffer{ this, GraphicsFeature::ImagelessFramebuffer };
 
 	const GraphicsFeatureProxy& operator[](size_t index) const { return *m_features[index]; }
 	GraphicsFeatureProxy& operator[](size_t index) { return *m_features[index]; }

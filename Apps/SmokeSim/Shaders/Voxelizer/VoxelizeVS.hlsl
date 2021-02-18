@@ -20,17 +20,26 @@ struct VSOutput
 };
 
 
-cbuffer VSConstants
+struct Matrices
 {
 	float4x4 modelViewProjectionMatrix;
 };
+#if VK
+[[vk::push_constant]]
+Matrices matrices;
+#else
+cbuffer VSConstants
+{
+	Matrices matrices;
+};
+#endif
 
 
 VSOutput main(VSInput input)
 {
 	VSOutput output = (VSOutput)0;
 
-	output.pos = mul(modelViewProjectionMatrix, float4(input.pos, 1.0));
+	output.pos = mul(matrices.modelViewProjectionMatrix, float4(input.pos, 1.0));
 
 	return output;
 }

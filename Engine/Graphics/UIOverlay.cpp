@@ -103,7 +103,7 @@ void UIOverlay::Render(GraphicsContext& context)
 	if (!imDrawData || imDrawData->CmdListsCount == 0)
 		return;
 
-	//ScopedDrawEvent event(context, "UI Overlay");
+	ScopedDrawEvent event(context, "UI Overlay");
 
 	context.SetViewportAndScissor(0u, 0u, m_width, m_height);
 

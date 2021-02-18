@@ -163,10 +163,12 @@ void GraphicsPSO::Finalize()
 	depthStencilInfo.back.passOp = static_cast<VkStencilOp>(m_depthStencilState.backFace.stencilPassOp);
 
 	// TODO - Add stencil ref to DepthStencilStateDesc
+	#if 0
 	if (depthStencilInfo.stencilTestEnable == VK_TRUE)
 	{
 		dynamicStates.push_back(VK_DYNAMIC_STATE_STENCIL_REFERENCE);
 	}
+	#endif
 
 	// Primitive topology & primitive restart
 	VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo = { VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO };

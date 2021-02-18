@@ -581,6 +581,8 @@ VkResult GraphicsDevice::CreateFramebuffer(const vector<ColorBufferPtr>& colorBu
 	uint32_t rtCount = numColorBuffers;
 	rtCount += depthBuffer ? 1 : 0;
 
+	bool bHas3DAttachment = false;
+
 	assert(rtCount > 0);
 
 	uint32_t width = 0;
@@ -601,29 +603,94 @@ VkResult GraphicsDevice::CreateFramebuffer(const vector<ColorBufferPtr>& colorBu
 	uint32_t attachmentCount = 0;
 	for (uint32_t i = 0; i < numColorBuffers; ++i)
 	{
+		if (colorBuffers[i]->GetType() == ResourceType::Texture3D)
+		{
+			bHas3DAttachment = true;
+		}
+
 		attachments[i] = colorBuffers[i]->GetImageView();
 		++attachmentCount;
 	}
 
 	if (depthBuffer)
 	{
+		if (depthBuffer->GetType() == ResourceType::Texture3D)
+		{
+			bHas3DAttachment = true;
+		}
 		attachments[attachmentCount] = depthBuffer->GetDepthStencilImageView();
 		++attachmentCount;
 	}
 
-	VkFramebufferCreateInfo frameBufferCreateInfo = {};
-	frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-	frameBufferCreateInfo.pNext = nullptr;
+	if (bHas3DAttachment && !g_requiredFeatures.imagelessFramebuffer)
+	{
+		Utility::ExitFatal("You are attempting to use a 3D image as a framebuffer attachment.  This requires g_requiredFeatures.imagelessFramebuffer = true.", "Fatal error");
+	}
+
+	VkFramebufferCreateInfo frameBufferCreateInfo = { VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO };
 	frameBufferCreateInfo.renderPass = renderPass;
-	frameBufferCreateInfo.attachmentCount = attachmentCount;
-	frameBufferCreateInfo.pAttachments = attachments.data();
 	frameBufferCreateInfo.width = width;
 	frameBufferCreateInfo.height = height;
 	frameBufferCreateInfo.layers = 1;
+	frameBufferCreateInfo.pNext = nullptr;
+	frameBufferCreateInfo.flags = 0;
+	frameBufferCreateInfo.attachmentCount = attachmentCount;
+	frameBufferCreateInfo.pAttachments = attachments.data();
 
-	// TODO - Move this to GraphicsDevice
 	VkFramebuffer vkFramebuffer = VK_NULL_HANDLE;
-	auto res = vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &vkFramebuffer);
+	VkResult res = VK_SUCCESS;
+
+	if (bHas3DAttachment)
+	{
+		vector<VkFramebufferAttachmentImageInfo> fbAttachments(rtCount);
+		vector<VkFormat> formats(rtCount);
+
+		uint32_t fbAttachmentCount = 0;
+		for(uint32_t i = 0; i < numColorBuffers; ++i)
+		{
+			auto& imageInfo = fbAttachments[i];
+			imageInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_ATTACHMENT_IMAGE_INFO;
+			imageInfo.pNext = nullptr;
+			imageInfo.flags = GetImageCreateFlags(colorBuffers[i]->GetType());
+			imageInfo.usage = GetImageUsageFlags(GpuImageUsage::RenderTarget | GpuImageUsage::ShaderResource | GpuImageUsage::UnorderedAccess | GpuImageUsage::CopyDest | GpuImageUsage::CopySource);
+			imageInfo.width = colorBuffers[i]->GetWidth();
+			imageInfo.height = colorBuffers[i]->GetHeight();
+			imageInfo.layerCount = 1;
+			imageInfo.viewFormatCount = 1;
+			formats[i] =  static_cast<VkFormat>(colorBuffers[i]->GetFormat());
+			imageInfo.pViewFormats = &formats[i];
+
+			++fbAttachmentCount;
+		}
+		if (depthBuffer)
+		{
+			auto& imageInfo = fbAttachments[fbAttachmentCount];
+			imageInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_ATTACHMENT_IMAGE_INFO;
+			imageInfo.pNext = nullptr;
+			imageInfo.flags = GetImageCreateFlags(depthBuffer->GetType());
+			imageInfo.usage = GetImageUsageFlags(GpuImageUsage::DepthStencilTarget | GpuImageUsage::CopyDest | GpuImageUsage::CopySource);
+			imageInfo.width = depthBuffer->GetWidth();
+			imageInfo.height = depthBuffer->GetHeight();
+			imageInfo.layerCount = 1;
+			imageInfo.viewFormatCount = 1;
+			formats[fbAttachmentCount] = static_cast<VkFormat>(depthBuffer->GetFormat());
+			imageInfo.pViewFormats = &formats[fbAttachmentCount];
+		}
+
+		VkFramebufferAttachmentsCreateInfo attachmentsCreateInfo = { VK_STRUCTURE_TYPE_FRAMEBUFFER_ATTACHMENTS_CREATE_INFO };
+		attachmentsCreateInfo.pNext = nullptr;
+		attachmentsCreateInfo.attachmentImageInfoCount = fbAttachmentCount;
+		attachmentsCreateInfo.pAttachmentImageInfos = fbAttachments.data();
+
+		frameBufferCreateInfo.pNext = &attachmentsCreateInfo;
+		frameBufferCreateInfo.flags = VK_FRAMEBUFFER_CREATE_IMAGELESS_BIT;
+
+		res = vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &vkFramebuffer);
+	}
+	else
+	{
+		res = vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &vkFramebuffer);
+	}
 
 	*ppFramebuffer = nullptr;
 	if (res == VK_SUCCESS)
@@ -1900,6 +1967,14 @@ void GraphicsDevice::EnableFeatures(bool optionalFeatures)
 				name,
 				m_supportedDeviceFeatures2.features.variableMultisampleRate,
 				m_enabledDeviceFeatures2.features.variableMultisampleRate);
+			break;
+
+		case GraphicsFeature::ImagelessFramebuffer:
+			enabledFeature = TryEnableFeature(
+				optionalFeatures,
+				name,
+				m_supportedDeviceFeatures1_2.imagelessFramebuffer,
+				m_enabledDeviceFeatures1_2.imagelessFramebuffer);
 			break;
 		}
 	}

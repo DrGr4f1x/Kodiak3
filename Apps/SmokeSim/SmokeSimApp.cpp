@@ -28,6 +28,7 @@ void SmokeSimApp::Configure()
 	Application::Configure();
 
 	g_requiredFeatures.geometryShader = true;
+	g_requiredFeatures.imagelessFramebuffer = true;
 }
 
 
@@ -62,6 +63,35 @@ void SmokeSimApp::Startup()
 	m_voxelizer.Initialize(
 		m_fluidEngine.GetRenderTarget(FluidEngine::RenderTarget::Obstacles), 
 		m_fluidEngine.GetRenderTarget(FluidEngine::RenderTarget::ObstacleVelocity));
+
+	/*Vector3 viewPos{ 0.0f, 8.0f, 0.0f };
+	Vector3 target{ 0.0f, 0.0f, 0.0f };
+	Vector3 up{ 1.0f, 0.0f, 0.0f };
+	Matrix4 gridToWorldMatrix = Matrix4(XMMatrixLookAtRH(viewPos, target, up));*/
+
+	//Matrix4 scale = Matrix4::MakeScale(8.0f);
+	//Matrix4 trans = Matrix4::MakeTranslation(-4.0f, 0.0f, -4.0f);
+	Matrix4 scale = Matrix4::MakeScale(4.0f);
+	Matrix4 trans = Matrix4::MakeTranslation(0.0f, 4.0f, 0.0f);
+
+	Matrix4 viewMatrix = Matrix4(Vector3(kYUnitVector), Vector3(kZUnitVector), Vector3(kXUnitVector), Vector3(kZero));
+
+	m_gridToWorldMatrix = trans * scale;
+	m_worldToGridMatrix = Invert(m_gridToWorldMatrix);
+
+	m_voxelizer.SetGridToWorldMatrix(m_gridToWorldMatrix);
+
+	MatrixTest();
+
+	int objIdx = 0;
+	for (auto& obj : m_sceneObjects)
+	{
+		if (objIdx++ == 0)
+		{
+			continue;
+		}
+		m_voxelizer.AddModel(obj.model);
+	}
 }
 
 
@@ -91,7 +121,19 @@ bool SmokeSimApp::Update()
 
 	UpdateConstantBuffers();
 
+	m_voxelizer.Update(m_frameTimer);
+
 	return true;
+}
+
+
+void SmokeSimApp::UpdateUI()
+{
+	if (m_uiOverlay->Header("Settings"))
+	{
+		m_uiOverlay->CheckBox("Ortho Cam", &m_bUseOrthoCamera);
+		m_uiOverlay->SliderInt("Depth Slice", &m_curSlice, 0, int(m_gridDepth - 1));
+	}
 }
 
 /*
@@ -117,14 +159,20 @@ void SmokeSimApp::Render()
 	context.ClearColor(GetColorBuffer());
 	context.ClearDepth(GetDepthBuffer());
 
+	m_voxelizer.Render(context);
+
 	context.BeginRenderPass(GetBackBuffer());
 
-	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
+	if (m_bUseOrthoCamera)
+	{
+		context.SetViewportAndScissor(200u, 200u, m_gridWidth, m_gridHeight);
+	}
+	else
+	{
+		context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
+	}
 
-	
 	RenderScene(context);
-
-	
 
 	// Grid and UI
 	RenderGrid(context);
@@ -148,11 +196,32 @@ void SmokeSimApp::InitRootSigs()
 
 void SmokeSimApp::UpdateConstantBuffers()
 {
+	using namespace Math;
 	for (uint32_t i = 0; i < 4; ++i)
 	{
 		auto& obj = m_sceneObjects[i];
-		obj.constants.projectionMatrix = m_camera.GetProjMatrix();
-		obj.constants.modelMatrix = m_camera.GetViewMatrix() * obj.model->GetMatrix();
+
+		if (m_bUseOrthoCamera)
+		{
+			float zNear = float(m_curSlice) / float(m_gridDepth) - 0.5f;
+			float zFar = 100000.0f;
+			//Matrix4 projectionMatrix = Matrix4(XMMatrixOrthographicOffCenterRH(-0.5f, 0.5f, -0.5f, 0.5f, zNear, zFar));
+			Matrix4 projectionMatrix = Matrix4(XMMatrixOrthographicRH(2.0f, 2.0f, zNear, zFar));
+
+			/*Vector3 viewPos{ 0.0f, 8.0f, 0.0f };
+			Vector3 target{ 0.0f, 0.0f, 0.0f };
+			Vector3 up{ 1.0f, 0.0f, 0.0f };
+			Matrix4 viewMatrix = Matrix4(XMMatrixLookAtRH(viewPos, target, up));*/
+			Matrix4 viewMatrix = Matrix4(Vector3(kYUnitVector), Vector3(kZUnitVector), Vector3(kXUnitVector), Vector3(kZero));
+
+			obj.constants.projectionMatrix = projectionMatrix;
+			obj.constants.modelMatrix = viewMatrix * m_worldToGridMatrix * obj.model->GetMatrix();
+		}
+		else
+		{
+			obj.constants.projectionMatrix = m_camera.GetProjMatrix();
+			obj.constants.modelMatrix = m_camera.GetViewMatrix() * obj.model->GetMatrix();
+		}
 
 		obj.constantBuffer.Update(sizeof(obj.constants), &obj.constants);
 	}
@@ -224,7 +293,10 @@ void SmokeSimApp::SetupScene()
 
 void SmokeSimApp::RenderScene(GraphicsContext& context)
 {
+	ScopedDrawEvent event(context, "3D Scene");
+
 	context.SetRootSignature(m_meshRootSig);
+	context.SetPrimitiveTopology(PrimitiveTopology::TriangleStrip);
 
 	for (const auto& obj : m_sceneObjects)
 	{
@@ -232,4 +304,59 @@ void SmokeSimApp::RenderScene(GraphicsContext& context)
 		context.SetPipelineState(obj.objectPSO);
 		obj.model->Render(context);
 	}
+}
+
+
+static void whoa() {}
+void SmokeSimApp::MatrixTest()
+{
+	using namespace Math;
+	//static const array<Vector3, 8> s_boxCornersLocal =
+	//{
+	//	Vector3{ 0.0f, 0.0f, 0.0f },
+	//	Vector3{ 0.0f, 0.0f, 1.0f },
+	//	Vector3{ 0.0f, 1.0f, 0.0f },
+	//	Vector3{ 0.0f, 1.0f, 1.0f },
+	//	Vector3{ 1.0f, 0.0f, 0.0f },
+	//	Vector3{ 1.0f, 0.0f, 1.0f },
+	//	Vector3{ 1.0f, 1.0f, 0.0f },
+	//	Vector3{ 1.0f, 1.0f, 1.0f }
+	//};
+
+	static const array<Vector3, 8> s_boxCornersLocal =
+	{
+		Vector3{ -1.0f, -1.0f, -1.0f },
+		Vector3{ -1.0f, -1.0f,  1.0f },
+		Vector3{ -1.0f,  1.0f, -1.0f },
+		Vector3{ -1.0f,  1.0f,  1.0f },
+		Vector3{  1.0f, -1.0f, -1.0f },
+		Vector3{  1.0f, -1.0f,  1.0f },
+		Vector3{  1.0f,  1.0f, -1.0f },
+		Vector3{  1.0f,  1.0f,  1.0f }
+	};
+
+	array<Vector3, 8> boxCornersWorld =
+	{
+		Vector3{ 0.0f, 0.0f, 0.0f },
+		Vector3{ 0.0f, 0.0f, 0.0f },
+		Vector3{ 0.0f, 0.0f, 0.0f },
+		Vector3{ 0.0f, 0.0f, 0.0f },
+		Vector3{ 0.0f, 0.0f, 0.0f },
+		Vector3{ 0.0f, 0.0f, 0.0f },
+		Vector3{ 0.0f, 0.0f, 0.0f },
+		Vector3{ 0.0f, 0.0f, 0.0f }
+	};
+
+	Matrix4 scale = Matrix4::MakeScale(4.0f);
+	Matrix4 trans = Matrix4::MakeTranslation(0.0f, 4.0f, 0.0f);
+	
+	Matrix4 localToWorld = trans * scale;
+	//Matrix4 localToWorld{ kIdentity };
+
+	for (int i = 0; i < 8; ++i)
+	{
+		boxCornersWorld[i] = localToWorld * s_boxCornersLocal[i];
+	}
+
+	whoa();
 }

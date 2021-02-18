@@ -84,28 +84,15 @@
     <CustomBuild Include="Shaders\Fluids\ProjectPS.hlsl">
       <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Shaders\Voxelizer\VoxelizeVS.hlsl">
+    <CustomBuild Include="Shaders\Voxelizer\ResolveGS.hlsl" />
+    <CustomBuild Include="Shaders\Voxelizer\ResolvePS.hlsl" />
+    <CustomBuild Include="Shaders\Voxelizer\ResolveVS.hlsl" />
+    <CustomBuild Include="Shaders\Voxelizer\VoxelizeVS.hlsl" />
+    <CustomBuild Include="Shaders\Voxelizer\GenVelocityGS.hlsl" />
+    <CustomBuild Include="Shaders\Voxelizer\GenVelocityPS.hlsl" />
+    <CustomBuild Include="Shaders\Voxelizer\GenVelocityVS.hlsl" />
+    <CustomBuild Include="Shaders\Voxelizer\VoxelizePS.hlsl">
       <Filter>Shaders\Voxelizer</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Voxelizer\ResolveVS.hlsl">
-      <Filter>Shaders\Voxelizer</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Voxelizer\ResolveGS.hlsl">
-      <Filter>Shaders\Voxelizer</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Voxelizer\ResolvePS.hlsl">
-      <Filter>Shaders\Voxelizer</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Voxelizer\GenVelocityVS.hlsl">
-      <Filter>Shaders\Voxelizer</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Voxelizer\GenVelocityGS.hlsl">
-      <Filter>Shaders\Voxelizer</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Voxelizer\GenVelocityPS.hlsl">
-      <Filter>Shaders\Voxelizer</Filter>
-    </FxCompile>
+    </CustomBuild>
   </ItemGroup>
 </Project>

@@ -35,6 +35,7 @@ public:
 	void Shutdown() final;
 
 	bool Update() final;
+	void UpdateUI() final;
 	void Render() final;
 
 private:
@@ -45,6 +46,8 @@ private:
 
 	// Simulation and render
 	void RenderScene(Kodiak::GraphicsContext& context);
+
+	void MatrixTest();
 
 private:
 	struct Vertex
@@ -75,11 +78,16 @@ private:
 
 	// Camera controls
 	Kodiak::CameraController	m_controller;
+	bool m_bUseOrthoCamera{ false };
+	int m_curSlice{ 0 };
 
 	// Fluid sim and rendering
 	uint32_t m_gridWidth{ 64 };
 	uint32_t m_gridHeight{ 64 };
 	uint32_t m_gridDepth{ 64 };
+	Math::Matrix4 m_gridToWorldMatrix;
+	Math::Matrix4 m_worldToGridMatrix;
+
 	FluidEngine m_fluidEngine;
 	Voxelizer m_voxelizer;
 };

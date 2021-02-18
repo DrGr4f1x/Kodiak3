@@ -69,6 +69,9 @@ public:
 	static INLINE Matrix4 MakeScale(float scale) { return Matrix4(XMMatrixScaling(scale, scale, scale)); }
 	static INLINE Matrix4 MakeScale(Vector3 scale) { return Matrix4(XMMatrixScalingFromVector(scale)); }
 
+	static INLINE Matrix4 MakeTranslation(float x, float y, float z) { return Matrix4(XMMatrixTranslation(x, y, z)); }
+	static INLINE Matrix4 MakeTranslation(Vector3 vec) { return Matrix4(XMMatrixTranslationFromVector(vec)); }
+
 	static INLINE Matrix4 MakePerspective(float fovY, float aspect, float nearZ, float farZ)
 	{
 		return Matrix4(XMMatrixPerspectiveFovRH(fovY, aspect, nearZ, farZ));

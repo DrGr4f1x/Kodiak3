@@ -545,6 +545,7 @@ void GraphicsDevice::EnableFeatures(bool optionalFeatures)
 			break;
 
 		case GraphicsFeature::VariableMultisampleRate:
+		case GraphicsFeature::ImagelessFramebuffer:
 			enabledFeature = true;
 			break;
 		}

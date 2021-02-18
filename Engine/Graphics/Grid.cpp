@@ -50,6 +50,8 @@ void Grid::Update(const Camera& camera)
 
 void Grid::Render(GraphicsContext& context)
 {
+	context.BeginEvent("Grid");
+
 	context.SetRootSignature(m_rootSig);
 	context.SetPipelineState(m_pso);
 
@@ -59,6 +61,8 @@ void Grid::Render(GraphicsContext& context)
 	context.SetIndexBuffer(m_indexBuffer);
 
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());
+
+	context.EndEvent();
 }
 
 
