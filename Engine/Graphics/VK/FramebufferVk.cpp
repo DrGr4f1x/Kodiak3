@@ -89,5 +89,5 @@ void FrameBuffer::Finalize()
 			break;
 	}
 	ThrowIfFailed(g_graphicsDevice->CreateRenderPass(colorBuffers, m_depthBuffer, &m_renderPass));
-	ThrowIfFailed(g_graphicsDevice->CreateFramebuffer(colorBuffers, m_depthBuffer, m_renderPass->Get(), &m_framebuffer));
+	ThrowIfFailed(g_graphicsDevice->CreateFramebuffer(colorBuffers, m_depthBuffer, m_renderPass->Get(), &m_bImageless, &m_framebuffer));
 }

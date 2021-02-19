@@ -67,7 +67,7 @@ public:
 	KODIAK_NODISCARD VkResult CreateImageView(UVkImage* uimage, ResourceType type, Format format, ImageAspect aspect, uint32_t baseMipLevel, uint32_t mipCount, uint32_t baseArraySlice, uint32_t arraySize, UVkImageView** ppImageView) const;
 	KODIAK_NODISCARD VkResult CreateBufferView(UVkBuffer* ubuffer, ResourceType type, Format format, uint32_t offsetInBytes, uint32_t sizeInBytes, UVkBufferView** ppBufferView) const;
 	KODIAK_NODISCARD VkResult CreateRenderPass(const std::vector<ColorBufferPtr>& colorBuffers, DepthBufferPtr depthBuffer, UVkRenderPass** ppRenderPass) const;
-	KODIAK_NODISCARD VkResult CreateFramebuffer(const std::vector<ColorBufferPtr>& colorBuffers, DepthBufferPtr depthBuffer, VkRenderPass renderPass, UVkFramebuffer** ppFramebuffer) const;
+	KODIAK_NODISCARD VkResult CreateFramebuffer(const std::vector<ColorBufferPtr>& colorBuffers, DepthBufferPtr depthBuffer, VkRenderPass renderPass, bool* bImageless, UVkFramebuffer** ppFramebuffer) const;
 	KODIAK_NODISCARD VkResult CreateBuffer(const std::string& name, const BufferDesc& desc, UVkBuffer** ppBuffer) const;
 	KODIAK_NODISCARD VkResult CreateImage(const std::string& name, const ImageDesc& desc, UVkImage** ppImage) const;
 	KODIAK_NODISCARD VkResult CreatePipelineCache(UVkPipelineCache** ppPipelineCache) const;

@@ -39,6 +39,7 @@ public:
 
 	VkFramebuffer GetFramebuffer() { return m_framebuffer->Get(); }
 	VkRenderPass GetRenderPass() { return m_renderPass->Get(); }
+	bool IsImageless() const { return m_bImageless; }
 
 	void Finalize();
 
@@ -49,6 +50,8 @@ private:
 	uint32_t m_width{ 0 };
 	uint32_t m_height{ 0 };
 	uint32_t m_numSamples{ 0 };
+
+	bool m_bImageless{ false };
 
 	Microsoft::WRL::ComPtr<UVkFramebuffer> m_framebuffer;
 	Microsoft::WRL::ComPtr<UVkRenderPass> m_renderPass;

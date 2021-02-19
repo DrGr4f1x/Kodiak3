@@ -475,6 +475,33 @@ void GraphicsContext::BeginRenderPass(FrameBuffer& framebuffer)
 	renderPassBeginInfo.pClearValues = nullptr;
 	renderPassBeginInfo.framebuffer = framebuffer.GetFramebuffer();
 
+	VkRenderPassAttachmentBeginInfo attachmentBeginInfo{ VK_STRUCTURE_TYPE_RENDER_PASS_ATTACHMENT_BEGIN_INFO };
+	attachmentBeginInfo.pNext = nullptr;
+	attachmentBeginInfo.attachmentCount = 0;
+	attachmentBeginInfo.pAttachments = nullptr;
+	array<VkImageView, 9> attachments;
+
+	if (framebuffer.IsImageless())
+	{
+		uint32_t curAttachment = 0;
+		for (size_t i = 0; i < framebuffer.m_colorBuffers.size(); ++i)
+		{
+			if (framebuffer.m_colorBuffers[i] == nullptr)
+				break;
+
+			attachments[curAttachment++] = framebuffer.m_colorBuffers[i]->GetImageView();
+		}
+
+		if (framebuffer.m_depthBuffer != nullptr)
+		{
+			attachments[curAttachment] = framebuffer.m_depthBuffer->GetDepthStencilImageView();
+		}
+
+		attachmentBeginInfo.attachmentCount = curAttachment;
+		attachmentBeginInfo.pAttachments = attachments.data();
+		renderPassBeginInfo.pNext = &attachmentBeginInfo;
+	}
+
 	vkCmdBeginRenderPass(m_commandList, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 	m_isRenderPassActive = true;
@@ -538,8 +565,8 @@ void GraphicsContext::SetViewport(float x, float y, float w, float h, float minD
 {
 	VkViewport viewport = {};
 	viewport.x = x;
-	viewport.y = h;
-	viewport.height = -h;
+	viewport.y = y;
+	viewport.height = h;
 	viewport.width = w;
 	viewport.minDepth = minDepth;
 	viewport.maxDepth = maxDepth;
@@ -560,7 +587,7 @@ void GraphicsContext::SetScissor(uint32_t left, uint32_t top, uint32_t right, ui
 
 void GraphicsContext::SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 {
-	VkViewport vp{ (float)x, (float)h, (float)w, -1.0f * (float)h, 0.0f, 1.0f };
+	VkViewport vp{ (float)x, (float)h, (float)w, /*-1.0f * */ (float)h, 0.0f, 1.0f };
 	VkRect2D rect;
 	rect.extent.width = w;
 	rect.extent.height = h;

@@ -22,6 +22,16 @@ using namespace Math;
 using namespace std;
 
 
+struct ResolveComputeConstants
+{
+	uint32_t width;
+	uint32_t height;
+	uint32_t depth;
+	uint32_t rows;
+	uint32_t cols;
+};
+
+
 void Voxelizer::Initialize(ColorBufferPtr obstacleTex3D, ColorBufferPtr obstacleVelocityTex3D)
 {
 	m_initialized = false;
@@ -44,6 +54,7 @@ void Voxelizer::Initialize(ColorBufferPtr obstacleTex3D, ColorBufferPtr obstacle
 	InitFrameBuffers();
 	InitRootSigs();
 	InitPSOs();
+	InitConstantBuffers();
 	InitSliceVertices();
 	InitResources();
 
@@ -79,7 +90,8 @@ void Voxelizer::Render(GraphicsContext& context)
 	ScopedDrawEvent event(context, "Voxelize");
 
 	StencilClipScene(context);
-	DrawSlices(context);
+	//DrawSlices(context);
+	ComputeResolve(context);
 }
 
 
@@ -121,6 +133,16 @@ void Voxelizer::InitRootSigs()
 		m_resolveRootSig.Reset(1, 0);
 		m_resolveRootSig[0].InitAsDescriptorRange(DescriptorType::TextureSRV, 0, 1, ShaderVisibility::Pixel);
 		m_resolveRootSig.Finalize("Resolve Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
+	}
+
+	// Resolve compute
+	{
+		m_resolveComputeRootSig.Reset(1, 0);
+		m_resolveComputeRootSig[0].InitAsDescriptorTable(3, ShaderVisibility::Compute);
+		m_resolveComputeRootSig[0].SetTableRange(0, DescriptorType::TextureSRV, 0, 1);
+		m_resolveComputeRootSig[0].SetTableRange(1, DescriptorType::TextureUAV, 0, 1);
+		m_resolveComputeRootSig[0].SetTableRange(2, DescriptorType::CBV, 0, 1);
+		m_resolveComputeRootSig.Finalize("Resolve Compute Root Sig");
 	}
 
 	// Gen Velocity
@@ -199,6 +221,13 @@ void Voxelizer::InitPSOs()
 		m_resolvePSO.Finalize();
 	}
 
+	// Resolve Compute
+	{
+		m_resolveComputePSO.SetRootSignature(m_resolveComputeRootSig);
+		m_resolveComputePSO.SetComputeShader("ResolveCS");
+		m_resolveComputePSO.Finalize();
+	}
+
 	// Gen Velocity
 	{
 		m_genVelocityPSO.SetRootSignature(m_genVelocityRootSig);
@@ -225,6 +254,14 @@ void Voxelizer::InitPSOs()
 		m_genVelocityPSO.SetInputLayout(vertexStream, vertexElements);
 		m_genVelocityPSO.Finalize();
 	}
+}
+
+
+void Voxelizer::InitConstantBuffers()
+{
+	ResolveComputeConstants constants{ m_width, m_height, m_depth, m_rows, m_cols };
+	m_resolveComputeConstantBuffer.Create("Resolve Compute Constant Buffer", 1, sizeof(ResolveComputeConstants), nullptr);
+	m_resolveComputeConstantBuffer.Update(sizeof(ResolveComputeConstants), &constants);
 }
 
 
@@ -264,6 +301,12 @@ void Voxelizer::InitResources()
 	m_resolveResources.Init(&m_resolveRootSig);
 	m_resolveResources.SetSRV(0, 0, *m_depthBuffer, false);
 	m_resolveResources.Finalize();
+
+	m_resolveComputeResources.Init(&m_resolveComputeRootSig);
+	m_resolveComputeResources.SetSRV(0, 0, *m_depthBuffer, false);
+	m_resolveComputeResources.SetUAV(0, 1, *m_obstacleTex3D);
+	m_resolveComputeResources.SetCBV(0, 2, m_resolveComputeConstantBuffer);
+	m_resolveComputeResources.Finalize();
 }
 
 
@@ -315,7 +358,9 @@ void Voxelizer::StencilClipScene(GraphicsContext& context)
 
 void Voxelizer::DrawSlices(GraphicsContext& context)
 {
-	//ScopedDrawEvent event(context, "Draw slices");
+	ScopedDrawEvent event(context, "Draw slices");
+
+	context.TransitionResource(*m_depthBuffer, ResourceState::ShaderResource);
 
 	context.BeginRenderPass(m_resolveFBO);
 
@@ -330,4 +375,23 @@ void Voxelizer::DrawSlices(GraphicsContext& context)
 	context.Draw(6 * m_depth);
 
 	context.EndRenderPass();
+}
+
+
+void Voxelizer::ComputeResolve(GraphicsContext& context)
+{
+	auto& computeContext = context.GetComputeContext();
+
+	ScopedDrawEvent event(context, "Compute Resolve");
+
+	context.TransitionResource(*m_depthBuffer, ResourceState::NonPixelShaderResource);
+	context.TransitionResource(*m_obstacleTex3D, ResourceState::UnorderedAccess);
+	
+	computeContext.SetRootSignature(m_resolveComputeRootSig);
+	computeContext.SetPipelineState(m_resolveComputePSO);
+
+	computeContext.SetResources(m_resolveComputeResources);
+
+	computeContext.Dispatch3D(m_width, m_height, m_depth, 8, 8, 1);
+	//...
 }

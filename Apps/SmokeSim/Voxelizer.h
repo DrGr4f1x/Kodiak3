@@ -37,11 +37,13 @@ private:
 	void InitFrameBuffers();
 	void InitRootSigs();
 	void InitPSOs();
+	void InitConstantBuffers();
 	void InitSliceVertices();
 	void InitResources();
 
 	void StencilClipScene(Kodiak::GraphicsContext& context);
 	void DrawSlices(Kodiak::GraphicsContext& context);
+	void ComputeResolve(Kodiak::GraphicsContext& context);
 
 private:
 	bool m_initialized{ false };
@@ -78,14 +80,19 @@ private:
 
 	Kodiak::RootSignature m_voxelizeRootSig;
 	Kodiak::RootSignature m_resolveRootSig;
+	Kodiak::RootSignature m_resolveComputeRootSig;
 	Kodiak::RootSignature m_genVelocityRootSig;
 
 	Kodiak::GraphicsPSO m_voxelizePSO;
 	Kodiak::GraphicsPSO m_resolvePSO;
+	Kodiak::ComputePSO m_resolveComputePSO;
 	Kodiak::GraphicsPSO m_genVelocityPSO;
 
 	Kodiak::VertexBuffer m_sliceVertexBuffer;
 	Kodiak::ResourceSet m_resolveResources;
+	Kodiak::ResourceSet m_resolveComputeResources;
+
+	Kodiak::ConstantBuffer m_resolveComputeConstantBuffer;
 
 	// Scene objects
 	struct VoxelizeConstants

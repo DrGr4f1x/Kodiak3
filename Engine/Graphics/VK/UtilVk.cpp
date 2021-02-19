@@ -100,6 +100,7 @@ VkImageViewType GetImageViewType(ResourceType type)
 
 	case ResourceType::Texture3D:
 		return VK_IMAGE_VIEW_TYPE_3D;
+		//return VK_IMAGE_VIEW_TYPE_2D_ARRAY;
 
 	default:
 		assert(false);
@@ -115,6 +116,8 @@ VkImageCreateFlagBits GetImageCreateFlags(ResourceType type)
 	case ResourceType::TextureCube:
 	case ResourceType::TextureCube_Array:
 		return VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+	case ResourceType::Texture3D:
+		return VK_IMAGE_CREATE_2D_ARRAY_COMPATIBLE_BIT;
 	default:
 		return static_cast<VkImageCreateFlagBits>(0);
 	}

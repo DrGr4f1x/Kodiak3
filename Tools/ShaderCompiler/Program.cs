@@ -424,6 +424,7 @@ namespace ShaderCompiler
         {
             m_cmdString += GetDefines();
             m_cmdString += " ";
+            //m_cmdString += "-Zi -Fd " + m_outputDir + " -Od ";
             m_cmdString += GetShaderStageStr();
             m_cmdString += " ";
             m_cmdString += GetSpirvStr();

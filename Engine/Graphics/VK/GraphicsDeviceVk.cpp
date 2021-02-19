@@ -100,7 +100,7 @@ VkBool32 messageCallback(
 
 	prefix += ":";
 
-	string debugMessage = fmt::format("{} [{}] Code {} : {} \n", prefix, pCallbackData->pMessageIdName, pCallbackData->messageIdNumber, pCallbackData->pMessageIdName);
+	string debugMessage = fmt::format("{} [{}] Code {} : {} \n", prefix, pCallbackData->pMessageIdName, pCallbackData->messageIdNumber, pCallbackData->pMessage);
 
 	// Display message to default output (console/logcat)
 	if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
@@ -573,7 +573,7 @@ VkResult GraphicsDevice::CreateRenderPass(const vector<ColorBufferPtr>& colorBuf
 }
 
 
-VkResult GraphicsDevice::CreateFramebuffer(const vector<ColorBufferPtr>& colorBuffers, DepthBufferPtr depthBuffer, VkRenderPass renderPass, UVkFramebuffer** ppFramebuffer) const
+VkResult GraphicsDevice::CreateFramebuffer(const vector<ColorBufferPtr>& colorBuffers, DepthBufferPtr depthBuffer, VkRenderPass renderPass, bool* bImageless, UVkFramebuffer** ppFramebuffer) const
 {
 	const uint32_t numColorBuffers = uint32_t(colorBuffers.size());
 	uint32_t rtCount = numColorBuffers;
@@ -682,6 +682,8 @@ VkResult GraphicsDevice::CreateFramebuffer(const vector<ColorBufferPtr>& colorBu
 
 		frameBufferCreateInfo.pNext = &attachmentsCreateInfo;
 		frameBufferCreateInfo.flags = VK_FRAMEBUFFER_CREATE_IMAGELESS_BIT;
+
+		*bImageless = true;
 
 		res = vkCreateFramebuffer(GetDevice(), &frameBufferCreateInfo, nullptr, &vkFramebuffer);
 	}
@@ -1525,7 +1527,7 @@ void GraphicsDevice::InitializeValidation()
 		VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
 		nullptr,
 		0,
-		VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT,
+		VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT,
 		VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT,
 		messageCallback,
 		nullptr
