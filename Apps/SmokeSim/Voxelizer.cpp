@@ -140,7 +140,7 @@ void Voxelizer::InitRootSigs()
 		m_resolveComputeRootSig.Reset(1, 0);
 		m_resolveComputeRootSig[0].InitAsDescriptorTable(3, ShaderVisibility::Compute);
 		m_resolveComputeRootSig[0].SetTableRange(0, DescriptorType::TextureSRV, 0, 1);
-		m_resolveComputeRootSig[0].SetTableRange(1, DescriptorType::TextureUAV, 0, 1);
+		m_resolveComputeRootSig[0].SetTableRange(1, DescriptorType::TextureUAV, 0, 2);
 		m_resolveComputeRootSig[0].SetTableRange(2, DescriptorType::CBV, 0, 1);
 		m_resolveComputeRootSig.Finalize("Resolve Compute Root Sig");
 	}
@@ -305,7 +305,8 @@ void Voxelizer::InitResources()
 	m_resolveComputeResources.Init(&m_resolveComputeRootSig);
 	m_resolveComputeResources.SetSRV(0, 0, *m_depthBuffer, false);
 	m_resolveComputeResources.SetUAV(0, 1, *m_obstacleTex3D);
-	m_resolveComputeResources.SetCBV(0, 2, m_resolveComputeConstantBuffer);
+	m_resolveComputeResources.SetUAV(0, 2, *m_debugColorBuffer);
+	m_resolveComputeResources.SetCBV(0, 3, m_resolveComputeConstantBuffer);
 	m_resolveComputeResources.Finalize();
 }
 
@@ -386,6 +387,7 @@ void Voxelizer::ComputeResolve(GraphicsContext& context)
 
 	context.TransitionResource(*m_depthBuffer, ResourceState::NonPixelShaderResource);
 	context.TransitionResource(*m_obstacleTex3D, ResourceState::UnorderedAccess);
+	context.TransitionResource(*m_debugColorBuffer, ResourceState::UnorderedAccess);
 	
 	computeContext.SetRootSignature(m_resolveComputeRootSig);
 	computeContext.SetPipelineState(m_resolveComputePSO);

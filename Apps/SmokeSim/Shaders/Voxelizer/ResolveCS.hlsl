@@ -12,8 +12,10 @@
 Texture2D<uint2>		StencilTex;
 [[vk::binding(1, 0)]]
 RWTexture3D<float>		VolumeTex;
-
 [[vk::binding(2, 0)]]
+RWTexture2D<float4>		DebugTex;
+
+[[vk::binding(3, 0)]]
 cbuffer CSConstants
 {
 	uint width;
@@ -31,12 +33,18 @@ void main( uint3 GTid : SV_GroupThreadID, uint3 Gid : SV_GroupID, uint3 DTid : S
 
 	uint row = z / cols;
 	uint col = z % cols;
-	int x = int(float(col) * float(width) + 0.5) + Gid.x * 8 + GTid.x;
-	int y = int(float(row) * float(height) + 0.5) + Gid.y * 8 + GTid.y;
+	int x = col * width + Gid.x * 8 + GTid.x;
+	int y = row * height + Gid.y * 8 + GTid.y;
 
 	float res = 0.0;
-	if (StencilTex.Load(int3(x, y, 1)).g)
+	float4 debugColor = float4(1,0,0,0);
+	if (StencilTex.Load(int3(x, y, 0)).g)
+	{
 		res = 0.5;
+		debugColor = float4(0,0,1,0);
+	}
+
+	DebugTex[int2(x,y)] = debugColor;
 
 	VolumeTex[DTid] = res;
 }
