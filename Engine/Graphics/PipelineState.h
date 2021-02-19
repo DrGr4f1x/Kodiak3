@@ -118,7 +118,7 @@ public:
 	void SetSampleMask(uint32_t sampleMask);
 	void SetPrimitiveTopology(PrimitiveTopology topology);
 	void SetRenderTargetFormat(Format rtvFormat, Format dsvFormat, uint32_t msaaCount = 1, bool sampleRateShading = false);
-	void SetRenderTargetFormats(uint32_t numRtvs, const Format* rtvFormats, Format dsvFormat, uint32_t msaaCount = 1, bool sampleRateShading = false);
+	void SetRenderTargetFormats(std::span<Format> rtvFormats, Format dsvFormat, uint32_t msaaCount = 1, bool sampleRateShading = false);
 	void SetInputLayout(const VertexStreamDesc& vertexStream, const std::vector<VertexElementDesc>& inputElementDescs);
 	void SetInputLayout(const std::vector<VertexStreamDesc>& vertexStreams, const std::vector<VertexElementDesc>& inputElementDescs);
 	void SetPrimitiveRestart(IndexBufferStripCutValue ibProps);

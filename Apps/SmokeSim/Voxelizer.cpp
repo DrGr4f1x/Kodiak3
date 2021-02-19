@@ -232,7 +232,7 @@ void Voxelizer::InitPSOs()
 	{
 		m_genVelocityPSO.SetRootSignature(m_genVelocityRootSig);
 		Format rtvFormats[] = { Format::R16G16B16A16_Float, Format::R8_UNorm };
-		m_genVelocityPSO.SetRenderTargetFormats(2, rtvFormats, Format::Unknown);
+		m_genVelocityPSO.SetRenderTargetFormats(rtvFormats, Format::Unknown);
 
 		m_genVelocityPSO.SetBlendState(CommonStates::BlendDisable());
 		m_genVelocityPSO.SetRasterizerState(CommonStates::RasterizerTwoSided());

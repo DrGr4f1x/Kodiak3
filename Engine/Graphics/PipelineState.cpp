@@ -171,22 +171,23 @@ void GraphicsPSO::SetRenderTargetFormat(Format rtvFormat, Format dsvFormat, uint
 {
 	if (rtvFormat == Format::Unknown)
 	{
-		SetRenderTargetFormats(0, nullptr, dsvFormat, msaaCount, sampleRateShading);
+		SetRenderTargetFormats({}, dsvFormat, msaaCount, sampleRateShading);
 	}
 	else
 	{
-		SetRenderTargetFormats(1, &rtvFormat, dsvFormat, msaaCount, sampleRateShading);
+		Format rtvFormats[] = {rtvFormat};
+		SetRenderTargetFormats(rtvFormats, dsvFormat, msaaCount, sampleRateShading);
 	}
 }
 
 
-void GraphicsPSO::SetRenderTargetFormats(uint32_t numRtvs, const Format* rtvFormats, Format dsvFormat, uint32_t msaaCount, bool sampleRateShading)
+void GraphicsPSO::SetRenderTargetFormats(span<Format> rtvFormats, Format dsvFormat, uint32_t msaaCount, bool sampleRateShading)
 {
-	for (uint32_t i = 0; i < numRtvs; ++i)
+	for (size_t i = 0; i < min(size_t(8), rtvFormats.size()); ++i)
 	{
 		m_rtvFormats[i] = rtvFormats[i];
 	}
-	m_numRtvs = numRtvs;
+	m_numRtvs = uint32_t(rtvFormats.size());
 	m_dsvFormat = dsvFormat;
 	m_msaaCount = msaaCount;
 	m_sampleRateShading = sampleRateShading;
@@ -198,6 +199,7 @@ void GraphicsPSO::SetInputLayout(const VertexStreamDesc& vertexStream, const vec
 	m_vertexStreams.push_back(vertexStream);
 	m_vertexElements = inputElementDescs;
 }
+
 
 void GraphicsPSO::SetInputLayout(const vector<VertexStreamDesc>& vertexStreams, const vector<VertexElementDesc>& inputElementDescs)
 {
