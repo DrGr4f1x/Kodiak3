@@ -46,7 +46,7 @@ void GetEdgePlaneIntersection(GSInput vtx0, GSInput vtx1, float sliceZ, inout Ve
 		return;
 
 	intersections[index].pos = lerp(vtx0.pos, vtx1.pos, t).xy;
-	intersections[index].vel = lerp(vtx0.vel, vtx1.vel, 1);
+	intersections[index].vel = lerp(vtx0.vel, vtx1.vel, t);
 	++index;
 }
 

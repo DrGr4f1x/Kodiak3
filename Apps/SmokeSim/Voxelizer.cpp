@@ -81,7 +81,8 @@ void Voxelizer::AddModel(ModelPtr model)
 
 void Voxelizer::Update(float deltaT)
 {
-	
+	m_deltaT = deltaT;
+
 }
 
 
@@ -92,6 +93,7 @@ void Voxelizer::Render(GraphicsContext& context)
 	StencilClipScene(context);
 	//DrawSlices(context);
 	ComputeResolve(context);
+	RenderVelocity(context);
 }
 
 
@@ -148,8 +150,8 @@ void Voxelizer::InitRootSigs()
 	// Gen Velocity
 	{
 		m_genVelocityRootSig.Reset(2, 0);
-		m_genVelocityRootSig[0].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Vertex);
-		m_genVelocityRootSig[1].InitAsDescriptorRange(DescriptorType::CBV, 0, 1, ShaderVisibility::Geometry);
+		m_genVelocityRootSig[0].InitAsConstants(0, sizeof(GenVelocityVSConstants) / sizeof(DWORD), ShaderVisibility::Vertex);
+		m_genVelocityRootSig[1].InitAsConstants(0, sizeof(GenVelocityGSConstants) / sizeof(DWORD), ShaderVisibility::Geometry);
 		m_genVelocityRootSig.Finalize("Gen Velocity Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
 	}
 }
@@ -395,5 +397,58 @@ void Voxelizer::ComputeResolve(GraphicsContext& context)
 	computeContext.SetResources(m_resolveComputeResources);
 
 	computeContext.Dispatch3D(m_width, m_height, m_depth, 8, 8, 1);
-	//...
+}
+
+
+void Voxelizer::RenderVelocity(GraphicsContext& context)
+{
+	ScopedDrawEvent event(context, "Render Velocity");
+
+	context.TransitionResource(*m_obstacleTex3D, ResourceState::RenderTarget);
+	context.TransitionResource(*m_obstacleVelocityTex3D, ResourceState::RenderTarget);
+	context.ClearColor(*m_obstacleVelocityTex3D);
+
+	context.BeginRenderPass(m_genVelocityFBO);
+
+	context.SetRootSignature(m_genVelocityRootSig);
+	context.SetPipelineState(m_genVelocityPSO);
+	context.SetPrimitiveTopology(PrimitiveTopology::TriangleStrip);
+
+	context.SetViewportAndScissor(0u, 0u, m_width, m_height);
+
+	GenVelocityVSConstants vsConstants{};
+	GenVelocityGSConstants gsConstants{};
+
+	for (uint32_t z = 0; z < m_depth; ++z)
+	{
+		ScopedDrawEvent innerEvent(context, fmt::format("Slice z = {}", z));
+
+		float zNear = float(z) / float(m_depth) - 0.5f;
+		float zFar = 100000.0f;
+
+		Matrix4 projectionMatrix = Matrix4(XMMatrixOrthographicOffCenterRH(-1.0f, 1.0f, -1.0f, 1.0f, -0.5f, 0.5f));
+		Matrix4 viewMatrix = Matrix4(Vector3(kYUnitVector), Vector3(kZUnitVector), Vector3(kXUnitVector), Vector3(kZero));
+
+		for (const auto& obj : m_sceneObjects)
+		{
+			vsConstants.modelViewProjectionMatrix = projectionMatrix * viewMatrix * m_worldToGridMatrix * obj.model->GetMatrix();
+			vsConstants.prevModelViewProjectionMatrix = projectionMatrix * viewMatrix * m_worldToGridMatrix * obj.model->GetPrevMatrix();
+			vsConstants.gridDim[0] = float(m_width);
+			vsConstants.gridDim[1] = float(m_height);
+			vsConstants.gridDim[2] = float(m_depth);
+			vsConstants.deltaT = m_deltaT;
+
+			gsConstants.projSpacePixDim[0] = 2.0f / float(m_width);
+			gsConstants.projSpacePixDim[1] = 2.0f / float(m_height);
+			gsConstants.sliceIndex = int(z);
+			gsConstants.sliceZ = float(z) / float(m_depth);
+
+			context.SetConstantArray(0, sizeof(vsConstants) / sizeof(DWORD), &vsConstants);
+			context.SetConstantArray(1, sizeof(gsConstants) / sizeof(DWORD), &gsConstants);
+
+			obj.model->RenderPositionOnly(context);
+		}
+	}
+
+	context.EndRenderPass();
 }

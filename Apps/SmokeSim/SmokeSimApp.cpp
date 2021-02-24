@@ -64,13 +64,6 @@ void SmokeSimApp::Startup()
 		m_fluidEngine.GetRenderTarget(FluidEngine::RenderTarget::Obstacles), 
 		m_fluidEngine.GetRenderTarget(FluidEngine::RenderTarget::ObstacleVelocity));
 
-	/*Vector3 viewPos{ 0.0f, 8.0f, 0.0f };
-	Vector3 target{ 0.0f, 0.0f, 0.0f };
-	Vector3 up{ 1.0f, 0.0f, 0.0f };
-	Matrix4 gridToWorldMatrix = Matrix4(XMMatrixLookAtRH(viewPos, target, up));*/
-
-	//Matrix4 scale = Matrix4::MakeScale(8.0f);
-	//Matrix4 trans = Matrix4::MakeTranslation(-4.0f, 0.0f, -4.0f);
 	Matrix4 scale = Matrix4::MakeScale(4.0f);
 	Matrix4 trans = Matrix4::MakeTranslation(0.0f, 4.0f, 0.0f);
 
@@ -80,8 +73,6 @@ void SmokeSimApp::Startup()
 	m_worldToGridMatrix = Invert(m_gridToWorldMatrix);
 
 	m_voxelizer.SetGridToWorldMatrix(m_gridToWorldMatrix);
-
-	MatrixTest();
 
 	int objIdx = 0;
 	for (auto& obj : m_sceneObjects)
@@ -304,59 +295,4 @@ void SmokeSimApp::RenderScene(GraphicsContext& context)
 		context.SetPipelineState(obj.objectPSO);
 		obj.model->Render(context);
 	}
-}
-
-
-static void whoa() {}
-void SmokeSimApp::MatrixTest()
-{
-	using namespace Math;
-	//static const array<Vector3, 8> s_boxCornersLocal =
-	//{
-	//	Vector3{ 0.0f, 0.0f, 0.0f },
-	//	Vector3{ 0.0f, 0.0f, 1.0f },
-	//	Vector3{ 0.0f, 1.0f, 0.0f },
-	//	Vector3{ 0.0f, 1.0f, 1.0f },
-	//	Vector3{ 1.0f, 0.0f, 0.0f },
-	//	Vector3{ 1.0f, 0.0f, 1.0f },
-	//	Vector3{ 1.0f, 1.0f, 0.0f },
-	//	Vector3{ 1.0f, 1.0f, 1.0f }
-	//};
-
-	static const array<Vector3, 8> s_boxCornersLocal =
-	{
-		Vector3{ -1.0f, -1.0f, -1.0f },
-		Vector3{ -1.0f, -1.0f,  1.0f },
-		Vector3{ -1.0f,  1.0f, -1.0f },
-		Vector3{ -1.0f,  1.0f,  1.0f },
-		Vector3{  1.0f, -1.0f, -1.0f },
-		Vector3{  1.0f, -1.0f,  1.0f },
-		Vector3{  1.0f,  1.0f, -1.0f },
-		Vector3{  1.0f,  1.0f,  1.0f }
-	};
-
-	array<Vector3, 8> boxCornersWorld =
-	{
-		Vector3{ 0.0f, 0.0f, 0.0f },
-		Vector3{ 0.0f, 0.0f, 0.0f },
-		Vector3{ 0.0f, 0.0f, 0.0f },
-		Vector3{ 0.0f, 0.0f, 0.0f },
-		Vector3{ 0.0f, 0.0f, 0.0f },
-		Vector3{ 0.0f, 0.0f, 0.0f },
-		Vector3{ 0.0f, 0.0f, 0.0f },
-		Vector3{ 0.0f, 0.0f, 0.0f }
-	};
-
-	Matrix4 scale = Matrix4::MakeScale(4.0f);
-	Matrix4 trans = Matrix4::MakeTranslation(0.0f, 4.0f, 0.0f);
-	
-	Matrix4 localToWorld = trans * scale;
-	//Matrix4 localToWorld{ kIdentity };
-
-	for (int i = 0; i < 8; ++i)
-	{
-		boxCornersWorld[i] = localToWorld * s_boxCornersLocal[i];
-	}
-
-	whoa();
 }

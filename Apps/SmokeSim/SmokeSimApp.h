@@ -47,8 +47,6 @@ private:
 	// Simulation and render
 	void RenderScene(Kodiak::GraphicsContext& context);
 
-	void MatrixTest();
-
 private:
 	struct Vertex
 	{

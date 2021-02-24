@@ -44,6 +44,7 @@ private:
 	void StencilClipScene(Kodiak::GraphicsContext& context);
 	void DrawSlices(Kodiak::GraphicsContext& context);
 	void ComputeResolve(Kodiak::GraphicsContext& context);
+	void RenderVelocity(Kodiak::GraphicsContext& context);
 
 private:
 	bool m_initialized{ false };
@@ -60,6 +61,9 @@ private:
 	// Rows, columns of flattened 3D volume
 	uint32_t m_rows{ 0 };
 	uint32_t m_cols{ 0 };
+
+	// Timestep
+	float m_deltaT{ 0.0f };
 
 	// Vertices
 	struct SliceVertex
@@ -98,6 +102,21 @@ private:
 	struct VoxelizeConstants
 	{
 		Math::Matrix4 modelViewProjectionMatrix;
+	};
+
+	struct GenVelocityVSConstants
+	{
+		Math::Matrix4 modelViewProjectionMatrix;
+		Math::Matrix4 prevModelViewProjectionMatrix;
+		float gridDim[3];
+		float deltaT;
+	};
+
+	struct GenVelocityGSConstants
+	{
+		int sliceIndex;
+		float sliceZ;
+		float projSpacePixDim[2];
 	};
 
 	struct Object
