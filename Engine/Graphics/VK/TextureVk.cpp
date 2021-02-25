@@ -530,7 +530,7 @@ void Texture::ClearRetainedData()
 
 void Texture::CreateDerivedViews()
 {
-	ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), m_type, m_format, ImageAspect::Color, 0, m_numMips, 0, m_arraySize, &m_imageView));
+	ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), m_type, GpuImageUsage::ShaderResource, m_format, ImageAspect::Color, 0, m_numMips, 0, m_arraySize, &m_imageView));
 	m_imageInfo = { VK_NULL_HANDLE, m_imageView->Get(), GetImageLayout(ResourceState::ShaderResource) };
 }
 

@@ -36,9 +36,10 @@ void ColorBuffer::CreateDerivedViews(Format format, uint32_t arraySize, uint32_t
 
 	m_numMipMaps = numMips - 1;
 
-	ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), m_type, format, ImageAspect::Color, 0, numMips, 0, arraySize, &m_imageView));
-	m_imageInfoSRV = { VK_NULL_HANDLE, m_imageView->Get(), GetImageLayout(ResourceState::ShaderResource) };
-	m_imageInfoUAV = { VK_NULL_HANDLE, m_imageView->Get(), GetImageLayout(ResourceState::UnorderedAccess) };
+	ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), m_type, GpuImageUsage::RenderTarget, format, ImageAspect::Color, 0, numMips, 0, arraySize, &m_imageViewRTV));
+	ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), m_type, GpuImageUsage::ShaderResource, format, ImageAspect::Color, 0, numMips, 0, arraySize, &m_imageViewSRV));
+	m_imageInfoSRV = { VK_NULL_HANDLE, m_imageViewSRV->Get(), GetImageLayout(ResourceState::ShaderResource) };
+	m_imageInfoUAV = { VK_NULL_HANDLE, m_imageViewSRV->Get(), GetImageLayout(ResourceState::UnorderedAccess) };
 }
 
 

@@ -413,6 +413,8 @@ void Voxelizer::StencilClipScene(GraphicsContext& context)
 	context.SetPipelineState(m_voxelizePSO);
 	context.SetPrimitiveTopology(PrimitiveTopology::TriangleStrip);
 
+	context.SetInvertedViewport(false);
+
 	uint32_t x = 0;
 	uint32_t y = 0;
 	for (uint32_t z = 0; z < m_depth; ++z)
@@ -434,6 +436,8 @@ void Voxelizer::StencilClipScene(GraphicsContext& context)
 			obj.model->RenderPositionOnly(context);
 		}
 	}
+
+	context.SetInvertedViewport(true);
 
 	context.EndRenderPass();
 }

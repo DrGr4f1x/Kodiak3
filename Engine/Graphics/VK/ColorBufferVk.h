@@ -36,7 +36,8 @@ public:
 	void CreateArray(const std::string& name, uint32_t width, uint32_t height, uint32_t arrayCount, Format format);
 
 	// Get pre-created CPU-visible descriptor handles
-	VkImageView GetImageView() const { return m_imageView->Get(); }
+	VkImageView GetImageViewRTV() const { return m_imageViewRTV->Get(); }
+	VkImageView GetImageViewSRV() const { return m_imageViewSRV->Get(); }
 	const VkDescriptorImageInfo* GetSRVImageInfoPtr() const { return &m_imageInfoSRV; }
 	const VkDescriptorImageInfo* GetUAVImageInfoPtr() const { return &m_imageInfoUAV; }
 
@@ -65,7 +66,8 @@ protected:
 	void CreateDerivedViews(Format format, uint32_t arraySize, uint32_t numMips);
 
 protected:
-	Microsoft::WRL::ComPtr<UVkImageView> m_imageView{ nullptr };
+	Microsoft::WRL::ComPtr<UVkImageView> m_imageViewRTV{ nullptr };
+	Microsoft::WRL::ComPtr<UVkImageView> m_imageViewSRV{ nullptr };
 	VkDescriptorImageInfo m_imageInfoSRV{};
 	VkDescriptorImageInfo m_imageInfoUAV{};
 	Color m_clearColor;

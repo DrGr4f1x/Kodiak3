@@ -74,7 +74,7 @@ VkImageType GetImageType(ResourceType type)
 }
 
 
-VkImageViewType GetImageViewType(ResourceType type)
+VkImageViewType GetImageViewType(ResourceType type, GpuImageUsage imageUsage)
 {
 	switch (type)
 	{
@@ -99,7 +99,7 @@ VkImageViewType GetImageViewType(ResourceType type)
 		return VK_IMAGE_VIEW_TYPE_CUBE_ARRAY;
 
 	case ResourceType::Texture3D:
-		return VK_IMAGE_VIEW_TYPE_3D;
+		return HasFlag(imageUsage, GpuImageUsage::RenderTarget) ? VK_IMAGE_VIEW_TYPE_2D_ARRAY : VK_IMAGE_VIEW_TYPE_3D;
 		//return VK_IMAGE_VIEW_TYPE_2D_ARRAY;
 
 	default:

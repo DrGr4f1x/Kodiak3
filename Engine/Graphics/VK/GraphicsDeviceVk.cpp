@@ -382,13 +382,13 @@ VkResult GraphicsDevice::CreateCommandPool(uint32_t queueFamilyIndex, UVkCommand
 }
 
 
-VkResult GraphicsDevice::CreateImageView(UVkImage* uimage, ResourceType type, Format format, ImageAspect aspect, uint32_t baseMipLevel, uint32_t mipCount, uint32_t baseArraySlice, uint32_t arraySize, UVkImageView** ppImageView) const
+VkResult GraphicsDevice::CreateImageView(UVkImage* uimage, ResourceType type, GpuImageUsage imageUsage, Format format, ImageAspect aspect, uint32_t baseMipLevel, uint32_t mipCount, uint32_t baseArraySlice, uint32_t arraySize, UVkImageView** ppImageView) const
 {
 	VkImageViewCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	createInfo.pNext = nullptr;
 	createInfo.flags = 0;
-	createInfo.viewType = GetImageViewType(type);
+	createInfo.viewType = GetImageViewType(type, imageUsage);
 	createInfo.format = static_cast<VkFormat>(format);
 	if (IsColorFormat(format))
 	{
@@ -606,7 +606,7 @@ VkResult GraphicsDevice::CreateFramebuffer(const vector<ColorBufferPtr>& colorBu
 			bHas3DAttachment = true;
 		}
 
-		attachments[i] = colorBuffers[i]->GetImageView();
+		attachments[i] = colorBuffers[i]->GetImageViewRTV();
 		++attachmentCount;
 	}
 

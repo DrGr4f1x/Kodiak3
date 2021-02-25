@@ -489,7 +489,7 @@ void GraphicsContext::BeginRenderPass(FrameBuffer& framebuffer)
 			if (framebuffer.m_colorBuffers[i] == nullptr)
 				break;
 
-			attachments[curAttachment++] = framebuffer.m_colorBuffers[i]->GetImageView();
+			attachments[curAttachment++] = framebuffer.m_colorBuffers[i]->GetImageViewRTV();
 		}
 
 		if (framebuffer.m_depthBuffer != nullptr)
@@ -561,12 +561,18 @@ void GraphicsContext::SetRootSignature(const RootSignature& rootSig)
 }
 
 
+void GraphicsContext::SetInvertedViewport(bool bInverted)
+{
+	m_bInvertedViewport = bInverted;
+}
+
+
 void GraphicsContext::SetViewport(float x, float y, float w, float h, float minDepth, float maxDepth)
 {
 	VkViewport viewport = {};
 	viewport.x = x;
 	viewport.y = y;
-	viewport.height = h;
+	viewport.height = (m_bInvertedViewport ? -1.0f : 1.0f) * h;
 	viewport.width = w;
 	viewport.minDepth = minDepth;
 	viewport.maxDepth = maxDepth;
@@ -587,7 +593,7 @@ void GraphicsContext::SetScissor(uint32_t left, uint32_t top, uint32_t right, ui
 
 void GraphicsContext::SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 {
-	VkViewport vp{ (float)x, (float)h, (float)w, /*-1.0f * */ (float)h, 0.0f, 1.0f };
+	VkViewport vp{ (float)x, (float)h, (float)w, (m_bInvertedViewport ? -1.0f : 1.0f) * (float)h, 0.0f, 1.0f };
 	VkRect2D rect;
 	rect.extent.width = w;
 	rect.extent.height = h;

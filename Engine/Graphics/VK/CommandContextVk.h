@@ -104,6 +104,7 @@ protected:
 	// Shader stages for the 8 descriptor set slots
 	VkShaderStageFlags m_shaderStages[8];
 
+	bool m_bInvertedViewport{ true };
 	bool m_hasPendingDebugEvent{ false };
 
 private:
@@ -138,6 +139,7 @@ public:
 
 	void SetRootSignature(const RootSignature& rootSig);
 
+	void SetInvertedViewport(bool bInverted);
 	void SetViewport(float x, float y, float w, float h, float minDepth = 0.0f, float maxDepth = 1.0f);
 	void SetScissor(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom);
 	void SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h);

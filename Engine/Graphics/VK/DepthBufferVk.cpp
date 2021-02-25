@@ -40,12 +40,12 @@ void DepthBuffer::CreateDerivedViews()
 	ImageAspect aspect = ImageAspect::Depth;
 	if (hasStencil)
 		aspect |= ImageAspect::Stencil;
-	ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), ResourceType::Texture2D, m_format, aspect, 0, 1, 0, 1, &m_imageViewDepthStencil));
+	ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), ResourceType::Texture2D, GpuImageUsage::DepthStencilTarget, m_format, aspect, 0, 1, 0, 1, &m_imageViewDepthStencil));
 
 	if (hasStencil)
 	{
-		ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), ResourceType::Texture2D, m_format, ImageAspect::Depth, 0, 1, 0, 1, &m_imageViewDepthOnly));
-		ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), ResourceType::Texture2D, m_format, ImageAspect::Stencil, 0, 1, 0, 1, &m_imageViewStencilOnly));
+		ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), ResourceType::Texture2D, GpuImageUsage::DepthStencilTarget, m_format, ImageAspect::Depth, 0, 1, 0, 1, &m_imageViewDepthOnly));
+		ThrowIfFailed(g_graphicsDevice->CreateImageView(m_image.Get(), ResourceType::Texture2D, GpuImageUsage::DepthStencilTarget, m_format, ImageAspect::Stencil, 0, 1, 0, 1, &m_imageViewStencilOnly));
 	}
 	else
 	{

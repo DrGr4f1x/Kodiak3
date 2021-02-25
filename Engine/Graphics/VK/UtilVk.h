@@ -15,7 +15,7 @@ namespace Kodiak
 
 VkSampleCountFlagBits SamplesToFlags(uint32_t numSamples);
 VkImageType GetImageType(ResourceType type);
-VkImageViewType GetImageViewType(ResourceType type);
+VkImageViewType GetImageViewType(ResourceType type, GpuImageUsage imageUsage);
 VkImageCreateFlagBits GetImageCreateFlags(ResourceType type);
 
 VkImageLayout GetImageLayout(ResourceState state);

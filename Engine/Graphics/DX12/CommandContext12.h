@@ -193,6 +193,7 @@ public:
 	void SetRenderTarget(const ColorBuffer& colorBuffer);
 	void SetRenderTarget(const ColorBuffer& colorBuffer, const DepthBuffer& depthBuffer);
 
+	void SetInvertedViewport(bool bInverted) { /* Unused, Vulkan-only */ }
 	void SetViewport(float x, float y, float w, float h, float minDepth = 0.0f, float maxDepth = 1.0f);
 	void SetScissor(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom);
 	void SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
