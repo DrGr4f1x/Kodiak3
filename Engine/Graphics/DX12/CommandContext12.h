@@ -328,7 +328,12 @@ inline void GraphicsContext::SetBlendFactor(Color blendFactor)
 
 inline void GraphicsContext::SetPrimitiveTopology(PrimitiveTopology topology)
 {
-	m_commandList->IASetPrimitiveTopology(static_cast<D3D12_PRIMITIVE_TOPOLOGY>(topology));
+	auto newTopology = static_cast<D3D12_PRIMITIVE_TOPOLOGY>(topology);
+	if (m_curPrimitiveTopology != newTopology)
+	{
+		m_commandList->IASetPrimitiveTopology(static_cast<D3D12_PRIMITIVE_TOPOLOGY>(newTopology));
+		m_curPrimitiveTopology = newTopology;
+	}
 }
 
 

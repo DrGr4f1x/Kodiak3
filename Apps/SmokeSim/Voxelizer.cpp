@@ -62,6 +62,13 @@ void Voxelizer::Initialize(ColorBufferPtr obstacleTex3D, ColorBufferPtr obstacle
 }
 
 
+void Voxelizer::Shutdown()
+{
+	_aligned_free(m_voxelizeProjectionConstants.projectionMatrix);
+	m_voxelizeProjectionConstants.projectionMatrix = nullptr;
+}
+
+
 void Voxelizer::SetGridToWorldMatrix(const Matrix4& gridToWorldMatrix)
 {
 	m_gridToWorldMatrix = gridToWorldMatrix;
@@ -75,6 +82,18 @@ void Voxelizer::AddModel(ModelPtr model)
 
 	obj.model = model;
 
+	obj.voxelizeConstantBuffer.Create("Model Voxelization Constant Buffer", 1, sizeof(VoxelizeModelConstants));
+	obj.voxelizeResources.Init(&m_voxelizeRootSig);
+	obj.voxelizeResources.SetCBV(0, 0, obj.voxelizeConstantBuffer);
+	obj.voxelizeResources.SetCBV(1, 0, m_voxelizeProjectionConstantBuffer);
+	obj.voxelizeResources.Finalize();
+
+	obj.genVelocityConstantBuffer.Create("Model Gen Velocity Constant Buffer", 1, sizeof(GenVelocityVSConstants));
+	obj.genVelocityResources.Init(&m_genVelocityRootSig);
+	obj.genVelocityResources.SetCBV(0, 0, obj.genVelocityConstantBuffer);
+	obj.genVelocityResources.SetCBV(1, 0, m_genVelocityGSConstantBuffer);
+	obj.genVelocityResources.Finalize();
+
 	m_sceneObjects.push_back(obj);
 }
 
@@ -83,6 +102,7 @@ void Voxelizer::Update(float deltaT)
 {
 	m_deltaT = deltaT;
 
+	UpdateConstantBuffers();
 }
 
 
@@ -91,8 +111,8 @@ void Voxelizer::Render(GraphicsContext& context)
 	ScopedDrawEvent event(context, "Voxelize");
 
 	StencilClipScene(context);
-	//DrawSlices(context);
-	ComputeResolve(context);
+	DrawSlices(context);
+	//ComputeResolve(context);
 	RenderVelocity(context);
 }
 
@@ -125,8 +145,9 @@ void Voxelizer::InitRootSigs()
 {
 	// Voxelize
 	{
-		m_voxelizeRootSig.Reset(1, 0);
-		m_voxelizeRootSig[0].InitAsConstants(0, 16, ShaderVisibility::Vertex);
+		m_voxelizeRootSig.Reset(2, 0);
+		m_voxelizeRootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+		m_voxelizeRootSig[1].InitAsDynamicConstantBuffer(1, ShaderVisibility::Vertex);
 		m_voxelizeRootSig.Finalize("Voxelize Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
 	}
 
@@ -150,8 +171,8 @@ void Voxelizer::InitRootSigs()
 	// Gen Velocity
 	{
 		m_genVelocityRootSig.Reset(2, 0);
-		m_genVelocityRootSig[0].InitAsConstants(0, sizeof(GenVelocityVSConstants) / sizeof(DWORD), ShaderVisibility::Vertex);
-		m_genVelocityRootSig[1].InitAsConstants(0, sizeof(GenVelocityGSConstants) / sizeof(DWORD), ShaderVisibility::Geometry);
+		m_genVelocityRootSig[0].InitAsConstantBuffer(0, ShaderVisibility::Vertex);
+		m_genVelocityRootSig[1].InitAsDynamicConstantBuffer(0, ShaderVisibility::Geometry);
 		m_genVelocityRootSig.Finalize("Gen Velocity Root Sig", RootSignatureFlags::AllowInputAssemblerInputLayout);
 	}
 }
@@ -261,9 +282,52 @@ void Voxelizer::InitPSOs()
 
 void Voxelizer::InitConstantBuffers()
 {
-	ResolveComputeConstants constants{ m_width, m_height, m_depth, m_rows, m_cols };
-	m_resolveComputeConstantBuffer.Create("Resolve Compute Constant Buffer", 1, sizeof(ResolveComputeConstants), nullptr);
-	m_resolveComputeConstantBuffer.Update(sizeof(ResolveComputeConstants), &constants);
+	// Voxelization constants
+	{
+		m_voxelizeDynamicAlignment = AlignUp(sizeof(Matrix4), Limits::ConstantBufferAlignment);
+
+		size_t allocSize = m_depth * m_voxelizeDynamicAlignment;
+		m_voxelizeProjectionConstants.projectionMatrix = (Matrix4*)_aligned_malloc(allocSize, m_voxelizeDynamicAlignment);
+
+		m_voxelizeProjectionConstantBuffer.Create("Voxelize Projection Constant Buffer", 1, allocSize);
+
+		for (uint32_t z = 0; z < m_depth; ++z)
+		{
+			auto projectionMatrix = (Matrix4*)((uint64_t)m_voxelizeProjectionConstants.projectionMatrix + (z * m_voxelizeDynamicAlignment));
+			float zNear = float(z) / float(m_depth) - 0.5f;
+			float zFar = 100000.0f;
+
+			*projectionMatrix = Matrix4(XMMatrixOrthographicOffCenterRH(-1.0f, 1.0f, -1.0f, 1.0f, zNear, zFar));
+		}
+		m_voxelizeProjectionConstantBuffer.Update(allocSize, m_voxelizeProjectionConstants.projectionMatrix);
+	}
+
+	// Resolve constants
+	{
+		ResolveComputeConstants constants{ m_width, m_height, m_depth, m_rows, m_cols };
+		m_resolveComputeConstantBuffer.Create("Resolve Compute Constant Buffer", 1, sizeof(ResolveComputeConstants), nullptr);
+		m_resolveComputeConstantBuffer.Update(sizeof(ResolveComputeConstants), &constants);
+	}
+
+	// Gen velocity constants
+	{
+		m_genVelocityDynamicAlignment = AlignUp(sizeof(GenVelocityGSConstantData), Limits::ConstantBufferAlignment);
+
+		size_t allocSize = m_depth * m_genVelocityDynamicAlignment;
+		m_genVelocityGSConstants.data = (GenVelocityGSConstantData*)_aligned_malloc(allocSize, m_genVelocityDynamicAlignment);
+
+		m_genVelocityGSConstantBuffer.Create("Gen Velocity GS Constant Buffer", 1, allocSize);
+
+		for (uint32_t z = 0; z < m_depth; ++z)
+		{
+			auto sliceData = (GenVelocityGSConstantData*)((uint64_t)m_genVelocityGSConstants.data + (z * m_genVelocityDynamicAlignment));
+			sliceData->projSpacePixDim[0] = 2.0f / float(m_width);
+			sliceData->projSpacePixDim[1] = 2.0f / float(m_height);
+			sliceData->sliceIndex = int(z);
+			sliceData->sliceZ = float(z) / float(m_depth);
+		}
+		m_genVelocityGSConstantBuffer.Update(allocSize, m_genVelocityGSConstants.data);
+	}
 }
 
 
@@ -313,6 +377,27 @@ void Voxelizer::InitResources()
 }
 
 
+void Voxelizer::UpdateConstantBuffers()
+{
+	Matrix4 viewMatrix = Matrix4(Vector3(kYUnitVector), Vector3(kZUnitVector), Vector3(kXUnitVector), Vector3(kZero));
+	Matrix4 projectionMatrix = Matrix4(XMMatrixOrthographicOffCenterRH(-1.0f, 1.0f, -1.0f, 1.0f, -0.5f, 0.5f));
+
+	for (auto& obj : m_sceneObjects)
+	{
+		obj.voxelizeConstants.modelViewMatrix = viewMatrix * m_worldToGridMatrix * obj.model->GetMatrix();
+		obj.voxelizeConstantBuffer.Update(sizeof(obj.voxelizeConstants), &obj.voxelizeConstants);
+
+		obj.genVelocityConstants.modelViewProjectionMatrix = projectionMatrix * viewMatrix * m_worldToGridMatrix * obj.model->GetMatrix();
+		obj.genVelocityConstants.prevModelViewProjectionMatrix = projectionMatrix * viewMatrix * m_worldToGridMatrix * obj.model->GetPrevMatrix();
+		obj.genVelocityConstants.gridDim[0] = float(m_width);
+		obj.genVelocityConstants.gridDim[1] = float(m_height);
+		obj.genVelocityConstants.gridDim[2] = float(m_depth);
+		obj.genVelocityConstants.deltaT = m_deltaT;
+		obj.genVelocityConstantBuffer.Update(sizeof(obj.genVelocityConstants), &obj.genVelocityConstants);
+	}
+}
+
+
 void Voxelizer::StencilClipScene(GraphicsContext& context)
 {
 	ScopedDrawEvent event(context, "Stencil clip scene");
@@ -340,17 +425,12 @@ void Voxelizer::StencilClipScene(GraphicsContext& context)
 		context.SetViewport(float(x), float(y), float(m_width), float(m_height));
 		context.SetScissor(x, y, x + m_width, y + m_height);
 
-		float zNear = float(z) / float(m_depth) - 0.5f;
-		float zFar = 100000.0f;
-
-		Matrix4 projectionMatrix = Matrix4(XMMatrixOrthographicOffCenterRH(-1.0f, 1.0f, -1.0f, 1.0f, zNear, zFar));
-		Matrix4 viewMatrix = Matrix4(Vector3(kYUnitVector), Vector3(kZUnitVector), Vector3(kXUnitVector), Vector3(kZero));
-
-		for (const auto& obj : m_sceneObjects)
+		for (auto& obj : m_sceneObjects)
 		{
-			Matrix4 objToProjMatrix = projectionMatrix * viewMatrix * m_worldToGridMatrix * obj.model->GetMatrix();
+			obj.voxelizeResources.SetDynamicOffset(1, z * uint32_t(m_voxelizeDynamicAlignment));
+
+			context.SetResources(obj.voxelizeResources);
 			
-			context.SetConstantArray(0, 16, &objToProjMatrix);
 			obj.model->RenderPositionOnly(context);
 		}
 	}
@@ -423,28 +503,11 @@ void Voxelizer::RenderVelocity(GraphicsContext& context)
 	{
 		ScopedDrawEvent innerEvent(context, fmt::format("Slice z = {}", z));
 
-		float zNear = float(z) / float(m_depth) - 0.5f;
-		float zFar = 100000.0f;
-
-		Matrix4 projectionMatrix = Matrix4(XMMatrixOrthographicOffCenterRH(-1.0f, 1.0f, -1.0f, 1.0f, -0.5f, 0.5f));
-		Matrix4 viewMatrix = Matrix4(Vector3(kYUnitVector), Vector3(kZUnitVector), Vector3(kXUnitVector), Vector3(kZero));
-
-		for (const auto& obj : m_sceneObjects)
+		for (auto& obj : m_sceneObjects)
 		{
-			vsConstants.modelViewProjectionMatrix = projectionMatrix * viewMatrix * m_worldToGridMatrix * obj.model->GetMatrix();
-			vsConstants.prevModelViewProjectionMatrix = projectionMatrix * viewMatrix * m_worldToGridMatrix * obj.model->GetPrevMatrix();
-			vsConstants.gridDim[0] = float(m_width);
-			vsConstants.gridDim[1] = float(m_height);
-			vsConstants.gridDim[2] = float(m_depth);
-			vsConstants.deltaT = m_deltaT;
+			obj.genVelocityResources.SetDynamicOffset(1, z * uint32_t(m_genVelocityDynamicAlignment));
 
-			gsConstants.projSpacePixDim[0] = 2.0f / float(m_width);
-			gsConstants.projSpacePixDim[1] = 2.0f / float(m_height);
-			gsConstants.sliceIndex = int(z);
-			gsConstants.sliceZ = float(z) / float(m_depth);
-
-			context.SetConstantArray(0, sizeof(vsConstants) / sizeof(DWORD), &vsConstants);
-			context.SetConstantArray(1, sizeof(gsConstants) / sizeof(DWORD), &gsConstants);
+			context.SetResources(obj.genVelocityResources);
 
 			obj.model->RenderPositionOnly(context);
 		}

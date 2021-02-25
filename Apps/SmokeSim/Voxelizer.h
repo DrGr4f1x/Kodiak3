@@ -24,6 +24,7 @@ class Voxelizer
 {
 public:
 	void Initialize(Kodiak::ColorBufferPtr obstacleTex3D, Kodiak::ColorBufferPtr obstacleVelocityTex3D);
+	void Shutdown();
 	
 	void SetGridToWorldMatrix(const Math::Matrix4& gridToWorldMatrix);
 	void AddModel(Kodiak::ModelPtr model);
@@ -40,6 +41,8 @@ private:
 	void InitConstantBuffers();
 	void InitSliceVertices();
 	void InitResources();
+
+	void UpdateConstantBuffers();
 
 	void StencilClipScene(Kodiak::GraphicsContext& context);
 	void DrawSlices(Kodiak::GraphicsContext& context);
@@ -96,12 +99,36 @@ private:
 	Kodiak::ResourceSet m_resolveResources;
 	Kodiak::ResourceSet m_resolveComputeResources;
 
+	struct alignas(256) VoxelizeProjectionConstants
+	{
+		Math::Matrix4* projectionMatrix{ nullptr };
+	};
+	size_t m_voxelizeDynamicAlignment{ 0 };
+	VoxelizeProjectionConstants m_voxelizeProjectionConstants{};
+	Kodiak::ConstantBuffer m_voxelizeProjectionConstantBuffer;
+
+	struct GenVelocityGSConstantData
+	{
+		int sliceIndex;
+		float sliceZ;
+		float projSpacePixDim[2];
+	};
+
+	struct GenVelocityGSConstants
+	{
+		GenVelocityGSConstantData* data{ nullptr };
+	};
+	size_t m_genVelocityDynamicAlignment{ 0 };
+	GenVelocityGSConstants m_genVelocityGSConstants{};
+	Kodiak::ConstantBuffer m_genVelocityGSConstantBuffer;
+
 	Kodiak::ConstantBuffer m_resolveComputeConstantBuffer;
 
 	// Scene objects
-	struct VoxelizeConstants
+
+	struct VoxelizeModelConstants
 	{
-		Math::Matrix4 modelViewProjectionMatrix;
+		Math::Matrix4 modelViewMatrix{ Math::kIdentity };
 	};
 
 	struct GenVelocityVSConstants
@@ -112,17 +139,18 @@ private:
 		float deltaT;
 	};
 
-	struct GenVelocityGSConstants
-	{
-		int sliceIndex;
-		float sliceZ;
-		float projSpacePixDim[2];
-	};
-
 	struct Object
 	{
+		// Voxelization pass
+		VoxelizeModelConstants voxelizeConstants{};
+		Kodiak::ConstantBuffer voxelizeConstantBuffer;
+		Kodiak::ResourceSet voxelizeResources;
+
 		// Gen velocity pass data
-		
+		GenVelocityVSConstants genVelocityConstants{};
+		Kodiak::ConstantBuffer genVelocityConstantBuffer;
+		Kodiak::ResourceSet genVelocityResources;
+
 		Kodiak::ModelPtr		model;
 	};
 	std::vector<Object> m_sceneObjects;

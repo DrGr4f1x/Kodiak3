@@ -89,6 +89,7 @@ void SmokeSimApp::Startup()
 void SmokeSimApp::Shutdown()
 {
 	m_meshRootSig.Destroy();
+	m_voxelizer.Shutdown();
 }
 
 
