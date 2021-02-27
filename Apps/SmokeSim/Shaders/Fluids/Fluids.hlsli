@@ -38,6 +38,7 @@ struct GSToPSData
 };
 
 
+[[vk::binding(0, 0)]]
 cbuffer SimConstants : register(b0)
 {
 	float3 texDim;
@@ -57,18 +58,28 @@ cbuffer SimConstants : register(b0)
 };
 
 
-Texture3D VelocityTex0;
-Texture3D VelocityTex1;
-Texture3D ColorTex;
-Texture3D ObstaclesTex;
-Texture3D ObstVelocityTex;
-Texture3D PressureTex;
-Texture3D TempScalarTex;
-Texture3D TempVectorTex;
+[[vk::binding(0, 1)]] 
+Texture3D VelocityTex0 : register(t0);
+[[vk::binding(1, 1)]] 
+Texture3D VelocityTex1 : register(t1);
+[[vk::binding(2, 1)]] 
+Texture3D ColorTex : register(t2);
+[[vk::binding(3, 1)]] 
+Texture3D ObstaclesTex : register(t3);
+[[vk::binding(4, 1)]] 
+Texture3D ObstVelocityTex : register(t4);
+[[vk::binding(5, 1)]] 
+Texture3D PressureTex : register(t5);
+[[vk::binding(6, 1)]] 
+Texture3D TempScalarTex : register(t6);
+[[vk::binding(7, 1)]] 
+Texture3D TempVectorTex : register(t7);
 
 
-SamplerState PointClampSampler;
-SamplerState LinearSampler;
+[[vk::binding(0, 2)]] 
+SamplerState PointClampSampler : register(s0);
+[[vk::binding(1, 2)]] 
+SamplerState LinearSampler : register(s1);
 
 
 #define LEFTCELL    float3 (input.LR.x, input.uvw.y, input.uvw.z)

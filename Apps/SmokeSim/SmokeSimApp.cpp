@@ -90,6 +90,7 @@ void SmokeSimApp::Shutdown()
 {
 	m_meshRootSig.Destroy();
 	m_voxelizer.Shutdown();
+	m_fluidEngine.Shutdown();
 }
 
 
@@ -114,6 +115,7 @@ bool SmokeSimApp::Update()
 	UpdateConstantBuffers();
 
 	m_voxelizer.Update(m_frameTimer);
+	m_fluidEngine.Update(m_frameTimer);
 
 	return true;
 }

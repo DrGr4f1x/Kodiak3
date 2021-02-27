@@ -82,10 +82,20 @@ void ResourceSet::Finalize()
 		if (resourceTable.writeDescriptorSets.empty())
 			continue;
 
+		vector<VkWriteDescriptorSet> liveDescriptors;
+		liveDescriptors.reserve(resourceTable.writeDescriptorSets.size());
+		for (auto& writeDescriptorSet : resourceTable.writeDescriptorSets)
+		{
+			if (writeDescriptorSet.descriptorCount > 0)
+			{
+				liveDescriptors.push_back(writeDescriptorSet);
+			}
+		}
+
 		vkUpdateDescriptorSets(
 			GetDevice(), 
-			(uint32_t)resourceTable.writeDescriptorSets.size(), 
-			resourceTable.writeDescriptorSets.data(), 
+			(uint32_t)liveDescriptors.size(), 
+			liveDescriptors.data(),
 			0, 
 			nullptr);
 	}

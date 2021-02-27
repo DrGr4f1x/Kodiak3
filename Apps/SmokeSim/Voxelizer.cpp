@@ -448,6 +448,7 @@ void Voxelizer::DrawSlices(GraphicsContext& context)
 	ScopedDrawEvent event(context, "Draw slices");
 
 	context.TransitionResource(*m_depthBuffer, ResourceState::ShaderResource);
+	context.TransitionResource(*m_obstacleTex3D, ResourceState::RenderTarget);
 
 	context.BeginRenderPass(m_resolveFBO);
 

@@ -275,6 +275,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="FluidEngine.cpp" />
+    <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="SmokeSimApp.cpp" />
     <ClCompile Include="SmokeSimUtils.cpp" />
@@ -290,6 +291,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FluidEngine.h" />
+    <ClInclude Include="Grid.h" />
     <ClInclude Include="SmokeSimApp.h" />
     <ClInclude Include="SmokeSimUtils.h" />
     <ClInclude Include="Stdafx.h" />
@@ -356,7 +358,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="Shaders\Fluids\GridVS.hlsl">
+    <CustomBuild Include="Shaders\Fluids\FluidGridVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Vertex</ShaderType>

@@ -88,6 +88,9 @@ void ResourceSet::Finalize()
 
 		for (uint32_t j = 0; j < numDescriptors; ++j)
 		{
+			if (resourceTable.descriptors[j].ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+				continue;
+
 			DescriptorHandle offsetHandle = descHandle + j * descriptorSize;
 			device->CopyDescriptorsSimple(1, offsetHandle.GetCpuHandle(), resourceTable.descriptors[j], heapType);
 		}

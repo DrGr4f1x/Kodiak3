@@ -7,6 +7,7 @@
     <ClCompile Include="FluidEngine.cpp" />
     <ClCompile Include="Voxelizer.cpp" />
     <ClCompile Include="SmokeSimUtils.cpp" />
+    <ClCompile Include="Grid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
@@ -14,6 +15,7 @@
     <ClInclude Include="FluidEngine.h" />
     <ClInclude Include="Voxelizer.h" />
     <ClInclude Include="SmokeSimUtils.h" />
+    <ClInclude Include="Grid.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -38,9 +40,6 @@
     </CustomBuild>
     <CustomBuild Include="Shaders\MeshPS.hlsl">
       <Filter>Shaders</Filter>
-    </CustomBuild>
-    <CustomBuild Include="Shaders\Fluids\GridVS.hlsl">
-      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
     <CustomBuild Include="Shaders\Fluids\AdvectBFECCPS.hlsl">
       <Filter>Shaders\Fluids</Filter>
@@ -110,6 +109,9 @@
     </CustomBuild>
     <CustomBuild Include="Shaders\Voxelizer\ResolveCS.hlsl">
       <Filter>Shaders\Voxelizer</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Fluids\FluidGridVS.hlsl">
+      <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

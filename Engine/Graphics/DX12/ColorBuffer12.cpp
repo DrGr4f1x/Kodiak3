@@ -240,6 +240,8 @@ void ColorBuffer::Create3D(const string& name, uint32_t width, uint32_t height, 
 	CreateTextureResource(name, resourceDesc, clearValue, &m_resource);
 
 	CreateDerivedViews(format, depth, 1);
+
+	m_resource->SetName(MakeWStr(name).c_str());
 }
 
 
