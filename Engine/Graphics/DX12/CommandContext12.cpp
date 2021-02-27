@@ -18,7 +18,7 @@
 #include "CommandListManager12.h"
 #include "Util12.h"
 
-#ifndef _RELEASE
+#if ENABLE_DX12_DEBUG_MARKUP
 #include <pix3.h>
 #endif
 
@@ -177,17 +177,17 @@ uint64_t CommandContext::Finish(bool waitForCompletion)
 
 void CommandContext::BeginEvent(const string& label)
 {
-#if _RELEASE
-	(label);
-#else
+#if ENABLE_DX12_DEBUG_MARKUP
 	::PIXBeginEvent(m_commandList, 0, label.c_str());
+#else
+	(label)
 #endif
 }
 
 
 void CommandContext::EndEvent()
 {
-#ifndef _RELEASE
+#if ENABLE_DX12_DEBUG_MARKUP
 	::PIXEndEvent(m_commandList);
 #endif
 }
@@ -195,9 +195,7 @@ void CommandContext::EndEvent()
 
 void CommandContext::SetMarker(const string& label)
 {
-#if _RELEASE
-	(label);
-#else
+#if ENABLE_DX12_DEBUG_MARKUP
 	::PIXSetMarker(m_commandList, 0, label.c_str());
 #endif
 }

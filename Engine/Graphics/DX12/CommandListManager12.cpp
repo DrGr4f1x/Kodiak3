@@ -56,10 +56,13 @@ void CommandQueue::Create()
 	queueDesc.Type = m_type;
 	queueDesc.NodeMask = 1;
 	ThrowIfFailed(device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_commandQueue)));
-	m_commandQueue->SetName(L"CommandListManager::m_commandQueue");
+
+	SetDebugName(m_commandQueue, "CommandListManager::m_commandQueue");
 
 	assert_succeeded(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
-	m_fence->SetName(L"CommandListManager::m_pFence");
+
+	SetDebugName(m_fence, "CommandListManager::m_fence");
+
 	m_fence->Signal((uint64_t)m_type << 56);
 
 	m_fenceEventHandle = CreateEvent(nullptr, false, false, nullptr);
@@ -221,7 +224,8 @@ void CommandListManager::CreateNewCommandList(CommandListType type, ID3D12Graphi
 	}
 
 	assert_succeeded(GetDevice()->CreateCommandList(1, static_cast<D3D12_COMMAND_LIST_TYPE>(type), *allocator, nullptr, IID_PPV_ARGS(commandList)));
-	(*commandList)->SetName(L"CommandList");
+
+	SetDebugName(*commandList, "CommandList");
 }
 
 

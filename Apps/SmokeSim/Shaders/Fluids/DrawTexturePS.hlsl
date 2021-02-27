@@ -11,7 +11,7 @@
 #include "Fluids.hlsli"
 
 
-float4 main(GSToPSData input) : SV_TARGET
+float4 main(VSToGSData input) : SV_TARGET
 {
     if (texNumber == 1)
         return abs(ColorTex.SampleLevel(LinearSampler,input.uvw, 0)).xxxx;

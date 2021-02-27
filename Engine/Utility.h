@@ -95,6 +95,8 @@ void ExitFatal(const std::string& message, const std::string& caption);
 	if (FAILED(hr)) { \
 		Utility::Print("\nHRESULT failed in " STRINGIFY_BUILTIN(__FILE__) " @ " STRINGIFY_BUILTIN(__LINE__) "\n"); \
 		Utility::PrintSubMessage("hr = 0x%08X", hr); \
+		_com_error err(hr); \
+		Utility::PrintSubMessage(L"hr = %s", err.ErrorMessage()); \
 		Utility::PrintSubMessage(__VA_ARGS__); \
 		Utility::Print("\n"); \
 		__debugbreak(); \

@@ -397,6 +397,10 @@ bool Application::Tick()
 	if (g_input.IsFirstPressed(DigitalInput::kKey_g))
 		m_showGrid = !m_showGrid;
 
+	// Check toggle UI with '\'
+	if (g_input.IsFirstPressed(DigitalInput::kKey_backslash))
+		m_showUI = !m_showUI;
+
 	bool res = Update();
 	if (res)
 	{

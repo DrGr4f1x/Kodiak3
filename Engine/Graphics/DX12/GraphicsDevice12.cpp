@@ -31,6 +31,16 @@ using namespace std;
 namespace Kodiak
 {
 GraphicsDevice* g_graphicsDevice = nullptr;
+
+#if ENABLE_DX12_DEBUG_MARKUP
+void SetDebugName(ID3D12Object* object, const string& name)
+{
+	object->SetPrivateData(WKPDID_D3DDebugObjectName, UINT(name.size()), name.data());
+}
+#else
+void SetDebugName(ID3D12Object* object, const string& name) {}
+#endif
+
 } // namespace Kodiak
 
 
@@ -357,7 +367,7 @@ void GraphicsDevice::Create()
 	else
 	{
 		// Prevent the GPU from overclocking or underclocking to get consistent timings
-		if (bIsDeveloperModeEnabled)
+		if (bIsDeveloperModeEnabled && !bIsRenderDocAvailable)
 		{
 			m_device->SetStablePowerState(TRUE);
 		}

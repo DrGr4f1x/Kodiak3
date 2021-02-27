@@ -12,6 +12,7 @@
 
 #include "SmokeSimApp.h"
 
+#include "Input.h"
 #include "Graphics\CommandContext.h"
 #include "Graphics\CommonStates.h"
 #include "Graphics\GraphicsFeatures.h"
@@ -112,10 +113,21 @@ bool SmokeSimApp::Update()
 		m_sceneObjects[3].model->SetMatrix(Matrix4(AffineTransform(Vector3(x, 4.0f, 0.0f))));
 	}
 
+	if (g_input.IsFirstPressed(DigitalInput::kKey_add))
+	{
+		++m_debugTex;
+	}
+	else if (g_input.IsFirstPressed(DigitalInput::kKey_subtract))
+	{
+		--m_debugTex;
+	}
+
+	m_debugTex = max(0, min(3, m_debugTex));
+
 	UpdateConstantBuffers();
 
 	m_voxelizer.Update(m_frameTimer);
-	m_fluidEngine.Update(m_frameTimer);
+	m_fluidEngine.Update(m_frameTimer, m_debugTex);
 
 	return true;
 }
@@ -123,11 +135,11 @@ bool SmokeSimApp::Update()
 
 void SmokeSimApp::UpdateUI()
 {
-	if (m_uiOverlay->Header("Settings"))
+	/*if (m_uiOverlay->Header("Settings"))
 	{
 		m_uiOverlay->CheckBox("Ortho Cam", &m_bUseOrthoCamera);
 		m_uiOverlay->SliderInt("Depth Slice", &m_curSlice, 0, int(m_gridDepth - 1));
-	}
+	}*/
 }
 
 /*
@@ -155,18 +167,26 @@ void SmokeSimApp::Render()
 
 	m_voxelizer.Render(context);
 
+	if (m_debugTex > 0)
+	{
+		m_fluidEngine.PrepareDebugDraw(context);
+	}
+
+
 	context.BeginRenderPass(GetBackBuffer());
 
-	if (m_bUseOrthoCamera)
+	if (m_debugTex > 0)
 	{
-		context.SetViewportAndScissor(200u, 200u, m_gridWidth, m_gridHeight);
+		m_fluidEngine.DebugDraw(context);
 	}
 	else
 	{
 		context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
+
+		RenderScene(context);
 	}
 
-	RenderScene(context);
+	context.SetViewportAndScissor(0u, 0u, m_displayWidth, m_displayHeight);
 
 	// Grid and UI
 	RenderGrid(context);
@@ -195,6 +215,7 @@ void SmokeSimApp::UpdateConstantBuffers()
 	{
 		auto& obj = m_sceneObjects[i];
 
+#if 0
 		if (m_bUseOrthoCamera)
 		{
 			float zNear = float(m_curSlice) / float(m_gridDepth) - 0.5f;
@@ -212,6 +233,7 @@ void SmokeSimApp::UpdateConstantBuffers()
 			obj.constants.modelMatrix = viewMatrix * m_worldToGridMatrix * obj.model->GetMatrix();
 		}
 		else
+#endif
 		{
 			obj.constants.projectionMatrix = m_camera.GetProjMatrix();
 			obj.constants.modelMatrix = m_camera.GetViewMatrix() * obj.model->GetMatrix();

@@ -202,7 +202,7 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 		assert_succeeded(GetDevice()->CreateRootSignature(1, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(),
 			IID_PPV_ARGS(&m_signature)));
 
-		m_signature->SetName(MakeWStr(name).c_str());
+		SetDebugName(m_signature, name);
 
 		s_rootSignatureHashMap[hashCode].Attach(m_signature);
 		assert(*RSRef == m_signature);

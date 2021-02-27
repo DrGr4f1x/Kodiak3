@@ -862,7 +862,7 @@ static HRESULT CreateD3DResources(ID3D12Device* d3dDevice,
 			}
 			else
 			{
-				tex->SetName(L"DDSTextureLoader");
+				SetDebugName(tex, "DDSTextureLoader");
 				tex->Release();
 			}
 		}
@@ -920,7 +920,7 @@ static HRESULT CreateD3DResources(ID3D12Device* d3dDevice,
 			}
 			else
 			{
-				tex->SetName(L"DDSTextureLoader");
+				SetDebugName(tex, "DDSTextureLoader");
 				tex->Release();
 			}
 		}
@@ -954,7 +954,7 @@ static HRESULT CreateD3DResources(ID3D12Device* d3dDevice,
 			}
 			else
 			{
-				tex->SetName(L"DDS Texture (3D)");
+				SetDebugName(tex, "DDS Texture (3D)");
 				tex->Release();
 			}
 		}
@@ -1300,11 +1300,13 @@ HRESULT Kodiak::CreateDDSTextureFromMemory(
 	{
 		if (texture != nullptr && *texture != nullptr)
 		{
-			(*texture)->SetName(L"DDSTextureLoader");
+			SetDebugName(*texture, "DDSTextureLoader");
 		}
 
 		if (alphaMode)
+		{
 			*alphaMode = GetAlphaMode(header);
+		}
 	}
 
 	return hr;

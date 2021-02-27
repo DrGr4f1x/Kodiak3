@@ -41,20 +41,21 @@ struct GSToPSData
 [[vk::binding(0, 0)]]
 cbuffer SimConstants : register(b0)
 {
+	float4 obstVelocity;
+	float4 splatColor;
 	float3 texDim;
 	float3 invTexDim;
-	int texNumber;
-	float4 obstVelocity;
-	float modulate;
-	float size;
 	float3 center;
-	float4 splatColor;
-	float epsilon;
-	float timestep;
-	float forward;
 	float3 halfVolumeDim;
 	float3 boxLBDCorner;
 	float3 boxRTUCorner;
+	float padding0;
+	int texNumber;
+	float modulate;
+	float size;
+	float epsilon;
+	float timestep;
+	float forward;
 };
 
 

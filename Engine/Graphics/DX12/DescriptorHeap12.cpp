@@ -89,12 +89,9 @@ void UserDescriptorHeap::Create(const string& debugHeapName)
 {
 	auto device = GetDevice();
 
-	assert_succeeded(device->CreateDescriptorHeap(&m_heapDesc, IID_PPV_ARGS(m_heap.ReleaseAndGetAddressOf())));
-#ifdef RELEASE
-	(void)debugHeapName;
-#else
-	m_heap->SetName(MakeWStr(debugHeapName).c_str());
-#endif
+	ThrowIfFailed(device->CreateDescriptorHeap(&m_heapDesc, IID_PPV_ARGS(m_heap.ReleaseAndGetAddressOf())));
+
+	SetDebugName(m_heap.Get(), debugHeapName);
 
 	m_descriptorSize = device->GetDescriptorHandleIncrementSize(m_heapDesc.Type);
 	m_numFreeDescriptors = m_heapDesc.NumDescriptors;

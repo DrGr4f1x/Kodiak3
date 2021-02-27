@@ -333,7 +333,7 @@ void Texture::Create(TextureInitializer& init)
 	assert_succeeded(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
 		GetResourceState(m_usageState), nullptr, IID_PPV_ARGS(&m_resource)));
 
-	m_resource->SetName(L"Texture");
+	SetDebugName(m_resource.Get(), "Texture");
 
 	uint32_t arraySize = (init.m_type == ResourceType::Texture3D) ? 1 : m_arraySize;
 

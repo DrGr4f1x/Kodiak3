@@ -73,11 +73,7 @@ void GpuBuffer::Create(const string& name, size_t numElements, size_t elementSiz
 
 	m_gpuAddress = m_resource->GetGPUVirtualAddress();
 
-#ifdef RELEASE
-	(name);
-#else
-	m_resource->SetName(MakeWStr(name).c_str());
-#endif
+	SetDebugName(m_resource.Get(), name);
 
 	CreateDerivedViews();
 }
@@ -213,11 +209,7 @@ void ReadbackBuffer::Create(const string& name, uint32_t numElements, uint32_t e
 	assert_succeeded(GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc,
 		D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_resource)));
 
-#ifdef RELEASE
-	(name);
-#else
-	m_resource->SetName(MakeWStr(name).c_str());
-#endif
+	SetDebugName(m_resource.Get(), name);
 }
 
 

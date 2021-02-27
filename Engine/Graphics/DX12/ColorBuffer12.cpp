@@ -173,11 +173,7 @@ void ColorBuffer::CreateFromSwapChain(const string& name, ID3D12Resource* resour
 	m_format = MapDXGIFormatToEngine(resourceDesc.Format);
 	m_type = ResourceType::Texture2D;
 
-#ifndef _RELEASE
-	m_resource->SetName(MakeWStr(name).c_str());
-#else
-	(name);
-#endif
+	SetDebugName(m_resource.Get(), name);
 
 	m_rtvHandle = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	GetDevice()->CreateRenderTargetView(m_resource.Get(), nullptr, m_rtvHandle);
@@ -240,8 +236,6 @@ void ColorBuffer::Create3D(const string& name, uint32_t width, uint32_t height, 
 	CreateTextureResource(name, resourceDesc, clearValue, &m_resource);
 
 	CreateDerivedViews(format, depth, 1);
-
-	m_resource->SetName(MakeWStr(name).c_str());
 }
 
 

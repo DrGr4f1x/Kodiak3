@@ -43,6 +43,7 @@
 #include <DirectXColors.h>
 #include <ppl.h>
 #include <ppltasks.h>
+#include <comdef.h>
 
 #pragma comment(lib, "shlwapi.lib")
 

@@ -151,7 +151,7 @@ void Grid::InitVertexBuffers()
 			vertices.push_back(temp4);
 		}
 
-		m_renderQuadVertexBuffer.Create("Render Quad Vertex Buffer", vertices.size(), sizeof(GridVertex), vertices.data());
+		m_renderQuadVertexBuffer.Create("Render Quad Vertex Buffer", vertices.size(), sizeof(GridVertex), false, vertices.data());
 	}
 
 	// Slices buffer
@@ -164,7 +164,7 @@ void Grid::InitVertexBuffers()
 			InitSlice(w, h, z, vertices);
 		}
 
-		m_slicesVertexBuffer.Create("Slices Vertex Buffer", vertices.size(), sizeof(GridVertex), vertices.data());
+		m_slicesVertexBuffer.Create("Slices Vertex Buffer", vertices.size(), sizeof(GridVertex), false, vertices.data());
 	}
 
 	// Boundary slices buffer
@@ -175,7 +175,7 @@ void Grid::InitVertexBuffers()
 		InitSlice(w, h, 0, vertices);
 		InitSlice(w, h, m_depth - 1, vertices);
 
-		m_boundarySlicesVertexBuffer.Create("Boundary Slices Vertex Buffer", vertices.size(), sizeof(GridVertex), vertices.data());
+		m_boundarySlicesVertexBuffer.Create("Boundary Slices Vertex Buffer", vertices.size(), sizeof(GridVertex), false, vertices.data());
 	}
 
 	// Boundary lines buffer
@@ -191,6 +191,6 @@ void Grid::InitVertexBuffers()
 			InitLine(w, h, z, w, 0.0f, w, h, vertices);
 		}
 
-		m_boundaryLinesVertexBuffer.Create("Boundary Lines Vertex Buffer", vertices.size(), sizeof(GridVertex), vertices.data());
+		m_boundaryLinesVertexBuffer.Create("Boundary Lines Vertex Buffer", vertices.size(), sizeof(GridVertex), false, vertices.data());
 	}
 }

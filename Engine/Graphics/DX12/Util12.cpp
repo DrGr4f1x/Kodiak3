@@ -468,11 +468,7 @@ void CreateTextureResource(const string& name, const D3D12_RESOURCE_DESC& resour
 	assert_succeeded(GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
 		&resourceDesc, D3D12_RESOURCE_STATE_COMMON, &clearValue, IID_PPV_ARGS(ppResource)));
 
-#ifndef _RELEASE
-	(*ppResource)->SetName(MakeWStr(name).c_str());
-#else
-	(name);
-#endif
+	SetDebugName(*ppResource, name);
 }
 
 

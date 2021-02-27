@@ -66,9 +66,9 @@ ID3D12CommandAllocator* CommandAllocatorPool::RequestAllocator(uint64_t complete
 	if (allocator == nullptr)
 	{
 		assert_succeeded(GetDevice()->CreateCommandAllocator(m_commandListType, IID_PPV_ARGS(&allocator)));
-		wchar_t allocatorName[32];
-		swprintf(allocatorName, 32, L"CommandAllocator %zu", m_allocatorPool.size());
-		allocator->SetName(allocatorName);
+
+		SetDebugName(allocator, fmt::format("CommandAllocator {}", m_allocatorPool.size()));
+
 		m_allocatorPool.push_back(allocator);
 	}
 

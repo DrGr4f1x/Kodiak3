@@ -200,7 +200,9 @@ void GraphicsPSO::Finalize()
 	{
 		HRESULT res = GetDevice()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&m_pso));
 		ThrowIfFailed(res);
-		m_pso->SetName(L"GfxPSO");
+
+		SetDebugName(m_pso, "GfxPSO");
+
 		s_graphicsPSOHashMap[hashCode].Attach(m_pso);
 	}
 	else

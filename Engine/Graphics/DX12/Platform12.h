@@ -10,6 +10,9 @@
 
 #pragma once
 
+#define FORCE_DX12_DEBUG_MARKUP 1
+#define ENABLE_DX12_DEBUG_MARKUP (_DEBUG || _PROFILE || FORCE_DX12_DEBUG_MARKUP)
+
 #include <d3d12.h>
 #include <d3dcompiler.h>
 #include <dxgi1_4.h>
@@ -35,5 +38,7 @@ namespace Kodiak
 {
 
 static const uint32_t NumSwapChainBuffers = 3;
+
+void SetDebugName(ID3D12Object* object, const std::string& name);
 
 } // namespace Kodiak

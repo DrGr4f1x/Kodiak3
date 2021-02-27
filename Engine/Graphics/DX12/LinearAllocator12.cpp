@@ -136,7 +136,7 @@ LinearAllocationPage* LinearAllocatorPageManager::CreateNewPage(size_t pageSize)
 	assert_succeeded(GetDevice()->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
 		&resourceDesc, GetResourceState(defaultUsage), nullptr, IID_PPV_ARGS(&buffer)));
 
-	buffer->SetName(L"LinearAllocator Page");
+	SetDebugName(buffer, "LinearAllocator Page");
 
 	return new LinearAllocationPage(buffer, defaultUsage);
 }
