@@ -273,6 +273,9 @@
     <ClInclude Include="Graphics\Material.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\VertexTypes.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -440,6 +443,9 @@
     </ClCompile>
     <ClCompile Include="Math\BoundingBox.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VertexTypes.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

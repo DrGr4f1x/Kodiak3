@@ -17,6 +17,7 @@
 #include "Color.h"
 #include "Graphics\CommandContext.h"
 #include "Graphics\CommonStates.h"
+#include "Graphics\VertexTypes.h"
 
 
 using namespace Kodiak;
@@ -68,11 +69,11 @@ void Grid::Render(GraphicsContext& context)
 
 void Grid::InitMesh()
 {
-	vector<Vertex> vertices;
+	vector<VertexPositionColor> vertices;
 
 	auto InsertVertex = [&vertices](float x, float y, float z, const Color& c)
 	{
-		vertices.push_back( { {x, y, z}, {c.R(), c.G(), c.B()} } );
+		vertices.push_back( { {x, y, z}, c } );
 	};
 
 	const float width = float(m_width);
@@ -134,7 +135,7 @@ void Grid::InitMesh()
 	InsertVertex(0.0f, 0.0f, 0.0f, color);
 	InsertVertex(0.0f, height, 0.0f, color);
 
-	m_vertexBuffer.Create("Vertex buffer", vertices.size(), sizeof(Vertex), false, vertices.data());
+	m_vertexBuffer.Create("Vertex buffer", vertices.size(), sizeof(VertexPositionColor), false, vertices.data());
 
 	vector<uint16_t> indices;
 	for (size_t i = 0; i < vertices.size(); ++i)
@@ -170,15 +171,7 @@ void Grid::InitPSO()
 	m_pso.SetRenderTargetFormat(app->GetColorFormat(), app->GetDepthFormat());
 
 	m_pso.SetPrimitiveTopology(PrimitiveTopology::LineList);
-
-	// Vertex inputs
-	VertexStreamDesc vertexStream = { 0, sizeof(Vertex), InputClassification::PerVertexData };
-	vector<VertexElementDesc> vertexElements =
-	{
-		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
-		{ "COLOR", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 }
-	};
-	m_pso.SetInputLayout(vertexStream, vertexElements);
+	m_pso.SetInputLayout(VertexPositionColor::Stream, VertexPositionColor::Layout);
 
 	m_pso.Finalize();
 }

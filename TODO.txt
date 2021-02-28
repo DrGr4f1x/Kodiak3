@@ -28,6 +28,8 @@ General bugs/improvements
 - Finish basic model factory (cube, sphere, cylinder, cone, etc.)
 - Revisit the linear allocator strategy for 'immediate' descriptor setting ala MiniEngine
 - Async loader/object creator
+- Support for GLTF loading
+- Support for skinned meshes/animation
 
 Shader Compiler
 ** Add logging to shader compiler
