@@ -47,6 +47,12 @@ private:
 	int m_height{ 10 };
 	float m_spacing{ 1.0f };
 
+	struct Vertex
+	{
+		float position[3];
+		float color[3];
+	};
+
 	// Vertex buffer and attributes
 	Kodiak::VertexBuffer m_vertexBuffer;
 

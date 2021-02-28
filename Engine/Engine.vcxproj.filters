@@ -273,9 +273,6 @@
     <ClInclude Include="Graphics\Material.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\VertexTypes.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -444,9 +441,6 @@
     <ClCompile Include="Math\BoundingBox.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\VertexTypes.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -490,12 +484,6 @@
     <None Include="packages.config" />
     <None Include="Shaders\Common\Common.hlsli">
       <Filter>Graphics\Shaders\Common</Filter>
-    </None>
-    <None Include="Graphics\Geometry\PlanePrimitive.inl">
-      <Filter>Graphics\Geometry</Filter>
-    </None>
-    <None Include="Graphics\Geometry\BoxPrimitive.inl">
-      <Filter>Graphics\Geometry</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

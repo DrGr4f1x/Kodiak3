@@ -164,20 +164,6 @@ void Model::RenderPositionOnly(GraphicsContext& context)
 }
 
 
-static inline void CheckIndex16Overflow(size_t value)
-{
-	if (value >= std::numeric_limits<uint16_t>::max())
-		throw std::exception("Index value out of range (uint16)");
-}
-
-
-void Model::AppendIndex(vector<uint16_t>& indices, size_t value)
-{
-	CheckIndex16Overflow(value);
-	indices.push_back(uint16_t(value));
-}
-
-
 ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float scale, ModelLoad modelLoadFlags)
 {
 	const string fullpath = Filesystem::GetInstance().GetFullPath(filename);
@@ -766,7 +752,6 @@ shared_ptr<Model> Model::MakeSphere(const VertexLayout& layout, float radius, ui
 }
 
 
-#if 0
 shared_ptr<Model> Model::MakeBox(const VertexLayout& layout, float width, float height, float depth)
 {
 	bool bHasNormals = false;
@@ -884,4 +869,3 @@ shared_ptr<Model> Model::MakeBox(const VertexLayout& layout, float width, float 
 
 	return model;
 }
-#endif

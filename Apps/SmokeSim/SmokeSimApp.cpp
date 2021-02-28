@@ -259,7 +259,7 @@ void SmokeSimApp::SetupScene()
 			obj.objectPSO.SetRasterizerState(CommonStates::RasterizerDefault());
 			obj.objectPSO.SetDepthStencilState(CommonStates::DepthStateReadWriteReversed());
 
-			obj.objectPSO.SetPrimitiveTopology(i == 0 ? PrimitiveTopology::TriangleList : PrimitiveTopology::TriangleStrip);
+			obj.objectPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleStrip);
 			obj.objectPSO.SetPrimitiveRestart(IndexBufferStripCutValue::Value_0xFFFF);
 
 			obj.objectPSO.SetVertexShader("MeshVS");
@@ -287,7 +287,7 @@ void SmokeSimApp::SetupScene()
 
 	// Create models
 	auto layout = VertexLayout( { VertexComponent::Position,VertexComponent::Normal } );
-	m_sceneObjects[0].model = Model::MakeBox<VertexPositionNormal>(Math::Vector3{ 8.0f, 0.25f, 8.0f });
+	m_sceneObjects[0].model = Model::MakeBox(layout, 8.0f, 0.25f, 8.0f);
 	m_sceneObjects[1].model = Model::MakeCylinder(layout, 4.0f, 0.25f, 32);
 	m_sceneObjects[2].model = Model::MakeCylinder(layout, 6.0f, 0.25f, 32);
 	m_sceneObjects[3].model = Model::MakeSphere(layout, 1.0f, 32, 32);
