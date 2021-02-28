@@ -73,7 +73,10 @@ void Grid::InitMesh()
 
 	auto InsertVertex = [&vertices](float x, float y, float z, const Color& c)
 	{
-		vertices.push_back( { {x, y, z}, c } );
+		VertexPositionColor vert;
+		vert.SetPosition(x, y, z);
+		vert.SetColor(c);
+		vertices.push_back(vert);
 	};
 
 	const float width = float(m_width);

@@ -479,6 +479,9 @@
     <Filter Include="Graphics\DX12\D3D12MemoryAllocator">
       <UniqueIdentifier>{087ccbbe-b36b-4ec1-877d-7aec93736c42}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics\Geometry">
+      <UniqueIdentifier>{79caba74-dc86-4461-8bcf-b0e4de81e99f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Math\Functions.inl">
@@ -487,6 +490,12 @@
     <None Include="packages.config" />
     <None Include="Shaders\Common\Common.hlsli">
       <Filter>Graphics\Shaders\Common</Filter>
+    </None>
+    <None Include="Graphics\Geometry\PlanePrimitive.inl">
+      <Filter>Graphics\Geometry</Filter>
+    </None>
+    <None Include="Graphics\Geometry\BoxPrimitive.inl">
+      <Filter>Graphics\Geometry</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

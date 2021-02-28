@@ -827,6 +827,8 @@
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Graphics\Geometry\BoxPrimitive.inl" />
+    <None Include="Graphics\Geometry\PlanePrimitive.inl" />
     <None Include="Math\Functions.inl" />
     <None Include="packages.config" />
     <None Include="Shaders\Common\Common.hlsli" />
