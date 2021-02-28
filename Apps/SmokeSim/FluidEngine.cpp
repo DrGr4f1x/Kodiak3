@@ -647,9 +647,15 @@ void FluidEngine::UpdateConstantBuffers(float deltaT)
 	const float depth = float(m_depth);
 
 	m_constants = {};
+	m_constants.obstVelocity = Vector4{ kZero };
+	m_constants.splatColor = Vector4{ 0.0f, 0.0f, 0.0f, 1.0f };
 	m_constants.texDim = Vector3{ width, height, depth };
 	m_constants.invTexDim = Vector3{ 1.0f / width, 1.0f / height, 1.0f / depth };
+	m_constants.center = Vector3{ kZero };
 	m_constants.halfVolumeDim = Vector3{ width / 2.0f, height / 2.0f, depth / 2.0f };
+	m_constants.boxLBDCorner = Vector3{ kZero };
+	m_constants.boxRTUCorner = Vector3{ kOne };
+	m_constants.texNumber = m_debugTexNumber;
 	m_constants.timestep = deltaT;
 
 	// Advect color
@@ -709,7 +715,6 @@ void FluidEngine::UpdateConstantBuffers(float deltaT)
 	m_projectVelocityConstantBuffer.Update(sizeof(FluidConstants), &m_constants);
 
 	// Debug
-	m_constants.texNumber = m_debugTexNumber;
 	m_debugConstantBuffer.Update(sizeof(FluidConstants), &m_constants);
 }
 

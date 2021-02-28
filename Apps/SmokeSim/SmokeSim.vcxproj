@@ -300,6 +300,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Shaders\Fluids\Fluids.hlsli" />
+    <None Include="Shaders\Volume\Volume.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Shaders\MeshPS.hlsl">
@@ -1053,6 +1054,278 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ComputeShader) %(FullPath)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ComputeShader) %(FullPath)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ComputeShader) %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputMsg)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Shaders\Volume\EdgeDetectPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Pixel</ShaderType>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputMsg)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\EdgeDetectVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Vertex</ShaderType>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(VertexShader) %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputMsg)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayCastCopyQuadPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Pixel</ShaderType>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputMsg)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayCastQuadPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Pixel</ShaderType>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputMsg)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayCastQuadVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Vertex</ShaderType>
+      <FileType>Document</FileType>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputMsg)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(VertexShader) %(FullPath)</Command>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayDataBackPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Pixel</ShaderType>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputMsg)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayDataBackVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Vertex</ShaderType>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(VertexShader) %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputMsg)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayDataCopyQuadPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Pixel</ShaderType>
+      <FileType>Document</FileType>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputMsg)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayDataFrontPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Pixel</ShaderType>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(PixelShader) %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputMsg)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputMsg)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(ShaderOutputDir)%(Filename)$(ShaderSuffix)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayDataFrontVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Vertex</ShaderType>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug12|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">$(VertexShader) %(FullPath)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">$(VertexShader) %(FullPath)</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='DebugVk|x64'">$(ShaderOutputMsg)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='ProfileVk|x64'">$(ShaderOutputMsg)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='ReleaseVk|x64'">$(ShaderOutputMsg)</Message>

@@ -22,6 +22,9 @@
     <None Include="Shaders\Fluids\Fluids.hlsli">
       <Filter>Shaders\Fluids</Filter>
     </None>
+    <None Include="Shaders\Volume\Volume.hlsli">
+      <Filter>Shaders\Volume</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
@@ -32,6 +35,9 @@
     </Filter>
     <Filter Include="Shaders\Voxelizer">
       <UniqueIdentifier>{2d2aea47-e4d9-4421-ada3-3d14392b452b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Volume">
+      <UniqueIdentifier>{bc878d23-5108-4454-9b28-bf3d3078cac4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -113,5 +119,37 @@
     <CustomBuild Include="Shaders\Fluids\FluidGridVS.hlsl">
       <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\Volume\RayDataBackVS.hlsl">
+      <Filter>Shaders\Volume</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Volume\RayDataFrontVS.hlsl">
+      <Filter>Shaders\Volume</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Volume\RayCastQuadVS.hlsl">
+      <Filter>Shaders\Volume</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Volume\EdgeDetectVS.hlsl">
+      <Filter>Shaders\Volume</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Volume\RayDataBackPS.hlsl">
+      <Filter>Shaders\Volume</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Volume\RayDataFrontPS.hlsl">
+      <Filter>Shaders\Volume</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Volume\RayCastQuadPS.hlsl">
+      <Filter>Shaders\Volume</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Volume\RayDataCopyQuadPS.hlsl">
+      <Filter>Shaders\Volume</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Volume\EdgeDetectPS.hlsl">
+      <Filter>Shaders\Volume</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Volume\RayCastCopyQuadPS.hlsl">
+      <Filter>Shaders\Volume</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -199,7 +199,7 @@ namespace ShaderCompiler
         private string GetSpirvStr()
         {
             if (m_compiler == ShaderCompiler.DXC && m_spirv)
-                return "-spirv";
+                return "-spirv -fvk-use-dx-layout";
             return "";
         }
 
