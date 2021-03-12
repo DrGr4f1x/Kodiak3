@@ -198,8 +198,8 @@ void InstancingApp::InitPSOs()
 		{
 			{ "POSITION", 0, Format::R32G32B32_Float, 0, 0, InputClassification::PerVertexData, 0 },
 			{ "NORMAL", 0, Format::R32G32B32_Float, 0, 3 * sizeof(float), InputClassification::PerVertexData, 0 },
-			{ "TEXCOORD", 0, Format::R32G32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 },
-			{ "COLOR", 0, Format::R32G32B32_Float, 0, 8 * sizeof(float), InputClassification::PerVertexData, 0 },
+			{ "COLOR", 0, Format::R32G32B32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 },
+			{ "TEXCOORD", 0, Format::R32G32_Float, 0, 10 * sizeof(float), InputClassification::PerVertexData, 0 },
 
 			{ "INSTANCED_POSITION", 0, Format::R32G32B32_Float, 1, 0, InputClassification::PerInstanceData, 1 },
 			{ "INSTANCED_ROTATION", 0, Format::R32G32B32_Float, 1, 3 * sizeof(float), InputClassification::PerInstanceData, 1 },
@@ -234,8 +234,8 @@ void InstancingApp::InitPSOs()
 		{
 			{ "POSITION", 0, Format::R32G32B32_Float, 0, 0, InputClassification::PerVertexData, 0 },
 			{ "NORMAL", 0, Format::R32G32B32_Float, 0, 3 * sizeof(float), InputClassification::PerVertexData, 0 },
-			{ "TEXCOORD", 0, Format::R32G32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 }, 
-			{ "COLOR", 0, Format::R32G32B32_Float, 0, 8 * sizeof(float), InputClassification::PerVertexData, 0 }
+			{ "COLOR", 0, Format::R32G32B32A32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 },
+			{ "TEXCOORD", 0, Format::R32G32_Float, 0, 10 * sizeof(float), InputClassification::PerVertexData, 0 }
 		};
 
 		m_planetPSO.SetInputLayout(vertexStream, vertexElements);
@@ -356,13 +356,7 @@ void InstancingApp::LoadAssets()
 	m_rockTexture = Texture::Load("texturearray_rocks_bc3_unorm.ktx", Format::Unknown, true);
 	m_planetTexture = Texture::Load("lavaplanet_bc3_unorm.ktx", Format::Unknown, true);
 
-	auto layout = VertexLayout(
-	{
-		VertexComponent::Position,
-		VertexComponent::Normal,
-		VertexComponent::UV,
-		VertexComponent::Color
-	});
+	auto layout = VertexLayout<VertexComponent::PositionNormalColorTexcoord>();
 
 	m_rockModel = Model::Load("rock01.dae", layout, 0.1f);
 	m_planetModel = Model::Load("sphere.obj", layout, 0.2f);

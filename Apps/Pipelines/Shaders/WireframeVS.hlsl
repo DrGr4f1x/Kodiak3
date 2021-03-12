@@ -11,7 +11,7 @@
 struct VSInput
 {
 	[[vk::location(0)]] float3 pos : POSITION;
-	[[vk::location(3)]] float3 color : COLOR;
+	[[vk::location(3)]] float4 color : COLOR;
 };
 
 
@@ -36,7 +36,7 @@ VSOutput main(VSInput input)
 	VSOutput output = (VSOutput)0;
 
 	output.pos = mul(projectionMatrix, mul(modelMatrix, float4(input.pos, 1.0)));
-	output.color = input.color;
+	output.color = input.color.rgb;
 
 	return output;
 }

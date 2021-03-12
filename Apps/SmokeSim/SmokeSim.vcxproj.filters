@@ -8,6 +8,7 @@
     <ClCompile Include="Voxelizer.cpp" />
     <ClCompile Include="SmokeSimUtils.cpp" />
     <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="VolumeRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stdafx.h" />
@@ -16,6 +17,7 @@
     <ClInclude Include="Voxelizer.h" />
     <ClInclude Include="SmokeSimUtils.h" />
     <ClInclude Include="Grid.h" />
+    <ClInclude Include="VolumeRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -119,37 +121,35 @@
     <CustomBuild Include="Shaders\Fluids\FluidGridVS.hlsl">
       <Filter>Shaders\Fluids</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Shaders\Volume\RayDataBackVS.hlsl">
+    <CustomBuild Include="Shaders\Volume\RayCastCopyQuadPS.hlsl">
       <Filter>Shaders\Volume</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Volume\RayDataFrontVS.hlsl">
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayCastQuadPS.hlsl">
       <Filter>Shaders\Volume</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Volume\RayCastQuadVS.hlsl">
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayCastQuadVS.hlsl">
       <Filter>Shaders\Volume</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Volume\EdgeDetectVS.hlsl">
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayDataBackPS.hlsl">
       <Filter>Shaders\Volume</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Volume\RayDataBackPS.hlsl">
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayDataBackVS.hlsl">
       <Filter>Shaders\Volume</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Volume\RayDataFrontPS.hlsl">
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayDataCopyQuadPS.hlsl">
       <Filter>Shaders\Volume</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Volume\RayCastQuadPS.hlsl">
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayDataFrontPS.hlsl">
       <Filter>Shaders\Volume</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Volume\RayDataCopyQuadPS.hlsl">
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\RayDataFrontVS.hlsl">
       <Filter>Shaders\Volume</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Volume\EdgeDetectPS.hlsl">
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\EdgeDetectPS.hlsl">
       <Filter>Shaders\Volume</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Volume\RayCastCopyQuadPS.hlsl">
+    </CustomBuild>
+    <CustomBuild Include="Shaders\Volume\EdgeDetectVS.hlsl">
       <Filter>Shaders\Volume</Filter>
-    </FxCompile>
+    </CustomBuild>
   </ItemGroup>
 </Project>

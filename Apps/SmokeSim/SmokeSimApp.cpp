@@ -61,6 +61,7 @@ void SmokeSimApp::Startup()
 
 	// Initialize fluid simulation
 	m_fluidEngine.Initialize(m_gridWidth, m_gridHeight, m_gridDepth);
+	m_volumeRenderer.Initialize(m_gridWidth, m_gridHeight, m_gridDepth);
 	m_voxelizer.Initialize(
 		m_fluidEngine.GetRenderTarget(FluidEngine::RenderTarget::Obstacles), 
 		m_fluidEngine.GetRenderTarget(FluidEngine::RenderTarget::ObstacleVelocity));
@@ -91,6 +92,7 @@ void SmokeSimApp::Shutdown()
 {
 	m_meshRootSig.Destroy();
 	m_voxelizer.Shutdown();
+	m_volumeRenderer.Shutdown();
 	m_fluidEngine.Shutdown();
 }
 
@@ -286,7 +288,7 @@ void SmokeSimApp::SetupScene()
 	}
 
 	// Create models
-	auto layout = VertexLayout( { VertexComponent::Position,VertexComponent::Normal } );
+	auto layout = VertexLayout<VertexComponent::PositionNormal>();
 	m_sceneObjects[0].model = Model::MakeBox(layout, 8.0f, 0.25f, 8.0f);
 	m_sceneObjects[1].model = Model::MakeCylinder(layout, 4.0f, 0.25f, 32);
 	m_sceneObjects[2].model = Model::MakeCylinder(layout, 6.0f, 0.25f, 32);

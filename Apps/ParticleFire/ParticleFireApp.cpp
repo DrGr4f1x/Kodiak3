@@ -131,10 +131,10 @@ void ParticleFireApp::InitPSOs()
 		vector<VertexElementDesc> vertexElements =
 		{
 			{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(ModelVertex, pos), InputClassification::PerVertexData, 0 },
-			{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(ModelVertex, uv), InputClassification::PerVertexData, 0 },
 			{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(ModelVertex, normal), InputClassification::PerVertexData, 0 },
 			{ "TANGENT", 0, Format::R32G32B32_Float, 0, offsetof(ModelVertex, tangent), InputClassification::PerVertexData, 0},
 			{ "BITANGENT", 0, Format::R32G32B32_Float, 0, offsetof(ModelVertex, bitangent), InputClassification::PerVertexData, 0},
+			{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(ModelVertex, uv), InputClassification::PerVertexData, 0 },
 		};
 
 		m_modelPSO.SetInputLayout(vertexStream, vertexElements);
@@ -185,14 +185,7 @@ void ParticleFireApp::LoadAssets()
 	m_particleFireTex = Texture::Load("particle_fire.ktx", Format::Unknown, true);
 	m_particleSmokeTex = Texture::Load("particle_smoke.ktx", Format::Unknown, true);
 
-	auto layout = VertexLayout(
-	{
-		VertexComponent::Position,
-		VertexComponent::UV,
-		VertexComponent::Normal,
-		VertexComponent::Tangent,
-		VertexComponent::Bitangent,
-	});
+	auto layout = VertexLayout<VertexComponent::Position | VertexComponent::Normal | VertexComponent::Tangent | VertexComponent::Bitangent | VertexComponent::Texcoord>();
 
 	m_model = Model::Load("fireplace.obj", layout, 10.0f, RemoveFlag(ModelLoad::StandardDefault, ModelLoad::FlipUVs));
 }

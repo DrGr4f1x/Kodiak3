@@ -98,15 +98,13 @@ void ContextManager::DestroyAllContexts()
 
 CommandContext::CommandContext(CommandListType type)
 	: m_type(type)
+	, m_cpuLinearAllocator()
 {}
 
 
 void CommandContext::DestroyAllContexts()
 {
-	// TODO
-#if 0
 	LinearAllocator::DestroyAll();
-#endif
 	g_contextManager.DestroyAllContexts();
 }
 
@@ -173,9 +171,7 @@ void CommandContext::Finish(bool waitForCompletion)
 	m_commandList = VK_NULL_HANDLE;
 
 	// Recycle dynamic allocations
-	//m_vertexBufferAllocator.CleanupUsedBuffers(fence);
-	//m_indexBufferAllocator.CleanupUsedBuffers(fence);
-	//m_constantBufferAllocator.CleanupUsedBuffers(fence);
+	m_cpuLinearAllocator.CleanupUsedPages(fenceValue);
 
 	if (waitForCompletion)
 	{

@@ -19,6 +19,7 @@
 #include "Graphics\RootSignature.h"
 
 #include "FluidEngine.h"
+#include "VolumeRenderer.h"
 #include "Voxelizer.h"
 
 
@@ -86,5 +87,6 @@ private:
 	Math::Matrix4 m_worldToGridMatrix;
 
 	FluidEngine m_fluidEngine;
+	VolumeRenderer m_volumeRenderer;
 	Voxelizer m_voxelizer;
 };

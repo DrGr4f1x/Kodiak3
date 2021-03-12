@@ -49,10 +49,10 @@ private:
 	struct ModelVertex
 	{
 		float pos[3];
-		float uv[2];
 		float normal[3];
 		float tangent[3];
 		float bitangent[3];
+		float uv[2];
 	};
 
 	struct ModelVSConstants

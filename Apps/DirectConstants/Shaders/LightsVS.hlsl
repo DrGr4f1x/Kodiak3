@@ -12,7 +12,7 @@ struct VSInput
 {
 	float3 position : POSITION;
 	float3 normal : NORMAL;
-	float3 color : COLOR;
+	float4 color : COLOR;
 };
 
 #define LIGHT_COUNT 6
@@ -53,7 +53,7 @@ VSOutput main(VSInput input)
 	VSOutput output = (VSOutput)0;
 
 	output.normal = input.normal;
-	output.color = input.color;
+	output.color = input.color.rgb;
 
 	float4x4 modelToProjection = mul(projectionMatrix, modelMatrix);
 	output.position = mul(modelToProjection, float4(input.position, 1.0f));

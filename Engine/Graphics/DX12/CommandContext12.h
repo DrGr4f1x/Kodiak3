@@ -211,6 +211,7 @@ public:
 	void SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer);
 	void SetVertexBuffer(uint32_t slot, const StructuredBuffer& vertexBuffer);
 	void SetVertexBuffers(uint32_t startSlot, uint32_t count, VertexBuffer vertexBuffers[]);
+	void SetDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, const void* data);
 
 	void Draw(uint32_t vertexCount, uint32_t vertexStartOffset = 0);
 	void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation = 0, int32_t baseVertexLocation = 0);
@@ -430,6 +431,24 @@ inline void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count
 		vbv[i] = vertexBuffers[i].GetVBV();
 	}
 	m_commandList->IASetVertexBuffers(startSlot, count, vbv.data());
+}
+
+
+inline void GraphicsContext::SetDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, const void* data)
+{
+	assert(data != nullptr && Math::IsAligned(data, 16));
+
+	size_t bufferSize = Math::AlignUp(numVertices * vertexStride, 16);
+	DynAlloc vb = m_cpuLinearAllocator.Allocate(bufferSize);
+
+	SIMDMemCopy(vb.dataPtr, data, bufferSize >> 4);
+
+	D3D12_VERTEX_BUFFER_VIEW vbv{};
+	vbv.BufferLocation = vb.gpuAddress;
+	vbv.SizeInBytes = (UINT)bufferSize;
+	vbv.StrideInBytes = (UINT)vertexStride;
+
+	m_commandList->IASetVertexBuffers(slot, 1, &vbv);
 }
 
 

@@ -236,12 +236,7 @@ void TextureCubeMapApp::LoadAssets()
 {
 	m_skyboxTex = Texture::Load("cubemap_yokohama_bc3_unorm.ktx");
 
-	auto layout = VertexLayout(
-	{
-		VertexComponent::Position,
-		VertexComponent::Normal,
-		VertexComponent::UV
-	});
+	auto layout = VertexLayout<VertexComponent::PositionNormalTexcoord>();
 
 	m_skyboxModel = Model::Load("cube.obj", layout, 0.05f);
 

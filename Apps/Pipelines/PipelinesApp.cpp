@@ -143,8 +143,8 @@ void PipelinesApp::InitPSOs()
 		{
 			{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
 			{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 },
-			{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 },
-			{ "COLOR", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 },
+			{ "COLOR", 0, Format::R32G32B32A32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 },
+			{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 }
 
 		};
 		m_phongPSO.SetInputLayout(vertexStream, vertexElements);
@@ -207,13 +207,7 @@ void PipelinesApp::UpdateConstantBuffer()
 
 void PipelinesApp::LoadAssets()
 {
-	auto layout = VertexLayout(
-		{
-			VertexComponent::Position,
-			VertexComponent::Normal,
-			VertexComponent::UV,
-			VertexComponent::Color
-		});
+	auto layout = VertexLayout<VertexComponent::PositionNormalColorTexcoord>();
 
 	m_model = Model::Load("treasure_smooth.dae", layout, 1.0f);
 }

@@ -273,6 +273,9 @@
     <ClInclude Include="Graphics\Material.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\VK\LinearAllocatorVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -441,6 +444,12 @@
     <ClCompile Include="Math\BoundingBox.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\InputLayout.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\LinearAllocatorVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -472,9 +481,6 @@
     </Filter>
     <Filter Include="Graphics\DX12\D3D12MemoryAllocator">
       <UniqueIdentifier>{087ccbbe-b36b-4ec1-877d-7aec93736c42}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Graphics\Geometry">
-      <UniqueIdentifier>{79caba74-dc86-4461-8bcf-b0e4de81e99f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

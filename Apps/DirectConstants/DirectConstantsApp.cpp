@@ -141,7 +141,7 @@ void DirectConstantsApp::InitPSO()
 	{
 		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
 		{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 },
-		{ "COLOR", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 },
+		{ "COLOR", 0, Format::R32G32B32A32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 },
 
 	};
 	m_PSO.SetInputLayout(vertexStream, vertexElements);
@@ -176,10 +176,6 @@ void DirectConstantsApp::UpdateConstantBuffer()
 
 void DirectConstantsApp::LoadAssets()
 {
-	auto layout = VertexLayout({
-		VertexComponent::Position,
-		VertexComponent::Normal,
-		VertexComponent::Color
-		});
+	auto layout = VertexLayout<VertexComponent::PositionNormalColor>();
 	m_model = Model::Load("samplescene.dae", layout, 0.35f);
 }

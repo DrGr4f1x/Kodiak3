@@ -12,8 +12,8 @@ struct VSInput
 {
 	float3 pos : POSITION;
 	float3 normal : NORMAL;
+	float4 color : COLOR;
 	float2 uv : TEXCOORD;
-	float3 color : COLOR;
 };
 
 
@@ -43,7 +43,7 @@ VSOutput main(VSInput input)
 
 	output.pos = mul(projectionMatrix, mul(modelMatrix, float4(input.pos, 1.0)));
 	output.uv = input.uv;
-	output.color = input.color;
+	output.color = input.color.rgb;
 
 	float4 pos = mul(modelMatrix, float4(input.pos, 1.0));
 	output.normal = mul((float3x3)modelMatrix, input.normal);

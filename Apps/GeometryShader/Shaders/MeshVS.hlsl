@@ -10,9 +10,9 @@
 
 struct VSInput
 {
-	float4 pos : POSITION;
+	float3 pos : POSITION;
 	float3 normal : NORMAL;
-	float3 color : COLOR;
+	float4 color : COLOR;
 };
 
 
@@ -38,9 +38,9 @@ VSOutput main(VSInput input)
 	VSOutput output = (VSOutput)0;
 
 	output.normal = mul((float3x3)modelMatrix, input.normal);
-	output.color = input.color;
+	output.color = input.color.rgb;
 
-	float4 pos = mul(modelMatrix, float4(input.pos.xyz, 1.0f));
+	float4 pos = mul(modelMatrix, float4(input.pos, 1.0f));
 
 	float3 lightPos = float3(1.0f, -1.0f, 1.0f);
 	output.lightVec = lightPos - pos.xyz;

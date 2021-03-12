@@ -24,8 +24,8 @@ struct VSInput
 	// Vertex attributes
 	float3 pos : POSITION;
 	float3 normal : NORMAL;
+	float4 color : COLOR;
 	float2 uv : TEXCOORD;
-	float3 color : COLOR;
 
 	// Instanced attributes
 	float3 instancePos : INSTANCED_POSITION;
@@ -50,7 +50,7 @@ VSOutput main(VSInput input)
 {
 	VSOutput output = (VSOutput)0;
 
-	output.color = input.color;
+	output.color = input.color.rgb;
 	output.uv = float3(input.uv, (float)input.instanceTexIndex);
 
 	// Rotate around x

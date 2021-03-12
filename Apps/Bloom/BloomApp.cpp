@@ -311,9 +311,9 @@ void BloomApp::InitPSOs()
 	vector<VertexElementDesc> vertexElements =
 	{
 		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
-		{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 },
-		{ "COLOR", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 },
-		{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 }
+		{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 },
+		{ "COLOR", 0, Format::R32G32B32A32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 },
+		{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 }
 	};
 	m_colorPassPSO.SetInputLayout(vertexStream, vertexElements);
 
@@ -410,13 +410,7 @@ void BloomApp::InitResourceSets()
 
 void BloomApp::LoadAssets()
 {
-	auto layout = VertexLayout(
-	{
-		VertexComponent::Position,
-		VertexComponent::UV,
-		VertexComponent::Color,
-		VertexComponent::Normal
-	});
+	auto layout = VertexLayout<VertexComponent::PositionNormalColorTexcoord>();
 	m_ufoModel = Model::Load("retroufo.dae", layout, 0.05f);
 	m_ufoGlowModel = Model::Load("retroufo_glow.dae", layout, 0.05f);
 	m_skyboxModel = Model::Load("cube.obj", layout, 1.0f);

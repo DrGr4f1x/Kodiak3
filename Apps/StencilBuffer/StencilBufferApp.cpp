@@ -152,8 +152,8 @@ void StencilBufferApp::InitPSOs()
 		vector<VertexElementDesc> vertexElements =
 		{
 			{ "POSITION", 0, Format::R32G32B32_Float, 0, 0, InputClassification::PerVertexData, 0 },
-			{ "COLOR", 0, Format::R32G32B32_Float, 0, 3 * sizeof(float), InputClassification::PerVertexData, 0 },
-			{ "NORMAL", 0, Format::R32G32B32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 }
+			{ "NORMAL", 0, Format::R32G32B32_Float, 0, 3 * sizeof(float), InputClassification::PerVertexData, 0 },
+			{ "COLOR", 0, Format::R32G32B32A32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 }
 		};
 		m_toonPSO.SetInputLayout(vertexStream, vertexElements);
 
@@ -190,8 +190,8 @@ void StencilBufferApp::InitPSOs()
 		vector<VertexElementDesc> vertexElements =
 		{
 			{ "POSITION", 0, Format::R32G32B32_Float, 0, 0, InputClassification::PerVertexData, 0 },
-			{ "COLOR", 0, Format::R32G32B32_Float, 0, 3 * sizeof(float), InputClassification::PerVertexData, 0 },
-			{ "NORMAL", 0, Format::R32G32B32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 }
+			{ "NORMAL", 0, Format::R32G32B32_Float, 0, 3 * sizeof(float), InputClassification::PerVertexData, 0 },
+			{ "COLOR", 0, Format::R32G32B32A32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 }
 		};
 		m_outlinePSO.SetInputLayout(vertexStream, vertexElements);
 
@@ -228,12 +228,7 @@ void StencilBufferApp::UpdateConstantBuffer()
 
 void StencilBufferApp::LoadAssets()
 {
-	auto layout = VertexLayout(
-	{
-		VertexComponent::Position,
-		VertexComponent::Color,
-		VertexComponent::Normal
-	});
+	auto layout = VertexLayout<VertexComponent::PositionNormalColor>();
 
 	m_model = Model::Load("venus.fbx", layout, 0.3f);
 }

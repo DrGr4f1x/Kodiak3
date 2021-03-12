@@ -233,6 +233,6 @@ void DisplacementApp::LoadAssets()
 {
 	m_texture = Texture::Load("stonefloor03_color_bc3_unorm.ktx");
 
-	auto layout = VertexLayout({ VertexComponent::Position, VertexComponent::Normal, VertexComponent::UV });
+	auto layout = VertexLayout<VertexComponent::PositionNormalTexcoord>();
 	m_model = Model::Load("plane.obj", layout, 0.25f);
 }

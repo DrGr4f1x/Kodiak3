@@ -103,7 +103,14 @@ void TriangleApp::Render()
 
 	context.SetResources(m_resources);
 
-	context.SetVertexBuffer(0, m_vertexBuffer);
+	vector<Vertex> vertexData =
+	{
+		{ { -1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } },
+		{ {  1.0f, -1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
+		{ {  0.0f,  1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } }
+	};
+	//context.SetVertexBuffer(0, m_vertexBuffer);
+	context.SetDynamicVB(0, 3, sizeof(Vertex), vertexData.data());
 	context.SetIndexBuffer(m_indexBuffer);
 
 	context.DrawIndexed((uint32_t)m_indexBuffer.GetElementCount());

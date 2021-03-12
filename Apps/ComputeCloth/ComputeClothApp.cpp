@@ -337,11 +337,7 @@ void ComputeClothApp::InitResourceSets()
 
 void ComputeClothApp::LoadAssets()
 {
-	auto layout = VertexLayout(
-	{
-		VertexComponent::Position,
-		VertexComponent::Normal
-	});
+	auto layout = VertexLayout<VertexComponent::PositionNormal>();
 	m_sphereModel = Model::Load("geosphere.obj", layout, m_sphereRadius * 0.05f);
 
 #if DX12

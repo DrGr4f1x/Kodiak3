@@ -174,12 +174,12 @@ void OcclusionQueryApp::InitPSOs()
 	m_solidPSO.SetPixelShader("MeshPS");
 
 	// Vertex inputs
-	VertexStreamDesc vertexStream{ 0, 9 * sizeof(float), InputClassification::PerVertexData };
+	VertexStreamDesc vertexStream{ 0, 10 * sizeof(float), InputClassification::PerVertexData };
 	vector<VertexElementDesc> vertexElements =
 	{
 		{ "POSITION", 0, Format::R32G32B32_Float, 0, 0, InputClassification::PerVertexData, 0 },
 		{ "NORMAL", 0, Format::R32G32B32_Float, 0, 3 * sizeof(float), InputClassification::PerVertexData, 0 },
-		{ "COLOR", 0, Format::R32G32B32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 }
+		{ "COLOR", 0, Format::R32G32B32A32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 }
 	};
 
 	m_solidPSO.SetInputLayout(vertexStream, vertexElements);
@@ -286,12 +286,7 @@ void OcclusionQueryApp::UpdateConstantBuffers()
 
 void OcclusionQueryApp::LoadAssets()
 {
-	auto layout = VertexLayout(
-	{
-		VertexComponent::Position,
-		VertexComponent::Normal,
-		VertexComponent::Color
-	});
+	auto layout = VertexLayout<VertexComponent::PositionNormalColor>();
 
 	m_occluderModel = Model::Load("plane_z.3ds", layout, 0.4f);
 	m_teapotModel = Model::Load("teapot.3ds", layout, 0.3f);

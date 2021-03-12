@@ -287,6 +287,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile12|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release12|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="VolumeRenderer.cpp" />
     <ClCompile Include="Voxelizer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -295,6 +296,7 @@
     <ClInclude Include="SmokeSimApp.h" />
     <ClInclude Include="SmokeSimUtils.h" />
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="VolumeRenderer.h" />
     <ClInclude Include="Voxelizer.h" />
   </ItemGroup>
   <ItemGroup>

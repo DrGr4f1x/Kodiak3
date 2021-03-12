@@ -20,6 +20,7 @@ namespace Kodiak
 
 // Forward declarations
 class GraphicsContext;
+class VertexLayoutBase;
 
 
 enum class ModelLoad
@@ -93,80 +94,6 @@ enum class ModelLoad
 };
 
 template <> struct EnableBitmaskOperators<ModelLoad> { static const bool enable = true; };
-
-
-enum class VertexComponent
-{
-	Position,
-	Normal,
-	Color,
-	UV,
-	Tangent,
-	Bitangent,
-	DummyFloat,
-	DummyVec4
-};
-
-
-struct VertexLayout
-{
-	VertexLayout(const std::vector<VertexComponent>& components) : components(components)
-	{}
-
-	uint32_t ComputeStride() const
-	{
-		uint32_t res = 0;
-
-		for (const auto& component : components)
-		{
-			switch (component)
-			{
-			case VertexComponent::UV:
-				res += 2 * sizeof(float);
-				break;
-			case VertexComponent::DummyFloat:
-				res += sizeof(float);
-				break;
-			case VertexComponent::DummyVec4:
-				res += 4 * sizeof(float);
-				break;
-			default:
-				res += 3 * sizeof(float);
-				break;
-			}
-		}
-
-		return res;
-	}
-
-	uint32_t ComputeNumFloats() const
-	{
-		uint32_t res = 0;
-
-		for (const auto& component : components)
-		{
-			switch (component)
-			{
-			case VertexComponent::UV:
-				res += 2;
-				break;
-			case VertexComponent::DummyFloat:
-				res += 1;
-				break;
-			case VertexComponent::DummyVec4:
-				res += 4;
-				break;
-			default:
-				res += 3;
-				break;
-			}
-		}
-
-		return res;
-	}
-
-	std::vector<VertexComponent> components;
-};
 
 
 struct MeshPart
@@ -245,12 +172,12 @@ public:
 	void Render(GraphicsContext& context);
 	void RenderPositionOnly(GraphicsContext& context);
 
-	static std::shared_ptr<Model> Load(const std::string& filename, const VertexLayout& layout, float scale = 1.0f, ModelLoad loadFlags = ModelLoad::StandardDefault);
+	static std::shared_ptr<Model> Load(const std::string& filename, const VertexLayoutBase& layout, float scale = 1.0f, ModelLoad loadFlags = ModelLoad::StandardDefault);
 
-	static std::shared_ptr<Model> MakePlane(const VertexLayout& layout, float width, float height);
-	static std::shared_ptr<Model> MakeCylinder(const VertexLayout& layout, float height, float radius, uint32_t numVerts);
-	static std::shared_ptr<Model> MakeSphere(const VertexLayout& layout, float radius, uint32_t numVerts, uint32_t numRings);
-	static std::shared_ptr<Model> MakeBox(const VertexLayout& layout, float width, float height, float depth);
+	static std::shared_ptr<Model> MakePlane(const VertexLayoutBase& layout, float width, float height);
+	static std::shared_ptr<Model> MakeCylinder(const VertexLayoutBase& layout, float height, float radius, uint32_t numVerts);
+	static std::shared_ptr<Model> MakeSphere(const VertexLayoutBase& layout, float radius, uint32_t numVerts, uint32_t numRings);
+	static std::shared_ptr<Model> MakeBox(const VertexLayoutBase& layout, float width, float height, float depth);
 
 protected:
 	std::string m_name;

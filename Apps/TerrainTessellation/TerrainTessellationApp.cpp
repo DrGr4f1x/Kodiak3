@@ -341,12 +341,7 @@ void TerrainTessellationApp::InitTerrain()
 
 void TerrainTessellationApp::LoadAssets()
 {
-	auto layout = VertexLayout(
-		{
-			VertexComponent::Position,
-			VertexComponent::Normal,
-			VertexComponent::UV
-		});
+	auto layout = VertexLayout<VertexComponent::PositionNormalTexcoord>();
 	m_skyModel = Model::Load("geosphere.obj", layout);
 	m_skyTexture = Texture::Load("skysphere_bc3_unorm.ktx");
 	m_terrainTextureArray = Texture::Load("terrain_texturearray_bc3_unorm.ktx");

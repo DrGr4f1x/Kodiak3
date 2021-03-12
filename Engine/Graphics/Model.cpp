@@ -14,6 +14,7 @@
 
 #include "Filesystem.h"
 #include "Graphics\CommandContext.h"
+#include "Graphics\InputLayout.h"
 
 #include <assimp/Importer.hpp> 
 #include <assimp/scene.h>     
@@ -164,7 +165,7 @@ void Model::RenderPositionOnly(GraphicsContext& context)
 }
 
 
-ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float scale, ModelLoad modelLoadFlags)
+ModelPtr Model::Load(const string& filename, const VertexLayoutBase& layout, float scale, ModelLoad modelLoadFlags)
 {
 	const string fullpath = Filesystem::GetInstance().GetFullPath(filename);
 	assert(!fullpath.empty());
@@ -187,6 +188,8 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 	vector<float> vertexData;
 	vector<float> vertexDataPositionOnly;
 	vector<uint32_t> indexData;
+
+	const VertexComponent components = layout.GetComponents();
 
 	// Min/max for bounding box computation
 	float maxF = std::numeric_limits<float>::max();
@@ -215,57 +218,57 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 			const aiVector3D* tangent = (aiMesh->HasTangentsAndBitangents()) ? &(aiMesh->mTangents[j]) : &zero;
 			const aiVector3D* bitangent = (aiMesh->HasTangentsAndBitangents()) ? &(aiMesh->mBitangents[j]) : &zero;
 
-			for (const auto& component : layout.components)
+			if (HasFlag(components, VertexComponent::Position))
 			{
-				switch (component)
-				{
-				case VertexComponent::Position:
-					vertexData.push_back(pos->x * scale);
-					vertexData.push_back(pos->y * scale);  // TODO: Is this a hack?
-					vertexData.push_back(pos->z * scale);
+				vertexData.push_back(pos->x * scale);
+				vertexData.push_back(pos->y * scale);  // TODO: Is this a hack?
+				vertexData.push_back(pos->z * scale);
 
-					vertexDataPositionOnly.push_back(pos->x * scale);
-					vertexDataPositionOnly.push_back(pos->y * scale);  // TODO: Is this a hack?
-					vertexDataPositionOnly.push_back(pos->z * scale);
+				vertexDataPositionOnly.push_back(pos->x * scale);
+				vertexDataPositionOnly.push_back(pos->y * scale);  // TODO: Is this a hack?
+				vertexDataPositionOnly.push_back(pos->z * scale);
 
-					UpdateExtents(minExtents, maxExtents, scale * Math::Vector3(pos->x, pos->y, pos->z));
-					break;
-				case VertexComponent::Normal:
-					vertexData.push_back(normal->x);
-					vertexData.push_back(normal->y); // TODO: Is this a hack?
-					vertexData.push_back(normal->z);
-					break;
-				case VertexComponent::UV:
-					vertexData.push_back(texCoord->x);
-					vertexData.push_back(texCoord->y);
-					break;
-				case VertexComponent::Color:
-					vertexData.push_back(color.r);
-					vertexData.push_back(color.g);
-					vertexData.push_back(color.b);
-					break;
-				case VertexComponent::Tangent:
-					vertexData.push_back(tangent->x);
-					vertexData.push_back(tangent->y);
-					vertexData.push_back(tangent->z);
-					break;
-				case VertexComponent::Bitangent:
-					vertexData.push_back(bitangent->x);
-					vertexData.push_back(bitangent->y);
-					vertexData.push_back(bitangent->z);
-					break;
-					// Dummy components for padding
-				case VertexComponent::DummyFloat:
-					vertexData.push_back(0.0f);
-					break;
-				case VertexComponent::DummyVec4:
-					vertexData.push_back(0.0f);
-					vertexData.push_back(0.0f);
-					vertexData.push_back(0.0f);
-					vertexData.push_back(0.0f);
-					break;
-				}
+				UpdateExtents(minExtents, maxExtents, scale * Math::Vector3(pos->x, pos->y, pos->z));
 			}
+
+			if (HasFlag(components, VertexComponent::Normal))
+			{
+				vertexData.push_back(normal->x);
+				vertexData.push_back(normal->y); // TODO: Is this a hack?
+				vertexData.push_back(normal->z);
+			}
+
+			if (HasFlag(components, VertexComponent::Tangent))
+			{
+				vertexData.push_back(tangent->x);
+				vertexData.push_back(tangent->y);
+				vertexData.push_back(tangent->z);
+			}
+
+			if (HasFlag(components, VertexComponent::Bitangent))
+			{
+				vertexData.push_back(bitangent->x);
+				vertexData.push_back(bitangent->y);
+				vertexData.push_back(bitangent->z);
+			}
+
+			if (HasFlag(components, VertexComponent::Color))
+			{
+				vertexData.push_back(color.r);
+				vertexData.push_back(color.g);
+				vertexData.push_back(color.b);
+				vertexData.push_back(1.0f);
+			}
+
+			// TODO Color1
+
+			if (HasFlag(components, VertexComponent::Texcoord))
+			{
+				vertexData.push_back(texCoord->x);
+				vertexData.push_back(texCoord->y);
+			}
+
+			// TODO Texcoord1-3, BlendIndices, BlendWeight
 		}
 
 		meshPart.vertexCount = aiMesh->mNumVertices;
@@ -283,7 +286,7 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 			indexCount += 3;
 		}
 
-		uint32_t stride = layout.ComputeStride();
+		uint32_t stride = layout.GetSizeInBytes();
 		mesh->m_vertexBuffer.Create("Model|VertexBuffer", sizeof(float) * vertexData.size() / stride, stride, false, vertexData.data());
 		stride = 3 * sizeof(float);
 		mesh->m_vertexBufferPositionOnly.Create("Model|VertexBuffer (Position Only)", sizeof(float) * vertexDataPositionOnly.size() / stride, stride, false, vertexDataPositionOnly.data());
@@ -298,16 +301,10 @@ ModelPtr Model::Load(const string& filename, const VertexLayout& layout, float s
 }
 
 
-shared_ptr<Model> Model::MakePlane(const VertexLayout& layout, float width, float height)
+shared_ptr<Model> Model::MakePlane(const VertexLayoutBase& layout, float width, float height)
 {
-	bool bHasNormals = false;
-	bool bHasUVs = false;
-	for (auto component : layout.components)
-	{
-		if (component == VertexComponent::Normal) bHasNormals = true;
-		if (component == VertexComponent::UV) bHasUVs = true;
-		if (bHasNormals && bHasUVs) break;
-	}
+	bool bHasNormals = HasFlag(layout.GetComponents(), VertexComponent::Normal);
+	bool bHasUVs = HasFlag(layout.GetComponents(), VertexComponent::Texcoord);
 
 	uint32_t stride = 3  * sizeof(float);
 	stride += bHasNormals ? (3 * sizeof(float)) : 0;
@@ -420,16 +417,10 @@ shared_ptr<Model> Model::MakePlane(const VertexLayout& layout, float width, floa
 }
 
 
-shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, float radius, uint32_t numVerts)
+shared_ptr<Model> Model::MakeCylinder(const VertexLayoutBase& layout, float height, float radius, uint32_t numVerts)
 {
-	bool bHasNormals = false;
-	bool bHasUVs = false;
-	for (auto component : layout.components)
-	{
-		if (component == VertexComponent::Normal) bHasNormals = true;
-		if (component == VertexComponent::UV) bHasUVs = true;
-		if (bHasNormals && bHasUVs) break;
-	}
+	bool bHasNormals = HasFlag(layout.GetComponents(), VertexComponent::Normal);
+	bool bHasUVs = HasFlag(layout.GetComponents(), VertexComponent::Texcoord);
 
 	uint32_t stride = 3 * sizeof(float);
 	stride += bHasNormals ? (3 * sizeof(float)) : 0;
@@ -655,16 +646,10 @@ shared_ptr<Model> Model::MakeCylinder(const VertexLayout& layout, float height, 
 }
 
 
-shared_ptr<Model> Model::MakeSphere(const VertexLayout& layout, float radius, uint32_t numVerts, uint32_t numRings)
+shared_ptr<Model> Model::MakeSphere(const VertexLayoutBase& layout, float radius, uint32_t numVerts, uint32_t numRings)
 {
-	bool bHasNormals = false;
-	bool bHasUVs = false;
-	for (auto component : layout.components)
-	{
-		if (component == VertexComponent::Normal) bHasNormals = true;
-		if (component == VertexComponent::UV) bHasUVs = true;
-		if (bHasNormals && bHasUVs) break;
-	}
+	bool bHasNormals = HasFlag(layout.GetComponents(), VertexComponent::Normal);
+	bool bHasUVs = HasFlag(layout.GetComponents(), VertexComponent::Texcoord);
 
 	uint32_t stride = 3 * sizeof(float);
 	stride += bHasNormals ? (3 * sizeof(float)) : 0;
@@ -752,17 +737,11 @@ shared_ptr<Model> Model::MakeSphere(const VertexLayout& layout, float radius, ui
 }
 
 
-shared_ptr<Model> Model::MakeBox(const VertexLayout& layout, float width, float height, float depth)
+shared_ptr<Model> Model::MakeBox(const VertexLayoutBase& layout, float width, float height, float depth)
 {
-	bool bHasNormals = false;
-	bool bHasUVs = false;
-	for (auto component : layout.components)
-	{
-		if (component == VertexComponent::Normal) bHasNormals = true;
-		if (component == VertexComponent::UV) bHasUVs = true;
-		if (bHasNormals && bHasUVs) break;
-	}
-
+	bool bHasNormals = HasFlag(layout.GetComponents(), VertexComponent::Normal);
+	bool bHasUVs = HasFlag(layout.GetComponents(), VertexComponent::Texcoord);
+	
 	uint32_t stride = 3 * sizeof(float);
 	stride += bHasNormals ? (3 * sizeof(float)) : 0;
 	stride += bHasUVs ? (2 * sizeof(float)) : 0;

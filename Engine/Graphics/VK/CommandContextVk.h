@@ -16,6 +16,7 @@
 #include "Graphics\Texture.h"
 
 #include "CommandListManagerVk.h"
+#include "LinearAllocatorVk.h"
 #include "ResourceSetVk.h"
 #include "UtilVk.h"
 
@@ -107,6 +108,8 @@ protected:
 	bool m_bInvertedViewport{ true };
 	bool m_hasPendingDebugEvent{ false };
 
+	LinearAllocator m_cpuLinearAllocator;
+
 private:
 	CommandContext(CommandListType type);
 
@@ -157,6 +160,7 @@ public:
 	void SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer);
 	void SetVertexBuffer(uint32_t slot, const StructuredBuffer& vertexBuffer);
 	void SetVertexBuffers(uint32_t startSlot, uint32_t count, VertexBuffer vertexBuffers[]);
+	void SetDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, const void* data);
 
 	void Draw(uint32_t vertexCount, uint32_t vertexStartOffset = 0);
 	void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation = 0, int32_t baseVertexLocation = 0);
@@ -451,6 +455,21 @@ inline void GraphicsContext::SetVertexBuffers(uint32_t startSlot, uint32_t count
 		buffers[i] = vertexBuffers[i].m_buffer->Get();
 	}
 	vkCmdBindVertexBuffers(m_commandList, startSlot, count, buffers.data(), offsets.data());
+}
+
+
+inline void GraphicsContext::SetDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, const void* data)
+{
+	assert(data != nullptr && Math::IsAligned(data, 16));
+
+	size_t bufferSize = Math::AlignUp(numVertices * vertexStride, 16);
+	DynAlloc vb = m_cpuLinearAllocator.Allocate(bufferSize);
+
+	SIMDMemCopy(vb.dataPtr, data, bufferSize >> 4);
+
+	VkDeviceSize offsets[1] = { 0 };
+	VkBuffer buffers[1] = { vb.buffer.m_buffer->Get() };
+	vkCmdBindVertexBuffers(m_commandList, slot, 1, buffers, offsets);
 }
 
 

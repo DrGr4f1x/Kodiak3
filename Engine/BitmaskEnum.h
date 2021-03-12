@@ -20,7 +20,7 @@ struct EnableBitmaskOperators
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, E>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, E>::type
 operator|(E lhs, E rhs)
 {
 	using underlying = std::underlying_type_t<E>;
@@ -29,7 +29,7 @@ operator|(E lhs, E rhs)
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, E>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, E>::type
 operator&(E lhs, E rhs)
 {
 	using underlying = std::underlying_type_t<E>;
@@ -38,7 +38,7 @@ operator&(E lhs, E rhs)
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, E>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, E>::type
 operator^(E lhs, E rhs)
 {
 	using underlying = std::underlying_type_t<E>;
@@ -47,7 +47,7 @@ operator^(E lhs, E rhs)
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, E&>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, E&>::type
 operator|=(E& lhs, E rhs)
 {
 	using underlying = std::underlying_type_t<E>;
@@ -57,7 +57,7 @@ operator|=(E& lhs, E rhs)
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, E&>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, E&>::type
 operator&=(E& lhs, E rhs)
 {
 	using underlying = std::underlying_type_t<E>;
@@ -67,7 +67,7 @@ operator&=(E& lhs, E rhs)
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, E&>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, E&>::type
 operator^=(E& lhs, E rhs)
 {
 	using underlying = std::underlying_type_t<E>;
@@ -77,7 +77,7 @@ operator^=(E& lhs, E rhs)
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
 operator==(E lhs, int rhs)
 {
 	return static_cast<int>(lhs) == rhs;
@@ -85,7 +85,7 @@ operator==(E lhs, int rhs)
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
 operator==(int lhs, E rhs)
 {
 	return lhs == static_cast<int>(rhs);
@@ -93,7 +93,7 @@ operator==(int lhs, E rhs)
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
 operator!=(E lhs, int rhs)
 {
 	return static_cast<int>(lhs) != rhs;
@@ -101,7 +101,7 @@ operator!=(E lhs, int rhs)
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
 operator!=(int lhs, E rhs)
 {
 	return lhs != static_cast<int>(rhs);
@@ -109,7 +109,7 @@ operator!=(int lhs, E rhs)
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
 HasFlag(E bitmask, E flag)
 {
 	using underlying = std::underlying_type_t<E>;
@@ -118,7 +118,7 @@ HasFlag(E bitmask, E flag)
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
 HasAnyFlag(E bitmask, E flags)
 {
 	return HasFlag(bitmask, flags);
@@ -126,7 +126,7 @@ HasAnyFlag(E bitmask, E flags)
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, bool>::type
 HasAllFlags(E bitmask, E flags)
 {
 	using underlying = std::underlying_type_t<E>;
@@ -135,7 +135,7 @@ HasAllFlags(E bitmask, E flags)
 
 
 template <typename E>
-typename std::enable_if<EnableBitmaskOperators<E>::enable, E>::type
+constexpr typename std::enable_if<EnableBitmaskOperators<E>::enable, E>::type
 RemoveFlag(E bitmask, E flag)
 {
 	using underlying = std::underlying_type_t<E>;
