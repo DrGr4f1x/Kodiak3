@@ -83,6 +83,11 @@ public:
 		return reinterpret_cast<ComputeContext&>(*this);
 	}
 
+	DynAlloc ReserveUploadMemory(size_t sizeInBytes)
+	{
+		return m_cpuLinearAllocator.Allocate(sizeInBytes);
+	}
+
 	static void InitializeTexture(Texture& dest, size_t numBytes, const void* initialData, uint32_t numBuffers, VkBufferImageCopy bufferCopies[]);
 	static void InitializeBuffer(GpuBuffer& dest, const void* initialData, size_t numBytes, bool useOffset = false, size_t offset = 0);
 
@@ -161,6 +166,9 @@ public:
 	void SetVertexBuffer(uint32_t slot, const StructuredBuffer& vertexBuffer);
 	void SetVertexBuffers(uint32_t startSlot, uint32_t count, VertexBuffer vertexBuffers[]);
 	void SetDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, const void* data);
+	void SetDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, DynAlloc vb);
+	void SetDynamicIB(size_t indexCount, bool bIndexSize16Bit, const void* data);
+	void SetDynamicIB(size_t indexCount, bool bIndexSize16Bit, DynAlloc ib);
 
 	void Draw(uint32_t vertexCount, uint32_t vertexStartOffset = 0);
 	void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation = 0, int32_t baseVertexLocation = 0);
@@ -462,14 +470,47 @@ inline void GraphicsContext::SetDynamicVB(uint32_t slot, size_t numVertices, siz
 {
 	assert(data != nullptr && Math::IsAligned(data, 16));
 
-	size_t bufferSize = Math::AlignUp(numVertices * vertexStride, 16);
+	const size_t bufferSize = Math::AlignUp(numVertices * vertexStride, 16);
 	DynAlloc vb = m_cpuLinearAllocator.Allocate(bufferSize);
 
 	SIMDMemCopy(vb.dataPtr, data, bufferSize >> 4);
 
-	VkDeviceSize offsets[1] = { 0 };
+	VkDeviceSize offsets[1] = { vb.offset };
 	VkBuffer buffers[1] = { vb.buffer.m_buffer->Get() };
 	vkCmdBindVertexBuffers(m_commandList, slot, 1, buffers, offsets);
+}
+
+
+inline void GraphicsContext::SetDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, DynAlloc vb)
+{
+	VkDeviceSize offsets[1] = { vb.offset };
+	VkBuffer buffers[1] = { vb.buffer.m_buffer->Get() };
+	vkCmdBindVertexBuffers(m_commandList, slot, 1, buffers, offsets);
+}
+
+
+inline void GraphicsContext::SetDynamicIB(size_t indexCount, bool bIndexSize16Bit, const void* data)
+{
+	assert(data != nullptr && Math::IsAligned(data, 16));
+
+	const size_t elementSize = bIndexSize16Bit ? sizeof(uint16_t) : sizeof(uint32_t);
+
+	const size_t bufferSize = Math::AlignUp(indexCount * elementSize, 16);
+	DynAlloc ib = m_cpuLinearAllocator.Allocate(bufferSize);
+
+	SIMDMemCopy(ib.dataPtr, data, bufferSize >> 4);
+
+	const VkIndexType indexType = bIndexSize16Bit ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32;
+	VkDeviceSize offset{ ib.offset };
+	vkCmdBindIndexBuffer(m_commandList, ib.buffer.m_buffer->Get(), offset, indexType);
+}
+
+
+inline void GraphicsContext::SetDynamicIB(size_t indexCount, bool bIndexSize16Bit, DynAlloc ib)
+{
+	const VkIndexType indexType = bIndexSize16Bit ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32;
+	VkDeviceSize offset{ ib.offset };
+	vkCmdBindIndexBuffer(m_commandList, ib.buffer.m_buffer->Get(), offset, indexType);
 }
 
 

@@ -55,44 +55,6 @@ void UIOverlay::Shutdown()
 void UIOverlay::Update()
 {
 	UpdateConstantBuffer();
-
-	ImDrawData* imDrawData = ImGui::GetDrawData();
-
-	if (!imDrawData)
-		return;
-
-	// Note: Alignment is done inside buffer creation
-	uint32_t vertexBufferSize = imDrawData->TotalVtxCount * sizeof(ImDrawVert);
-	uint32_t indexBufferSize = imDrawData->TotalIdxCount * sizeof(ImDrawIdx);
-
-	// Update buffers only if vertex or index count has been changed compared to current buffer size
-	if ((vertexBufferSize == 0) || (indexBufferSize == 0))
-		return;
-
-	if (m_vertexBuffer.GetSize() == 0 || (m_vertexCount != imDrawData->TotalVtxCount))
-	{
-		m_vertexBuffer.Create("UI Vertex Buffer", imDrawData->TotalVtxCount, sizeof(ImDrawVert), true);
-		m_vertexCount = imDrawData->TotalVtxCount;
-	}
-
-	if (m_indexBuffer.GetSize() == 0 || (m_indexCount != imDrawData->TotalIdxCount))
-	{
-		m_indexBuffer.Create("UI Index Buffer", imDrawData->TotalIdxCount, sizeof(ImDrawIdx), true);
-		m_indexCount = imDrawData->TotalIdxCount;
-	}
-
-	size_t indexOffset = 0;
-	size_t vertexOffset = 0;
-	for (int n = 0; n < imDrawData->CmdListsCount; n++) 
-	{
-		const ImDrawList* cmd_list = imDrawData->CmdLists[n];
-
-		m_indexBuffer.Update(cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), indexOffset, cmd_list->IdxBuffer.Data);
-		m_vertexBuffer.Update(cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), vertexOffset, cmd_list->VtxBuffer.Data);
-
-		indexOffset += cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx);
-		vertexOffset += cmd_list->VtxBuffer.Size * sizeof(ImDrawVert);
-	}
 }
 
 
@@ -112,8 +74,27 @@ void UIOverlay::Render(GraphicsContext& context)
 
 	context.SetResources(m_resources);
 
-	context.SetVertexBuffer(0, m_vertexBuffer);
-	context.SetIndexBuffer(m_indexBuffer);
+	// Gather dynamic vertices and indices
+	{
+		DynAlloc vb = context.ReserveUploadMemory(imDrawData->TotalVtxCount * sizeof(ImDrawVert));
+		DynAlloc ib = context.ReserveUploadMemory(imDrawData->TotalIdxCount * sizeof(ImDrawIdx));
+
+		ImDrawVert* vtxDst = (ImDrawVert*)vb.dataPtr;
+		ImDrawIdx* idxDst = (ImDrawIdx*)ib.dataPtr;
+
+		for (int i = 0; i < imDrawData->CmdListsCount; ++i)
+		{
+			const ImDrawList* cmd_list = imDrawData->CmdLists[i];
+			memcpy(vtxDst, cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.Size * sizeof(ImDrawVert));
+			memcpy(idxDst, cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx));
+			vtxDst += cmd_list->VtxBuffer.Size;
+			idxDst += cmd_list->IdxBuffer.Size;
+		}
+
+		context.SetDynamicVB(0, imDrawData->TotalVtxCount, sizeof(ImDrawVert), vb);
+		const bool bIndexSize16Bit = sizeof(ImDrawIdx) == sizeof(uint16_t);
+		context.SetDynamicIB(imDrawData->TotalIdxCount, bIndexSize16Bit, ib);
+	}
 
 	ImGuiIO& io = ImGui::GetIO();
 

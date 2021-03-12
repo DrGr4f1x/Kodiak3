@@ -212,6 +212,9 @@ public:
 	void SetVertexBuffer(uint32_t slot, const StructuredBuffer& vertexBuffer);
 	void SetVertexBuffers(uint32_t startSlot, uint32_t count, VertexBuffer vertexBuffers[]);
 	void SetDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, const void* data);
+	void SetDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, DynAlloc vb);
+	void SetDynamicIB(size_t indexCount, bool bIndexSize16Bit, const void* data);
+	void SetDynamicIB(size_t indexCount, bool bIndexSize16Bit, DynAlloc ib);
 
 	void Draw(uint32_t vertexCount, uint32_t vertexStartOffset = 0);
 	void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation = 0, int32_t baseVertexLocation = 0);
@@ -438,7 +441,7 @@ inline void GraphicsContext::SetDynamicVB(uint32_t slot, size_t numVertices, siz
 {
 	assert(data != nullptr && Math::IsAligned(data, 16));
 
-	size_t bufferSize = Math::AlignUp(numVertices * vertexStride, 16);
+	const size_t bufferSize = Math::AlignUp(numVertices * vertexStride, 16);
 	DynAlloc vb = m_cpuLinearAllocator.Allocate(bufferSize);
 
 	SIMDMemCopy(vb.dataPtr, data, bufferSize >> 4);
@@ -449,6 +452,54 @@ inline void GraphicsContext::SetDynamicVB(uint32_t slot, size_t numVertices, siz
 	vbv.StrideInBytes = (UINT)vertexStride;
 
 	m_commandList->IASetVertexBuffers(slot, 1, &vbv);
+}
+
+
+inline void GraphicsContext::SetDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, DynAlloc vb)
+{
+	const size_t bufferSize = Math::AlignUp(numVertices * vertexStride, 16);
+
+	D3D12_VERTEX_BUFFER_VIEW vbv{};
+	vbv.BufferLocation = vb.gpuAddress;
+	vbv.SizeInBytes = (UINT)bufferSize;
+	vbv.StrideInBytes = (UINT)vertexStride;
+
+	m_commandList->IASetVertexBuffers(slot, 1, &vbv);
+}
+
+
+inline void GraphicsContext::SetDynamicIB(size_t indexCount, bool bIndexSize16Bit, const void* data)
+{
+	assert(data != nullptr && Math::IsAligned(data, 16));
+
+	const size_t elementSize = bIndexSize16Bit ? sizeof(uint16_t) : sizeof(uint32_t);
+
+	const size_t bufferSize = Math::AlignUp(indexCount * elementSize, 16);
+	DynAlloc ib = m_cpuLinearAllocator.Allocate(bufferSize);
+
+	SIMDMemCopy(ib.dataPtr, data, bufferSize >> 4);
+
+	D3D12_INDEX_BUFFER_VIEW ibv{};
+	ibv.BufferLocation = ib.gpuAddress;
+	ibv.SizeInBytes = (UINT)(indexCount * elementSize);
+	ibv.Format = bIndexSize16Bit ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
+
+	m_commandList->IASetIndexBuffer(&ibv);
+}
+
+
+inline void GraphicsContext::SetDynamicIB(size_t indexCount, bool bIndexSize16Bit, DynAlloc ib)
+{
+	const size_t elementSize = bIndexSize16Bit ? sizeof(uint16_t) : sizeof(uint32_t);
+
+	const size_t bufferSize = Math::AlignUp(indexCount * elementSize, 16);
+
+	D3D12_INDEX_BUFFER_VIEW ibv{};
+	ibv.BufferLocation = ib.gpuAddress;
+	ibv.SizeInBytes = (UINT)(indexCount * elementSize);
+	ibv.Format = bIndexSize16Bit ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
+
+	m_commandList->IASetIndexBuffer(&ibv);
 }
 
 

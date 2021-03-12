@@ -68,11 +68,6 @@ protected:
 		Math::Matrix4 projectionMatrix;
 	};
 
-	IndexBuffer		m_indexBuffer;
-	VertexBuffer	m_vertexBuffer;
-	uint32_t		m_indexCount{ 0 };
-	uint32_t		m_vertexCount{ 0 };
-
 	RootSignature	m_rootSig;
 	GraphicsPSO		m_pso;
 
