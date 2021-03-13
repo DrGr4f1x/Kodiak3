@@ -10,6 +10,9 @@
 
 #pragma once
 
+#include "DescriptorSetVk.h"
+
+
 namespace Kodiak
 {
 
@@ -46,19 +49,7 @@ public:
 	void SetDynamicOffset(int rootIndex, uint32_t offset);
 
 private:
-	struct ResourceTable
-	{
-		VkDescriptorSet descriptorSet{ VK_NULL_HANDLE };
-		std::vector<VkWriteDescriptorSet> writeDescriptorSets;
-		int rootIndex{ -1 };
-		bool isDynamicCBV{ false };
-	};
-	std::array<ResourceTable, 8> m_resourceTables;
-	std::array<uint32_t, 8> m_dynamicOffsets;
-	VkDescriptorSet m_staticSamplers{ VK_NULL_HANDLE };
-	int m_staticSamplerIndex{ -1 };
-
-	const RootSignature* m_rootSig{ nullptr };
+	std::array<DescriptorSet, 8> m_descriptorSets;
 };
 
 } // namespace Kodiak

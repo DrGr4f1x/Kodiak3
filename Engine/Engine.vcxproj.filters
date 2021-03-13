@@ -276,6 +276,15 @@
     <ClInclude Include="Graphics\VK\LinearAllocatorVk.h">
       <Filter>Graphics\VK</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\DX12\DynamicMemoryManager12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX12\DescriptorSet12.h">
+      <Filter>Graphics\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VK\DescriptorSetVk.h">
+      <Filter>Graphics\VK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -448,6 +457,12 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\VK\LinearAllocatorVk.cpp">
+      <Filter>Graphics\VK</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX12\DescriptorSet12.cpp">
+      <Filter>Graphics\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VK\DescriptorSetVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
   </ItemGroup>

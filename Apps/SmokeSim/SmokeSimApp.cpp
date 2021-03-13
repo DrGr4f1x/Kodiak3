@@ -316,7 +316,7 @@ void SmokeSimApp::RenderScene(GraphicsContext& context)
 	context.SetRootSignature(m_meshRootSig);
 	context.SetPrimitiveTopology(PrimitiveTopology::TriangleStrip);
 
-	for (const auto& obj : m_sceneObjects)
+	for (auto& obj : m_sceneObjects)
 	{
 		context.SetResources(obj.resources);
 		context.SetPipelineState(obj.objectPSO);

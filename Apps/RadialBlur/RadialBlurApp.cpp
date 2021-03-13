@@ -177,8 +177,8 @@ void RadialBlurApp::InitPSOs()
 	vector<VertexElementDesc> vertexElements =
 	{
 		{ "POSITION", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, position), InputClassification::PerVertexData, 0 },
-		{ "COLOR", 0, Format::R32G32B32A32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 },
 		{ "NORMAL", 0, Format::R32G32B32_Float, 0, offsetof(Vertex, normal), InputClassification::PerVertexData, 0 },
+		{ "COLOR", 0, Format::R32G32B32A32_Float, 0, offsetof(Vertex, color), InputClassification::PerVertexData, 0 },
 		{ "TEXCOORD", 0, Format::R32G32_Float, 0, offsetof(Vertex, uv), InputClassification::PerVertexData, 0 }
 	};
 	m_phongPassPSO.SetInputLayout(vertexStream, vertexElements);

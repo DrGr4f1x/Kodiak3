@@ -19,6 +19,7 @@
 #include "Graphics\Texture.h"
 
 #include "CommandListManager12.h"
+#include "DescriptorSet12.h"
 #include "DynamicDescriptorHeap12.h"
 #include "LinearAllocator12.h"
 #include "ResourceSet12.h"
@@ -205,7 +206,8 @@ public:
 
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset);
-	void SetResources(const ResourceSet& resources);
+	void SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet);
+	void SetResources(ResourceSet& resources);
 
 	void SetIndexBuffer(const IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer);
@@ -236,7 +238,8 @@ public:
 	
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset);
-	void SetResources(const ResourceSet& resources);
+	void SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet);
+	void SetResources(ResourceSet& resources);
 
 	void Dispatch(uint32_t groupCountX = 1, uint32_t groupCountY = 1, uint32_t groupCountZ = 1);
 	void Dispatch1D(uint32_t threadCountX, uint32_t groupSizeX = 64);
@@ -374,7 +377,28 @@ inline void GraphicsContext::SetConstantArray(uint32_t rootIndex, uint32_t numCo
 }
 
 
-inline void GraphicsContext::SetResources(const ResourceSet& resources)
+inline void GraphicsContext::SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet)
+{
+	if (!descriptorSet.IsInitialized())
+		return;
+
+	if (descriptorSet.IsDirty())
+		descriptorSet.Update();
+
+	if (descriptorSet.m_gpuDescriptor.ptr != D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_commandList->SetGraphicsRootDescriptorTable((UINT)rootIndex, descriptorSet.m_gpuDescriptor);
+	}
+	else if (descriptorSet.m_gpuAddress != D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_commandList->SetGraphicsRootConstantBufferView(
+			(UINT)rootIndex,
+			descriptorSet.m_gpuAddress + descriptorSet.m_dynamicOffset);
+	}
+}
+
+
+inline void GraphicsContext::SetResources(ResourceSet& resources)
 {
 	ID3D12DescriptorHeap* heaps[] = {
 		g_userDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].GetHeapPointer(),
@@ -384,24 +408,7 @@ inline void GraphicsContext::SetResources(const ResourceSet& resources)
 
 	for (uint32_t i = 0; i < 8; ++i)
 	{
-		int rootIndex = resources.m_resourceTables[i].rootIndex;
-		if (rootIndex == -1)
-			break;
-
-		const auto& resourceTable = resources.m_resourceTables[i];
-
-		if (resourceTable.gpuDescriptor.ptr != D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
-		{
-			m_commandList->SetGraphicsRootDescriptorTable(
-				(UINT)rootIndex, 
-				resourceTable.gpuDescriptor);
-		}
-		else if (resourceTable.gpuAddress != D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
-		{
-			m_commandList->SetGraphicsRootConstantBufferView(
-				(UINT)rootIndex, 
-				resourceTable.gpuAddress + resources.m_dynamicOffsets[rootIndex]);
-		}
+		SetDescriptorSet(i, resources.m_descriptorSets[i]);
 	}
 }
 
@@ -579,7 +586,28 @@ inline void ComputeContext::SetConstantArray(uint32_t rootIndex, uint32_t numCon
 }
 
 
-inline void ComputeContext::SetResources(const ResourceSet& resources)
+inline void ComputeContext::SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet)
+{
+	if (!descriptorSet.IsInitialized())
+		return;
+
+	if (descriptorSet.IsDirty())
+		descriptorSet.Update();
+
+	if (descriptorSet.m_gpuDescriptor.ptr != D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_commandList->SetComputeRootDescriptorTable((UINT)rootIndex, descriptorSet.m_gpuDescriptor);
+	}
+	else if (descriptorSet.m_gpuAddress != D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	{
+		m_commandList->SetComputeRootConstantBufferView(
+			(UINT)rootIndex,
+			descriptorSet.m_gpuAddress + descriptorSet.m_dynamicOffset);
+	}
+}
+
+
+inline void ComputeContext::SetResources(ResourceSet& resources)
 {
 	D3D12_DESCRIPTOR_HEAP_TYPE heapTypes[] =
 	{
@@ -595,10 +623,7 @@ inline void ComputeContext::SetResources(const ResourceSet& resources)
 
 	for (uint32_t i = 0; i < 8; ++i)
 	{
-		if (resources.m_resourceTables[i].descriptors.empty())
-			break;
-
-		m_commandList->SetComputeRootDescriptorTable(i, resources.m_resourceTables[i].gpuDescriptor);
+		SetDescriptorSet(i, resources.m_descriptorSets[i]);
 	}
 }
 

@@ -162,7 +162,9 @@ protected:
 
 class RootSignature
 {
+	friend class ComputeContext;
 	friend class DynamicDescriptorPool;
+	friend class GraphicsContext;
 
 public:
 	RootSignature(uint32_t numRootParams = 0, uint32_t numStaticSamplers = 0) : m_numParameters(numRootParams)

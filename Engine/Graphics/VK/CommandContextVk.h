@@ -159,7 +159,8 @@ public:
 	
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset);
-	void SetResources(const ResourceSet& resources);	
+	void SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet);
+	void SetResources(ResourceSet& resources);	
 
 	void SetIndexBuffer(const IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer);
@@ -190,7 +191,8 @@ public:
 	
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset);
-	void SetResources(const ResourceSet& resources);
+	void SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet);
+	void SetResources(ResourceSet& resources);
 
 	void Dispatch(uint32_t groupCountX = 1, uint32_t groupCountY = 1, uint32_t groupCountZ = 1);
 	void Dispatch1D(uint32_t threadCountX, uint32_t groupSizeX = 64);
@@ -392,40 +394,34 @@ inline void GraphicsContext::SetConstantArray(uint32_t rootIndex, uint32_t numCo
 }
 
 
-inline void GraphicsContext::SetResources(const ResourceSet& resources)
+inline void GraphicsContext::SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet)
 {
-	uint32_t i = 0;
-	for (i = 0; i < 8; ++i)
+	if (!descriptorSet.IsInitialized())
+		return;
+
+	if (descriptorSet.IsDirty())
+		descriptorSet.Update();
+
+	if (descriptorSet.m_descriptorSet == VK_NULL_HANDLE)
+		return;
+
+	vkCmdBindDescriptorSets(
+		m_commandList,
+		VK_PIPELINE_BIND_POINT_GRAPHICS,
+		m_curGraphicsPipelineLayout,
+		rootIndex,
+		1,
+		&descriptorSet.m_descriptorSet,
+		descriptorSet.m_isDynamicCBV ? 1 : 0,
+		descriptorSet.m_isDynamicCBV ? &descriptorSet.m_dynamicOffset : nullptr);
+}
+
+
+inline void GraphicsContext::SetResources(ResourceSet& resources)
+{
+	for (uint32_t i = 0; i < 8; ++i)
 	{
-		int rootIndex = resources.m_resourceTables[i].rootIndex;
-		if (rootIndex == -1)
-			break;
-
-		if (resources.m_resourceTables[i].descriptorSet == VK_NULL_HANDLE)
-			continue;
-
-		vkCmdBindDescriptorSets(
-			m_commandList, 
-			VK_PIPELINE_BIND_POINT_GRAPHICS, 
-			m_curGraphicsPipelineLayout, 
-			(uint32_t)rootIndex, 
-			1, 
-			&resources.m_resourceTables[i].descriptorSet, 
-			resources.m_resourceTables[i].isDynamicCBV ? 1 : 0,
-			resources.m_resourceTables[i].isDynamicCBV ? &resources.m_dynamicOffsets[i] : nullptr);
-	}
-
-	if (resources.m_staticSamplers != VK_NULL_HANDLE)
-	{
-		vkCmdBindDescriptorSets(
-			m_commandList,
-			VK_PIPELINE_BIND_POINT_GRAPHICS,
-			m_curGraphicsPipelineLayout,
-			(uint32_t)resources.m_staticSamplerIndex,
-			1,
-			&resources.m_staticSamplers,
-			0,
-			nullptr);
+		SetDescriptorSet(i, resources.m_descriptorSets[i]);
 	}
 }
 
@@ -580,7 +576,7 @@ inline void ComputeContext::SetConstantArray(uint32_t rootIndex, uint32_t numCon
 {
 	vkCmdPushConstants(
 		m_commandList,
-		m_curGraphicsPipelineLayout,
+		m_curComputePipelineLayout,
 		VK_SHADER_STAGE_COMPUTE_BIT,
 		0,
 		numConstants * sizeof(DWORD),
@@ -592,7 +588,7 @@ inline void ComputeContext::SetConstantArray(uint32_t rootIndex, uint32_t numCon
 {
 	vkCmdPushConstants(
 		m_commandList,
-		m_curGraphicsPipelineLayout,
+		m_curComputePipelineLayout,
 		VK_SHADER_STAGE_COMPUTE_BIT,
 		offset * sizeof(DWORD),
 		numConstants * sizeof(DWORD),
@@ -600,36 +596,34 @@ inline void ComputeContext::SetConstantArray(uint32_t rootIndex, uint32_t numCon
 }
 
 
-inline void ComputeContext::SetResources(const ResourceSet& resources)
+inline void ComputeContext::SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet)
 {
-	uint32_t i = 0;
-	for (i = 0; i < 8; ++i)
-	{
-		if (resources.m_resourceTables[i].descriptorSet == VK_NULL_HANDLE)
-			break;
+	if (!descriptorSet.IsInitialized())
+		return;
 
-		vkCmdBindDescriptorSets(
-			m_commandList,
-			VK_PIPELINE_BIND_POINT_COMPUTE,
-			m_curComputePipelineLayout,
-			i,
-			1,
-			&resources.m_resourceTables[i].descriptorSet,
-			0,
-			nullptr);
-	}
+	if (descriptorSet.IsDirty())
+		descriptorSet.Update();
 
-	if (resources.m_staticSamplers != VK_NULL_HANDLE)
+	if (descriptorSet.m_descriptorSet == VK_NULL_HANDLE)
+		return;
+
+	vkCmdBindDescriptorSets(
+		m_commandList,
+		VK_PIPELINE_BIND_POINT_COMPUTE,
+		m_curComputePipelineLayout,
+		rootIndex,
+		1,
+		&descriptorSet.m_descriptorSet,
+		descriptorSet.m_isDynamicCBV ? 1 : 0,
+		descriptorSet.m_isDynamicCBV ? &descriptorSet.m_dynamicOffset : nullptr);
+}
+
+
+inline void ComputeContext::SetResources(ResourceSet& resources)
+{
+	for (uint32_t i = 0; i < 8; ++i)
 	{
-		vkCmdBindDescriptorSets(
-			m_commandList,
-			VK_PIPELINE_BIND_POINT_COMPUTE,
-			m_curGraphicsPipelineLayout,
-			i,
-			1,
-			&resources.m_staticSamplers,
-			0,
-			nullptr);
+		SetDescriptorSet(i, resources.m_descriptorSets[i]);
 	}
 }
 

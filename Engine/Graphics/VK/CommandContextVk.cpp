@@ -126,6 +126,8 @@ CommandContext& CommandContext::Begin(const string ID)
 	beginInfo.flags = 0;
 	beginInfo.pInheritanceInfo = nullptr;
 
+	newContext->m_bInvertedViewport = true;
+
 	vkBeginCommandBuffer(newContext->m_commandList, &beginInfo);
 
 #if ENABLE_VULKAN_DEBUG_MARKUP
@@ -554,6 +556,19 @@ void GraphicsContext::SetRootSignature(const RootSignature& rootSig)
 	{
 		m_shaderStages[i] = VK_SHADER_STAGE_ALL;
 	}
+
+	if (rootSig.m_staticSamplerSet != VK_NULL_HANDLE)
+	{
+		vkCmdBindDescriptorSets(
+			m_commandList,
+			VK_PIPELINE_BIND_POINT_GRAPHICS,
+			m_curGraphicsPipelineLayout,
+			(uint32_t)rootSig.m_staticSamplerSetIndex,
+			1,
+			&rootSig.m_staticSamplerSet,
+			0,
+			nullptr);
+	}
 }
 
 
@@ -614,6 +629,19 @@ void ComputeContext::SetRootSignature(const RootSignature& rootSig)
 	for (uint32_t i = 0; i < 8; ++i)
 	{
 		m_shaderStages[i] = VK_SHADER_STAGE_COMPUTE_BIT;
+	}
+
+	if (rootSig.m_staticSamplerSet != VK_NULL_HANDLE)
+	{
+		vkCmdBindDescriptorSets(
+			m_commandList,
+			VK_PIPELINE_BIND_POINT_COMPUTE,
+			m_curGraphicsPipelineLayout,
+			(uint32_t)rootSig.m_staticSamplerSetIndex,
+			1,
+			&rootSig.m_staticSamplerSet,
+			0,
+			nullptr);
 	}
 }
 

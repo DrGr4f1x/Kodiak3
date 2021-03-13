@@ -275,6 +275,7 @@ void RootSignature::Finalize(const string& name, RootSignatureFlags flags)
 		{
 			hashCode = Utility::HashState(&binding, 1, hashCode);
 		}
+		hashCode = Utility::HashState(&parameter.m_pushConstantRange, 1, hashCode);
 	}
 
 	VkPipelineLayout* layoutRef = nullptr;

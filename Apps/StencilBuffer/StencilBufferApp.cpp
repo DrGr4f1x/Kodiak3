@@ -148,7 +148,7 @@ void StencilBufferApp::InitPSOs()
 		m_toonPSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
 		// Vertex inputs
-		VertexStreamDesc vertexStream{ 0, 9 * sizeof(float), InputClassification::PerVertexData };
+		VertexStreamDesc vertexStream{ 0, 10  * sizeof(float), InputClassification::PerVertexData };
 		vector<VertexElementDesc> vertexElements =
 		{
 			{ "POSITION", 0, Format::R32G32B32_Float, 0, 0, InputClassification::PerVertexData, 0 },
@@ -186,7 +186,7 @@ void StencilBufferApp::InitPSOs()
 		m_outlinePSO.SetPrimitiveTopology(PrimitiveTopology::TriangleList);
 
 		// Vertex inputs
-		VertexStreamDesc vertexStream{ 0, 9 * sizeof(float), InputClassification::PerVertexData };
+		VertexStreamDesc vertexStream{ 0, 10 * sizeof(float), InputClassification::PerVertexData };
 		vector<VertexElementDesc> vertexElements =
 		{
 			{ "POSITION", 0, Format::R32G32B32_Float, 0, 0, InputClassification::PerVertexData, 0 },

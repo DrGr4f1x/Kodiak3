@@ -10,6 +10,9 @@
 
 #pragma once
 
+#include "DescriptorSet12.h"
+
+
 namespace Kodiak
 {
 
@@ -45,19 +48,7 @@ public:
 	void SetDynamicOffset(int rootIndex, uint32_t offset);
 
 private:
-	struct ResourceTable
-	{
-		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> descriptors;
-		D3D12_GPU_DESCRIPTOR_HANDLE gpuDescriptor{ D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN };
-		uint64_t gpuAddress{ D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN };
-		int rootIndex{ -1 };
-		bool isSamplerTable{ false };
-		bool isRootCBV{ false };
-	};
-	std::array<ResourceTable, 8> m_resourceTables;
-	std::array<uint32_t, 8> m_dynamicOffsets;
-
-	const RootSignature* m_rootSig{ nullptr };
+	std::array<DescriptorSet, 8> m_descriptorSets;
 };
 
 } // namespace Kodiak

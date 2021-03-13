@@ -191,14 +191,14 @@ void InstancingApp::InitPSOs()
 
 		// Vertex inputs
 		vector<VertexStreamDesc> vertexStreams = {
-			{ 0, 11 * sizeof(float), InputClassification::PerVertexData },
+			{ 0, 12 * sizeof(float), InputClassification::PerVertexData },
 			{ 1, 8 * sizeof(float), InputClassification::PerInstanceData }
 		};
 		vector<VertexElementDesc> vertexElements =
 		{
 			{ "POSITION", 0, Format::R32G32B32_Float, 0, 0, InputClassification::PerVertexData, 0 },
 			{ "NORMAL", 0, Format::R32G32B32_Float, 0, 3 * sizeof(float), InputClassification::PerVertexData, 0 },
-			{ "COLOR", 0, Format::R32G32B32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 },
+			{ "COLOR", 0, Format::R32G32B32A32_Float, 0, 6 * sizeof(float), InputClassification::PerVertexData, 0 },
 			{ "TEXCOORD", 0, Format::R32G32_Float, 0, 10 * sizeof(float), InputClassification::PerVertexData, 0 },
 
 			{ "INSTANCED_POSITION", 0, Format::R32G32B32_Float, 1, 0, InputClassification::PerInstanceData, 1 },
@@ -229,7 +229,7 @@ void InstancingApp::InitPSOs()
 		m_planetPSO.SetPixelShader("StarfieldPS");
 
 		// Vertex inputs
-		VertexStreamDesc vertexStream{ 0, 11 * sizeof(float), InputClassification::PerVertexData };
+		VertexStreamDesc vertexStream{ 0, 12 * sizeof(float), InputClassification::PerVertexData };
 		vector<VertexElementDesc> vertexElements =
 		{
 			{ "POSITION", 0, Format::R32G32B32_Float, 0, 0, InputClassification::PerVertexData, 0 },

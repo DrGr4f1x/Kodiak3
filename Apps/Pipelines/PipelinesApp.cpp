@@ -90,6 +90,7 @@ void PipelinesApp::Render()
 
 	// Left : solid color
 	{
+		ScopedDrawEvent event(context, "Left: solid color");
 		context.SetViewport(0.0f, 0.0f, (float)m_displayWidth / 3.0f, (float)m_displayHeight);
 		context.SetPipelineState(m_phongPSO);
 		m_model->Render(context);
@@ -97,6 +98,7 @@ void PipelinesApp::Render()
 
 	// Middle : toon shading
 	{
+		ScopedDrawEvent event(context, "Middle: toon shading");
 		context.SetViewport((float)m_displayWidth / 3.0f, 0.0f, (float)m_displayWidth / 3.0f, (float)m_displayHeight);
 		context.SetPipelineState(m_toonPSO);
 		m_model->Render(context);
@@ -105,11 +107,13 @@ void PipelinesApp::Render()
 	// Right : wireframe
 	if (g_enabledFeatures.fillModeNonSolid)
 	{
+		ScopedDrawEvent event(context, "Right: wireframe");
 		context.SetViewport(2.0f * (float)m_displayWidth / 3.0f, 0, (float)m_displayWidth / 3.0f, (float)m_displayHeight);
 		context.SetPipelineState(m_wireframePSO);
 		m_model->Render(context);
 	}
 
+	RenderGrid(context);
 	RenderUI(context);
 
 	context.EndRenderPass();
