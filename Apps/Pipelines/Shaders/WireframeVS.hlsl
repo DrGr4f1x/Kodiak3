@@ -10,8 +10,10 @@
 
 struct VSInput
 {
-	[[vk::location(0)]] float3 pos : POSITION;
-	[[vk::location(3)]] float4 color : COLOR;
+	float3 pos : POSITION;
+	float3 normal : NORMAL;
+	float4 color : COLOR;
+	float2 uv : TEXCOORD;
 };
 
 

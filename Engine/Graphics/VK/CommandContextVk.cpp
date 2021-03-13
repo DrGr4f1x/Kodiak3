@@ -580,10 +580,13 @@ void GraphicsContext::SetInvertedViewport(bool bInverted)
 
 void GraphicsContext::SetViewport(float x, float y, float w, float h, float minDepth, float maxDepth)
 {
+	const float vp_y = m_bInvertedViewport ? h : y;
+	const float vp_h = m_bInvertedViewport ? -h : h;
+
 	VkViewport viewport = {};
 	viewport.x = x;
-	viewport.y = y;
-	viewport.height = (m_bInvertedViewport ? -1.0f : 1.0f) * h;
+	viewport.y = vp_y;
+	viewport.height = vp_h;
 	viewport.width = w;
 	viewport.minDepth = minDepth;
 	viewport.maxDepth = maxDepth;
@@ -604,7 +607,10 @@ void GraphicsContext::SetScissor(uint32_t left, uint32_t top, uint32_t right, ui
 
 void GraphicsContext::SetViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 {
-	VkViewport vp{ (float)x, (float)h, (float)w, (m_bInvertedViewport ? -1.0f : 1.0f) * (float)h, 0.0f, 1.0f };
+	const float vp_y = m_bInvertedViewport ? float(h) : float(y);
+	const float vp_h = m_bInvertedViewport ? -float(h) : float(h);
+
+	VkViewport vp{ (float)x, vp_y, (float)w, vp_h, 0.0f, 1.0f };
 	VkRect2D rect;
 	rect.extent.width = w;
 	rect.extent.height = h;
