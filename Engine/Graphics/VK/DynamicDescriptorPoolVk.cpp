@@ -53,7 +53,6 @@ void DynamicDescriptorSet::Init(const RootSignature& rootSig, int rootParam)
 
 void DynamicDescriptorSet::Invalidate()
 {
-	m_descriptorSet = VK_NULL_HANDLE;
 	m_layout = VK_NULL_HANDLE;
 	for (uint32_t j = 0; j < MaxDescriptors; ++j)
 	{
@@ -204,36 +203,6 @@ void DynamicDescriptorSet::SetCBV(int paramIndex, const ConstantBuffer& buffer)
 	m_allocation.numUniformBuffers++;
 
 	m_dirtyBits |= (1 << paramIndex);
-}
-
-
-void DynamicDescriptorSet::Update()
-{
-	if (!IsDirty())
-		return;
-
-	array<VkWriteDescriptorSet, MaxDescriptors> liveDescriptors;
-
-	//m_descriptorSet = m_pool->AllocateDescriptorSet(m_layout);
-
-	unsigned long setBit{ 0 };
-	uint32_t index{ 0 };
-	while (_BitScanForward(&setBit, m_dirtyBits))
-	{
-		liveDescriptors[index].dstSet = m_descriptorSet;
-		liveDescriptors[index] = m_writeDescriptorSets[setBit];
-		m_dirtyBits &= ~(1 << setBit);
-		++index;
-	}
-
-	assert(m_dirtyBits == 0);
-
-	vkUpdateDescriptorSets(
-		GetDevice(),
-		index,
-		liveDescriptors.data(),
-		0,
-		nullptr);
 }
 
 
@@ -503,7 +472,7 @@ void DynamicDescriptorPool::CommitDescriptorSetsInternal(VkCommandBuffer command
 	if (numNewDescriptorSets + m_curNumDescriptorSets >= s_maxDescriptorSets)
 		bNeedNewPool = true;
 
-	DescriptorAllocation descriptorAllocation{};
+	m_commitAllocation.Reset();
 
 	if (!bNeedNewPool)
 	{
@@ -512,11 +481,11 @@ void DynamicDescriptorPool::CommitDescriptorSetsInternal(VkCommandBuffer command
 		{
 			if (descriptorSet.IsDirty())
 			{
-				descriptorAllocation += descriptorSet.m_allocation;
+				m_commitAllocation += descriptorSet.m_allocation;
 			}
 		}
 
-		if (!(descriptorAllocation + m_curPoolAllocation < s_maxAllocationPerPool))
+		if (!(m_commitAllocation + m_curPoolAllocation < s_maxAllocationPerPool))
 			bNeedNewPool = true;
 	}
 
@@ -530,17 +499,15 @@ void DynamicDescriptorPool::CommitDescriptorSetsInternal(VkCommandBuffer command
 	// OK, now we have a pool that will fit everything
 
 	// Allocate the new descriptor sets
-	array<VkDescriptorSet, 8> vkDescriptorSets;
-	array<bool, 8> dirtyList;
+	
 	{
-		array<VkDescriptorSetLayout, 8> layouts;
 		int curSet = 0;
 		for (int i = 0; i < 8; ++i)
 		{
-			dirtyList[i] = descriptorSets[i].IsDirty();
+			m_commitDirtyList[i] = descriptorSets[i].IsDirty();
 			if (descriptorSets[i].IsDirty())
 			{
-				layouts[curSet] = descriptorSets[i].m_layout;
+				m_commitLayouts[curSet] = descriptorSets[i].m_layout;
 				++curSet;
 			}
 		}
@@ -548,14 +515,13 @@ void DynamicDescriptorPool::CommitDescriptorSetsInternal(VkCommandBuffer command
 		VkDescriptorSetAllocateInfo allocInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
 		allocInfo.descriptorPool = *m_curDescriptorPool;
 		allocInfo.descriptorSetCount = numNewDescriptorSets;
-		allocInfo.pSetLayouts = layouts.data();
+		allocInfo.pSetLayouts = m_commitLayouts.data();
 
-		ThrowIfFailed(vkAllocateDescriptorSets(GetDevice(), &allocInfo, vkDescriptorSets.data()));
+		ThrowIfFailed(vkAllocateDescriptorSets(GetDevice(), &allocInfo, m_commitDescriptorSets.data()));
 	}
 
 	// Now, write the staged descriptors
 	{
-		array<VkWriteDescriptorSet, 8 * 32> writeDescriptors;
 		uint32_t curDescriptor = 0;
 		uint32_t curDescriptorSet = 0;
 		for (auto& descriptorSet : descriptorSets)
@@ -566,8 +532,8 @@ void DynamicDescriptorPool::CommitDescriptorSetsInternal(VkCommandBuffer command
 			unsigned long setBit{ 0 };
 			while (_BitScanForward(&setBit, descriptorSet.m_dirtyBits))
 			{
-				writeDescriptors[curDescriptor] = descriptorSet.m_writeDescriptorSets[setBit];
-				writeDescriptors[curDescriptor].dstSet = vkDescriptorSets[curDescriptorSet];
+				m_commitWriteDescriptors[curDescriptor] = descriptorSet.m_writeDescriptorSets[setBit];
+				m_commitWriteDescriptors[curDescriptor].dstSet = m_commitDescriptorSets[curDescriptorSet];
 				descriptorSet.m_dirtyBits &= ~(1 << setBit);
 				++curDescriptor;
 			}
@@ -578,7 +544,7 @@ void DynamicDescriptorPool::CommitDescriptorSetsInternal(VkCommandBuffer command
 		vkUpdateDescriptorSets(
 			GetDevice(),
 			curDescriptor,
-			writeDescriptors.data(),
+			m_commitWriteDescriptors.data(),
 			0,
 			nullptr);
 	}
@@ -588,7 +554,7 @@ void DynamicDescriptorPool::CommitDescriptorSetsInternal(VkCommandBuffer command
 		uint32_t curDescriptorSet = 0;
 		for (int i = 0; i < 8; ++i)
 		{
-			if (!dirtyList[i])
+			if (!m_commitDirtyList[i])
 				continue;
 
 			vkCmdBindDescriptorSets(
@@ -597,7 +563,7 @@ void DynamicDescriptorPool::CommitDescriptorSetsInternal(VkCommandBuffer command
 				pipelineLayout,
 				i,
 				1,
-				&vkDescriptorSets[curDescriptorSet++],
+				&m_commitDescriptorSets[curDescriptorSet++],
 				0,
 				nullptr);
 		}
@@ -605,7 +571,7 @@ void DynamicDescriptorPool::CommitDescriptorSetsInternal(VkCommandBuffer command
 
 	// Record the new numbers of descriptor sets and descriptors allocated from the current pool
 	m_curNumDescriptorSets += numNewDescriptorSets;
-	m_curPoolAllocation += descriptorAllocation;
+	m_curPoolAllocation += m_commitAllocation;
 
 	// Invalidate the descriptor sets
 	for (auto& descriptorSet : descriptorSets)

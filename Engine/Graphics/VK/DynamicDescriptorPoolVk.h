@@ -142,10 +142,6 @@ public:
 	void SetCBV(int paramIndex, const ConstantBuffer& buffer);
 
 private:
-	void Update();
-
-private:
-	VkDescriptorSet m_descriptorSet{ VK_NULL_HANDLE };
 	std::array<VkWriteDescriptorSet, MaxDescriptors> m_writeDescriptorSets;
 	VkDescriptorSetLayout m_layout{ VK_NULL_HANDLE };
 	DescriptorAllocation m_allocation{};
@@ -221,6 +217,13 @@ private:
 	uint32_t m_curNumDescriptorSets{ 0 };
 	bool m_bAnyGraphicsDescriptorsDirty{ false };
 	bool m_bAnyComputeDescriptorsDirty{ false };
+
+	// Data arrays used during Commit
+	DescriptorAllocation m_commitAllocation{};
+	std::array<VkDescriptorSet, 8> m_commitDescriptorSets;
+	std::array<bool, 8> m_commitDirtyList;
+	std::array<VkDescriptorSetLayout, 8> m_commitLayouts;
+	std::array<VkWriteDescriptorSet, 8 * 32> m_commitWriteDescriptors;
 };
 
 } // namespace Kodiak
