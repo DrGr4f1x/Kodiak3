@@ -73,6 +73,7 @@ public:
 	KODIAK_NODISCARD VkResult CreatePipelineCache(UVkPipelineCache** ppPipelineCache) const;
 	KODIAK_NODISCARD VkResult CreateGraphicsPipeline(const VkGraphicsPipelineCreateInfo& createInfo, UVkPipeline** ppPipeline) const;
 	KODIAK_NODISCARD VkResult CreateComputePipeline(const VkComputePipelineCreateInfo& createInfo, UVkPipeline** ppPipeline) const;
+	KODIAK_NODISCARD VkResult CreateDescriptorPool(const VkDescriptorPoolCreateInfo& createInfo, UVkDescriptorPool** ppPool) const;
 
 	Format GetColorFormat() const { return m_colorFormat; }
 	Format GetDepthFormat() const { return m_depthFormat; }

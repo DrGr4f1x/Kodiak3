@@ -101,7 +101,9 @@ void TextureApp::Render()
 	context.SetRootSignature(m_rootSig);
 	context.SetPipelineState(m_pso);
 
-	context.SetResources(m_resources);
+	//context.SetResources(m_resources);
+	context.SetCBV(0, 0, m_constantBuffer);
+	context.SetSRV(1, 0, *m_texture);
 
 	context.SetVertexBuffer(0, m_vertexBuffer);
 	context.SetIndexBuffer(m_indexBuffer);

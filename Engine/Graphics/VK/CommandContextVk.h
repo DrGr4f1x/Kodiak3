@@ -11,11 +11,13 @@
 #pragma once
 
 #include "Color.h"
+#include "DWParam.h"
 #include "Graphics\Framebuffer.h"
 #include "Graphics\GpuBuffer.h"
 #include "Graphics\Texture.h"
 
 #include "CommandListManagerVk.h"
+#include "DynamicDescriptorPoolVk.h"
 #include "LinearAllocatorVk.h"
 #include "ResourceSetVk.h"
 #include "UtilVk.h"
@@ -107,6 +109,8 @@ protected:
 	VkPipelineLayout m_curGraphicsPipelineLayout{ VK_NULL_HANDLE };
 	VkPipelineLayout m_curComputePipelineLayout{ VK_NULL_HANDLE };
 
+	DynamicDescriptorPool m_dynamicDescriptorPool;
+
 	// Shader stages for the 8 descriptor set slots
 	VkShaderStageFlags m_shaderStages[8];
 
@@ -159,8 +163,25 @@ public:
 	
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset);
+	void SetConstant(uint32_t rootIndex, uint32_t offset, DWParam val);
+	void SetConstants(uint32_t rootIndex, DWParam x);
+	void SetConstants(uint32_t rootIndex, DWParam x, DWParam y);
+	void SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z);
+	void SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z, DWParam w);
 	void SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet);
 	void SetResources(ResourceSet& resources);	
+
+	void SetSRV(int rootIndex, int offset, const ColorBuffer& buffer);
+	void SetSRV(int rootIndex, int offset, const DepthBuffer& buffer, bool depthSrv = true);
+	void SetSRV(int rootIndex, int offset, const StructuredBuffer& buffer);
+	void SetSRV(int rootIndex, int offset, const Texture& texture);
+
+	void SetUAV(int rootIndex, int offset, const ColorBuffer& buffer);
+	void SetUAV(int rootIndex, int offset, const DepthBuffer& buffer);
+	void SetUAV(int rootIndex, int offset, const StructuredBuffer& buffer);
+	void SetUAV(int rootIndex, int offset, const Texture& texture);
+
+	void SetCBV(int rootIndex, int offset, const ConstantBuffer& buffer);
 
 	void SetIndexBuffer(const IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer);
@@ -191,8 +212,25 @@ public:
 	
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset);
+	void SetConstant(uint32_t rootIndex, uint32_t offset, DWParam val);
+	void SetConstants(uint32_t rootIndex, DWParam x);
+	void SetConstants(uint32_t rootIndex, DWParam x, DWParam y);
+	void SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z);
+	void SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z, DWParam w);
 	void SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet);
 	void SetResources(ResourceSet& resources);
+
+	void SetSRV(int rootIndex, int offset, const ColorBuffer& buffer);
+	void SetSRV(int rootIndex, int offset, const DepthBuffer& buffer, bool depthSrv = true);
+	void SetSRV(int rootIndex, int offset, const StructuredBuffer& buffer);
+	void SetSRV(int rootIndex, int offset, const Texture& texture);
+
+	void SetUAV(int rootIndex, int offset, const ColorBuffer& buffer);
+	void SetUAV(int rootIndex, int offset, const DepthBuffer& buffer);
+	void SetUAV(int rootIndex, int offset, const StructuredBuffer& buffer);
+	void SetUAV(int rootIndex, int offset, const Texture& texture);
+
+	void SetCBV(int rootIndex, int offset, const ConstantBuffer& buffer);
 
 	void Dispatch(uint32_t groupCountX = 1, uint32_t groupCountY = 1, uint32_t groupCountZ = 1);
 	void Dispatch1D(uint32_t threadCountX, uint32_t groupSizeX = 64);
@@ -394,6 +432,69 @@ inline void GraphicsContext::SetConstantArray(uint32_t rootIndex, uint32_t numCo
 }
 
 
+inline void GraphicsContext::SetConstant(uint32_t rootIndex, uint32_t offset, DWParam val)
+{
+	vkCmdPushConstants(
+		m_commandList,
+		m_curGraphicsPipelineLayout,
+		m_shaderStages[rootIndex],
+		offset * sizeof(DWORD),
+		sizeof(DWORD),
+		&val);
+}
+
+
+inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x)
+{
+	vkCmdPushConstants(
+		m_commandList,
+		m_curGraphicsPipelineLayout,
+		m_shaderStages[rootIndex],
+		0,
+		sizeof(DWORD),
+		&x);
+}
+
+
+inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y)
+{
+	DWParam val[] = { x, y };
+	vkCmdPushConstants(
+		m_commandList,
+		m_curGraphicsPipelineLayout,
+		m_shaderStages[rootIndex],
+		0,
+		sizeof(DWORD),
+		&val);
+}
+
+
+inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z)
+{
+	DWParam val[] = { x, y, z };
+	vkCmdPushConstants(
+		m_commandList,
+		m_curGraphicsPipelineLayout,
+		m_shaderStages[rootIndex],
+		0,
+		sizeof(DWORD),
+		&val);
+}
+
+
+inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z, DWParam w)
+{
+	DWParam val[] = { x, y, z, w };
+	vkCmdPushConstants(
+		m_commandList,
+		m_curGraphicsPipelineLayout,
+		m_shaderStages[rootIndex],
+		0,
+		sizeof(DWORD),
+		&val);
+}
+
+
 inline void GraphicsContext::SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet)
 {
 	if (!descriptorSet.IsInitialized())
@@ -414,6 +515,60 @@ inline void GraphicsContext::SetDescriptorSet(uint32_t rootIndex, DescriptorSet&
 		&descriptorSet.m_descriptorSet,
 		descriptorSet.m_isDynamicCBV ? 1 : 0,
 		descriptorSet.m_isDynamicCBV ? &descriptorSet.m_dynamicOffset : nullptr);
+}
+
+
+inline void GraphicsContext::SetSRV(int rootIndex, int offset, const ColorBuffer& buffer)
+{
+	m_dynamicDescriptorPool.SetGraphicsSRV(rootIndex, offset, buffer);
+}
+
+
+inline void GraphicsContext::SetSRV(int rootIndex, int offset, const DepthBuffer& buffer, bool depthSrv)
+{
+	m_dynamicDescriptorPool.SetGraphicsSRV(rootIndex, offset, buffer, depthSrv);
+}
+
+
+inline void GraphicsContext::SetSRV(int rootIndex, int offset, const StructuredBuffer& buffer)
+{
+	m_dynamicDescriptorPool.SetGraphicsSRV(rootIndex, offset, buffer);
+}
+
+
+inline void GraphicsContext::SetSRV(int rootIndex, int offset, const Texture& texture)
+{
+	m_dynamicDescriptorPool.SetGraphicsSRV(rootIndex, offset, texture);
+}
+
+
+inline void GraphicsContext::SetUAV(int rootIndex, int offset, const ColorBuffer& buffer)
+{
+	m_dynamicDescriptorPool.SetGraphicsUAV(rootIndex, offset, buffer);
+}
+
+
+inline void GraphicsContext::SetUAV(int rootIndex, int offset, const DepthBuffer& buffer)
+{
+	m_dynamicDescriptorPool.SetGraphicsUAV(rootIndex, offset, buffer);
+}
+
+
+inline void GraphicsContext::SetUAV(int rootIndex, int offset, const StructuredBuffer& buffer)
+{
+	m_dynamicDescriptorPool.SetGraphicsUAV(rootIndex, offset, buffer);
+}
+
+
+inline void GraphicsContext::SetUAV(int rootIndex, int offset, const Texture& texture)
+{
+	m_dynamicDescriptorPool.SetGraphicsUAV(rootIndex, offset, texture);
+}
+
+
+inline void GraphicsContext::SetCBV(int rootIndex, int offset, const ConstantBuffer& buffer)
+{
+	m_dynamicDescriptorPool.SetGraphicsCBV(rootIndex, offset, buffer);
 }
 
 
@@ -526,6 +681,7 @@ inline void GraphicsContext::DrawInstanced(uint32_t vertexCountPerInstance, uint
 	uint32_t startVertexLocation, uint32_t startInstanceLocation)
 {
 	FlushResourceBarriers();
+	m_dynamicDescriptorPool.CommitGraphicsDescriptorSets(m_commandList, m_curGraphicsPipelineLayout);
 	vkCmdDraw(m_commandList, vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 }
 
@@ -534,6 +690,7 @@ inline void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance
 	int32_t baseVertexLocation, uint32_t startInstanceLocation)
 {
 	FlushResourceBarriers();
+	m_dynamicDescriptorPool.CommitGraphicsDescriptorSets(m_commandList, m_curGraphicsPipelineLayout);
 	vkCmdDrawIndexed(m_commandList, indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
 }
 
@@ -596,6 +753,69 @@ inline void ComputeContext::SetConstantArray(uint32_t rootIndex, uint32_t numCon
 }
 
 
+inline void ComputeContext::SetConstant(uint32_t rootIndex, uint32_t offset, DWParam val)
+{
+	vkCmdPushConstants(
+		m_commandList,
+		m_curComputePipelineLayout,
+		VK_SHADER_STAGE_COMPUTE_BIT,
+		offset * sizeof(DWORD),
+		sizeof(DWORD),
+		&val);
+}
+
+
+inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x)
+{
+	vkCmdPushConstants(
+		m_commandList,
+		m_curComputePipelineLayout,
+		VK_SHADER_STAGE_COMPUTE_BIT,
+		0,
+		sizeof(DWORD),
+		&x);
+}
+
+
+inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y)
+{
+	DWParam val[] = { x, y };
+	vkCmdPushConstants(
+		m_commandList,
+		m_curComputePipelineLayout,
+		VK_SHADER_STAGE_COMPUTE_BIT,
+		0,
+		sizeof(DWORD),
+		&val);
+}
+
+
+inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z)
+{
+	DWParam val[] = { x, y, z };
+	vkCmdPushConstants(
+		m_commandList,
+		m_curComputePipelineLayout,
+		VK_SHADER_STAGE_COMPUTE_BIT,
+		0,
+		sizeof(DWORD),
+		&val);
+}
+
+
+inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z, DWParam w)
+{
+	DWParam val[] = { x, y, z, w };
+	vkCmdPushConstants(
+		m_commandList,
+		m_curComputePipelineLayout,
+		VK_SHADER_STAGE_COMPUTE_BIT,
+		0,
+		sizeof(DWORD),
+		&val);
+}
+
+
 inline void ComputeContext::SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet)
 {
 	if (!descriptorSet.IsInitialized())
@@ -628,9 +848,64 @@ inline void ComputeContext::SetResources(ResourceSet& resources)
 }
 
 
+inline void ComputeContext::SetSRV(int rootIndex, int offset, const ColorBuffer& buffer)
+{
+	m_dynamicDescriptorPool.SetComputeSRV(rootIndex, offset, buffer);
+}
+
+
+inline void ComputeContext::SetSRV(int rootIndex, int offset, const DepthBuffer& buffer, bool depthSrv)
+{
+	m_dynamicDescriptorPool.SetComputeSRV(rootIndex, offset, buffer, depthSrv);
+}
+
+
+inline void ComputeContext::SetSRV(int rootIndex, int offset, const StructuredBuffer& buffer)
+{
+	m_dynamicDescriptorPool.SetComputeSRV(rootIndex, offset, buffer);
+}
+
+
+inline void ComputeContext::SetSRV(int rootIndex, int offset, const Texture& texture)
+{
+	m_dynamicDescriptorPool.SetComputeSRV(rootIndex, offset, texture);
+}
+
+
+inline void ComputeContext::SetUAV(int rootIndex, int offset, const ColorBuffer& buffer)
+{
+	m_dynamicDescriptorPool.SetComputeUAV(rootIndex, offset, buffer);
+}
+
+
+inline void ComputeContext::SetUAV(int rootIndex, int offset, const DepthBuffer& buffer)
+{
+	m_dynamicDescriptorPool.SetComputeUAV(rootIndex, offset, buffer);
+}
+
+
+inline void ComputeContext::SetUAV(int rootIndex, int offset, const StructuredBuffer& buffer)
+{
+	m_dynamicDescriptorPool.SetComputeUAV(rootIndex, offset, buffer);
+}
+
+
+inline void ComputeContext::SetUAV(int rootIndex, int offset, const Texture& texture)
+{
+	m_dynamicDescriptorPool.SetComputeUAV(rootIndex, offset, texture);
+}
+
+
+inline void ComputeContext::SetCBV(int rootIndex, int offset, const ConstantBuffer& buffer)
+{
+	m_dynamicDescriptorPool.SetComputeCBV(rootIndex, offset, buffer);
+}
+
+
 inline void ComputeContext::Dispatch(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ)
 {
 	FlushResourceBarriers();
+	m_dynamicDescriptorPool.CommitComputeDescriptorSets(m_commandList, m_curComputePipelineLayout);
 	vkCmdDispatch(m_commandList, groupCountX, groupCountY, groupCountZ);
 }
 

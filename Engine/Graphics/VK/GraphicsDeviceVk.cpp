@@ -828,6 +828,22 @@ VkResult GraphicsDevice::CreateComputePipeline(const VkComputePipelineCreateInfo
 }
 
 
+VkResult GraphicsDevice::CreateDescriptorPool(const VkDescriptorPoolCreateInfo& createInfo, UVkDescriptorPool** ppPool) const
+{
+	VkDescriptorPool vkDescriptorPool = VK_NULL_HANDLE;
+	auto res = vkCreateDescriptorPool(m_device->Get(), &createInfo, nullptr, &vkDescriptorPool);
+
+	*ppPool = nullptr;
+	if (res == VK_SUCCESS)
+	{
+		*ppPool = new UVkDescriptorPool(m_device.Get(), vkDescriptorPool);
+		(*ppPool)->AddRef();
+	}
+
+	return res;
+}
+
+
 ColorBufferPtr GraphicsDevice::GetBackBuffer(uint32_t index) const
 {
 	assert(index < NumSwapChainBuffers);

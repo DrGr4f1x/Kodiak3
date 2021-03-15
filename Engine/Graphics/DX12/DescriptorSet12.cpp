@@ -31,10 +31,10 @@ void DescriptorSet::Init(const RootSignature& rootSig, int rootParam)
 	const auto& rootParameter = rootSig[rootParam];
 
 	const uint32_t numDescriptors = rootParameter.GetNumDescriptors();
+	assert(numDescriptors <= MaxDescriptors);
+
 	if (numDescriptors == 0)
 		return;
-
-	m_descriptors.resize(numDescriptors);
 
 	for (uint32_t j = 0; j < numDescriptors; ++j)
 	{
@@ -119,12 +119,12 @@ void DescriptorSet::SetDynamicOffset(uint32_t offset)
 
 void DescriptorSet::Update()
 {
-	if (!m_bIsDirty || m_descriptors.empty())
+	if (!IsDirty() || m_descriptors.empty())
 		return;
 
 	auto device = GetDevice();
 
-	const uint32_t numDescriptors = static_cast<uint32_t>(m_descriptors.size());
+	const uint32_t numDescriptors = __popcnt(m_dirtyBits);
 
 	D3D12_DESCRIPTOR_HEAP_TYPE heapType{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV };
 
@@ -138,16 +138,19 @@ void DescriptorSet::Update()
 
 	m_gpuDescriptor = descHandle.GetGpuHandle();
 
-	for (uint32_t j = 0; j < numDescriptors; ++j)
+	unsigned long setBit{ 0 };
+	uint32_t index{ 0 };
+	while (_BitScanForward(&setBit, m_dirtyBits))
 	{
-		if (m_descriptors[j].ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
-			continue;
+		DescriptorHandle offsetHandle = descHandle + index * descriptorSize;
+		m_dirtyBits &= ~(1 << setBit);
 
-		DescriptorHandle offsetHandle = descHandle + j * descriptorSize;
-		device->CopyDescriptorsSimple(1, offsetHandle.GetCpuHandle(), m_descriptors[j], heapType);
+		device->CopyDescriptorsSimple(1, offsetHandle.GetCpuHandle(), m_descriptors[index], heapType);
+
+		++index;
 	}
 
-	m_bIsDirty = false;
+	assert(m_dirtyBits == 0);
 }
 
 
@@ -156,6 +159,6 @@ void DescriptorSet::SetDescriptor(int paramIndex, D3D12_CPU_DESCRIPTOR_HANDLE de
 	if (m_descriptors[paramIndex].ptr != descriptor.ptr)
 	{
 		m_descriptors[paramIndex] = descriptor;
-		m_bIsDirty = true;
+		m_dirtyBits |= (1 << paramIndex);
 	}
 }

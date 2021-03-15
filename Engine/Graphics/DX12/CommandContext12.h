@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Color.h"
+#include "DWParam.h"
 
 #include "Graphics\ColorBuffer.h"
 #include "Graphics\DepthBuffer.h"
@@ -38,25 +39,6 @@ class FrameBuffer;
 class GraphicsContext;
 class OcclusionQueryHeap;
 class ReadbackBuffer;
-
-
-struct DWParam
-{
-	DWParam(float f) : _float(f) {}
-	DWParam(uint32_t u) : _uint(u) {}
-	DWParam(int32_t i) : _int(i) {}
-
-	void operator=(float f) { _float = f; }
-	void operator=(uint32_t u) { _uint = u; }
-	void operator=(int32_t i) { _int = i; }
-
-	union
-	{
-		float		_float;
-		uint32_t	_uint;
-		int32_t		_int;
-	};
-};
 
 
 class ContextManager
@@ -130,14 +112,17 @@ protected:
 	void BindDescriptorHeaps();
 
 protected:
-	CommandListManager* m_owningManager;
-	ID3D12GraphicsCommandList* m_commandList;
-	ID3D12CommandAllocator* m_currentAllocator;
+	CommandListManager* m_owningManager{ nullptr };
+	ID3D12GraphicsCommandList* m_commandList{ nullptr };
+	ID3D12CommandAllocator* m_currentAllocator{ nullptr };
 
-	ID3D12RootSignature* m_curGraphicsRootSignature;
-	ID3D12PipelineState* m_curGraphicsPipelineState;
-	ID3D12RootSignature* m_curComputeRootSignature;
-	ID3D12PipelineState* m_curComputePipelineState;
+	ID3D12RootSignature* m_curGraphicsRootSignature{ nullptr };
+	ID3D12PipelineState* m_curGraphicsPipelineState{ nullptr };
+	ID3D12RootSignature* m_curComputeRootSignature{ nullptr };
+	ID3D12PipelineState* m_curComputePipelineState{ nullptr };
+
+	DynamicDescriptorHeap m_dynamicViewDescriptorHeap;
+	DynamicDescriptorHeap m_dynamicSamplerDescriptorHeap;
 
 	D3D12_RESOURCE_BARRIER m_resourceBarrierBuffer[16];
 	uint32_t m_numBarriersToFlush;
@@ -150,8 +135,8 @@ protected:
 	D3D12_PRIMITIVE_TOPOLOGY m_curPrimitiveTopology;
 
 	// Current render targets
-	std::array<ColorBuffer*, 8>		m_renderTargets;
-	DepthBuffer* m_depthTarget;
+	std::array<ColorBuffer*, 8>	m_renderTargets;
+	DepthBuffer* m_depthTarget{ nullptr };
 
 	std::string m_id;
 
@@ -206,8 +191,25 @@ public:
 
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset);
+	void SetConstant(uint32_t rootIndex, uint32_t offset, DWParam val);
+	void SetConstants(uint32_t rootIndex, DWParam x);
+	void SetConstants(uint32_t rootIndex, DWParam x, DWParam y);
+	void SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z);
+	void SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z, DWParam w);
 	void SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet);
 	void SetResources(ResourceSet& resources);
+
+	void SetSRV(int rootIndex, int offset, const ColorBuffer& buffer);
+	void SetSRV(int rootIndex, int offset, const DepthBuffer& buffer, bool depthSrv = true);
+	void SetSRV(int rootIndex, int offset, const StructuredBuffer& buffer);
+	void SetSRV(int rootIndex, int offset, const Texture& texture);
+
+	void SetUAV(int rootIndex, int offset, const ColorBuffer& buffer);
+	void SetUAV(int rootIndex, int offset, const DepthBuffer& buffer);
+	void SetUAV(int rootIndex, int offset, const StructuredBuffer& buffer);
+	void SetUAV(int rootIndex, int offset, const Texture& texture);
+
+	void SetCBV(int rootIndex, int offset, const ConstantBuffer& buffer);
 
 	void SetIndexBuffer(const IndexBuffer& indexBuffer);
 	void SetVertexBuffer(uint32_t slot, const VertexBuffer& vertexBuffer);
@@ -226,6 +228,9 @@ public:
 		int32_t baseVertexLocation, uint32_t startInstanceLocation);
 
 	void Resolve(ColorBuffer& src, ColorBuffer& dest, Format format);
+
+private:
+	void SetDynamicDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle);
 };
 
 
@@ -238,13 +243,33 @@ public:
 	
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants);
 	void SetConstantArray(uint32_t rootIndex, uint32_t numConstants, const void* constants, uint32_t offset);
+	void SetConstant(uint32_t rootIndex, uint32_t offset, DWParam val);
+	void SetConstants(uint32_t rootIndex, DWParam x);
+	void SetConstants(uint32_t rootIndex, DWParam x, DWParam y);
+	void SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z);
+	void SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z, DWParam w);
 	void SetDescriptorSet(uint32_t rootIndex, DescriptorSet& descriptorSet);
 	void SetResources(ResourceSet& resources);
+
+	void SetSRV(int rootIndex, int offset, const ColorBuffer& buffer);
+	void SetSRV(int rootIndex, int offset, const DepthBuffer& buffer, bool depthSrv = true);
+	void SetSRV(int rootIndex, int offset, const StructuredBuffer& buffer);
+	void SetSRV(int rootIndex, int offset, const Texture& texture);
+
+	void SetUAV(int rootIndex, int offset, const ColorBuffer& buffer);
+	void SetUAV(int rootIndex, int offset, const DepthBuffer& buffer);
+	void SetUAV(int rootIndex, int offset, const StructuredBuffer& buffer);
+	void SetUAV(int rootIndex, int offset, const Texture& texture);
+
+	void SetCBV(int rootIndex, int offset, const ConstantBuffer& buffer);
 
 	void Dispatch(uint32_t groupCountX = 1, uint32_t groupCountY = 1, uint32_t groupCountZ = 1);
 	void Dispatch1D(uint32_t threadCountX, uint32_t groupSizeX = 64);
 	void Dispatch2D(uint32_t threadCountX, uint32_t threadCountY, uint32_t groupSizeX = 8, uint32_t groupSizeY = 8);
 	void Dispatch3D(uint32_t threadCountX, uint32_t threadCountY, uint32_t threadCountZ, uint32_t groupSizeX, uint32_t groupSizeY, uint32_t groupSizeZ);
+
+private:
+	void SetDynamicDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle);
 };
 
 
@@ -319,6 +344,9 @@ inline void GraphicsContext::SetRootSignature(const RootSignature& rootSig)
 
 	m_commandList->SetGraphicsRootSignature(signature);
 	m_curGraphicsRootSignature = signature;
+
+	m_dynamicViewDescriptorHeap.ParseGraphicsRootSignature(rootSig);
+	m_dynamicSamplerDescriptorHeap.ParseGraphicsRootSignature(rootSig);
 }
 
 
@@ -362,6 +390,42 @@ inline void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 		m_commandList->IASetPrimitiveTopology(topology);
 		m_curPrimitiveTopology = topology;
 	}
+}
+
+
+inline void GraphicsContext::SetConstant(uint32_t rootIndex, uint32_t offset, DWParam val)
+{
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, val._uint, offset);
+}
+
+
+inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x)
+{
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, x._uint, 0);
+}
+
+
+inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y)
+{
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, x._uint, 0);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, y._uint, 1);
+}
+
+
+inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z)
+{
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, x._uint, 0);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, y._uint, 1);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, z._uint, 2);
+}
+
+
+inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z, DWParam w)
+{
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, x._uint, 0);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, y._uint, 1);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, z._uint, 2);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, w._uint, 3);
 }
 
 
@@ -410,6 +474,60 @@ inline void GraphicsContext::SetResources(ResourceSet& resources)
 	{
 		SetDescriptorSet(i, resources.m_descriptorSets[i]);
 	}
+}
+
+
+inline void GraphicsContext::SetSRV(int rootIndex, int offset, const ColorBuffer& buffer)
+{
+	SetDynamicDescriptor(rootIndex, offset, buffer.GetSRV());
+}
+
+
+inline void GraphicsContext::SetSRV(int rootIndex, int offset, const DepthBuffer& buffer, bool depthSrv)
+{
+	SetDynamicDescriptor(rootIndex, offset, depthSrv ? buffer.GetDepthSRV() : buffer.GetStencilSRV());
+}
+
+
+inline void GraphicsContext::SetSRV(int rootIndex, int offset, const StructuredBuffer& buffer)
+{
+	SetDynamicDescriptor(rootIndex, offset, buffer.GetSRV());
+}
+
+
+inline void GraphicsContext::SetSRV(int rootIndex, int offset, const Texture& texture)
+{
+	SetDynamicDescriptor(rootIndex, offset, texture.GetSRV());
+}
+
+
+inline void GraphicsContext::SetUAV(int rootIndex, int offset, const ColorBuffer& buffer)
+{
+	SetDynamicDescriptor(rootIndex, offset, buffer.GetUAV());
+}
+
+
+inline void GraphicsContext::SetUAV(int rootIndex, int offset, const DepthBuffer& buffer)
+{
+	assert_msg("Depth buffer UAVs not supported yet.");
+}
+
+
+inline void GraphicsContext::SetUAV(int rootIndex, int offset, const StructuredBuffer& buffer)
+{
+	SetDynamicDescriptor(rootIndex, offset, buffer.GetUAV());
+}
+
+
+inline void GraphicsContext::SetUAV(int rootIndex, int offset, const Texture& texture)
+{
+	assert_msg("Texture UAVs not supported yet.");
+}
+
+
+inline void GraphicsContext::SetCBV(int rootIndex, int offset, const ConstantBuffer& buffer)
+{
+	SetDynamicDescriptor(rootIndex, offset, buffer.GetCBV());
 }
 
 
@@ -526,6 +644,8 @@ inline void GraphicsContext::DrawInstanced(uint32_t vertexCountPerInstance, uint
 	uint32_t startVertexLocation, uint32_t startInstanceLocation)
 {
 	FlushResourceBarriers();
+	m_dynamicViewDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
+	m_dynamicSamplerDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
 	m_commandList->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 }
 
@@ -534,6 +654,8 @@ inline void GraphicsContext::DrawIndexedInstanced(uint32_t indexCountPerInstance
 	int32_t baseVertexLocation, uint32_t startInstanceLocation)
 {
 	FlushResourceBarriers();
+	m_dynamicViewDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
+	m_dynamicSamplerDescriptorHeap.CommitGraphicsRootDescriptorTables(m_commandList);
 	m_commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
 }
 
@@ -543,6 +665,12 @@ inline void GraphicsContext::Resolve(ColorBuffer& src, ColorBuffer& dest, Format
 	FlushResourceBarriers();
 	auto dxFormat = static_cast<DXGI_FORMAT>(format);
 	m_commandList->ResolveSubresource(dest.m_resource.Get(), 0, src.m_resource.Get(), 0, dxFormat);
+}
+
+
+inline void GraphicsContext::SetDynamicDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle)
+{
+	m_dynamicViewDescriptorHeap.SetGraphicsDescriptorHandles(rootIndex, offset, 1, &handle);
 }
 
 
@@ -558,6 +686,9 @@ inline void ComputeContext::SetRootSignature(const RootSignature& rootSig)
 
 	m_commandList->SetComputeRootSignature(signature);
 	m_curComputeRootSignature = signature;
+
+	m_dynamicViewDescriptorHeap.ParseComputeRootSignature(rootSig);
+	m_dynamicSamplerDescriptorHeap.ParseComputeRootSignature(rootSig);
 }
 
 
@@ -571,6 +702,42 @@ inline void ComputeContext::SetPipelineState(const ComputePSO& pso)
 		m_commandList->SetPipelineState(pipelineState);
 		m_curComputePipelineState = pipelineState;
 	}
+}
+
+
+inline void ComputeContext::SetConstant(uint32_t rootIndex, uint32_t offset, DWParam val)
+{
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, val._uint, offset);
+}
+
+
+inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x)
+{
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, x._uint, 0);
+}
+
+
+inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y)
+{
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, x._uint, 0);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, y._uint, 1);
+}
+
+
+inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z)
+{
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, x._uint, 0);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, y._uint, 1);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, z._uint, 2);
+}
+
+
+inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z, DWParam w)
+{
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, x._uint, 0);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, y._uint, 1);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, z._uint, 2);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, w._uint, 3);
 }
 
 
@@ -628,9 +795,65 @@ inline void ComputeContext::SetResources(ResourceSet& resources)
 }
 
 
+inline void ComputeContext::SetSRV(int rootIndex, int offset, const ColorBuffer& buffer)
+{
+	SetDynamicDescriptor(rootIndex, offset, buffer.GetSRV());
+}
+
+
+inline void ComputeContext::SetSRV(int rootIndex, int offset, const DepthBuffer& buffer, bool depthSrv)
+{
+	SetDynamicDescriptor(rootIndex, offset, depthSrv ? buffer.GetDepthSRV() : buffer.GetStencilSRV());
+}
+
+
+inline void ComputeContext::SetSRV(int rootIndex, int offset, const StructuredBuffer& buffer)
+{
+	SetDynamicDescriptor(rootIndex, offset, buffer.GetSRV());
+}
+
+
+inline void ComputeContext::SetSRV(int rootIndex, int offset, const Texture& texture)
+{
+	SetDynamicDescriptor(rootIndex, offset, texture.GetSRV());
+}
+
+
+inline void ComputeContext::SetUAV(int rootIndex, int offset, const ColorBuffer& buffer)
+{
+	SetDynamicDescriptor(rootIndex, offset, buffer.GetUAV());
+}
+
+
+inline void ComputeContext::SetUAV(int rootIndex, int offset, const DepthBuffer& buffer)
+{
+	assert_msg("Depth buffer UAVs not supported yet.");
+}
+
+
+inline void ComputeContext::SetUAV(int rootIndex, int offset, const StructuredBuffer& buffer)
+{
+	SetDynamicDescriptor(rootIndex, offset, buffer.GetUAV());
+}
+
+
+inline void ComputeContext::SetUAV(int rootIndex, int offset, const Texture& texture)
+{
+	assert_msg("Texture UAVs not supported yet.");
+}
+
+
+inline void ComputeContext::SetCBV(int rootIndex, int offset, const ConstantBuffer& buffer)
+{
+	SetDynamicDescriptor(rootIndex, offset, buffer.GetCBV());
+}
+
+
 inline void ComputeContext::Dispatch(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ)
 {
 	FlushResourceBarriers();
+	m_dynamicViewDescriptorHeap.CommitComputeRootDescriptorTables(m_commandList);
+	m_dynamicSamplerDescriptorHeap.CommitComputeRootDescriptorTables(m_commandList);
 	m_commandList->Dispatch(groupCountX, groupCountY, groupCountZ);
 }
 
@@ -655,6 +878,12 @@ inline void ComputeContext::Dispatch3D(uint32_t threadCountX, uint32_t threadCou
 		Math::DivideByMultiple(threadCountX, groupSizeX),
 		Math::DivideByMultiple(threadCountY, groupSizeY),
 		Math::DivideByMultiple(threadCountZ, groupSizeZ));
+}
+
+
+inline void ComputeContext::SetDynamicDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle)
+{
+	m_dynamicViewDescriptorHeap.SetComputeDescriptorHandles(rootIndex, offset, 1, &handle);
 }
 
 } // namespace Kodiak

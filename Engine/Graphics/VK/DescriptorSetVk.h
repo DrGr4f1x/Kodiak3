@@ -28,11 +28,13 @@ class DescriptorSet
 	friend class GraphicsContext;
 	friend class ResourceSet;
 
+	enum { MaxDescriptors = 32 };
+
 public:
 	void Init(const RootSignature& rootSig, int rootParam);
 
 	bool IsInitialized() const { return m_bIsInitialized; }
-	bool IsDirty() const { return m_bIsDirty; }
+	bool IsDirty() const { return m_dirtyBits != 0; }
 
 	void SetSRV(int paramIndex, const ColorBuffer& buffer);
 	void SetSRV(int paramIndex, const DepthBuffer& buffer, bool depthSrv = true);
@@ -53,14 +55,14 @@ private:
 
 private:
 	VkDescriptorSet m_descriptorSet{ VK_NULL_HANDLE };
-	std::vector<VkWriteDescriptorSet> m_writeDescriptorSets;
+	std::array<VkWriteDescriptorSet, MaxDescriptors> m_writeDescriptorSets;
+	uint32_t m_dirtyBits{ 0 };
 	uint32_t m_dynamicOffset{ 0 };
 	bool m_isDynamicCBV{ false };
 
 	bool m_bIsRootCBV{ false };
 
 	bool m_bIsInitialized{ false };
-	bool m_bIsDirty{ false };
 };
 
 } // namespace Kodiak

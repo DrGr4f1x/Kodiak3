@@ -28,11 +28,13 @@ class DescriptorSet
 	friend class GraphicsContext;
 	friend class ResourceSet;
 
+	enum { MaxDescriptors = 32 };
+
 public:
 	void Init(const RootSignature& rootSig, int rootParam);
 
 	bool IsInitialized() const { return m_bIsInitialized; }
-	bool IsDirty() const { return m_bIsDirty; }
+	bool IsDirty() const { return m_dirtyBits != 0; }
 
 	void SetSRV(int paramIndex, const ColorBuffer& buffer);
 	void SetSRV(int paramIndex, const DepthBuffer& buffer, bool depthSrv = true);
@@ -53,16 +55,16 @@ private:
 	void SetDescriptor(int paramIndex, D3D12_CPU_DESCRIPTOR_HANDLE descriptor);
 
 private:
-	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> m_descriptors;
+	std::array<D3D12_CPU_DESCRIPTOR_HANDLE, MaxDescriptors> m_descriptors;
 	D3D12_GPU_DESCRIPTOR_HANDLE m_gpuDescriptor{ D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN };
 	uint64_t m_gpuAddress{ D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN };
+	uint32_t m_dirtyBits{ 0 };
 	uint32_t m_dynamicOffset{ 0 };
 	
 	bool m_bIsSamplerTable{ false };
 	bool m_bIsRootCBV{ false };
 
 	bool m_bIsInitialized{ false };
-	bool m_bIsDirty{ false };
 };
 
 } // namespace Kodiak

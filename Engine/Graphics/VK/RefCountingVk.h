@@ -52,6 +52,9 @@ DEFINE_GUID(IID_UVkFramebuffer, 0x81b64f6d, 0x7c5d, 0x4a8f, 0x86, 0x54, 0x71, 0x
 DEFINE_GUID(IID_UVkPipeline, 0x7656df62, 0x58f9, 0x4631, 0x8f, 0x52, 0x2a, 0x7c, 0xc, 0xd4, 0x22, 0x7e);
 // {7DE4B776-1B41-4EE2-A2CA-6D77A413EE7E}
 DEFINE_GUID(IID_UVkPipelineCache, 0x7de4b776, 0x1b41, 0x4ee2, 0xa2, 0xca, 0x6d, 0x77, 0xa4, 0x13, 0xee, 0x7e);
+// {DF674E8B-60E8-44D4-A87C-D9BC04EF3988}
+DEFINE_GUID(IID_UVkDescriptorPool, 0xdf674e8b, 0x60e8, 0x44d4, 0xa8, 0x7c, 0xd9, 0xbc, 0x4, 0xef, 0x39, 0x88);
+
 
 
 // Macro to define the IUnknown interface
@@ -692,6 +695,35 @@ private:
 	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
 	Microsoft::WRL::ComPtr<UVkPipelineCache> m_pipelineCache{ nullptr };
 	VkPipeline m_pipeline{ VK_NULL_HANDLE };
+};
+
+//
+// VkDescriptorPool
+//
+class UVkDescriptorPool : public IUnknown, public NonCopyable
+{
+public:
+	UVkDescriptorPool(UVkDevice* udevice, VkDescriptorPool descriptorPool)
+		: m_device(udevice)
+		, m_descriptorPool(descriptorPool)
+	{}
+	~UVkDescriptorPool()
+	{
+		if (m_descriptorPool)
+		{
+			vkDestroyDescriptorPool(m_device->Get(), m_descriptorPool, nullptr);
+			m_descriptorPool = VK_NULL_HANDLE;
+		}
+	}
+
+	VkDescriptorPool Get() const { return m_descriptorPool; }
+	operator VkDescriptorPool() const { return m_descriptorPool; }
+
+	IMPLEMENT_IUNKNOWN(IID_UVkDescriptorPool)
+
+private:
+	Microsoft::WRL::ComPtr<UVkDevice> m_device{ nullptr };
+	VkDescriptorPool m_descriptorPool{ VK_NULL_HANDLE };
 };
 
 } // namespace Kodiak

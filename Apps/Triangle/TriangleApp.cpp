@@ -101,7 +101,8 @@ void TriangleApp::Render()
 	context.SetRootSignature(m_rootSig);
 	context.SetPipelineState(m_pso);
 
-	context.SetResources(m_resources);
+	//context.SetResources(m_resources);
+	context.SetCBV(0, 0, m_constantBuffer);
 
 	vector<Vertex> vertexData =
 	{

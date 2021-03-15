@@ -98,6 +98,7 @@ void ContextManager::DestroyAllContexts()
 
 CommandContext::CommandContext(CommandListType type)
 	: m_type(type)
+	, m_dynamicDescriptorPool(*this)
 	, m_cpuLinearAllocator()
 {}
 
@@ -174,6 +175,7 @@ void CommandContext::Finish(bool waitForCompletion)
 
 	// Recycle dynamic allocations
 	m_cpuLinearAllocator.CleanupUsedPages(fenceValue);
+	m_dynamicDescriptorPool.CleanupUsedPools(fenceValue);
 
 	if (waitForCompletion)
 	{
@@ -569,6 +571,8 @@ void GraphicsContext::SetRootSignature(const RootSignature& rootSig)
 			0,
 			nullptr);
 	}
+
+	m_dynamicDescriptorPool.ParseGraphicsRootSignature(rootSig);
 }
 
 
@@ -649,6 +653,8 @@ void ComputeContext::SetRootSignature(const RootSignature& rootSig)
 			0,
 			nullptr);
 	}
+
+	m_dynamicDescriptorPool.ParseComputeRootSignature(rootSig);
 }
 
 

@@ -33,17 +33,16 @@ void DescriptorSet::Init(const RootSignature& rootSig, int rootParam)
 		m_isDynamicCBV = true;
 
 	const uint32_t numDescriptors = rootParameter.GetNumDescriptors();
+	assert(numDescriptors <= MaxDescriptors);
+
 	if (numDescriptors == 0)
 		return;
 
 	m_descriptorSet = AllocateDescriptorSet(rootSig[rootParam].GetLayout());
 
-	m_writeDescriptorSets.resize(numDescriptors);
-
 	for (uint32_t j = 0; j < numDescriptors; ++j)
 	{
 		VkWriteDescriptorSet& writeSet = m_writeDescriptorSets[j];
-		writeSet = {};
 		writeSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		writeSet.pNext = nullptr;
 	}
@@ -65,7 +64,7 @@ void DescriptorSet::SetSRV(int paramIndex, const ColorBuffer& buffer)
 	writeSet.dstBinding = paramIndex;
 	writeSet.pImageInfo = buffer.GetSRVImageInfoPtr();
 
-	m_bIsDirty = true;
+	m_dirtyBits |= (1 << paramIndex);
 }
 
 
@@ -83,7 +82,7 @@ void DescriptorSet::SetSRV(int paramIndex, const DepthBuffer& buffer, bool depth
 	writeSet.dstBinding = paramIndex;
 	writeSet.pImageInfo = imageInfo;
 	
-	m_bIsDirty = true;
+	m_dirtyBits |= (1 << paramIndex);
 }
 
 
@@ -100,7 +99,7 @@ void DescriptorSet::SetSRV(int paramIndex, const StructuredBuffer& buffer)
 	writeSet.dstBinding = paramIndex;
 	writeSet.pBufferInfo = buffer.GetBufferInfoPtr();
 
-	m_bIsDirty = true;
+	m_dirtyBits |= (1 << paramIndex);
 }
 
 
@@ -117,7 +116,7 @@ void DescriptorSet::SetSRV(int paramIndex, const Texture& texture)
 	writeSet.dstBinding = paramIndex;
 	writeSet.pImageInfo = texture.GetImageInfoPtr();
 
-	m_bIsDirty = true;
+	m_dirtyBits |= (1 << paramIndex);
 }
 
 
@@ -134,7 +133,7 @@ void DescriptorSet::SetUAV(int paramIndex, const ColorBuffer& buffer)
 	writeSet.dstBinding = paramIndex;
 	writeSet.pImageInfo = buffer.GetUAVImageInfoPtr();
 
-	m_bIsDirty = true;
+	m_dirtyBits |= (1 << paramIndex);
 }
 
 
@@ -157,7 +156,7 @@ void DescriptorSet::SetUAV(int paramIndex, const StructuredBuffer& buffer)
 	writeSet.dstBinding = paramIndex;
 	writeSet.pBufferInfo = buffer.GetBufferInfoPtr();
 
-	m_bIsDirty = true;
+	m_dirtyBits |= (1 << paramIndex);
 }
 
 
@@ -180,7 +179,7 @@ void DescriptorSet::SetCBV(int paramIndex, const ConstantBuffer& buffer)
 	writeSet.dstBinding = paramIndex;
 	writeSet.pBufferInfo = buffer.GetBufferInfoPtr();
 
-	m_bIsDirty = true;
+	m_dirtyBits |= (1 << paramIndex);
 }
 
 
@@ -194,25 +193,25 @@ void DescriptorSet::SetDynamicOffset(uint32_t offset)
 
 void DescriptorSet::Update()
 {
-	if (!m_bIsDirty || m_writeDescriptorSets.empty())
+	if (!IsDirty() || m_writeDescriptorSets.empty())
 		return;
 
-	vector<VkWriteDescriptorSet> liveDescriptors;
-	liveDescriptors.reserve(m_writeDescriptorSets.size());
-	for (auto& writeDescriptorSet : m_writeDescriptorSets)
+	array<VkWriteDescriptorSet, MaxDescriptors> liveDescriptors;
+
+	unsigned long setBit{ 0 };
+	uint32_t index{ 0 };
+	while (_BitScanForward(&setBit, m_dirtyBits))
 	{
-		if (writeDescriptorSet.descriptorCount > 0)
-		{
-			liveDescriptors.push_back(writeDescriptorSet);
-		}
+		liveDescriptors[index++] = m_writeDescriptorSets[setBit];
+		m_dirtyBits &= ~(1 << setBit);
 	}
+
+	assert(m_dirtyBits == 0);
 
 	vkUpdateDescriptorSets(
 		GetDevice(),
-		(uint32_t)liveDescriptors.size(),
+		(uint32_t)index,
 		liveDescriptors.data(),
 		0,
 		nullptr);
-
-	m_bIsDirty = false;
 }
