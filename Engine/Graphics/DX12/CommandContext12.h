@@ -395,37 +395,37 @@ inline void GraphicsContext::SetPipelineState(const GraphicsPSO& pso)
 
 inline void GraphicsContext::SetConstant(uint32_t rootIndex, uint32_t offset, DWParam val)
 {
-	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, val._uint, offset);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, get<uint32_t>(val.value), offset);
 }
 
 
 inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x)
 {
-	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, x._uint, 0);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, get<uint32_t>(x.value), 0);
 }
 
 
 inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y)
 {
-	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, x._uint, 0);
-	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, y._uint, 1);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, get<uint32_t>(x.value), 0);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, get<uint32_t>(y.value), 1);
 }
 
 
 inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z)
 {
-	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, x._uint, 0);
-	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, y._uint, 1);
-	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, z._uint, 2);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, get<uint32_t>(x.value), 0);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, get<uint32_t>(y.value), 1);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, get<uint32_t>(z.value), 2);
 }
 
 
 inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z, DWParam w)
 {
-	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, x._uint, 0);
-	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, y._uint, 1);
-	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, z._uint, 2);
-	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, w._uint, 3);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, get<uint32_t>(x.value), 0);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, get<uint32_t>(y.value), 1);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, get<uint32_t>(z.value), 2);
+	m_commandList->SetGraphicsRoot32BitConstant(rootIndex, get<uint32_t>(w.value), 3);
 }
 
 
@@ -707,37 +707,37 @@ inline void ComputeContext::SetPipelineState(const ComputePSO& pso)
 
 inline void ComputeContext::SetConstant(uint32_t rootIndex, uint32_t offset, DWParam val)
 {
-	m_commandList->SetComputeRoot32BitConstant(rootIndex, val._uint, offset);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, get<uint32_t>(val.value), offset);
 }
 
 
 inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x)
 {
-	m_commandList->SetComputeRoot32BitConstant(rootIndex, x._uint, 0);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, get<uint32_t>(x.value), 0);
 }
 
 
 inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y)
 {
-	m_commandList->SetComputeRoot32BitConstant(rootIndex, x._uint, 0);
-	m_commandList->SetComputeRoot32BitConstant(rootIndex, y._uint, 1);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, get<uint32_t>(x.value), 0);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, get<uint32_t>(y.value), 1);
 }
 
 
 inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z)
 {
-	m_commandList->SetComputeRoot32BitConstant(rootIndex, x._uint, 0);
-	m_commandList->SetComputeRoot32BitConstant(rootIndex, y._uint, 1);
-	m_commandList->SetComputeRoot32BitConstant(rootIndex, z._uint, 2);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, get<uint32_t>(x.value), 0);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, get<uint32_t>(y.value), 1);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, get<uint32_t>(z.value), 2);
 }
 
 
 inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z, DWParam w)
 {
-	m_commandList->SetComputeRoot32BitConstant(rootIndex, x._uint, 0);
-	m_commandList->SetComputeRoot32BitConstant(rootIndex, y._uint, 1);
-	m_commandList->SetComputeRoot32BitConstant(rootIndex, z._uint, 2);
-	m_commandList->SetComputeRoot32BitConstant(rootIndex, w._uint, 3);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, get<uint32_t>(x.value), 0);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, get<uint32_t>(y.value), 1);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, get<uint32_t>(z.value), 2);
+	m_commandList->SetComputeRoot32BitConstant(rootIndex, get<uint32_t>(w.value), 3);
 }
 
 

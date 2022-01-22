@@ -15,20 +15,15 @@ namespace Kodiak
 
 struct DWParam
 {
-	DWParam(float f) : _float(f) {}
-	DWParam(uint32_t u) : _uint(u) {}
-	DWParam(int32_t i) : _int(i) {}
+	DWParam(float f) : value{ f } {}
+	DWParam(uint32_t u) : value{ u } {}
+	DWParam(int32_t i) : value{ i } {}
 
-	void operator=(float f) { _float = f; }
-	void operator=(uint32_t u) { _uint = u; }
-	void operator=(int32_t i) { _int = i; }
+	void operator=(float f) { value = f; }
+	void operator=(uint32_t u) { value = u; }
+	void operator=(int32_t i) { value = i; }
 
-	union
-	{
-		float		_float;
-		uint32_t	_uint;
-		int32_t		_int;
-	};
+	std::variant<float, uint32_t, int32_t> value;
 };
 
 } // namespace Kodiak

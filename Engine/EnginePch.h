@@ -88,6 +88,7 @@ inline void ThrowIfFailed(HRESULT hr)
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include <variant>
 #include <vector>
 
 // Additional headers

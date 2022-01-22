@@ -434,63 +434,65 @@ inline void GraphicsContext::SetConstantArray(uint32_t rootIndex, uint32_t numCo
 
 inline void GraphicsContext::SetConstant(uint32_t rootIndex, uint32_t offset, DWParam val)
 {
+	uint32_t v = get<uint32_t>(val.value);
 	vkCmdPushConstants(
 		m_commandList,
 		m_curGraphicsPipelineLayout,
 		m_shaderStages[rootIndex],
-		offset * sizeof(DWORD),
-		sizeof(DWORD),
-		&val);
+		offset * sizeof(uint32_t),
+		sizeof(uint32_t),
+		&v);
 }
 
 
 inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x)
 {
+	uint32_t v = get<uint32_t>(x.value);
 	vkCmdPushConstants(
 		m_commandList,
 		m_curGraphicsPipelineLayout,
 		m_shaderStages[rootIndex],
 		0,
-		sizeof(DWORD),
-		&x);
+		sizeof(uint32_t),
+		&v);
 }
 
 
 inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y)
 {
-	DWParam val[] = { x, y };
+	uint32_t val[] = { get<uint32_t>(x.value), get<uint32_t>(y.value) };
 	vkCmdPushConstants(
 		m_commandList,
 		m_curGraphicsPipelineLayout,
 		m_shaderStages[rootIndex],
 		0,
-		sizeof(DWORD),
+		2 * sizeof(uint32_t),
 		&val);
 }
 
 
 inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z)
 {
-	DWParam val[] = { x, y, z };
+	uint32_t val[] = { get<uint32_t>(x.value), get<uint32_t>(y.value), get<uint32_t>(z.value) };
 	vkCmdPushConstants(
 		m_commandList,
 		m_curGraphicsPipelineLayout,
 		m_shaderStages[rootIndex],
 		0,
-		sizeof(DWORD),
+		3 * sizeof(uint32_t),
 		&val);
 }
 
 
 inline void GraphicsContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z, DWParam w)
 {
-	DWParam val[] = { x, y, z, w };
+	uint32_t val[] = { get<uint32_t>(x.value), get<uint32_t>(y.value), get<uint32_t>(z.value), get<uint32_t>(w.value) };
 	vkCmdPushConstants(
 		m_commandList,
 		m_curGraphicsPipelineLayout,
 		m_shaderStages[rootIndex],
 		0,
-		sizeof(DWORD),
+		4 * sizeof(uint32_t),
 		&val);
 }
 
@@ -755,63 +757,65 @@ inline void ComputeContext::SetConstantArray(uint32_t rootIndex, uint32_t numCon
 
 inline void ComputeContext::SetConstant(uint32_t rootIndex, uint32_t offset, DWParam val)
 {
+	uint32_t v = get<uint32_t>(val.value);
 	vkCmdPushConstants(
 		m_commandList,
 		m_curComputePipelineLayout,
 		VK_SHADER_STAGE_COMPUTE_BIT,
-		offset * sizeof(DWORD),
-		sizeof(DWORD),
-		&val);
+		offset * sizeof(uint32_t),
+		sizeof(uint32_t),
+		&v);
 }
 
 
 inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x)
 {
+	uint32_t v = get<uint32_t>(x.value);
 	vkCmdPushConstants(
 		m_commandList,
 		m_curComputePipelineLayout,
 		VK_SHADER_STAGE_COMPUTE_BIT,
 		0,
-		sizeof(DWORD),
-		&x);
+		sizeof(uint32_t),
+		&v);
 }
 
 
 inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y)
 {
-	DWParam val[] = { x, y };
+	uint32_t val[] = { get<uint32_t>(x.value), get<uint32_t>(y.value) };
 	vkCmdPushConstants(
 		m_commandList,
 		m_curComputePipelineLayout,
 		VK_SHADER_STAGE_COMPUTE_BIT,
 		0,
-		sizeof(DWORD),
+		2 * sizeof(uint32_t),
 		&val);
 }
 
 
 inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z)
 {
-	DWParam val[] = { x, y, z };
+	uint32_t val[] = { get<uint32_t>(x.value), get<uint32_t>(y.value), get<uint32_t>(z.value) };
 	vkCmdPushConstants(
 		m_commandList,
 		m_curComputePipelineLayout,
 		VK_SHADER_STAGE_COMPUTE_BIT,
 		0,
-		sizeof(DWORD),
+		3 * sizeof(uint32_t),
 		&val);
 }
 
 
 inline void ComputeContext::SetConstants(uint32_t rootIndex, DWParam x, DWParam y, DWParam z, DWParam w)
 {
-	DWParam val[] = { x, y, z, w };
+	uint32_t val[] = { get<uint32_t>(x.value), get<uint32_t>(y.value), get<uint32_t>(z.value), get<uint32_t>(w.value) };
 	vkCmdPushConstants(
 		m_commandList,
 		m_curComputePipelineLayout,
 		VK_SHADER_STAGE_COMPUTE_BIT,
 		0,
-		sizeof(DWORD),
+		4 * sizeof(uint32_t),
 		&val);
 }
 
