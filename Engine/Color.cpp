@@ -20,7 +20,7 @@ using namespace Kodiak;
 using DirectX::XMVECTORU32;
 
 
-uint32_t Color::R11G11B10F(bool RoundToEven) const
+uint32_t Color::R11G11B10F(bool RoundToEven) const noexcept
 {
 #if 1
 	static const float kMaxVal = float(1 << 16);
@@ -85,7 +85,7 @@ uint32_t Color::R11G11B10F(bool RoundToEven) const
 #endif
 }
 
-uint32_t Color::R9G9B9E5() const
+uint32_t Color::R9G9B9E5() const noexcept
 {
 #if 1
 	static const float kMaxVal = float(0x1FF << 7);

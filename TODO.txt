@@ -30,6 +30,7 @@ General bugs/improvements
 - Async loader/object creator
 - Support for GLTF loading
 - Support for skinned meshes/animation
+- Add noexcept everywhere applicable
 
 Shader Compiler
 ** Add logging to shader compiler
