@@ -2117,7 +2117,7 @@ uint32_t Kodiak::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags pro
 }
 
 
-#if ENABLE_VULKAN_DEBUG_MARKUP
+#if ENABLE_VULKAN_DEBUG_MARKERS
 
 void Kodiak::SetDebugName(VkInstance obj, const string& name)
 {

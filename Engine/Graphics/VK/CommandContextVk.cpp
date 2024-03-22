@@ -131,7 +131,7 @@ CommandContext& CommandContext::Begin(const string ID)
 
 	vkBeginCommandBuffer(newContext->m_commandList, &beginInfo);
 
-#if ENABLE_VULKAN_DEBUG_MARKUP
+#if ENABLE_VULKAN_DEBUG_MARKERS
 	if (!ID.empty())
 	{
 		newContext->BeginEvent(ID);
@@ -157,7 +157,7 @@ void CommandContext::Finish(bool waitForCompletion)
 	}
 #endif
 
-#if ENABLE_VULKAN_DEBUG_MARKUP
+#if ENABLE_VULKAN_DEBUG_MARKERS
 	if (m_hasPendingDebugEvent)
 	{
 		EndEvent();
@@ -188,7 +188,7 @@ void CommandContext::Finish(bool waitForCompletion)
 
 void CommandContext::BeginEvent(const string& label)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
+#if ENABLE_VULKAN_DEBUG_MARKERS
 	if (vkCmdBeginDebugUtilsLabel)
 	{
 		VkDebugUtilsLabelEXT labelInfo = {};
@@ -206,7 +206,7 @@ void CommandContext::BeginEvent(const string& label)
 
 void CommandContext::EndEvent()
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
+#if ENABLE_VULKAN_DEBUG_MARKERS
 	if (vkCmdEndDebugUtilsLabel)
 	{
 		vkCmdEndDebugUtilsLabel(m_commandList);
@@ -217,7 +217,7 @@ void CommandContext::EndEvent()
 
 void CommandContext::SetMarker(const string& label)
 {
-#if ENABLE_VULKAN_DEBUG_MARKUP
+#if ENABLE_VULKAN_DEBUG_MARKERS
 	if (vkCmdInsertDebugUtilsLabel)
 	{
 		VkDebugUtilsLabelEXT labelInfo = {};
