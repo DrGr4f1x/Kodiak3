@@ -147,7 +147,8 @@ float4 RayCast(VSToPSRayCast input)
 	stepVec = -stepVec;
 #endif
 
-	for (int i = 0; i < nSamples; ++i)
+    int i = 0;
+	for (i = 0; i < nSamples; ++i)
 	{
 		DoSample(1.0, O, color);
 		O += stepVec;

@@ -32,7 +32,7 @@ namespace Kodiak
 {
 GraphicsDevice* g_graphicsDevice = nullptr;
 
-#if ENABLE_DX12_DEBUG_MARKUP
+#if ENABLE_D3D12_DEBUG_MARKERS
 void SetDebugName(ID3D12Object* object, const string& name)
 {
 	object->SetPrivateData(WKPDID_D3DDebugObjectName, UINT(name.size()), name.data());
@@ -52,7 +52,7 @@ Microsoft::WRL::ComPtr<ID3D12Device> g_device;
 
 void ConfigureInfoQueue(ID3D12Device* device)
 {
-#if _DEBUG
+#if ENABLE_D3D12_VALIDATION
 	ID3D12InfoQueue* pInfoQueue = nullptr;
 	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&pInfoQueue))))
 	{
@@ -203,7 +203,7 @@ void GraphicsDevice::Destroy()
 
 	m_swapChain = nullptr;
 
-#if defined(_DEBUG)
+#if defined(ENABLE_D3D12_VALIDATION)
 	ID3D12DebugDevice* debugInterface;
 	if (SUCCEEDED(m_device->QueryInterface(&debugInterface)))
 	{
@@ -284,7 +284,7 @@ void GraphicsDevice::ReleaseDeferredResources()
 
 void GraphicsDevice::Create()
 {
-#if _DEBUG
+#if ENABLE_D3D12_VALIDATION
 	Microsoft::WRL::ComPtr<ID3D12Debug> debugInterface;
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface))))
 	{

@@ -42,20 +42,22 @@ GraphicsDevice* g_graphicsDevice = nullptr;
 extern Kodiak::CommandListManager g_commandManager;
 
 
-#if USE_VALIDATION_LAYER
+#if ENABLE_VULKAN_DEBUG_MARKERS
 PFN_vkCmdBeginDebugUtilsLabelEXT vkCmdBeginDebugUtilsLabel{ nullptr };
 PFN_vkCmdEndDebugUtilsLabelEXT vkCmdEndDebugUtilsLabel{ nullptr };
 PFN_vkCmdInsertDebugUtilsLabelEXT vkCmdInsertDebugUtilsLabel{ nullptr };
-PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessenger{ nullptr };
-PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger{ nullptr };
 PFN_vkQueueBeginDebugUtilsLabelEXT vkQueueBeginDebugUtilsLabel{ nullptr };
 PFN_vkQueueEndDebugUtilsLabelEXT vkQueueEndDebugUtilsLabel{ nullptr };
 PFN_vkQueueInsertDebugUtilsLabelEXT vkQueueInsertDebugUtilsLabel{ nullptr };
 PFN_vkSetDebugUtilsObjectNameEXT vkSetDebugUtilsObjectName{ nullptr };
 PFN_vkSetDebugUtilsObjectTagEXT vkSetDebugUtilsObjectTag{ nullptr };
-PFN_vkSubmitDebugUtilsMessageEXT vkSubmitDebugUtilsMessage{ nullptr };
+#endif
 
 #if ENABLE_VULKAN_VALIDATION
+PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessenger{ nullptr };
+PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger{ nullptr };
+PFN_vkSubmitDebugUtilsMessageEXT vkSubmitDebugUtilsMessage{ nullptr };
+
 VkBool32 messageCallback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 	VkDebugUtilsMessageTypeFlagsEXT messageTypes,
@@ -100,16 +102,16 @@ VkBool32 messageCallback(
 
 	prefix += ":";
 
-	string debugMessage = fmt::format("{} [{}] Code {} : {} \n", prefix, pCallbackData->pMessageIdName, pCallbackData->messageIdNumber, pCallbackData->pMessage);
+	string debugMessage = format("{} [{}] Code {} : {} \n", prefix, pCallbackData->pMessageIdName, pCallbackData->messageIdNumber, pCallbackData->pMessage);
 
 	// Display message to default output (console/logcat)
 	if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
-		fmt::print(stderr, debugMessage);
+		cerr << debugMessage << endl;
 	}
 	else
 	{
-		fmt::print(stdout, debugMessage);
+		cout << debugMessage << endl;
 	}
 
 	OutputDebugString(debugMessage.c_str());
@@ -134,10 +136,8 @@ VkBool32 messageCallback(
 }
 #endif // ENABLE_VULKAN_VALIDATION
 
-#endif // USE_VALIDATION_LAYER
 
-
-#if ENABLE_VULKAN_DEBUG_MARKUP
+#if ENABLE_VULKAN_DEBUG_MARKERS
 bool g_debugMarkupAvailable = false;
 
 void SetDebugName(uint64_t obj, VkObjectType objType, const char* name)
@@ -1016,24 +1016,20 @@ void GraphicsDevice::CreateInstance()
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.pApplicationName = m_appName.c_str();
 	appInfo.pEngineName = "Kodiak";
-	appInfo.apiVersion = VK_API_VERSION_1_2;
+	appInfo.apiVersion = VK_API_VERSION_1_3;
 
 	const vector<const char*> instanceExtensions =
 	{
-#if USE_VALIDATION_LAYER
-			VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+#if ENABLE_VULKAN_DEBUG_MARKERS
+		"VK_EXT_debug_utils",
 #endif
-#if ENABLE_VULKAN_VALIDATION
-			VK_EXT_VALIDATION_FEATURES_EXTENSION_NAME,
-#endif
-			VK_KHR_SURFACE_EXTENSION_NAME,
-			VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
-			VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+		"VK_KHR_win32_surface",
+		"VK_KHR_surface"
 	};
 
 	const vector<const char*> instanceLayers =
 	{
-#if USE_VALIDATION_LAYER
+#if ENABLE_VULKAN_VALIDATION
 			"VK_LAYER_KHRONOS_validation"
 #endif
 	};
@@ -1508,36 +1504,39 @@ void GraphicsDevice::GetPhysicalDeviceProperties()
 
 void GraphicsDevice::InitializeValidation()
 {
-#if USE_VALIDATION_LAYER
 	VkInstance instance = m_instance->Get();
 
+#if ENABLE_VULKAN_DEBUG_MARKERS
 	vkCmdBeginDebugUtilsLabel = reinterpret_cast<PFN_vkCmdBeginDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdBeginDebugUtilsLabelEXT"));
 	vkCmdEndDebugUtilsLabel = reinterpret_cast<PFN_vkCmdEndDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdEndDebugUtilsLabelEXT"));
 	vkCmdInsertDebugUtilsLabel = reinterpret_cast<PFN_vkCmdInsertDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdInsertDebugUtilsLabelEXT"));
-	vkCreateDebugUtilsMessenger = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
-	vkDestroyDebugUtilsMessenger = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
 	vkQueueBeginDebugUtilsLabel = reinterpret_cast<PFN_vkQueueBeginDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkQueueBeginDebugUtilsLabelEXT"));
 	vkQueueEndDebugUtilsLabel = reinterpret_cast<PFN_vkQueueEndDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkQueueEndDebugUtilsLabelEXT"));
 	vkQueueInsertDebugUtilsLabel = reinterpret_cast<PFN_vkQueueInsertDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkQueueInsertDebugUtilsLabelEXT"));
 	vkSetDebugUtilsObjectName = reinterpret_cast<PFN_vkSetDebugUtilsObjectNameEXT>(vkGetInstanceProcAddr(instance, "vkSetDebugUtilsObjectNameEXT"));
 	vkSetDebugUtilsObjectTag = reinterpret_cast<PFN_vkSetDebugUtilsObjectTagEXT>(vkGetInstanceProcAddr(instance, "vkSetDebugUtilsObjectTagEXT"));
-	vkSubmitDebugUtilsMessage = reinterpret_cast<PFN_vkSubmitDebugUtilsMessageEXT>(vkGetInstanceProcAddr(instance, "vkSubmitDebugUtilsMessageEXT"));
 
 	assert(vkCmdBeginDebugUtilsLabel);
 	assert(vkCmdEndDebugUtilsLabel);
 	assert(vkCmdInsertDebugUtilsLabel);
-	assert(vkCreateDebugUtilsMessenger);
-	assert(vkDestroyDebugUtilsMessenger);
 	assert(vkQueueBeginDebugUtilsLabel);
 	assert(vkQueueEndDebugUtilsLabel);
 	assert(vkQueueInsertDebugUtilsLabel);
 	assert(vkSetDebugUtilsObjectName);
 	assert(vkSetDebugUtilsObjectTag);
-	assert(vkSubmitDebugUtilsMessage);
 
 	g_debugMarkupAvailable = true;
+#endif // ENABLE_VULKAN_DEBUG_MARKERS
 
 #if ENABLE_VULKAN_VALIDATION
+	vkCreateDebugUtilsMessenger = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
+	vkDestroyDebugUtilsMessenger = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
+	vkSubmitDebugUtilsMessage = reinterpret_cast<PFN_vkSubmitDebugUtilsMessageEXT>(vkGetInstanceProcAddr(instance, "vkSubmitDebugUtilsMessageEXT"));
+
+	assert(vkCreateDebugUtilsMessenger);
+	assert(vkDestroyDebugUtilsMessenger);
+	assert(vkSubmitDebugUtilsMessage);
+
 	VkDebugUtilsMessengerCreateInfoEXT createInfo = 
 	{
 		VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
@@ -1553,9 +1552,7 @@ void GraphicsDevice::InitializeValidation()
 	ThrowIfFailed(vkCreateDebugUtilsMessenger(instance, &createInfo, nullptr, &messenger));
 
 	m_debugUtilsMessenger = new UVkDebugUtilsMessenger(m_instance.Get(), messenger);
-#endif
-
-#endif // USE_VALIDATION_LAYER
+#endif // ENABLE_VULKAN_VALIDATION
 }
 
 

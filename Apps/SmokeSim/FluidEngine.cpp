@@ -962,7 +962,7 @@ void FluidEngine::ComputePressure(GraphicsContext& context)
 	for (uint32_t i = 0; i < m_iterations; i += 2)
 	{
 		{
-			ScopedDrawEvent inner(context, fmt::format("Iteration {}", i));
+			ScopedDrawEvent inner(context, format("Iteration {}", i));
 
 			if (i > 0)
 			{
@@ -984,7 +984,7 @@ void FluidEngine::ComputePressure(GraphicsContext& context)
 		}
 
 		{
-			ScopedDrawEvent inner(context, fmt::format("Iteration {}", i + 1));
+			ScopedDrawEvent inner(context, format("Iteration {}", i + 1));
 
 			context.TransitionResource(GetColorBuffer(RenderTarget::Pressure), ResourceState::RenderTarget);
 			context.TransitionResource(GetColorBuffer(RenderTarget::TempScalar), ResourceState::PixelShaderResource);

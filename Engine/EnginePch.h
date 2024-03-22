@@ -73,6 +73,7 @@ inline void ThrowIfFailed(HRESULT hr)
 #include <cstdarg>
 #include <exception>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <functional>
 #include <future>
@@ -90,12 +91,6 @@ inline void ThrowIfFailed(HRESULT hr)
 #include <unordered_map>
 #include <variant>
 #include <vector>
-
-// Additional headers
-#define FMT_HEADER_ONLY 1
-#include <fmt/core.h>
-#include <fmt/format.h>
-#include <fmt/format-inl.h>
 
 // Engine headers
 #include "BitmaskEnum.h"

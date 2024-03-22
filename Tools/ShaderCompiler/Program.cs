@@ -435,7 +435,7 @@ namespace ShaderCompiler
             m_cmdString += " ";
             m_cmdString += m_inputFile;
 
-            //System.Console.WriteLine("Full command: {0} {1}", GetShaderCompilerStr(), m_cmdString);
+            System.Console.WriteLine("Full command: {0} {1}", GetShaderCompilerStr(), m_cmdString);
         }
 
         public int Execute()

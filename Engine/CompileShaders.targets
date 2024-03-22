@@ -1,0 +1,49 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Choose>
+		<When Condition="'$(Configuration)' == 'DebugVk'">
+			<PropertyGroup>
+				<TargetShader>spirv</TargetShader>
+				<ShaderConfig>debug</ShaderConfig>
+				<Optimize>nooptimize</Optimize>
+				<ShaderOutputDir Condition="'$(ShaderOutputDir)' == ''">$(ProjectDir)\Data\Shaders\SPIR-V\</ShaderOutputDir>
+			</PropertyGroup>
+		</When>
+		<When Condition="'$(Configuration)' == 'ProfileVk' Or '$(Configuration)' == 'ReleaseVk'">
+			<PropertyGroup>
+				<TargetShader>spirv</TargetShader>
+				<ShaderConfig>release</ShaderConfig>
+				<Optimize>optimize</Optimize>
+				<ShaderOutputDir Condition="'$(ShaderOutputDir)' == ''">$(ProjectDir)\Data\Shaders\SPIR-V\</ShaderOutputDir>
+			</PropertyGroup>
+		</When>
+		<When Condition="'$(Configuration)' == 'Debug12'">
+			<PropertyGroup>
+				<TargetShader>dxil</TargetShader>
+				<ShaderConfig>debug</ShaderConfig>
+				<Optimize>nooptimize</Optimize>
+				<ShaderOutputDir Condition="'$(ShaderOutputDir)' == ''">$(ProjectDir)\Data\Shaders\DXIL\</ShaderOutputDir>
+			</PropertyGroup>
+		</When>
+		<When Condition="'$(Configuration)' == 'Profile12' Or '$(Configuration)' == 'Release12'">
+			<PropertyGroup>
+				<TargetShader>dxil</TargetShader>
+				<ShaderConfig>false</ShaderConfig>
+				<Optimize>optimize</Optimize>
+				<ShaderOutputDir Condition="'$(ShaderOutputDir)' == ''">$(ProjectDir)\Data\Shaders\DXIL\</ShaderOutputDir>
+			</PropertyGroup>
+		</When>
+	</Choose>
+	<PropertyGroup>
+		<ShaderIncludeDir>$(SolutionDir)\Engine\Shaders\Common\</ShaderIncludeDir>
+	</PropertyGroup>
+	<Target Name="KodiakEnsureShaders" BeforeTargets="PrepareForBuild">
+		<MkDir Condition="!Exists('$(ShaderOutputDir)')" Directories="$(ShaderOutputDir)" />
+		<Exec WorkingDirectory="$(ProjectDir)\Shaders" Command="CompileShaders $(TargetShader) $(ShaderConfig) $(Optimize) &quot;$(ShaderIncludeDir)&quot; &quot;$(ShaderOutputDir)&quot;" />
+	</Target>
+	<Target Name="KodiakDeleteShaders" AfterTargets="Clean">
+		<ItemGroup>
+			<KodiakCompiledShaders Include="$(ShaderOutputDir)*.*" />
+		</ItemGroup>
+		<Delete Files="@(KodiakCompiledShaders)" />
+	</Target>
+</Project>

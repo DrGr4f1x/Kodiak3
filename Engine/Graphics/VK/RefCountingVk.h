@@ -313,7 +313,7 @@ public:
 	{
 		if (m_messenger)
 		{
-#if USE_VALIDATION_LAYER
+#if ENABLE_VULKAN_VALIDATION
 			extern PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger;
 			vkDestroyDebugUtilsMessenger(m_instance->Get(), m_messenger, nullptr);
 #endif
