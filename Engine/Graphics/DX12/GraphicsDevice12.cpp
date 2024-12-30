@@ -105,7 +105,7 @@ void ConfigureInfoQueue(ID3D12Device* device)
 #endif
 }
 
-Microsoft::WRL::ComPtr<IDXGISwapChain3> CreateSwapChain(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height, Format colorFormat)
+Microsoft::WRL::ComPtr<IDXGISwapChain3> CreateSwapChain(IDXGIFactory4* dxgiFactory, HWND hWnd, uint32_t width, uint32_t height, Format colorFormat, bool bIsTearingSupported)
 {
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain;
 	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain3;
@@ -119,7 +119,7 @@ Microsoft::WRL::ComPtr<IDXGISwapChain3> CreateSwapChain(IDXGIFactory4* dxgiFacto
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount = NumSwapChainBuffers;
-	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	swapChainDesc.Flags = bIsTearingSupported ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0u;;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) // Win32
@@ -320,6 +320,16 @@ void GraphicsDevice::Create()
 	Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
 	assert_succeeded(CreateDXGIFactory2(0, IID_PPV_ARGS(&dxgiFactory)));
 
+	Microsoft::WRL::ComPtr<IDXGIFactory5> dxgiFactory5;
+	if (SUCCEEDED(dxgiFactory->QueryInterface(IID_PPV_ARGS(&dxgiFactory5))))
+	{
+		BOOL supported{ 0 };
+		if (SUCCEEDED(dxgiFactory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &supported, sizeof(supported))))
+		{
+			m_bIsTearingSupported = (supported != 0);
+		}
+	}
+
 	// Create the D3D graphics device
 	Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter;
 
@@ -420,7 +430,7 @@ void GraphicsDevice::Create()
 
 	g_commandManager.Create();
 
-	m_swapChain = CreateSwapChain(dxgiFactory.Get(), m_hwnd, m_width, m_height, m_colorFormat);
+	m_swapChain = CreateSwapChain(dxgiFactory.Get(), m_hwnd, m_width, m_height, m_colorFormat, m_bIsTearingSupported);
 	m_currentBuffer = m_swapChain->GetCurrentBackBufferIndex();
 
 	for (int i = 0; i < NumSwapChainBuffers; ++i)

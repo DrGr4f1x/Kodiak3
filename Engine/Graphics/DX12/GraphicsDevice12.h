@@ -68,6 +68,7 @@ private:
 	bool m_vsync{ false };
 	Format m_colorFormat{ Format::Unknown };
 	Format m_depthFormat{ Format::Unknown };
+	bool m_bIsTearingSupported{ false };
 
 	std::string m_deviceName{ "Unknown" };
 
