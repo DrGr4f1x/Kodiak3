@@ -140,9 +140,9 @@ bool UIOverlay::CheckBox(const char* caption, int32_t* value)
 }
 
 
-bool UIOverlay::InputFloat(const char* caption, float* value, float step, uint32_t precision)
+bool UIOverlay::InputFloat(const char* caption, float* value, float step)
 {
-	return ImGui::InputFloat(caption, value, step, step * 10.0f, precision);
+	return ImGui::InputFloat(caption, value, step, step * 10.0f);
 }
 
 

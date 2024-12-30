@@ -82,8 +82,8 @@ void DisplacementApp::UpdateUI()
 	if (m_uiOverlay->Header("Settings")) 
 	{
 		m_uiOverlay->CheckBox("Tessellation displacement", &m_displacement);
-		m_uiOverlay->InputFloat("Strength", &m_dsConstants.tessStrength, 0.025f, 3);
-		m_uiOverlay->InputFloat("Level", &m_hsConstants.tessLevel, 0.5f, 2);
+		m_uiOverlay->InputFloat("Strength", &m_dsConstants.tessStrength, 0.025f);
+		m_uiOverlay->InputFloat("Level", &m_hsConstants.tessLevel, 0.5f);
 
 		if (g_enabledFeatures.fillModeNonSolid) 
 		{

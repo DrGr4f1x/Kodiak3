@@ -80,7 +80,7 @@ void BloomApp::UpdateUI()
 	if (m_uiOverlay->Header("Settings")) 
 	{
 		m_uiOverlay->CheckBox("Bloom", &m_bloom);
-		if (m_uiOverlay->InputFloat("Scale", &m_blurScale, 0.1f, 2))
+		if (m_uiOverlay->InputFloat("Scale", &m_blurScale, 0.1f))
 		{
 			UpdateBlurConstants();
 		}

@@ -66,11 +66,6 @@ uint32_t GetPreprocessFlags(ModelLoad modelLoadFlags)
 	flags |= HasFlag(modelLoadFlags, ModelLoad::FlipWindingOrder) ? aiProcess_FlipWindingOrder : 0;
 	flags |= HasFlag(modelLoadFlags, ModelLoad::SplitByBoneCount) ? aiProcess_SplitByBoneCount : 0;
 	flags |= HasFlag(modelLoadFlags, ModelLoad::Debone) ? aiProcess_Debone : 0;
-	flags |= HasFlag(modelLoadFlags, ModelLoad::GlobalScale) ? aiProcess_GlobalScale : 0;
-	flags |= HasFlag(modelLoadFlags, ModelLoad::EmbedTextures) ? aiProcess_EmbedTextures : 0;
-	flags |= HasFlag(modelLoadFlags, ModelLoad::ForceGenNormals) ? aiProcess_ForceGenNormals : 0;
-	flags |= HasFlag(modelLoadFlags, ModelLoad::DropNormals) ? aiProcess_DropNormals : 0;
-	flags |= HasFlag(modelLoadFlags, ModelLoad::GenBoundingBoxes) ? aiProcess_GenBoundingBoxes : 0;
 
 	return flags;
 }

@@ -21,7 +21,7 @@
 #include "UtilVk.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "stb\stb_image.h"
 
 
 using namespace Kodiak;

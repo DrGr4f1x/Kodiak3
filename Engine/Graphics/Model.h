@@ -51,11 +51,6 @@ enum class ModelLoad
 	FlipWindingOrder =				1 << 23,
 	SplitByBoneCount =				1 << 24,
 	Debone =						1 << 25,
-	GlobalScale =					1 << 26,
-	EmbedTextures =					1 << 27,
-	ForceGenNormals =				1 << 28,
-	DropNormals =					1 << 29,
-	GenBoundingBoxes =				1 << 30,
 
 	ConvertToLeftHandded =			MakeLeftHanded | 
 									FlipUVs | 
@@ -89,8 +84,7 @@ enum class ModelLoad
 	StandardDefault =				FlipUVs |
 									Triangulate |
 									PreTransformVertices |
-									CalcTangentSpace |
-									GenBoundingBoxes
+									CalcTangentSpace
 };
 
 template <> struct EnableBitmaskOperators<ModelLoad> { static const bool enable = true; };

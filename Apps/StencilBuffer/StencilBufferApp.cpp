@@ -67,7 +67,7 @@ void StencilBufferApp::UpdateUI()
 {
 	if (m_uiOverlay->Header("Settings")) 
 	{
-		m_uiOverlay->InputFloat("Outline width", &m_constants.outlineWidth, 0.05f, 2);
+		m_uiOverlay->InputFloat("Outline width", &m_constants.outlineWidth, 0.05f);
 	}
 }
 

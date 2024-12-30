@@ -289,6 +289,30 @@
       <Filter>Graphics\VK</Filter>
     </ClInclude>
     <ClInclude Include="DWParam.h" />
+    <ClInclude Include="Extern\imgui\imconfig.h">
+      <Filter>Extern\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Extern\imgui\imgui.h">
+      <Filter>Extern\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Extern\imgui\imgui_internal.h">
+      <Filter>Extern\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Extern\imgui\imstb_rectpack.h">
+      <Filter>Extern\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Extern\imgui\imstb_textedit.h">
+      <Filter>Extern\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Extern\imgui\imstb_truetype.h">
+      <Filter>Extern\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Extern\imgui\backends\imgui_impl_dx12.h">
+      <Filter>Extern\imgui\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="Extern\imgui\backends\imgui_impl_vulkan.h">
+      <Filter>Extern\imgui\backends</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Stdafx.cpp" />
@@ -472,6 +496,27 @@
     <ClCompile Include="Graphics\VK\DynamicDescriptorPoolVk.cpp">
       <Filter>Graphics\VK</Filter>
     </ClCompile>
+    <ClCompile Include="Extern\imgui\imgui.cpp">
+      <Filter>Extern\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Extern\imgui\imgui_demo.cpp">
+      <Filter>Extern\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Extern\imgui\imgui_draw.cpp">
+      <Filter>Extern\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Extern\imgui\imgui_tables.cpp">
+      <Filter>Extern\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Extern\imgui\imgui_widgets.cpp">
+      <Filter>Extern\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Extern\imgui\backends\imgui_impl_dx12.cpp">
+      <Filter>Extern\imgui\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="Extern\imgui\backends\imgui_impl_vulkan.cpp">
+      <Filter>Extern\imgui\backends</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -503,6 +548,15 @@
     </Filter>
     <Filter Include="Graphics\DX12\D3D12MemoryAllocator">
       <UniqueIdentifier>{087ccbbe-b36b-4ec1-877d-7aec93736c42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extern">
+      <UniqueIdentifier>{f64a143b-dab6-4dae-9788-083a2e6ccd1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extern\imgui">
+      <UniqueIdentifier>{3d7c8074-4a0f-4ebf-bdf3-f14944c7abe4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extern\imgui\backends">
+      <UniqueIdentifier>{79c636ef-02fa-40a5-b028-47378bc67117}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

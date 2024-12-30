@@ -38,7 +38,7 @@ public:
 	bool Header(const char* caption);
 	bool CheckBox(const char* caption, bool* value);
 	bool CheckBox(const char* caption, int32_t* value);
-	bool InputFloat(const char* caption, float* value, float step, uint32_t precision);
+	bool InputFloat(const char* caption, float* value, float step);
 	bool SliderFloat(const char* caption, float* value, float min, float max);
 	bool SliderInt(const char* caption, int32_t* value, int32_t min, int32_t max);
 	bool ComboBox(const char* caption, int32_t* itemindex, std::vector<std::string> items);
