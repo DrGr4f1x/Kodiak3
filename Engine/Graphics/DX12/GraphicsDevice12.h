@@ -26,6 +26,7 @@ public:
 	void Initialize(const std::string& appName, HINSTANCE hInstance, HWND hWnd, uint32_t width, uint32_t height, Format colorFormat, Format depthFormat);
 	void Destroy();
 
+	void PrepareFrame();
 	void SubmitFrame();
 
 	void WaitForGpuIdle();
@@ -86,6 +87,12 @@ private:
 	// DirectX 12 members
 	Microsoft::WRL::ComPtr<ID3D12Device> m_device;
 	Microsoft::WRL::ComPtr<IDXGISwapChain3> m_swapChain;
+
+	// Present synchronization
+	Microsoft::WRL::ComPtr<ID3D12Fence> m_fence;
+	std::array<uint64_t, NumSwapChainBuffers> m_fenceValues;
+	HANDLE m_fenceEvent;
+	uint32_t m_activeFrame{ 0 };
 
 	D3D_FEATURE_LEVEL m_bestFeatureLevel{ D3D_FEATURE_LEVEL_11_0 };
 	D3D_SHADER_MODEL m_bestShaderModel{ D3D_SHADER_MODEL_6_5 };

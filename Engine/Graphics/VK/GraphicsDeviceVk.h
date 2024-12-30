@@ -55,6 +55,7 @@ public:
 	void Initialize(const std::string& appName, HINSTANCE hInstance, HWND hWnd, uint32_t width, uint32_t height, Format colorFormat, Format depthFormat);
 	void Destroy();
 
+	void PrepareFrame();
 	void SubmitFrame();
 
 	void WaitForGpuIdle();

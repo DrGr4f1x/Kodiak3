@@ -277,6 +277,12 @@ void GraphicsDevice::Destroy()
 }
 
 
+void GraphicsDevice::PrepareFrame()
+{
+
+}
+
+
 void GraphicsDevice::SubmitFrame()
 {
 	Present();

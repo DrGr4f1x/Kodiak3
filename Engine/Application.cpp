@@ -406,6 +406,8 @@ bool Application::Tick()
 	{
 		m_grid->Update(m_camera);
 
+		m_graphicsDevice->PrepareFrame();
+
 		Render();
 
 		m_graphicsDevice->SubmitFrame();

@@ -164,6 +164,10 @@ void GraphicsDevice::Initialize(const string& appName, HINSTANCE hInstance, HWND
 	m_colorFormat = colorFormat;
 	m_depthFormat = depthFormat;
 
+	m_fenceValues[0] = 0;
+	m_fenceValues[1] = 0;
+	m_fenceValues[2] = 0;
+
 	Create();
 }
 
@@ -219,16 +223,24 @@ void GraphicsDevice::Destroy()
 }
 
 
+void GraphicsDevice::PrepareFrame()
+{
+	m_currentBuffer = m_swapChain->GetCurrentBackBufferIndex();
+	g_commandManager.GetGraphicsQueue().WaitForFence(m_fenceValues[m_activeFrame]);
+}
+
+
 void GraphicsDevice::SubmitFrame()
 {
 	UINT presentInterval = 0;
 	m_swapChain->Present(presentInterval, 0);
 
-	m_currentBuffer = m_swapChain->GetCurrentBackBufferIndex();
+	m_fenceValues[m_activeFrame] = g_commandManager.GetGraphicsQueue().GetNextFenceValue() - 1;
 
 	ReleaseDeferredResources();
 
 	++m_frameNumber;
+	m_activeFrame = (m_activeFrame + 1) % NumSwapChainBuffers;
 }
 
 
@@ -421,6 +433,11 @@ void GraphicsDevice::Create()
 
 		m_swapChainBuffers[i] = buffer;
 	}
+
+	// Create synchronization primitives
+	assert_succeeded(m_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
+	m_fenceEvent = CreateEvent(nullptr, false, false, nullptr);
+	assert(m_fenceEvent != INVALID_HANDLE_VALUE);
 }
 
 
