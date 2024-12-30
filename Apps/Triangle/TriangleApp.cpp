@@ -78,7 +78,7 @@ bool TriangleApp::Update()
 {
 	m_controller.Update(m_frameTimer);
 
-	UpdateConstantBuffer();
+	//UpdateConstantBuffer();
 
 	return true;
 }

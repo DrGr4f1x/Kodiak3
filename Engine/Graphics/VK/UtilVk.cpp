@@ -251,7 +251,7 @@ VkPipelineStageFlags GetShaderStageMask(ResourceState state, bool isSrc)
 		return VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 	case ResourceState::DepthRead:
 	case ResourceState::DepthWrite:
-		return isSrc ? VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT : VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;;
+		return isSrc ? VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT : VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 	case ResourceState::StreamOut:
 		return s_invalidShaderStage;
 	case ResourceState::IndirectArgument:
@@ -263,7 +263,7 @@ VkPipelineStageFlags GetShaderStageMask(ResourceState state, bool isSrc)
 	case ResourceState::GenericRead:
 		return VK_PIPELINE_STAGE_TRANSFER_BIT;
 	case ResourceState::Present:
-		return isSrc ? (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_ALL_COMMANDS_BIT) : VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;;
+		return isSrc ? (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_ALL_COMMANDS_BIT) : VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 	case ResourceState::Predication:
 		return s_invalidShaderStage;
 	
