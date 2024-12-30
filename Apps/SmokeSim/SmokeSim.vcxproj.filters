@@ -20,13 +20,13 @@
     <ClInclude Include="VolumeRenderer.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Shaders\Fluids\Fluids.hlsli">
       <Filter>Shaders\Fluids</Filter>
     </None>
     <None Include="Shaders\Volume\Volume.hlsli">
       <Filter>Shaders\Volume</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">

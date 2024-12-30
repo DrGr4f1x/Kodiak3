@@ -509,10 +509,10 @@
     <None Include="Math\Functions.inl">
       <Filter>Math</Filter>
     </None>
-    <None Include="packages.config" />
     <None Include="Shaders\Common\Common.hlsli">
       <Filter>Graphics\Shaders\Common</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Shaders\UIPS.hlsl">
